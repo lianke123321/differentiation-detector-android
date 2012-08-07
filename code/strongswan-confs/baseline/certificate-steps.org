@@ -1,0 +1,48 @@
+* Generate the Certificates for the CA.
+
+  /home/arao/usr/sbin/ipsec pki --gen --outform pem > caKey.pem
+
+  /home/arao/usr/sbin/ipsec pki --self --in caKey.pem --dn "C=US, O=snowmane, CN=snowmane CA" --ca --outform pem > caCert.pem
+
+* Generate the keys for the Server
+
+  /home/arao/usr/sbin/ipsec pki --gen --outform pem > serverKey.pem
+
+  /home/arao/usr/sbin/ipsec pki --pub --in serverKey.pem | /home/arao/usr/sbin/ipsec pki --issue --cacert caCert.pem --cakey caKey.pem --dn "C=US, O=snowmane, CN=snowmane.cs.washington.edu" --san="snowmane.cs.washington.edu" --flag serverAuth --flag ikeIntermediate --outform pem > serverCert.pem
+
+* Generate the keys for the Client
+
+  /home/arao/usr/sbin/ipsec pki --gen --outform pem > clientKey.pem
+
+  /home/arao/usr/sbin/ipsec pki --pub --in clientKey.pem | /home/arao/usr/sbin/ipsec pki --issue --cacert caCert.pem --cakey caKey.pem --dn "C=US, O=snowmane, CN=client" --outform pem > clientCert.pem
+
+  openssl pkcs12 -export -inkey clientKey.pem -in clientCert.pem -name "client" -certfile caCert.pem -caname "snowmane CA" -out clientCert.p12
+
+     Enter Export Password: testing
+
+     Verifying - Enter Export Password: testing
+
+The above password is for the certificate. This is required during installing the certificate.
+* Add entries in ipsec.secrets file 
+  Create an entry in the ipsec.secrets files for the client.
+
+  <username for client> : XAUTH “<password for the client>”
+
+* Copy the certificates and the keys
+** Copy the certificates at the appropriate folders in /etc/ipsec.d folder
+** all private keys at etc/ipsec.d/private/ (client keys not required)
+** Server key
+  cp serverKey.pem /home/arao/etc/ipsec.d/private/
+** CA certificates
+  cp caCert.pem /home/arao/etc/ipsec.d/cacerts/
+** All other certificates other certificates at etc/ipsec.d/certs/
+  cp serverCert.pem /home/arao/etc/ipsec.d/certs/
+* NOTE 
+ Android supports DER-encoded X.509 certificates, saved in files with a .crt or .cer file extension.
+* Load libraries before starting ipsec
+  do source of bashrc which has path to the libraries /home/arao/usr/lib LD_LIBRARY_PATH and LD_RUN_PATH 
+** Steps 
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/home/arao/usr/lib/ipsec
+export LD_RUN_PATH=${LD_LIBRARY_PATH}:/home/arao/usr/lib/ipsec
+export PATH=${PATH}:/home/arao/usr/bin:/home/arao/usr/sbin
+
