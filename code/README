@@ -1,0 +1,3 @@
+README - this file
+strongswan-confs - contains the files required to get strongswan running
+tunnel-generation - contains the files to create the tunnel device
