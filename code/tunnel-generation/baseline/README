@@ -1,0 +1,10 @@
+tun-route.c - program to create the NON-PERSISTENT tun device
+tun-setup.sh - setup to route packets via the tun device created
+
+Steps as user root:
+1) Run ./a.out  on one terminal
+2) Run ./tun-setup.sh on the other termina
+3) Then start the ipsec tunnel
+4) Capture packets using tcpdump on the tun0 device  
+
+The sample trace is included in this folder. 
