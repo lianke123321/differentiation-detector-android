@@ -1,0 +1,2 @@
+
+genP12 - to generate the P12 file for manual installation of certificates. Input is the username and password. The same username and password will be used by the client in the .secrets file. Same password is not mandatory but useful for consistency and ease of deployment.
