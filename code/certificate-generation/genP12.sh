@@ -15,11 +15,6 @@ then
 fi
 clientName="$1"
 clientPassword="$2"
-ipSecCertPath="/home/arao/etc/ipsec.d/"
-caCert="${ipSecCertPath}/cacerts/caCert.pem"
-caKey="${ipSecCertPath}/private/caKey.pem"
-DNstr="C=US, O=snowmane, CN=${clientName}"
-caName="snowmane CA" # The name used in the certificate
 
 if [ "${IPSEC}" == "" ] || [ "${OPENSSL}" == "" ];
 then
@@ -27,10 +22,17 @@ then
     exit 2;
 fi
 
+#TODO:: Take all CA related info from a conf file or as arguments
+ipSecCertPath="/home/arao/etc/ipsec.d/"
+caCert="${ipSecCertPath}/cacerts/caCert.pem"
+caKey="${ipSecCertPath}/private/caKey.pem"
+DNstr="C=US, O=snowmane, CN=${clientName}"
+caName="snowmane CA" # The name used in the certificate
 CERTPATH="./"
+p12File="${CERTPATH}/${clientName}.p12"
+
 keyFile="${CERTPATH}/${clientName}Key${MYPID}.pem"
 certFile="${CERTPATH}/${clientName}Cert${MYPID}.pem"
-p12File="${CERTPATH}/${clientName}.p12"
 
 ${IPSEC} pki --gen --outform pem > ${keyFile}
 # echo "${keyFile} created using ${IPSEC}"
