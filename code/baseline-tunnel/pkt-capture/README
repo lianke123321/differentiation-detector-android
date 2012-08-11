@@ -1,0 +1,10 @@
+leftfirewall=yes needs to be enabled in ipsec.conf
+This calls the ${PREFIX}/usr/lib/_updown. 
+When a client comes up or goes down the _updown is called 
+with PLUTO_VERB=up-client when the client comes up and 
+PLUTO_VERB=down-client when the client goes down
+
+_updown is located in ${PREFIX}/usr/lib/ipsec/ folder
+
+
+
