@@ -43,8 +43,10 @@ then
     echo "Error Creating Key File for the Certificate"
     exit 3;
 fi
-${IPSEC} pki --pub --in ${keyFile} | ${IPSEC} pki --issue --cacert ${caCert} --cakey ${caKey} --dn ${DNstr} --outform pem > ${certFile} 
-${OPENSSL} x509 -in ${certFile} -noout > /dev/null 2>&1
+# Required the eval stuff to get the quotes for DN working..
+cmd=""${IPSEC}" pki --pub --in "${keyFile}" | "${IPSEC}" pki --issue --cacert "${caCert}" --cakey "${caKey}" --dn \""${DNstr}"\" --outform pem > ${certFile}"
+eval ${cmd}
+"${OPENSSL}" x509 -in "${certFile}" -noout > /dev/null 2>&1
 if [ $? -ne 0 ];
 then
     echo "Error Creating Certificate File"
@@ -54,7 +56,7 @@ fi
 #openssl pkcs12 -export -inkey /tmp/abcKey6906.pem -in /tmp/abcCert6906.pem -name "client" -certfile /home/arao/etc/ipsec.d/cacerts/caCert.pem -caname "snowmane CA" -out abc.p12 -passout pass:hello
 
 # Secure way is to use env variables
-${OPENSSL} pkcs12 -export -inkey ${keyFile} -in ${certFile} -name "${clientName}" -passout pass:"${clientPassword}" -certfile ${caCert} -caname \""${caName}"\" -out ${p12File}
+"${OPENSSL}" pkcs12 -export -inkey "${keyFile}" -in "${certFile}" -name "${clientName}" -passout pass:"${clientPassword}" -certfile "${caCert}" -caname \""${caName}"\" -out "${p12File}"
 
 # TODO:: check the p12 file
 # ${OPENSSL} pkcs12 -info -in ${p12File} -passin env:${clientPassword} TODO:: specify PEM key 

@@ -51,12 +51,18 @@ def dumpConfXML(xmlPath, p12Path, clientName, clientPassword, serverHostName, ca
     return 1
 
 if __name__ == "__main__":
-    #if len(sys.argv) != 3:
-    #    print "sys.argv[0] <clientName> <password>"
-    #    exit(-1)
+    if len(sys.argv) != 3:
+        print "sys.argv[0] <clientName> <password>"
+        exit(-1)
     # Check for the encoding
-    #clientName = sys.argv[0]
-    #clientPass = sys.argv[1]
+    orgName="University of Washington CSE"
+    connDisplayName="Meddle VPN"
+    caName="snowmane CA"
+    serverHostName="snowmane.cs.washington.edu"
+    caCertPath ="./caCert.pem"
+
+    clientName = sys.argv[1]
+    clientPassword = sys.argv[2]
     
-    dumpConfXML(p12Path="./dave1.p12", clientName="dave1", clientPassword="newsecret", serverHostName="snowmane.cs.washington.edu", caCertPath="./caCert.pem", orgName="University of Washington CSE", connDisplayName="Meddle VPN", caName="snowmane CA", xmlPath="./dave1.mobileconfig")    
+    dumpConfXML(p12Path="./"+str(clientName)+".p12", clientName=clientName, clientPassword=clientPassword, serverHostName=serverHostName, caCertPath=caCertPath, orgName=orgName, connDisplayName=connDisplayName, caName=caName, xmlPath="./"+str(clientName)+".mobileconfig")
 
