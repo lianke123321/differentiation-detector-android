@@ -1,7 +1,8 @@
 #!/bin/bash
 
-basePath="/home/arao/capture-path/"
+basePath="/data/pcap-data/"
 logFile="${basePath}/pkt-capt.log"
+ipLookUpFile="${basePath}/ipLookUp.txt"
 devCapture="tun0"
 passPhrase="poiuytrewq"
 
@@ -16,7 +17,9 @@ function genDumpName()
     #TODO:: Assuming that the last field of the DN in the certificate is the login name of the client 
     clientID=`echo ${PLUTO_PEER_ID} | awk -F '=' '{print $NF}'`
     clientIP=`echo ${PLUTO_PEER_CLIENT} | awk -F '/' '{print $1}'`    
-    dumpName=${basePath}/"tcpdump-${clientID}-${timeStamp}-${PLUTO_ME}-${clientIP}-${PLUTO_PEER}.pcap.enc"
+    dumpPath="${basePath}/${clientID}/"
+    mkdir -p ${dumpPath}
+    dumpName="${dumpPath}/tcpdump-${clientID}-${timeStamp}-${PLUTO_ME}-${clientIP}-${PLUTO_PEER}.pcap.enc"
     echo "Dump Name is ${dumpName}" >> ${logFile}
 }
 
@@ -66,7 +69,11 @@ function startEncPacketCapture()
     cat ${lockName} >> ${logFile} 
 }
 
- 
+function updateIPLookUp()
+{
+    echo "${timeStamp} ${clientIP} ${clientID} ${PLUTO_PEER} ${PLUTO_ME} ${PLUTO_VERB}" >> ${ipLookUpFile}
+}
+
 function mainFunc()
 {    
     mkdir -p ${basePath}
@@ -74,11 +81,13 @@ function mainFunc()
     if [ "${PLUTO_VERB}" == "up-client" ];
     then
 	startEncPacketCapture
+	updateIPLookUp
      # The client is up
     elif [ "${PLUTO_VERB}" == "down-client" ];
     then
     # the client is down
 	stopEncPacketCapture
+	updateIPLookUp
     else
 	echo "WARNING:: PLUTO_VERB=${PLUTO_VERB} is not supported" >> ${logFile}
     fi

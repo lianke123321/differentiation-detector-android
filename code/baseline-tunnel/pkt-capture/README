@@ -6,5 +6,10 @@ PLUTO_VERB=down-client when the client goes down
 
 _updown is located in ${PREFIX}/usr/lib/ipsec/ folder
 
+in Ubuntu systems run aa-complain /usr/sbin/tcpdump
+to ensure tcpdump can write into folders not owned by root
 
+the node.cfg file is to be copied in ${BROPREFIX}/usr/etc/ folder
+
+broctl install 
 

@@ -56,6 +56,7 @@ setup()
     iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth1 -j MASQUERADE
     # Reduce the MSS to support the IPsec headers in the response.  We do not want to fragment on this machine. 
     iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o eth1  -j TCPMSS --set-mss 1250
+    iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o tun0  -j TCPMSS --set-mss 1250
 }
 
 undo()
@@ -63,6 +64,7 @@ undo()
     # All the above steps with s/add/del/g 
     iptables --flush
     iptables --flush -t nat
+    iptables --flush -t mangle
 
     ip rule del from 192.168.0.0/24 to all lookup fwdpath prio 1000
     ip rule del from 192.168.1.0/24 to all lookup depart prio 1001
