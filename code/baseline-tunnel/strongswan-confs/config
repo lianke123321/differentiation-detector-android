@@ -1,1 +1,6 @@
-./configure --sysconfdir=/home/arao/etc --prefix=/home/arao/usr/ --libexecdir=/home/arao/usr/lib --enable-openssl --enable-agent --enable-gcrypt --enable-integrity-test --enable-openssl --enable-eap-gtc --enable-eap-md5 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2 --enable-eap-identity --enable-md4 --enable-eap-radius --enable-socket-raw --enable-socket-dynamic
+./configure --sysconfdir=/data/etc/ --prefix=/data/usr/ --libexecdir=/data/usr/lib --enable-openssl --enable-agent --enable-gcrypt --enable-integrity-test --enable-openssl --enable-eap-gtc --enable-eap-md5 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2 --enable-eap-identity --enable-md4 --enable-eap-radius --enable-socket-raw --enable-socket-dynamic
+
+make 
+make install
+cp -vRf ipsec.d/ /data/etc/
+

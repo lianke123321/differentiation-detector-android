@@ -688,4 +688,4 @@ esac
 #done
 #echo "Env:" >> ${LOG_NAME}
 #printenv >> ${LOG_NAME}
-/home/arao/usr/lib/ipsec/pkt-capture.sh 
+/data/usr/lib/ipsec/pkt-capture.sh 
