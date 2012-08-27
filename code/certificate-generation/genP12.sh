@@ -33,6 +33,7 @@ p12File="${CERTPATH}/${clientName}.p12"
 
 keyFile="${CERTPATH}/${clientName}Key${MYPID}.pem"
 certFile="${CERTPATH}/${clientName}Cert${MYPID}.pem"
+androidFile="${CERTPATH}/${clientName}.crt"
 
 ${IPSEC} pki --gen --outform pem > ${keyFile}
 # echo "${keyFile} created using ${IPSEC}"
@@ -57,7 +58,7 @@ fi
 
 # Secure way is to use env variables
 "${OPENSSL}" pkcs12 -export -inkey "${keyFile}" -in "${certFile}" -name "${clientName}" -passout pass:"${clientPassword}" -certfile "${caCert}" -caname \""${caName}"\" -out "${p12File}"
-
+cp ${certFile} ${androidFile}
 # TODO:: check the p12 file
 # ${OPENSSL} pkcs12 -info -in ${p12File} -passin env:${clientPassword} TODO:: specify PEM key 
 
