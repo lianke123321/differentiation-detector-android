@@ -322,9 +322,7 @@ int nat_packet(unsigned char packet[], int nbytes, __u32 privnet, __u32 modnet)
 			mod = 1;
 		}
 		/* If modified then update the checksums of the L3 and L4 protocols  */
-		if (mod == 1) {
-			
-			ip->check = ip_checksum(ip);
+		if (mod == 1) {						
 			switch (ip->protocol) {
 			case IPPROTO_TCP:
 				tcp = (struct tcphdr *) ((__u8*)ip + (ip->ihl)*4);
@@ -336,7 +334,8 @@ int nat_packet(unsigned char packet[], int nbytes, __u32 privnet, __u32 modnet)
 				break;
 			default:
 				break;
-			}			
+			}
+			ip->check = ip_checksum(ip);
 		}
 	}
 	return 0;
