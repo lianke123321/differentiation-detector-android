@@ -23,7 +23,7 @@ then
 fi
 
 #TODO:: Take all CA related info from a conf file or as arguments
-ipSecCertPath="/home/arao/etc/ipsec.d/"
+ipSecCertPath="/data/etc/ipsec.d/"
 caCert="${ipSecCertPath}/cacerts/caCert.pem"
 caKey="${ipSecCertPath}/private/caKey.pem"
 DNstr="C=US, O=snowmane, CN=${clientName}"
