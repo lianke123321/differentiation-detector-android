@@ -146,7 +146,7 @@ typedef struct tap_hdr tap_hdr_t;
  * Based on page 6 http://tools.ietf.org/rfc/rfc1071.txt
  * Wrap the sum to 16 bits and take its complement
  */
-__sum16 wrap_sum16(__u32 csum)
+inline __sum16 wrap_sum16(__u32 csum)
 {
 	__sum16 ret; 
 	while (csum>>16) 
@@ -160,7 +160,7 @@ __sum16 wrap_sum16(__u32 csum)
  * Based on page 6 http://tools.ietf.org/rfc/rfc1071.txt
  * Sum the bytes and account for padding
  */
-__u32 compute_sum16(__u8 *data, __u32 len)
+inline __u32 compute_sum16(__u8 *data, __u32 len)
 {
 	__u32 sum;
 	__u16 *ptr, cnt;
@@ -227,7 +227,7 @@ typedef struct proxy_iphdr proxy_iphdr_t;
 /**
  * Fill the proxy header with the ip details and length (given in host byte order)
  */
-void fill_proxy (proxy_iphdr_t *proxy_hdr, struct iphdr *ip, __u16 len)
+inline void fill_proxy (proxy_iphdr_t *proxy_hdr, struct iphdr *ip, __u16 len)
 {
 	
 	memset(proxy_hdr, 0, sizeof(proxy_iphdr_t));
@@ -241,7 +241,7 @@ void fill_proxy (proxy_iphdr_t *proxy_hdr, struct iphdr *ip, __u16 len)
  * Compute the checksum for the header field
  * Return the checksum 
  */
-__sum16 ip_checksum(struct iphdr *ip)
+inline __sum16 ip_checksum(struct iphdr *ip)
 {
 	__sum16 final_sum;
 	__u32 new_sum;
@@ -255,7 +255,7 @@ __sum16 ip_checksum(struct iphdr *ip)
  * Compute the tcp checksum
  * Return the checksum
  */
-__sum16 tcp_checksum(struct iphdr *ip, struct tcphdr *tcp)
+inline __sum16 tcp_checksum(struct iphdr *ip, struct tcphdr *tcp)
 {
 	proxy_iphdr_t proxy;
 	__sum16 final_sum;
@@ -273,7 +273,7 @@ __sum16 tcp_checksum(struct iphdr *ip, struct tcphdr *tcp)
  * Compute the udp checksum
  * Return the checksum
  */
-__sum16 udp_checksum(struct iphdr *ip, struct udphdr *udp)
+inline __sum16 udp_checksum(struct iphdr *ip, struct udphdr *udp)
 {
 	proxy_iphdr_t proxy;
 	__sum16 final_sum;
@@ -289,7 +289,7 @@ __sum16 udp_checksum(struct iphdr *ip, struct udphdr *udp)
 /**
  * If IP packet change the network from private network to modified network
  */
-int nat_packet(unsigned char packet[], int nbytes, __u32 privnet, __u32 modnet)
+inline int nat_packet(unsigned char packet[], int nbytes, __u32 privnet, __u32 modnet, __u32 netmask)
 {
 	const tap_hdr_t *frame_hdr;
 	struct iphdr *ip;
@@ -307,7 +307,7 @@ int nat_packet(unsigned char packet[], int nbytes, __u32 privnet, __u32 modnet)
 		mod = 0;
 		/* If packets come from the private network change the source address */
 		/* to one in the modified network */
-		if ((srcaddr & privnet) == privnet) {
+		if ((srcaddr & netmask) == privnet) {
 			if ((dstaddr & privnet) != privnet) {
  				srcaddr = htonl(modnet | (privnet ^ srcaddr));
 				ip->saddr = srcaddr;
@@ -316,7 +316,7 @@ int nat_packet(unsigned char packet[], int nbytes, __u32 privnet, __u32 modnet)
 		}
 		/* If packets are destined to the modified network change the destination address */
 		/* to one in the modified network */		
-		if ((dstaddr & modnet) == modnet) {
+		if ((dstaddr & netmask) == modnet) {
 			dstaddr = htonl(privnet | (modnet ^ dstaddr));
 			ip->daddr = dstaddr;
 			mod = 1;
@@ -344,14 +344,14 @@ int nat_packet(unsigned char packet[], int nbytes, __u32 privnet, __u32 modnet)
 /**
  * Read and forward loop
  */
-int read_and_fwd_loop(int tap0_fd, __u32 privnet, __u32 modnet)
+int read_and_fwd_loop(int tap0_fd, __u32 privnet, __u32 modnet, __u32 netmask)
 {
 	int nread, nwrite;
 	unsigned char buffer[10240];	
 	while(1)
 	{
 		nread = read(tap0_fd,buffer,sizeof(buffer));
-		nat_packet(buffer, nread, privnet, modnet);
+		nat_packet(buffer, nread, privnet, modnet, netmask);
 		nwrite = write(tap0_fd, buffer, nread);
 		if (nwrite != nread) {
 			perror("Error in write");
@@ -363,7 +363,7 @@ int main(int argc, char *argv[])
 {  
 	char tun_name[IFNAMSIZ];
 	int tap0_fd;
-	__u32 privnet, modnet;
+	__u32 privnet, modnet, netmask;
 		
 	strcpy(tun_name, "tun0");
         tap0_fd = tun_alloc(tun_name, IFF_TUN);  /* tap interface TODO:: try with tun interface */
@@ -371,12 +371,14 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}		
 	ip_alloc("tun0", "192.168.0.1", "255.255.254.0");
+	   
 	inet_pton(AF_INET, "192.168.0.0", &privnet);
 	inet_pton(AF_INET, "192.168.1.0", &modnet);
-
+	inet_pton(AF_INET, "255.255.255.0", &netmask); // netmask of each network
+	netmask = htonl(netmask);
 	privnet = htonl(privnet);
 	modnet = htonl(modnet);
 	printf("File descriptors are %d\n", tap0_fd);
-	read_and_fwd_loop(tap0_fd, privnet, modnet);
+	read_and_fwd_loop(tap0_fd, privnet, modnet, netmask);
 	return 0;
 }
