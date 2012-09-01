@@ -8,3 +8,6 @@ Steps as user root:
 4) Capture packets using tcpdump on the tun0 device  
 
 The sample trace is included in this folder. 
+
+sysctl.conf enables ip forward -- to be placed in /etc folder
+rt_tables contains the routing tables  -- to be placed in /etc/iproute2/ folder
