@@ -89,18 +89,10 @@ public class CharonVpnService extends VpnService implements Runnable
 	private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-        	ConnectivityManager conman = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        	for (NetworkInfo ni : conman.getAllNetworkInfo()){
-        		 if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED) {
-                     Log.i(TAG,"Network "+ni.getTypeName()+" connected");
-                 }
-        	}
             boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-            Log.d("app","Network connectivity change");
-            if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
-            	Log.d(TAG,"There's no network connectivity");
-            }
-            if (!noConnectivity && syncObject != null && mService.getState()==State.CONNECTED){
+            boolean isNewAddress = mLastLocalAddress != null && getLocalIPv4Address() != mLastLocalAddress;
+            if (!noConnectivity && syncObject != null && isNewAddress &&
+            		mService.getState()==State.CONNECTED){
             	synchronized (syncObject){
 	            	mProfileUpdated = true;
 	            	mNextProfile = mCurrentProfile;
@@ -110,6 +102,7 @@ public class CharonVpnService extends VpnService implements Runnable
         }
 	};
 	private CharonVpnService syncObject;
+	private String mLastLocalAddress;
 	
 
 	/**
@@ -248,6 +241,7 @@ public class CharonVpnService extends VpnService implements Runnable
 						Log.i(TAG, "charon started");
 
 						String local_address = getLocalIPv4Address();
+						mLastLocalAddress = local_address;
 						initiate(local_address != null ? local_address : "0.0.0.0",
 								 mCurrentProfile.getGateway(), mCurrentProfile.getUsername(),
 								 mCurrentProfile.getPassword());

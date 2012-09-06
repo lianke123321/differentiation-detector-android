@@ -18,8 +18,8 @@
 <resources>
 
     <!-- Application -->
-    <string name="app_name">strongSwan VPN Client</string>
-    <string name="main_activity_name">strongSwan</string>
+    <string name="app_name">Meddle</string>
+    <string name="main_activity_name">Meddle</string>
     <string name="reload_trusted_certs">Reload CA certificates</string>
     <string name="show_log">View log</string>
     <string name="search">Search</string>
