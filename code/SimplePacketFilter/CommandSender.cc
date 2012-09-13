@@ -1,4 +1,5 @@
 #include "CommandSender.h"
+#include "CommandFrame.h"
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -73,4 +74,3 @@ bool CommandSender::sendCommand(uint32_t cmd, cmdTunnel_t cmdCreate)
 	logDebug("Yippie sent the frame now returning" << cmdFrame);
 	return true;
 }
-

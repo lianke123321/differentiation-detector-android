@@ -10,6 +10,8 @@
 #define CMD_CREATETUNNEL 3
 #define CMD_CLOSETUNNEL 4
 
+#define USERNAMELEN_MAX 512
+
 struct cmdHeader {
 	uint32_t cmdType;
 	uint32_t cmdLen; //placeholder ignored
@@ -19,9 +21,9 @@ typedef struct cmdHeader cmdHeader_t;
 typedef uint32_t cmd_ack_t;
 
 struct cmdTunnel {
-	uint8_t ipAddress[INET_ADDRSTRLEN]; // TODO:: this will break for IPv6
+	int8_t ipAddress[INET_ADDRSTRLEN]; // TODO:: this will break for IPv6
 	uint32_t userNameLen; //placeholder ignored
-	uint8_t userName[512];
+	int8_t userName[USERNAMELEN_MAX];
 }__attribute__((packed));
 
 typedef cmdTunnel cmdTunnel_t;
