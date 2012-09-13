@@ -10,6 +10,7 @@
 #include <netinet/udp.h>
 #include <iostream>
 #include "Logging.h"
+ #include <sys/select.h>
 
 MeddleDaemon::MeddleDaemon()
 {
@@ -25,7 +26,7 @@ MeddleDaemon::~MeddleDaemon()
 	return;
 }
 
-bool MeddleDaemon:: Setup(std::string deviceName, std::string ipAddress, std::string netMask, std::string routeMask, std::string fwdNet, std::string revNet)
+bool MeddleDaemon:: setupTunnel(std::string deviceName, std::string ipAddress, std::string netMask, std::string routeMask, std::string fwdNet, std::string revNet)
 {
 	logDebug("Creating Tunnel")
 	if (false == tunDevice.createTunnel(deviceName)) {
@@ -80,7 +81,9 @@ inline void MeddleDaemon::__processUDP()
 	return;
 }
 
-inline bool MeddleDaemon::ProcessFrame()
+
+
+inline bool MeddleDaemon::meddleFrame()
 {
 	uint8_t *buffer = tunFrame->buffer;
 	tunFrame->tunhdr = (struct tun_pi *)(buffer);
@@ -126,7 +129,7 @@ inline void MeddleDaemon::__natDst(in_addr_t currNet,  in_addr_t newNet)
 	return;
 }
 
-bool MeddleDaemon::ReadWriteLoop()
+bool MeddleDaemon::mainLoop()
 {
 	while(1)
 	{
@@ -137,7 +140,9 @@ bool MeddleDaemon::ReadWriteLoop()
 			return false;
 		}
 		logDebug("Now Processing the Frame");
-		this->ProcessFrame();
+		// Take the lock here
+		this->meddleFrame();
+		// Release the lock here
 		logDebug("Now Writing the Frame")
 		if (false == tunDevice.writeFrame(this->tunFrame)) {
 			logError("Error writing frame");
@@ -148,3 +153,4 @@ bool MeddleDaemon::ReadWriteLoop()
 	}
 	return true;
 }
+

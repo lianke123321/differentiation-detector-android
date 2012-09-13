@@ -1,14 +1,14 @@
 CXXFLAGS = -O3 -g -Wall -fmessage-length=0
-LIBS=
-SRC = $(wildcard *.cc)
+LIBS= -lboost_thread  -lboost_date_time
+SRC = $(wildcard $(PWD)/*.cc)
 OBJS = $(SRC:.cc=.o)
 TARGET = SimplePacketFilter
 
 $(TARGET): clean $(OBJS)
-	$(CXX) -o $(TARGET) $(OBJS) $(LIBS)
+	$(CXX)  -o $(TARGET) $(OBJS) $(LIBS) 
 	
 %.o : %.cc
-	$(CXX) $(CFLAGS) -c $<
+	$(CXX) $(LIBS) $(CFLAGS) -c $<
 	
 all: $(TARGET)
 

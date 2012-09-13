@@ -112,7 +112,7 @@ bool TunnelDevice::assignIP(std::string ip_address, std::string netmask)
 	p = (char *) &sai;
 	memcpy(&ifr.ifr_netmask, p, sizeof(struct sockaddr));
 	if (ioctl(sockfd, SIOCSIFNETMASK, &ifr) <0) {
-		logError("Erro performing ioctl to assign the netmask");
+		logError("Error performing ioctl to assign the netmask");
 		close(sockfd);
 		return false;
 	}

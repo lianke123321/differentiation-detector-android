@@ -3,9 +3,9 @@
 
 #include <iostream>
 
-#if 0
+#if 1
 #define logDebug(msg) do {				\
-	std::cout << msg << std::endl;	\
+	std::cout << __FILE__ << ":" << __func__ << ":"<<  __LINE__ << ":" << msg << std::endl;	\
 } while (0);
 #else
 #define logDebug(msg) do {} while (0);
@@ -14,7 +14,7 @@
 
 #if 1
 #define logError(msg) do {				\
-	std::cout << msg << std::endl;	\
+	std::cout << "ERR:" << __FILE__ << ":"<< __func__ << ":"<< __LINE__ << ":" << msg << std::endl;	\
 } while (0);
 #else
 #define logError(msg) do {} while (0);

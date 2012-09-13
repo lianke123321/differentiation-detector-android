@@ -11,12 +11,12 @@
 
 #define DEFAULT_TUNNEL_FLAGS  IFF_TUN
 class TunnelDevice {
-private:
+public:
 	uint32_t tunFD;
+private:
 	std::string deviceName;
 	in_addr_t ipAddress;
 	in_addr_t netMask;
-
 public:
 	TunnelDevice();
 	bool createTunnel(std::string deviceName);

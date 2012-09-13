@@ -12,6 +12,7 @@ class MeddleDaemon
 {
 private:
 	TunnelDevice tunDevice;
+
 	in_addr_t fwdNet;
 	in_addr_t revNet;
 	in_addr_t routeMask;
@@ -25,9 +26,11 @@ private:
 public:
 	MeddleDaemon();
 	~MeddleDaemon();
-	bool Setup(std::string deviceName, std::string ipAddress, std::string netMask, std::string routeMask, std::string fwdNet, std::string revNet);
-	bool ReadWriteLoop();
-	bool ProcessFrame();
+	bool setupTunnel(std::string deviceName, std::string ipAddress, std::string netMask, std::string routeMask, std::string fwdNet, std::string revNet);
+	bool setupCommandHandler(std::string socketPath);
+	bool waitForData();
+	bool mainLoop();
+	bool meddleFrame();
 
 };
 
