@@ -1,0 +1,77 @@
+#!/bin/bash
+
+NDK_ROOT=/Applications/android-ndk-r8b
+INSTALLDIR=/Users/choffnes2/workspace/StrongSwanVPN/jni/vstr
+PLATFORM=android-5
+TOOLCHAIN=`pwd`/$PLATFORM-toolchain
+RANLIB=arm-linux-androideabi-ranlib
+
+OPTIONS="\
+  --host=arm-none-linux-gnueabi \
+  --build=i686-apple-darwin12.1.0 \
+  --disable-shared \
+  "
+
+export local_cv_has_long_long=yes
+export local_cv_has_offsetof=yes
+export local_cv_has_strerror=yes
+export local_cv_has_va_copy=yes
+export local_cv_has___va_copy=yes
+export local_cv_has_poll=no
+export local_cv_has_dl_rtld_global=yes
+export local_cv_has_C9x_snprintf_ret=no
+export local_cv_has_C9x_sprintf_fmt_F=no
+export local_cv_has_C9x_sprintf_fmt_A=no
+export local_cv_has_C9x_sprintf_fmt_a=no
+export local_cv_has_char_bitflag=no
+export local_cv_has_setrlimit=yes
+export local_cv_has_prctl=yes
+export local_cv_has_sigcontext=no
+export local_cv_has_old_sigcontext=no
+export local_cv_has_mallinfo=yes
+export local_cv_has_decl_termcap_vars=no
+export local_cv_use_quick_add_time=no
+export local_cv_have_sigaltstack=no
+export local_cv_have_C9x_struct_hack=yes
+export local_cv_have_struct_cmsghdr=yes
+export local_cv_have_cmsghdr_rights=yes
+export local_cv_have_cmsghdr_credentials=yes
+export local_cv_have_so_peercreds=yes
+export local_cv_have_cmsg_data=yes
+export local_cv_have_tcp_cork=yes
+export local_cv_have_sockaddr_in6=yes
+export local_cv_linker_have_relocationable_main=true
+export local_cv_has_ULONG_MAX_len_sprintf="nope"
+export local_cv_has_inline=yes
+export local_cv_has_attrib_alias=yes
+export local_cv_has_attrib_deprecated=yes
+export local_cv_has_attrib_malloc=yes
+export local_cv_has_attrib_nonnull=yes
+export local_cv_has_attrib_pure=yes
+export local_cv_has_attrib_const=yes
+export local_cv_has_attrib_visibility=yes
+export local_cv_has_attrib_warn_unused_ret=yes
+export local_cv_has___typeof=yes
+
+# build a standalone toolchain
+if [ ! -d $TOOLCHAIN ]; then
+	$NDK_ROOT/build/tools/make-standalone-toolchain.sh \
+		--platform=$PLATFORM --install-dir=$TOOLCHAIN
+fi
+
+export PATH=$TOOLCHAIN/bin:$PATH
+export CC=arm-linux-androideabi-gcc
+CFLAGS="-DUSE_RESTRICTED_HEADERS -Wall -O2" \
+./configure ${OPTIONS}
+RANLIB=arm-linux-androideabi-ranlib
+make
+
+mkdir -p ${INSTALLDIR}
+cp src/.libs/libvstr.a ${INSTALLDIR}
+
+mkdir -p ${INSTALLDIR}/include
+pushd include
+cp vstr-arch.h vstr-conf.h vstr-const.h vstr-def.h vstr-extern.h \
+   vstr.h vstr-inline.h vstr-switch.h ${INSTALLDIR}/include
+popd
+
