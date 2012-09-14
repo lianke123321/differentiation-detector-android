@@ -49,15 +49,20 @@ void sigInit()
 int mainInit(MeddleDaemon &meddle, CommandHandler &cmd)
 {
 	sigInit();
-	logDebug("Setting UP");
+	logDebug("Listening on "<< COMMAND_SOCKET_PATH << " for commands from other processes");
 	if (false == cmd.setupCommandHandler(COMMAND_SOCKET_PATH)) {
 		logError("Unable to setup the socket for receiving commands");
 		return -1;
 	}
+	logDebug("Creating a tunnel device" << TUN_DEVICE  <<
+			 " assigning it an IP " << IP_ADDRESS << " with mask " << ROUTE_NETMASK
+			 " to NAT packets from " << FWD_PATH_NET <<
+			 " to network " << REV_PATH_NET);
 	if (false == meddle.setupTunnel(TUN_DEVICE, IP_ADDRESS, DEV_NETMASK, ROUTE_NETMASK, FWD_PATH_NET, REV_PATH_NET)) {
 		logError("Unable to setup the tunnel");
 		return -1;
 	}
+	logDebug("We have done the initialisation now time to meddle");
 	return 0;
 }
 
@@ -83,10 +88,7 @@ int main()
 		sigset_t sigSet;
 		siginfo_t sigInfo;
 		int sigVal;
-//		int n = (int)boost::posix_time::time_duration::ticks_per_second() / 10;
-//
-//		boost::posix_time::time_duration delay1(0,0,0,n);
-//		boost::posix_time::time_duration delay2(0,0,0,n);
+
 
 		struct timespec tSpec;
 
@@ -114,10 +116,10 @@ int main()
 				switch(sigVal) {
 				// A Signal is set
 				case SIGINT:
-					break;
 				case SIGHUP:
-					break;
 				case SIGTERM:
+					// TODO :: Add code to cancel the threads
+					logDebug("Now stop the threads in a clean manner");
 					break;
 				default:
 					logError("Error in the received signal"<<sigVal);

@@ -22,7 +22,7 @@ CommandSender::CommandSender()
 	 strncpy(addr.sun_path, COMMAND_SOCKET_PATH, sizeof(addr.sun_path)-1);
 	 logDebug("Connecting to the Socket at path " << COMMAND_SOCKET_PATH );
 	 if (connect(sockFD, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-		 logError("connect error");
+		 logError("Connect error");
 		 sockFD = -1;
 		 return;
 	 }

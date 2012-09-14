@@ -26,10 +26,13 @@ bool CommandHandler::setupCommandHandler(std::string socketPath)
 {
 	uint32_t len;
 
+	logDebug("The socket path is of length " << socketPath.length() << " and the max length is " << sizeof(localAddr.sun_path));
 	if (socketPath.length() > sizeof(localAddr.sun_path) - 1) {
+		logError("The socket path " << socketPath.length() << " has a length larger than the maximum length " << sizeof(localAddr.sun_path));
 		sockFD = -1;
 		return false;
 	}
+	logDebug("Now connecting the socket");
 	sockFD = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (0 > sockFD ) {
 		logError("Error creating socket to read commands");
@@ -53,6 +56,7 @@ bool CommandHandler::setupCommandHandler(std::string socketPath)
 		sockFD = -1;
 		return false;
 	}
+	logDebug("Successful in creating a socket at " << sockFD);
 	return true;
 }
 
@@ -63,18 +67,15 @@ CommandFrame* CommandHandler::recvCommand(uint32_t remoteFD)
 	uint32_t nRead, nwrite;
 	memset(lastRead, 0, sizeof(lastRead));
 
-	if ((remoteFD = accept(sockFD, NULL, NULL)) < 0) {
-	      logError("Error during the read operation");
-	      return cmd;
-	}
 	logDebug("Accepted a new connection: Reading for data on " << remoteFD);
 	nRead = read(remoteFD, lastRead, sizeof(lastRead));
-
+	logDebug("Read " << nRead << " bytes on socket" << remoteFD);
 	if (nRead < 0) {
 		logError("Error during the read operation");
 		return cmd;
 	}
 
+	logDebug("Now parsing the received bytes");
 	cmd = new CommandFrame(lastRead, nRead);
 	if (cmd == NULL) {
 		logError("Error creating the command");
@@ -82,7 +83,7 @@ CommandFrame* CommandHandler::recvCommand(uint32_t remoteFD)
 		return cmd;
 	}
 	if (cmd->frameLen < 0) {
-		logError("Sending NACK");
+		logError("Sending NACK because the command could not be parsed");
 		delete cmd;
 		ack_data = CMD_ACK_NEGATIVE;
 		ackFrame = new CommandFrame(ack_data);
@@ -96,6 +97,7 @@ CommandFrame* CommandHandler::recvCommand(uint32_t remoteFD)
 		cmd = NULL;
 		return cmd;
 	}
+	logDebug("Received a command that can be interpreted therefore sending ACK");
 	ack_data = CMD_ACK_POSITIVE;
 	ackFrame = new CommandFrame(ack_data);
 	if (ackFrame == NULL) {
@@ -106,6 +108,7 @@ CommandFrame* CommandHandler::recvCommand(uint32_t remoteFD)
 		nwrite = write(remoteFD, ackFrame->buffer, ackFrame->frameLen);
 		delete ackFrame;
 	}
+	logDebug("Received the command " << cmd);
 	return cmd;
 }
 
@@ -153,6 +156,7 @@ bool CommandHandler::processCommand()
 	switch(cmd->cmdHeader->cmdType) {
 	case CMD_CREATETUNNEL:
 	case CMD_CLOSETUNNEL:
+		logDebug("Processing the command now");
 		ret = processTunnelCommand();
 		break;
 	default:
@@ -168,13 +172,16 @@ bool CommandHandler::mainLoop()
 	while(1) {
 		this->cmd = NULL;
 		// TODO:: Add pselect here with 100000 seconds and signal handler to ensure that thread receives signals quits
+		logDebug("Waiting for a connection");
 		if ((remoteFD = accept(sockFD, NULL, NULL)) < 0) {
 			logError("Error during the accept operation");
 			return cmd;
 		}
+		logDebug("Received a new connection request on " << remoteFD);
 		this->cmd = recvCommand(remoteFD);
 		processCommand();
 		logDebug("Accepted a new connection: Reading for data on " << remoteFD);
+		close(remoteFD);
 		delete this->cmd;
 	}
 	return true;

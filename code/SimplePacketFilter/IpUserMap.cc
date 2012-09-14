@@ -28,8 +28,10 @@ bool IpUserMap::getUserID(in_addr_t ipAddress, uint32_t &userID)
 
 bool IpUserMap::addEntry(in_addr_t ipAddress, uint32_t userID)
 {
+	logDebug("Attempting to associate " << userID << " to IP address " << ipAddress);
 	insertRet = ipMap.insert(std::make_pair(ipAddress, userID));
 	if (insertRet.second == false) {
+		logDebug("Previous Entry already exists so removing it now");
 		ipMap.erase(ipAddress);
 		insertRet = ipMap.insert(std::make_pair(ipAddress, userID));
 		if (insertRet.second == false) {
@@ -37,14 +39,23 @@ bool IpUserMap::addEntry(in_addr_t ipAddress, uint32_t userID)
 			return false;
 		}
 	}
+	logDebug("Successful in adding the association");
 	return true;
 }
 
 bool IpUserMap::removeEntry(in_addr_t ipAddress)
 {
+	// Note: No check is being performed to check if it is the mapping we want to remove
+	logDebug("Removing the association for the ipAddress " << ipAddress << " First seeing if it exists");
 	mapIter=ipMap.find(ipAddress);
 	if (mapIter != ipMap.end()) {
+		logDebug("Entry for " << ipAddress << " exists so removing it ");
 		ipMap.erase (mapIter);
+		mapIter=ipMap.find(ipAddress);
+		if (mapIter != ipMap.end()) {
+			logError("Error removing the association for IP" << ipAddress);
+			return false;
+		}
 	}
 	return true;
 }

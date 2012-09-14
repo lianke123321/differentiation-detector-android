@@ -9,10 +9,18 @@
 bool checkArgs(std::string &userName, std::string &ipAddress, std::string &cmdType)
 {
 	// Checking each of the arguments
-	if ((userName.length() > USERNAMELEN_MAX) || ipAddress.length() > INET_ADDRSTRLEN) {
+	logDebug("Checking if the arguments : " << userName << " has length " << userName.length() <<
+			 " which should be less than "<< USERNAMELEN_MAX <<
+			 " and IP address " << ipAddress << " has length " << ipAddress.length() <<
+			 " which must be less than " << INET_ADDRSTRLEN);
+	if ((userName.length() > USERNAMELEN_MAX) || (ipAddress.length() > INET_ADDRSTRLEN)) {
+		logError(" Length of user name " << userName.length() << " " << ( userName.length() > USERNAMELEN_MAX) <<
+				 " and Length of user inet addr" << ipAddress.length() << " " << (ipAddress.length() > INET_ADDRSTRLEN));
 		return false;
 	}
-	if (cmdType.compare(UPCLIENT_CMD) != 0 || cmdType.compare(DOWNCLIENT_CMD) != 0) {
+	logDebug("Command is " << cmdType << " which must be either " << UPCLIENT_CMD << " " << DOWNCLIENT_CMD);
+	if ((cmdType.compare(UPCLIENT_CMD) != 0) && (cmdType.compare(DOWNCLIENT_CMD) != 0)) {
+		logError("Error in the command type " << (cmdType.compare(UPCLIENT_CMD)) << " " << (cmdType.compare(DOWNCLIENT_CMD)));
 		return false;
 	}
 	return true;
