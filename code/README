@@ -1,4 +1,4 @@
 README - this file
 AndroidVPN - code for the Android VPN client to use for Meddle
-strongswan-confs - contains the files required to get strongswan running
-tunnel-generation - contains the files to create the tunnel device
+baseline-tunnel - contains the files required to get a simple tunnel for monitoring packets.
+SimplePacketFilter - framework for meddling with packets
