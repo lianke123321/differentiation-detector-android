@@ -101,7 +101,7 @@ CommandFrame* CommandHandler::recvCommand(uint32_t remoteFD)
 	ack_data = CMD_ACK_POSITIVE;
 	ackFrame = new CommandFrame(ack_data);
 	if (ackFrame == NULL) {
-		logError("Error creating the ACK frame")
+		logError("Error creating the ACK frame");
 		// TODO:: should we continue sending the command as we have not acked it
 		// TODO:: This means retransmissions must not break system state.
 	} else {
@@ -114,9 +114,9 @@ CommandFrame* CommandHandler::recvCommand(uint32_t remoteFD)
 
 bool CommandHandler::processTunnelCommand()
 {
-	bool ret;
 	// ignoring the name len for now
 	std::string userName((char *)(cmd->cmdTunnel->userName));
+	uint32_t userID;
 
 	// TODO:: assuming IPv4 here and not performing any sanity checks
 	in_addr_t ipAddress;
@@ -126,25 +126,29 @@ bool CommandHandler::processTunnelCommand()
 		return false;
 	}
 	// TODO Code to lookup the UserID for the user Name;
-	static uint32_t userID = ipAddress%10;
 
+	if (false == mainPktFilter.userConfigs.getUserIdByName(userName, userID)) {
+		logError("Unable to get the DB entry for the user" << userName);
+		return false;
+	}
+
+	logDebug("Prev Table" << mainPktFilter.ipMap);
 	if (CMD_CREATETUNNEL == cmd->cmdHeader->cmdType) {
 		boost::mutex::scoped_lock scoped_lock(mainPktFilter.filterLock); // lock is released automatically outside this scope
-		ret = mainPktFilter.ipMap.addEntry(ipAddress, userID);
-		if (false == ret) {
+		if (false == mainPktFilter.ipMap.addEntry(ipAddress, userID)) {
 			logError("Error adding the user" << cmd->cmdTunnel->userName);
-			return ret;
+			return false;
 		}
 	} else {
 		boost::mutex::scoped_lock scoped_lock(mainPktFilter.filterLock);
-		ret = mainPktFilter.ipMap.removeEntry(ipAddress);
-		if (false == ret) {
+		if (false == mainPktFilter.ipMap.removeEntry(ipAddress)) {
 			logError("Error in removing the entry for ipAddress" << cmd->cmdTunnel->ipAddress << " for user "<< cmd->cmdTunnel->userName);
-			return ret;
+			return false;
 		}
 	}
+	logDebug("New Table" << mainPktFilter.ipMap);
 	// TODO release the lock here
-	return ret;
+	return true;
 }
 bool CommandHandler::processCommand()
 {

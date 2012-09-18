@@ -7,6 +7,7 @@
 #include "SimplePacketFilter.h"
 #include <boost/thread.hpp>
 #include "CommandHandler.h"
+#include "ReadDatabase.h"
 #include "boost/date_time/local_time/local_time.hpp"
 
 /* The main file
@@ -43,9 +44,7 @@ void sigInit()
 	sigaction(SIGBUS, &action, NULL);
 }
 
-/*
- *
- */
+
 int mainInit(MeddleDaemon &meddle, CommandHandler &cmd)
 {
 	sigInit();
@@ -62,6 +61,17 @@ int mainInit(MeddleDaemon &meddle, CommandHandler &cmd)
 		logError("Unable to setup the tunnel");
 		return -1;
 	}
+
+	logDebug("Connecting to the Database");
+	if (false == mainPktFilter.dbManager.connectDB(DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME)) {
+		logError("Error in connecting to the database");
+		return -1;
+	}
+	if (false == loadUserConfigs()) {
+		logError("Error in loading the configs to memory");
+		return -1;
+	}
+	logDebug("Config Table is " << mainPktFilter.userConfigs);
 	logDebug("We have done the initialisation now time to meddle");
 	return 0;
 }

@@ -59,3 +59,15 @@ bool IpUserMap::removeEntry(in_addr_t ipAddress)
 	}
 	return true;
 }
+
+std::ostream& operator<<(std::ostream& os, const IpUserMap& ipMapTable)
+{
+	std::map<in_addr_t, uint32_t>::const_iterator iter;
+	os << "IpUserTableMap is as follows:" << std::endl << "-----------" << std::endl;
+	for(iter = ipMapTable.ipMap.begin(); iter != ipMapTable.ipMap.end(); iter++)
+	{
+		os << "| " << iter->first << " | " << iter->second << " | " << std::endl;
+	}
+	os << "-----------" << std::endl;
+	return os;
+}
