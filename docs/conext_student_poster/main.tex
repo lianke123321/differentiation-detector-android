@@ -1,0 +1,88 @@
+\documentclass{sig-alternate-10pt}
+\usepackage{amsfonts,xspace}
+\usepackage{url}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{ifpdf}
+\usepackage[usenames,dvipsnames]{color}
+\newcommand{\tbd}[1]{}
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\eg}{{\it e.g.}}
+\newcommand{\etc}{{\it etc.}}
+\newcommand{\eat}[1]{}
+
+\newcommand{\mypara}[1]{\medskip\noindent{\bf {#1}:}~}
+\newcommand{\chk}{$\checkmark$}
+\newcommand{\dsh}{{\bf --}}
+\newcommand{\til}{{\bf\large \textasciitilde}}
+\usepackage{rotating}
+
+
+\newcounter{packednmbr}
+
+\newenvironment{packedenumerate}{\begin{list}{\thepackednmbr.}{\usecounter{packednmbr}\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+
+\newenvironment{packeditemize}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+
+\newenvironment{packedtrivlist}{\begin{list}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+
+
+\usepackage{times}
+
+\title{Using the Middle to Meddle with Mobile\vspace{-25pt}}
+
+\numberofauthors{6}
+\author{
+\alignauthor
+Ashwin Rao\\
+\affaddr{INRIA}
+\alignauthor        
+David Choffnes\\
+\affaddr{University of Washington}
+\alignauthor
+Justine Sherry\\
+\affaddr{UC Berkeley}
+\and
+\alignauthor
+Arnaud Legaut\\
+\affaddr{INRIA}
+\alignauthor 
+Arvind Krishnamurthy\\
+\affaddr{University of Washington}
+\alignauthor
+Walid Dabbous\\
+\affaddr{INRIA}
+}
+
+
+
+\date{}
+\begin{document}	
+    \maketitle
+        
+    \section{Introduction}
+Mobile networks are arguably the most popular, fastest
+growing systems in today’s Internet ecosystem. 
+However, these networks are also the least understood, largely
+due to locked-down operating systems running on devices that interact over a closed and opaque mobile network. 
+This severely limits users’ control over how their
+devices use mobile networks and restricts researchers’
+ability to deploy and test new in-network functionality
+at scale. 
+ 
+    \section{Service Deployment}
+
+    \section{Measurement Platform}
+
+    \section{Challenges}
+
+    \section{Conclusion \& Related Work}
+   
+ 
+    \scriptsize
+    \bibliographystyle{abbrv}
+    \bibliography{related_work}
+    \normalsize
+
+\end{document}
