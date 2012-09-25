@@ -6,6 +6,7 @@
 #include <boost/thread/mutex.hpp>
 #include "DatabaseManager.h"
 #include "UserConfigs.h"
+#include "PacketFilterData.h"
 
 // Structure that has all objects to be kept global
 struct pktFilter {
@@ -31,6 +32,6 @@ typedef struct pktFilter pktFilter_t;
 #define DB_NAME "MeddleDB"
 
 
-extern pktFilter_t mainPktFilter;
+extern PacketFilterData mainPktFilter;
 
 #endif /* SIMPLEPACKETFILTER_H_ */

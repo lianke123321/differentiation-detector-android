@@ -8,6 +8,7 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
+#include "UserConfigs.h"
 
 struct proxy_iphdr {
 	uint32_t saddr;
@@ -35,6 +36,8 @@ public:
 	struct udphdr* udp;
 	bool validCheckSum;
 	uint8_t framePath;
+	uint32_t userID; // The user ID for this frame;
+	user_config_entry_t configEntry;
 private:
 	void __fillProxy(proxy_iphdr_t *proxy_hdr, uint16_t len);
 	bool __updateIpChecksum();

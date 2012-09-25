@@ -1,3 +1,4 @@
+#include "SimplePacketFilter.h"
 #include "MeddleDaemon.h"
 #include "TunnelDevice.h"
 #include "TunnelFrame.h"
@@ -49,12 +50,12 @@ inline void MeddleDaemon::__processIP()
 	if (((tunFrame->ip->saddr) & routeMask) == fwdNet) {
 		logDebug("Frame in Forward Path");
 		tunFrame->framePath = tunFrame->framePath | FRAME_PATH_FWD;
-		__natSrc(fwdNet, revNet);
+
 	}
 	if (((tunFrame->ip->daddr) & routeMask) == revNet) {
 		logDebug("Frame in Reverse Path");
 		tunFrame->framePath = tunFrame->framePath | FRAME_PATH_REV;
-		__natDst(revNet, fwdNet);
+		// in_addr_t orig_addr = __natAddr(tunFrame->ip->daddr, revNet, fwdNet);
 	}
 	return;
 }
@@ -81,7 +82,22 @@ inline void MeddleDaemon::__processUDP()
 	return;
 }
 
+inline in_addr_t MeddleDaemon::__natAddr(const in_addr_t &addr, const in_addr_t &currNet, const in_addr_t &newNet)
+{
+	return newNet | (currNet ^ addr);
+}
 
+inline void MeddleDaemon::__performNAT()
+{
+	if (FRAME_PATH_FWD == (tunFrame->framePath & FRAME_PATH_FWD)) {
+		tunFrame->ip->saddr = __natAddr(tunFrame->ip->saddr, fwdNet, revNet);
+	}
+	if (FRAME_PATH_REV == (tunFrame->framePath & FRAME_PATH_REV)) {
+		tunFrame->ip->daddr = __natAddr(tunFrame->ip->daddr, revNet, fwdNet);
+	}
+	tunFrame->validCheckSum = false;
+	return;
+}
 
 inline bool MeddleDaemon::meddleFrame()
 {
@@ -89,45 +105,48 @@ inline bool MeddleDaemon::meddleFrame()
 	tunFrame->tunhdr = (struct tun_pi *)(buffer);
 	if (ETH_P_IP == (ntohs(tunFrame->tunhdr->proto))) {
 		tunFrame->ip = (struct iphdr *) (((uint8_t *)buffer) + sizeof(struct tun_pi));
-		this->__processIP();
+		__processIP();
 		switch(tunFrame->ip->protocol) {
 		case IPPROTO_TCP:
 			tunFrame->tcp = (struct tcphdr *) (((uint8_t *)(tunFrame->ip)) + ((tunFrame->ip->ihl)*4));
-			this->__processTCP();
+			__processTCP();
 			break;
 		case IPPROTO_UDP:
 			tunFrame->udp = (struct udphdr *) (((uint8_t *)(tunFrame->ip)) + ((tunFrame->ip->ihl)*4));
-			this->__processUDP();
+			__processUDP();
 			break;
 		default:
 			break;
 		}
+		__performNAT();
 		tunFrame->updateChecksum();
 	}
 	return true;
 }
 
-inline void MeddleDaemon::__natSrc(in_addr_t currNet, in_addr_t newNet)
-{
-	// TODO:: Verify if you really need to do everything with htonl and ntohl
-	in_addr_t srcaddr = tunFrame->ip->saddr;
-	srcaddr = newNet | (currNet ^ srcaddr);
-	tunFrame->ip->saddr = srcaddr;
-	// TODO::
-	// Fast update checksum based on IP change only
-	tunFrame->validCheckSum = false;
-	return;
-}
 
-inline void MeddleDaemon::__natDst(in_addr_t currNet,  in_addr_t newNet)
-{
-	in_addr_t dstaddr = tunFrame->ip->daddr;
-	dstaddr = newNet | (currNet ^ dstaddr);
-	tunFrame->ip->daddr = dstaddr;
-	// TODO:: Fast update checksum based on IP change only
-	tunFrame->validCheckSum = false;
-	return;
-}
+
+//inline void MeddleDaemon::__natSrc(in_addr_t currNet, in_addr_t newNet)
+//{
+//	// TODO:: Verify if you really need to do everything with htonl and ntohl
+//	in_addr_t srcaddr = tunFrame->ip->saddr;
+//	srcaddr = newNet | (currNet ^ srcaddr);
+//	tunFrame->ip->saddr = srcaddr;
+//	// TODO::
+//	// Fast update checksum based on IP change only
+//	tunFrame->validCheckSum = false;
+//	return;
+//}
+
+//inline void MeddleDaemon::__natDst(in_addr_t currNet,  in_addr_t newNet)
+//{
+//	in_addr_t dstaddr = tunFrame->ip->daddr;
+//	dstaddr = newNet | (currNet ^ dstaddr);
+//	tunFrame->ip->daddr = dstaddr;
+//	// TODO:: Fast update checksum based on IP change only
+//	tunFrame->validCheckSum = false;
+//	return;
+//}
 
 bool MeddleDaemon::mainLoop()
 {

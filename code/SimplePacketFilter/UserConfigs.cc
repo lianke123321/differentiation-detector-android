@@ -24,7 +24,7 @@ bool UserConfigs::getConfigById(uint32_t userID, user_config_entry_t& entry)
 	return false;
 }
 
-bool UserConfigs::getConfigByName(std::string& userName, user_config_entry_t& entry)
+bool UserConfigs::getConfigByName(const std::string& userName, user_config_entry_t& entry)
 {
 
 //	uint32_t len = userName.length() < USERNAMELEN ? userName.length() : USERNAMELEN;
@@ -97,7 +97,7 @@ bool UserConfigs::updateEntry(user_config_entry_t& entry)
 }
 
 
-bool UserConfigs::getUserIdByName(std::string& userName, uint32_t &userID)
+bool UserConfigs::getUserIdByName(const std::string& userName, uint32_t &userID)
 {
 	user_config_entry_t entry;
 	if (false == getConfigByName(userName, entry)) {

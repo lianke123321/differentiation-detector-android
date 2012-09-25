@@ -18,17 +18,17 @@ private:
 	in_addr_t routeMask;
 	TunnelFrame *tunFrame;
 private:
-	void __natSrc(in_addr_t currNet, in_addr_t newNet);
-	void __natDst(in_addr_t currNet, in_addr_t newNet);
+	in_addr_t __natAddr(const in_addr_t &addr, const in_addr_t &currNet, const in_addr_t &newNet);
 	void __processIP();
 	void __processTCP();
 	void __processUDP();
+	void __performNAT();
 public:
 	MeddleDaemon();
 	~MeddleDaemon();
 	bool setupTunnel(std::string deviceName, std::string ipAddress, std::string netMask, std::string routeMask, std::string fwdNet, std::string revNet);
-	bool setupCommandHandler(std::string socketPath);
-	bool waitForData();
+	// bool setupCommandHandler(std::string socketPath);
+	// bool waitForData();
 	bool mainLoop();
 	bool meddleFrame();
 

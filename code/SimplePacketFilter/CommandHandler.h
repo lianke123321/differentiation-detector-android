@@ -18,6 +18,7 @@ private:
 	CommandFrame * recvCommand(uint32_t remoteFD);
 	bool processCommand();
 	bool processTunnelCommand();
+	bool processReadAllConfs();
 public:
 	CommandHandler();
 	~CommandHandler();

@@ -1,0 +1,16 @@
+http://dev.mysql.com/doc/refman/5.1/en/adding-users.html
+
+$> mysql --user=root -p 
+pass: <root password>
+
+mysql> CREATE USER 'meddle'@'localhost' IDENTIFIED BY 'meddle';
+
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'meddle'@'localhost' WITH GRANT OPTION;
+
+mysql> CREATE DATABASE MeddleDB;
+
+$> mysql -u meddle -p MeddleDB
+Enter password: <meddle password>
+
+mysql> CREATE TABLE UserConfigs (userID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, userName VARCHAR(512), FilterAdsAnalytics INT NOT NULL DEFAULT 0, UNIQUE(userName)) ENGINE="InnoDB";
+

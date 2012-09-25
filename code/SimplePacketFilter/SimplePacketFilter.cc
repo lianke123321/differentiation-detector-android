@@ -7,7 +7,6 @@
 #include "SimplePacketFilter.h"
 #include <boost/thread.hpp>
 #include "CommandHandler.h"
-#include "ReadDatabase.h"
 #include "boost/date_time/local_time/local_time.hpp"
 
 /* The main file
@@ -63,11 +62,12 @@ int mainInit(MeddleDaemon &meddle, CommandHandler &cmd)
 	}
 
 	logDebug("Connecting to the Database");
-	if (false == mainPktFilter.dbManager.connectDB(DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME)) {
+
+	if (false == mainPktFilter.connectToDB(DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME)) {
 		logError("Error in connecting to the database");
 		return -1;
 	}
-	if (false == loadUserConfigs()) {
+	if (false == mainPktFilter.loadAllUserConfigs()) {
 		logError("Error in loading the configs to memory");
 		return -1;
 	}
@@ -77,8 +77,8 @@ int mainInit(MeddleDaemon &meddle, CommandHandler &cmd)
 }
 
 /* mainPktFilter is the global object that is shared by all the threads */
+PacketFilterData mainPktFilter;
 
-pktFilter_t mainPktFilter;
 int main()
 {
 	MeddleDaemon meddle;

@@ -125,23 +125,15 @@ bool CommandHandler::processTunnelCommand()
 		logError("Error parsing the IP address");
 		return false;
 	}
-	// TODO Code to lookup the UserID for the user Name;
-
-	if (false == mainPktFilter.userConfigs.getUserIdByName(userName, userID)) {
-		logError("Unable to get the DB entry for the user" << userName);
-		return false;
-	}
 
 	logDebug("Prev Table" << mainPktFilter.ipMap);
 	if (CMD_CREATETUNNEL == cmd->cmdHeader->cmdType) {
-		boost::mutex::scoped_lock scoped_lock(mainPktFilter.filterLock); // lock is released automatically outside this scope
-		if (false == mainPktFilter.ipMap.addEntry(ipAddress, userID)) {
+		if (false == mainPktFilter.associateUserToIp(userName, ipAddress)) {
 			logError("Error adding the user" << cmd->cmdTunnel->userName);
 			return false;
 		}
 	} else {
-		boost::mutex::scoped_lock scoped_lock(mainPktFilter.filterLock);
-		if (false == mainPktFilter.ipMap.removeEntry(ipAddress)) {
+		if (false == mainPktFilter.disassociateIpFromUser(userName, ipAddress)) {
 			logError("Error in removing the entry for ipAddress" << cmd->cmdTunnel->ipAddress << " for user "<< cmd->cmdTunnel->userName);
 			return false;
 		}
@@ -150,6 +142,12 @@ bool CommandHandler::processTunnelCommand()
 	// TODO release the lock here
 	return true;
 }
+
+bool CommandHandler::processReadAllConfs()
+{
+	return mainPktFilter.loadAllUserConfigs();
+}
+
 bool CommandHandler::processCommand()
 {
 	bool ret;
@@ -160,8 +158,12 @@ bool CommandHandler::processCommand()
 	switch(cmd->cmdHeader->cmdType) {
 	case CMD_CREATETUNNEL:
 	case CMD_CLOSETUNNEL:
-		logDebug("Processing the command now");
+		logDebug("Processing the Tunnel command now");
 		ret = processTunnelCommand();
+		break;
+	case CMD_READALLCONFS:
+		logDebug("Processing the command to read configs");
+		ret = processReadAllConfs();
 		break;
 	default:
 		break;
