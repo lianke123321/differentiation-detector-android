@@ -89,5 +89,6 @@
     <string name="error_generic">Unspecified failure while connecting.</string>
     <string name="connecting_title">Connecting: %1$s</string>
     <string name="connecting_message">Establishing VPN with \""%1$s\".</string>
+    <string name="profile_auto_reconnect_box">Reconnect automatically</string>
 
 </resources>

@@ -79,6 +79,13 @@
             android:inputType="textPassword|textNoSuggestions"
             android:hint="@string/profile_password_hint" />
 
+        <CheckBox
+            android:id="@+id/auto_reconnect_box"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/profile_auto_reconnect_box" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

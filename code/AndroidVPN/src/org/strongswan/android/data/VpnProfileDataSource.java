@@ -37,6 +37,7 @@ public class VpnProfileDataSource
 	public static final String KEY_USERNAME = "username";
 	public static final String KEY_PASSWORD = "password";
 	public static final String KEY_CERTIFICATE = "certificate";
+	public static final String KEY_RECONNECT = "auto_reconnect";
 
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDatabase;
@@ -45,7 +46,7 @@ public class VpnProfileDataSource
 	private static final String DATABASE_NAME = "strongswan.db";
 	private static final String TABLE_VPNPROFILE = "vpnprofile";
 
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	public static final String DATABASE_CREATE =
 							"CREATE TABLE " + TABLE_VPNPROFILE + " (" +
@@ -54,7 +55,8 @@ public class VpnProfileDataSource
 								KEY_GATEWAY + " TEXT NOT NULL," +
 								KEY_USERNAME + " TEXT NOT NULL," +
 								KEY_PASSWORD + " TEXT," +
-								KEY_CERTIFICATE + " TEXT" +
+								KEY_CERTIFICATE + " TEXT," +
+								KEY_RECONNECT + " TEXT" +
 							");";
 	private final String[] ALL_COLUMNS = new String[] {
 								KEY_ID,
@@ -62,7 +64,8 @@ public class VpnProfileDataSource
 								KEY_GATEWAY,
 								KEY_USERNAME,
 								KEY_PASSWORD,
-								KEY_CERTIFICATE
+								KEY_CERTIFICATE,
+								KEY_RECONNECT
 							};
 
 	private static class DatabaseHelper extends SQLiteOpenHelper
@@ -215,6 +218,7 @@ public class VpnProfileDataSource
 		profile.setUsername(cursor.getString(cursor.getColumnIndex(KEY_USERNAME)));
 		profile.setPassword(cursor.getString(cursor.getColumnIndex(KEY_PASSWORD)));
 		profile.setCertificateAlias(cursor.getString(cursor.getColumnIndex(KEY_CERTIFICATE)));
+		profile.setAutoReconnect(cursor.getString(cursor.getColumnIndex(KEY_RECONNECT)).equals("True"));
 		return profile;
 	}
 
@@ -226,6 +230,7 @@ public class VpnProfileDataSource
 		values.put(KEY_USERNAME, profile.getUsername());
 		values.put(KEY_PASSWORD, profile.getPassword());
 		values.put(KEY_CERTIFICATE, profile.getCertificateAlias());
+		values.put(KEY_RECONNECT, profile.isAutoReconnect() ? "True" : "False");
 		return values;
 	}
 }

@@ -20,6 +20,7 @@ package org.strongswan.android.data;
 public class VpnProfile implements Cloneable
 {
 	private String mName, mGateway, mUsername, mPassword, mCertificate;
+	private boolean autoReconnect;
 	private long mId = -1;
 
 	public long getId()
@@ -109,5 +110,13 @@ public class VpnProfile implements Cloneable
 		{
 			throw new AssertionError();
 		}
+	}
+
+	public boolean isAutoReconnect() {
+		return autoReconnect;
+	}
+
+	public void setAutoReconnect(boolean autoReconnect) {
+		this.autoReconnect = autoReconnect;
 	}
 }
