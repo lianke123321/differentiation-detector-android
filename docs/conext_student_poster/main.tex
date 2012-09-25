@@ -34,7 +34,7 @@
 \renewcommand{\fref}{\Fref}
 \renewcommand\thesubfigure{~(\alph{subfigure})}
 
-\title{Meddle: A Middlebox to Meddle with Mobile Traffic}
+\title{Middleboxes to \meddle with Mobile Traffic}
 
 \numberofauthors{6}
 \author{
@@ -66,14 +66,11 @@ Walid Dabbous\\
 \maketitle
 
 \begin{abstract}
-In this poster we present \meddle, a middlebox aimed at enhancing
+In this poster we present \meddle, a framework aimed at enhancing
 the transparency in mobile networks and providing a platform to
-meddle with mobile traffic for improving user experience. We argue
-that \meddle, which builds upon VPN middleboxes, is feasible to
-implement, and is capable of providing sufficient incentives for a
-user based measurement study. In addition, \meddle can be used to
-build a powerful framework that enables new research directions in
-mobile networks.
+meddle with mobile traffic. We argue that \meddle, which builds upon
+VPN and middleboxes, is feasible to implement, and is capable of
+providing sufficient incentives for a user based measurement study.   
 \end{abstract}
 
 \begin{keywords}
@@ -153,9 +150,18 @@ if they were deployed in carrier networks.
    
 \section{\meddle Architecture}
 
-The key idea behind the \meddle architecture is to take two well-known
-technologies -- VPNs and middleboxes -- and combine them in unintended
-ways for the mobile environment. Andriod, BlackBerry and iOS all
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\columnwidth]{figures/meddle-servers.pdf}
+  \caption{Meddle deployment. \emph{Clients connect to a \meddle
+      server depending on their location. Client configurations are
+      stored in a data store shared by \meddle servers.}} 
+  \label{fig:MeddleDeployment}
+\end{figure}
+
+The key idea behind \meddle is to take two well-known technologies --
+VPNs and middleboxes -- and combine them in unintended 
+ways for the mobile environment. Andriod, BlackBerry, and iOS all
 support VPNs natively, representing more than 86\% of the mobile
 device market~\cite{gartner-phone-share}. As shown in
 \fref{fig:MeddleDeployment} when a mobile device connects to the
@@ -164,21 +170,25 @@ similar way to how the Akamai CDN uses DNS to redirect Web clients to
 nearby content caches~\cite{akamai:cdn}. On each \meddle server we (a)
 implement custom services for users such as packet filtering, caching,
 and intrusion detection, (b) monitor the network traffic
-characteristics, and (c) experiment with alternative protocols for the
-mobile environment without requiring access to mobile carrier
-networks. \meddle thus uses VPNs as a portable mechanism to tunnel 
-traffic from mobile devices to a machine outside of the carrier's
-network for the purpose of analysis and interposition.
+characteristics, and (c) experiment with alternative algorithms and
+protocols for the mobile environment without requiring access to
+mobile carrier networks. \meddle thus uses VPNs as a portable
+mechanism to tunnel  traffic from mobile devices to a machine outside
+of the carrier's network for the purpose of analysis and
+interposition. 
 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.6\columnwidth]{figures/meddle-servers.pdf}
-  \caption{Meddle deployment}
-  \label{fig:MeddleDeployment}
-\end{figure}
-
-To manage the VPN tunnels we use the StrongSwan~\cite{strongswan}, an
-open-source VPN implementation that uses native IPsec functionality.
+We use StrongSwan~\cite{strongswan}, an open-source VPN implementation
+that uses native IPsec functionality, to manage VPN tunnels on each
+\meddle server. We use the iPhone Configuration Utility to generate
+the required configuration file to create a VPN tunnel on an iOS
+device. Once this configuration file is installed on an iOS device,
+all its data traffic is routed via the \meddle servers. The iOS
+devices do not require any additional apps to be installed because all
+the software required to manage VPNs is shipped in the recent iOS
+versions. For Android devices, we use the a modified version of the
+Strongswan app to ensure that the VPN tunnels are created without
+any inputs from the user. Our system thus requires minimal user
+inputs.  
 
 % \begin{figure}
 %  \centering
@@ -240,22 +250,59 @@ even negligible.
 
 \section{Incentive for Users}
 
-\cite{Leontiadis:2012:AdsMobile},
-\cite{Vallina-rodriguez:2012:AdCache}
-\cite{Hornyack:2011:AppFence}
+We do not expect any single incentive to be sufficient for user
+adoption of \meddle. Rather, the research enabled by \meddle should
+form a positive feedback loop in which new, proven research artifacts
+become additional incentives for user adoption, thus enabling further
+research.  
 
-\cite{collusion}
+For starters, we have implemented a DNS based filter to block ads,
+analytics, and mediation sites. Blocking ads is an important incentive
+because Vallina-rodriguez \etal~\cite{Vallina-rodriguez:2012:AdCache}
+observe that ads account for 5\% of daily traffic from more than 50\%
+of Android users in a large European ISP. Our ad blocking engine
+relies on publicly available 
+list of domains for ads and analytics~\cite{YoyoAds}. To filter
+domains specific to mobile networks, we also use the recent research
+on mobile ads~\cite{Leontiadis:2012:AdsMobile, hornyack:appfence}. We
+have also built a prototype framework inspired by Mozilla
+Collusion~\cite{collusion} to generate a graph of domains with which
+the mobile device exchanges data. We are currently working on a
+frontend to enable users to view this graph.
 
-Implemented a dns based filter for ads, analytics and mediation sites.
-DNS entries from http://pgl.yoyo.org/as/. Added new entries for
-mobile networks based on results from appfence, Adcache paper.
+\section{Conclusion \& Roadmap}
 
-Built a framework for collusion database. Working on a frontend for
-mobile clients. 
+Using overlays for a user based measurement study is not
+new~\cite{Joseph:2006:OCALA}; however, to the best of our knowledge, we
+are the first to propose and build such a system for mobile clients. 
 
-\section{Conclusion \& Related Work}
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=0.7\columnwidth]{figures/OpenSwitch.pdf}
+%   \caption{Meddle Server. \emph{Open vSwitch to route packets via
+%       VMs. The VMs used depend on the source of the traffic and type
+%       of packets.}} 
+%   \label{fig:MeddleServer}
+% \end{figure}
 
-
+On each \meddle server, we envision using Open
+vSwitch~\cite{Openvswitch} to process packets on Virtual Machines
+depending on the source of the traffic and the protocols used to
+create the packets~\cite{Sekar:2012:ConsolidatedMBox}. This
+architecture enables us to test algorithms for content coalescing,
+caching, prefetching, and offloading the work of processing the DOM to
+speed up page load times~\cite{silk,opera-mini,google-spdy}.
+Furthermore, we envision that most of the interesting opportunities
+for mobile offloading will come at the intersection of severe
+constraints for mobile devices (power, data volume quota, and
+latencies) and the applications that extensively exercise those
+constraints. For instance, distributed hash tables (DHTs) are an
+example of a distributed service that has become critical for a
+variety of applications from P2P communication to content caching and
+anonymous networking. Using a split-application model, mobile device
+need only send a request for a key to the server-side and the server
+can perform all the network operations required to locate the value
+without consuming mobile network bandwidth.
 
 \scriptsize
 \bibliographystyle{abbrv}
