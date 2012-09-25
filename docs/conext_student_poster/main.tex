@@ -34,8 +34,8 @@
 \renewcommand{\fref}{\Fref}
 \renewcommand\thesubfigure{~(\alph{subfigure})}
 
-\title{Middleboxes to \meddle with Mobile Traffic}
-
+\title{\meddle: Middleboxes for Increased Transparency and Control of Mobile Traffic }
+% middlebox transparency control mobile traffic 
 \numberofauthors{6}
 \author{
 \alignauthor
@@ -67,10 +67,11 @@ Walid Dabbous\\
 
 \begin{abstract}
 In this poster we present \meddle, a framework aimed at enhancing
-the transparency in mobile networks and providing a platform to
-meddle with mobile traffic. We argue that \meddle, which builds upon
-VPN and middleboxes, is feasible to implement, and is capable of
-providing sufficient incentives for a user based measurement study.   
+the transparency in mobile networks and providing a platform that lets
+users reclaim control over their mobile traffic. We argue that
+\meddle, which builds upon VPN and middleboxes, is feasible to
+implement, and is capable of  providing sufficient incentives for 
+large scale experiments and user based measurement studies.    
 \end{abstract}
 
 \begin{keywords}
@@ -79,15 +80,14 @@ Middlebox, Mobile, VPN, Measurement platform.
 
 \section{Introduction}
 
-\meddle is motivated by the following characteristics of today's
-mobile systems. Currently users have little control of how their
-devices use the mobile networks they pay for. In the mobile
-environment, users are forced to interact with a single operating
-system tied to their device, generally use closed-source apps provided
-for the OS that routinely violate user
-privacy~\cite{hornyack:appfence}, and subscribe to network providers
-that can (and do) transparently modify, block or otherwise interfere
-with network traffic~\cite{wang:middleboxes}.
+\meddle is motivated by the opaque nature of mobile systems and the
+limited control users have over how their mobile devices use the
+various networks they pay for. In the mobile environment, users are
+forced to interact with a single operating system tied to their
+device, generally use closed-source apps provided for the OS that
+routinely violate user privacy~\cite{hornyack:appfence}, and subscribe
+to network providers that can (and do) transparently modify, block or
+otherwise interfere with network traffic~\cite{wang:middleboxes}. 
 
 Researchers face a similar set of challenges for characterizing an
 experiment for mobile systems. To characterize mobile traffic and
@@ -109,9 +109,9 @@ solutions.
 In this poster, we show that \meddle provides the necessary
 framework to simultaneously address these issues for users and
 researchers. \meddle relies on VPN tunnels to route mobile traffic
-through it. Once packets arrive at \meddle, we can use a variety of
-middlebox approaches to transform traffic to and from mobile
-devices. This enables new research in both measuring and
+through it. Once packets arrive at a \meddle server, we can use a
+variety of middlebox approaches to transform traffic to and from
+mobile devices. This enables new research in both measuring and
 characterizing mobile traffic, and designing new in-network features
 to improve the mobile experience. \meddle also enables researchers
 to investigate what-if scenarios for the impact of new middleboxes as
@@ -152,7 +152,7 @@ if they were deployed in carrier networks.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.7\columnwidth]{figures/meddle-servers.pdf}
+  \includegraphics[width=0.6\columnwidth]{figures/meddle-servers.pdf}
   \caption{Meddle deployment. \emph{Clients connect to a \meddle
       server depending on their location. Client configurations are
       stored in a data store shared by \meddle servers.}} 
@@ -161,34 +161,32 @@ if they were deployed in carrier networks.
 
 The key idea behind \meddle is to take two well-known technologies --
 VPNs and middleboxes -- and combine them in unintended 
-ways for the mobile environment. Andriod, BlackBerry, and iOS all
-support VPNs natively, representing more than 86\% of the mobile
-device market~\cite{gartner-phone-share}. As shown in
-\fref{fig:MeddleDeployment} when a mobile device connects to the
+ways for the mobile environment. Andriod, BlackBerry, and iOS have
+native VPN support; these devices represent more than 86\% of the
+mobile device market~\cite{gartner-phone-share}. As shown in
+\fref{fig:MeddleDeployment}, when a mobile device connects to the
 Internet, we route its traffic via a nearby \meddle server in a
 similar way to how the Akamai CDN uses DNS to redirect Web clients to
 nearby content caches~\cite{akamai:cdn}. On each \meddle server we (a)
 implement custom services for users such as packet filtering, caching,
 and intrusion detection, (b) monitor the network traffic
 characteristics, and (c) experiment with alternative algorithms and
-protocols for the mobile environment without requiring access to
-mobile carrier networks. \meddle thus uses VPNs as a portable
-mechanism to tunnel  traffic from mobile devices to a machine outside
-of the carrier's network for the purpose of analysis and
-interposition. 
+protocols for the mobile environment. \meddle thus uses VPNs as a
+portable mechanism to tunnel the data traffic from mobile devices to a
+machine whose functionality can by controlled by the user and used by
+researchers for the purpose of analysis and interposition.     
 
 We use StrongSwan~\cite{strongswan}, an open-source VPN implementation
 that uses native IPsec functionality, to manage VPN tunnels on each
-\meddle server. We use the iPhone Configuration Utility to generate
-the required configuration file to create a VPN tunnel on an iOS
-device. Once this configuration file is installed on an iOS device,
-all its data traffic is routed via the \meddle servers. The iOS
-devices do not require any additional apps to be installed because all
-the software required to manage VPNs is shipped in the recent iOS
-versions. For Android devices, we use the a modified version of the
-Strongswan app to ensure that the VPN tunnels are created without
-any inputs from the user. Our system thus requires minimal user
-inputs.  
+\meddle server. For iOS devices, we use the iPhone Configuration
+Utility to generate the required configuration file to create and
+manage a VPN tunnel. Once a user installs this configuration file on
+an iOS device, all the data traffic from that device is routed via the 
+\meddle servers. For Android devices, we use a modified Strongswan app
+because of some bugs related to reconnection in the native IPsec
+implementation. A user needs to enter the credentials only once while
+running the Strongswan app for the first time. \meddle thus requires
+minimal inputs from end users.    
 
 % \begin{figure}
 %  \centering
@@ -197,33 +195,27 @@ inputs.
 %  \label{fig:MeddleboxPacketFlow}
 % \end{figure}
 
-\section{Feasibility}
-\label{sec:eval}
-We now highlight several key questions regarding the feasibility of
-deploying our approach at scale. Because our approach in part depends
-on users installing a VPN configuration and tunneling all traffic
-through \meddle, we evaluate whether the cost to the user in terms
-of performance, power and data quota is sufficiently low. 
+\section{Overheads}
 
-\noindent\textbf{Power consumption.} Tunneling traffic through a
-\meddle requires that all traffic to be encrypted. We observed a 
-10\% increase in power consumption when streaming an HD 
-video to Android and iPhone devices using our IPsec tunnel. 
+We now present the overheads incurred on tunnelling traffic through
+\meddle.
 
-\noindent\textbf{Data consumption.} IPsec encapsulation slightly
-inflates packet sizes, in addition to preventing carrier middleboxes
-from applying their own compression. We measured the overhead of the
+\noindent\textbf{Power consumption.} We observed a 10\% increase in
+power consumption when streaming an HD video from YouTube to an
+Android device and an iPhone via one of our \meddle servers.  
+
+\noindent\textbf{Data consumption.} IPsec encapsulation inflates
+packet sizes, in addition to preventing carrier middleboxes from
+applying their own compression. We measured the overhead of the 
 tunnel in terms of data overhead from IPsec headers and keepalive
-messages, finding that it ranges from 8--12\%. For our measurements we
-setup a \meddle as a VPN gateway for an iPhone and Android
-phone. On each phone we accessed the Internet using the VPN tunnel for
-one hour. Our test traffic was generated by activities that we 
-expect to be typical of mobile device usage: Web searches, map
+messages, finding that it ranges from 8--12\%. On each phone, an
+Android phone and an iPhone, we accessed the Internet using the VPN
+tunnel for one hour. Our test traffic included Web searches, map 
 searches, online shopping, downloading popular apps, emailing and
-reading the news. We also uploaded a picture to Facebook and Twitter,
+reading the news. We also uploaded a picture to Facebook and Twitter, 
 streamed a video on YouTube, and played a popular game (Angry Birds).
 
-\noindent\textbf{Performance.} By forcing user traffic to \meddle 
+\noindent\textbf{Network Latency.} By forcing user traffic to \meddle 
 and interposing on flows, we may add latency both due to additional
 hops and due to processing time at the \meddle. We envision a
 DONAR-style deployment where users are dynamically redirected to a
@@ -236,73 +228,78 @@ phones located throughout the US and issued traceroutes from the
 devices to targets in Google and Facebook's networks. We then used the
 first non-private IP address seen from the mobile device on the path
 to a server. We assume that this corresponds to the first router
-adjacent to the mobile carrier's public Internet egress point. Note
-that we could not simply ping the device IPs because mobile carriers
-filter inbound ping requests. Using this set of egress adjacencies, we
-determined the round-trip time from each PlanetLab site, then took the
-average of the nearest five sites to represent the case where a host
-at the nearest site is unavailable due to load or other issues. The
-average latency to each router was between 3\,ms and 13\,ms, with a
-median of 5\,ms. Thus, when compared to RTTs of 10s or 100s of
-milliseconds that exist in mobile networks, the additional latencies
-from traversing a \meddle is expected to be relatively small or
-even negligible.
+adjacent to the mobile carrier's public Internet egress point. Using
+this set of egress adjacencies, we determined the round-trip time from
+each PlanetLab site, then took the average of the nearest five sites
+to represent the case where a host at the nearest site is unavailable
+due to load or other issues. The average latency to each router was
+between 3\,ms and 13\,ms, with a median of 5\,ms. Thus, when compared
+to RTTs of 10s or 100s of  milliseconds that exist in mobile networks,
+the additional latencies from traversing a \meddle is expected to be
+relatively small or even negligible. 
 
-\section{Incentive for Users}
+\section{Example Case Studies}
 
-We do not expect any single incentive to be sufficient for user
-adoption of \meddle. Rather, the research enabled by \meddle should
-form a positive feedback loop in which new, proven research artifacts
-become additional incentives for user adoption, thus enabling further
-research.  
+We believe that the research enabled by \meddle shall form a positive
+feedback loop in which new, proven research artifacts become
+additional incentives for user adoption, thus enabling further
+research.   
 
 For starters, we have implemented a DNS based filter to block ads,
 analytics, and mediation sites. Blocking ads is an important incentive
 because Vallina-rodriguez \etal~\cite{Vallina-rodriguez:2012:AdCache}
 observe that ads account for 5\% of daily traffic from more than 50\%
 of Android users in a large European ISP. Our ad blocking engine
-relies on publicly available 
-list of domains for ads and analytics~\cite{YoyoAds}. To filter
-domains specific to mobile networks, we also use the recent research
-on mobile ads~\cite{Leontiadis:2012:AdsMobile, hornyack:appfence}. We
-have also built a prototype framework inspired by Mozilla
-Collusion~\cite{collusion} to generate a graph of domains with which
-the mobile device exchanges data. We are currently working on a
-frontend to enable users to view this graph.
+relies on publicly available list of domains for ads and
+analytics~\cite{YoyoAds}. We use the recent research on mobile
+ads~\cite{Leontiadis:2012:AdsMobile, hornyack:appfence} to filter
+domains specific to mobile networks.
 
-\section{Conclusion \& Roadmap}
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+{\bf User} & {\bf Home (Wi-fi)} & {\bf Work (Wi-fi)} & {\bf Mobile (3G)} \\
+\hline
+User 1 & 84.4\% & 11.9\% & 3.7\% \\
+\hline
+User 2 & 95.1\% & 4.2\% & 0.7\% \\
+\hline
+\end{tabular}
+\caption{Traffic volume from a mobile device when the user is either
+  at home, or at work, or is mobile. \emph{A significant fraction of
+    mobile traffic volume comes from Wi-fi networks.}}  
+\label{tab:Usage}
+\end{table}
 
-Using overlays for a user based measurement study is not
-new~\cite{Joseph:2006:OCALA}; however, to the best of our knowledge, we
-are the first to propose and build such a system for mobile clients. 
+In \fref{tab:Usage}, we summarize the traffic volume observed from two
+users, one in the US and another in France. We observe that for these
+two users the 3G traffic contributes to a very small fraction of the
+total traffic from the mobile device. We are currently using our
+\meddle system to validate similar results by an IRB approved study on
+the network usage profiles of mobile phone users. 
 
-% \begin{figure}
-%   \centering
-%   \includegraphics[width=0.7\columnwidth]{figures/OpenSwitch.pdf}
-%   \caption{Meddle Server. \emph{Open vSwitch to route packets via
-%       VMs. The VMs used depend on the source of the traffic and type
-%       of packets.}} 
-%   \label{fig:MeddleServer}
-% \end{figure}
+\section{Future Work}
 
-On each \meddle server, we envision using Open
+On each \meddle server, we plan on using Open
 vSwitch~\cite{Openvswitch} to process packets on Virtual Machines
 depending on the source of the traffic and the protocols used to
-create the packets~\cite{Sekar:2012:ConsolidatedMBox}. This
+create the packets~\cite{Sekar:2012:ConsolidatedMBox}. This 
 architecture enables us to test algorithms for content coalescing,
 caching, prefetching, and offloading the work of processing the DOM to
-speed up page load times~\cite{silk,opera-mini,google-spdy}.
-Furthermore, we envision that most of the interesting opportunities
-for mobile offloading will come at the intersection of severe
-constraints for mobile devices (power, data volume quota, and
-latencies) and the applications that extensively exercise those
-constraints. For instance, distributed hash tables (DHTs) are an
-example of a distributed service that has become critical for a
-variety of applications from P2P communication to content caching and
-anonymous networking. Using a split-application model, mobile device
-need only send a request for a key to the server-side and the server
-can perform all the network operations required to locate the value
-without consuming mobile network bandwidth.
+speed up page load
+times~\cite{silk,opera-mini,google-spdy}. Furthermore, we envision
+that most of the interesting opportunities for mobile offloading will
+come at the intersection of severe constraints for mobile devices
+(power, data volume quota, and latencies) and the applications that
+extensively exercise those constraints. For instance, distributed hash
+tables (DHTs) are an example of a distributed service that has become
+critical for a variety of applications from P2P communication to
+content caching and anonymous networking. Using a split-application
+model, mobile device need only send a request for a key to the
+server-side and the server can perform all the network operations
+required to locate the value without consuming mobile network
+bandwidth. 
 
 \scriptsize
 \bibliographystyle{abbrv}
