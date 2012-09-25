@@ -91,5 +91,5 @@
     <string name="error_generic">Nieznany błąd w czasie połączenia</string>
     <string name="connecting_title">Łączenie: %1$s</string>
     <string name="connecting_message">Tworzenie tunelu VPN z \""%1$s\".</string>
-
+		<string name="profile_auto_reconnect_box">Reconnect automatically</string>
 </resources>

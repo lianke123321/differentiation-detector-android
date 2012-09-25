@@ -56,6 +56,7 @@ public class VpnProfileDetailActivity extends Activity
 	private EditText mUsername;
 	private EditText mPassword;
 	private CheckBox mCheckAuto;
+	private CheckBox mAutoReconnect;
 	private RelativeLayout mSelectCert;
 	private TextView mCertTitle;
 	private TextView mCertSubtitle;
@@ -78,6 +79,7 @@ public class VpnProfileDetailActivity extends Activity
 		mPassword = (EditText)findViewById(R.id.password);
 		mGateway = (EditText)findViewById(R.id.gateway);
 		mUsername = (EditText)findViewById(R.id.username);
+		mAutoReconnect = (CheckBox)findViewById(R.id.auto_reconnect_box);
 
 		mCheckAuto = (CheckBox)findViewById(R.id.ca_auto);
 		mSelectCert = (RelativeLayout)findViewById(R.id.select_certificate);
@@ -291,6 +293,7 @@ public class VpnProfileDetailActivity extends Activity
 		mProfile.setPassword(password);
 		String certAlias = mCheckAuto.isChecked() ? null : mCertEntry.getAlias();
 		mProfile.setCertificateAlias(certAlias);
+		mProfile.setAutoReconnect(mAutoReconnect.isChecked());
 	}
 
 	/**
@@ -314,6 +317,8 @@ public class VpnProfileDetailActivity extends Activity
 				mPassword.setText(mProfile.getPassword());
 				alias = mProfile.getCertificateAlias();
 				getActionBar().setTitle(mProfile.getName());
+				mAutoReconnect.setChecked(mProfile.isAutoReconnect());
+				
 			}
 			else
 			{

@@ -19,37 +19,38 @@ public final class R {
         public static final int vpn_state_background=0x7f020001;
     }
     public static final class id {
-        public static final int action=0x7f080017;
-        public static final int add_profile=0x7f08001d;
-        public static final int ca_auto=0x7f080009;
-        public static final int delete_profile=0x7f08001f;
-        public static final int edit_profile=0x7f08001e;
+        public static final int action=0x7f080018;
+        public static final int add_profile=0x7f08001e;
+        public static final int auto_reconnect_box=0x7f080009;
+        public static final int ca_auto=0x7f08000a;
+        public static final int delete_profile=0x7f080020;
+        public static final int edit_profile=0x7f08001f;
         public static final int gateway=0x7f080008;
         public static final int log_frag=0x7f080000;
         public static final int log_view=0x7f080002;
-        public static final int menu_accept=0x7f08001b;
-        public static final int menu_cancel=0x7f08001c;
-        public static final int menu_reload_certs=0x7f080019;
-        public static final int menu_send_log=0x7f080018;
-        public static final int menu_show_log=0x7f08001a;
+        public static final int menu_accept=0x7f08001c;
+        public static final int menu_cancel=0x7f08001d;
+        public static final int menu_reload_certs=0x7f08001a;
+        public static final int menu_send_log=0x7f080019;
+        public static final int menu_show_log=0x7f08001b;
         public static final int name=0x7f080007;
         public static final int password=0x7f080004;
-        public static final int profile_item_gateway=0x7f080010;
-        public static final int profile_item_name=0x7f08000f;
-        public static final int profile_item_username=0x7f080011;
-        public static final int profile_list=0x7f08000d;
-        public static final int profile_list_empty=0x7f08000e;
+        public static final int profile_item_gateway=0x7f080011;
+        public static final int profile_item_name=0x7f080010;
+        public static final int profile_item_username=0x7f080012;
+        public static final int profile_list=0x7f08000e;
+        public static final int profile_list_empty=0x7f08000f;
         public static final int profile_list_frag=0x7f080006;
         public static final int scroll_view=0x7f080001;
-        public static final int select_certificate=0x7f08000a;
-        public static final int select_certificate_subtitle=0x7f08000c;
-        public static final int select_certificate_title=0x7f08000b;
-        public static final int subject_primary=0x7f080012;
-        public static final int subject_secondary=0x7f080013;
+        public static final int select_certificate=0x7f08000b;
+        public static final int select_certificate_subtitle=0x7f08000d;
+        public static final int select_certificate_title=0x7f08000c;
+        public static final int subject_primary=0x7f080013;
+        public static final int subject_secondary=0x7f080014;
         public static final int username=0x7f080003;
-        public static final int vpn_profile_label=0x7f080015;
-        public static final int vpn_profile_name=0x7f080016;
-        public static final int vpn_state=0x7f080014;
+        public static final int vpn_profile_label=0x7f080016;
+        public static final int vpn_profile_name=0x7f080017;
+        public static final int vpn_state=0x7f080015;
         public static final int vpn_state_frag=0x7f080005;
     }
     public static final class layout {
@@ -119,6 +120,7 @@ public final class R {
          */
         public static final int no_profiles=0x7f05000b;
         public static final int one_profile_selected=0x7f050012;
+        public static final int profile_auto_reconnect_box=0x7f05003a;
         public static final int profile_ca_auto_label=0x7f05001d;
         public static final int profile_ca_label=0x7f05001c;
         public static final int profile_ca_select_certificate=0x7f05001f;

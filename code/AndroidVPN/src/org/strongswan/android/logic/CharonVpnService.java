@@ -25,6 +25,9 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.strongswan.android.data.VpnProfile;
 import org.strongswan.android.data.VpnProfileDataSource;
@@ -43,6 +46,7 @@ import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.VpnService;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
@@ -89,20 +93,27 @@ public class CharonVpnService extends VpnService implements Runnable
 	private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-            boolean isNewAddress = mLastLocalAddress != null && getLocalIPv4Address() != mLastLocalAddress;
-            if (!noConnectivity && syncObject != null && isNewAddress &&
-            		mService.getState()==State.CONNECTED){
-            	synchronized (syncObject){
+        	if (syncObject==null) return;
+        	synchronized (syncObject){
+	        	if (mCurrentProfile==null || !mCurrentProfile.isAutoReconnect()) {
+	        		// TODO: This isn't quite right. Need to update some state here
+	        		return;
+	        	}
+	            boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+	            boolean isNewAddress = mLastLocalAddress != null && getLocalIPv4Address() != mLastLocalAddress;
+	            if (!noConnectivity && syncObject != null && isNewAddress &&
+	            		mService.getState()==State.CONNECTED){
+	        	
 	            	mProfileUpdated = true;
 	            	mNextProfile = mCurrentProfile;
 	            	syncObject.notifyAll();
-            	}
-            }
+	            }
+	        }
         }
 	};
 	private CharonVpnService syncObject;
 	private String mLastLocalAddress;
+	private boolean isUserGeneratedClose = false;
 	
 
 	/**
@@ -131,8 +142,13 @@ public class CharonVpnService extends VpnService implements Runnable
 					String password = bundle.getString(VpnProfileDataSource.KEY_PASSWORD);
 					profile.setPassword(password);
 				}
+				setNextProfile(profile);
+
 			}
-			setNextProfile(profile);
+			else{
+				isUserGeneratedClose = true;
+				setNextProfile(null);
+			}
 		}
 		return START_NOT_STICKY;
 	}
@@ -158,6 +174,7 @@ public class CharonVpnService extends VpnService implements Runnable
 	public void onRevoke()
 	{	/* the system revoked the rights grated with the initial prepare() call.
 		 * called when the user clicks disconnect in the system's VPN dialog */
+		isUserGeneratedClose  = true;
 		setNextProfile(null);
 	}
 
@@ -224,6 +241,7 @@ public class CharonVpnService extends VpnService implements Runnable
 					}
 					else
 					{
+						isUserGeneratedClose = false;
 						mCurrentProfile = mNextProfile;
 						mNextProfile = null;
 
@@ -251,6 +269,11 @@ public class CharonVpnService extends VpnService implements Runnable
 				{
 					stopCurrentConnection();
 					setState(State.DISABLED);
+					synchronized (syncObject){
+		            	mProfileUpdated = true;
+		            	mNextProfile = mCurrentProfile;
+		            	syncObject.notifyAll();
+	            	}
 				}
 			}
 		}
@@ -267,9 +290,31 @@ public class CharonVpnService extends VpnService implements Runnable
 			{
 				setState(State.DISCONNECTING);
 				mIsDisconnecting = true;
-				deinitializeCharon();
+//				try {
+//					new AsyncTask(){
+//
+//						@Override
+//						protected Object doInBackground(Object... params) {
+							deinitializeCharon();
+//							return null;
+//						}}.get(10000, TimeUnit.MILLISECONDS);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (ExecutionException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (TimeoutException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+				
 				Log.i(TAG, "charon stopped");
+				if (mCurrentProfile.isAutoReconnect() && !isUserGeneratedClose){
+					mNextProfile = mCurrentProfile;
+				}
 				mCurrentProfile = null;
+	
 			}
 		}
 	}
@@ -333,17 +378,30 @@ public class CharonVpnService extends VpnService implements Runnable
 	 */
 	private void setErrorDisconnect(ErrorState error)
 	{
-		synchronized (mServiceLock)
-		{
-			if (mService != null)
-			{
-				mService.setError(error);
-				if (!mIsDisconnecting)
+		
+			
+			if (!mCurrentProfile.isAutoReconnect()) {
+				synchronized (syncObject){
+		        	mProfileUpdated = true;
+		        	mNextProfile = mCurrentProfile;
+		        	syncObject.notifyAll();
+		    	}
+			} else {
+				synchronized (mServiceLock)
 				{
-					mService.disconnect();
+					if (mService != null)
+					{
+						mService.setError(error);
+						if (!mIsDisconnecting)
+						{
+							mService.disconnect();
+						}
+					}
 				}
 			}
-		}
+			
+			
+
 	}
 
 	/**
@@ -357,6 +415,13 @@ public class CharonVpnService extends VpnService implements Runnable
 		switch (status)
 		{
 			case STATE_CHILD_SA_DOWN:
+				if (!mCurrentProfile.isAutoReconnect()) {
+					synchronized (syncObject){
+			        	mProfileUpdated = true;
+			        	mNextProfile = mCurrentProfile;
+			        	syncObject.notifyAll();
+			    	}
+				} else {
 				synchronized (mServiceLock)
 				{
 					/* if we are not actively disconnecting we assume the remote terminated
@@ -365,6 +430,7 @@ public class CharonVpnService extends VpnService implements Runnable
 					{
 						mService.disconnect();
 					}
+				}
 				}
 				break;
 			case STATE_CHILD_SA_UP:
