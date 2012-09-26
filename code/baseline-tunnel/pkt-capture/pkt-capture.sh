@@ -4,7 +4,7 @@ basePath="/data/pcap-data/"
 logFile="${basePath}/pkt-capt.log"
 ipLookUpFile="${basePath}/ipLookUp.txt"
 devCapture="tun0"
-passPhrase="poiuytrewq"
+passPhrase="manger preservatifs ou conservatifs"
 
 function logState()
 {
@@ -42,7 +42,7 @@ function stopLastTcpdump()
         do
 	    #kill ${line} >> $logFile 2>&1         
             # TODO:: CHECK IF THIS IS INDEED TCPDUMP .. check way to flush packets 
-            kill -9 ${line} >> ${logFile} 2>&1
+            kill ${line} >> ${logFile} 2>&1
             echo "Killing ${line} " >> ${logFile} 2>&1
         done < "${lockName}"
     fi
@@ -62,9 +62,9 @@ function startEncPacketCapture()
 {
     stopEncPacketCapture
     echo "starting Capture" >> ${logFile}
-    # THIS DID NOT WORK  { (tcpdump -i ${devCapture} -n ip host ${clientIP} -w - & echo $! >${lockName}) | gpg -o ${dumpName} -c --passphrase ${passPhrase} > /dev/null 2>&1 & } &
-    tcpdump -i ${devCapture} -n ip host ${clientIP} -w ${dumpName} >> ${logFile} 2>&1  &
-    echo $! >  ${lockName}
+    { (tcpdump -i ${devCapture} -n ip host ${clientIP} -w - & echo $! >${lockName}) | gpg -o ${dumpName} -c --passphrase ${passPhrase} > /dev/null 2>&1 & } &
+#   tcpdump -i ${devCapture} -n ip host ${clientIP} -w ${dumpName} >> ${logFile} 2>&1  &
+#   echo $! >  ${lockName}
     echo "Started Enc Packet capture" >> ${logFile} 
     cat ${lockName} >> ${logFile} 
 }
