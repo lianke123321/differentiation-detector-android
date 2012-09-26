@@ -1,0 +1,72 @@
+Contains the outline for the Mobisys paper and the time line
+
+(Mobisys paper might end up being a paper with a lot of measurements)
+
+* Introduction
+ - Platform for characterization of mobile traffic
+ - no modifications required to operating systems
+ - control and transparency 
+    - users can take back control
+    - researchers can perform experiments
+ - VPN based middlebox - all packets routed via our servers
+* Platform Descripton
+ - VPN based middlebox
+ - Strongswan on the server 
+ - Native IPsec support on mobile devices exists
+ - IKEv1 with Certificates for iOS - IKEv2 for Android 
+ - DNS reidrection 
+ - Openvswitch based middleboxes (Discuss with Justine on the timeline and splitting of tasks with her undergrad)
+* Overheads of VPN
+ - Network overheads (1 day)
+   - Signalling overheads - from Strongswan   
+   - Headers in each packet - from IPsec standards 
+   - Other overheads
+   - (Ideas for VPN issues and improvements of VPN for Mobile networks). (0.5 days)
+ - Power overheads (Inputs from Aruna on the time required to perform these tests -- at 1 day)
+   - Power meter setup
+      - Devices used in the test            
+   - Test case description
+         - factory reset the device (stop all apps that have been installed by the user)
+         - Perform the test with and without VPN
+              - browse the web with and without VPN - Select websites domain from alexa top sites
+              - Install 5 most popular games from the store for atleast 15 minutes
+              - Listen to Music, Pandora, TuneIn radio (1 hour per app -- about 10 songs to include ads)
+              - See 5 videos from YouTube                  
+   - Test results
+* Network Traffic Characteristics 
+ - Time Evolution of Traffic (results based on Arnauds script and its extension, tstat) - (3 days to 7 days to build on the scripts to plot the data)
+   - traffic when devices are asleep
+      - apps that contribute the majority of traffic in off peak hours 
+      - periodic nature from apps
+      - impact of synchronization lack of synchronization of requests between apps on power and network usage
+      - Traffic that can be potentially blocked or turned off
+ - Traffic Monitoring
+   - Identifiers exposed by Ads, Analytics,  and Webservices 
+      - Other compare results from appfence in terms of privacy violation -- with iOS and windows phone data
+      - USer agents indicating app names in case of iOS (Morleys paper)
+      - Yahoo sending usernames and sql queries in HTTP requests (Has anyone reported this yet) 
+      - Images not sent over https (http in the case of facebook, g+ images appears to use http and https, confirm with twitter)
+   - improved visibility using collusion based graphs (Discuss with Justine on contributions by Amy Tang -- the infrastructure to parse and dump HTTP headers in DB is present). 
+      - differences with web based graph for same webservices
+          - nature of servers used for ads and analytics servers (share me not and appfence)
+          - privacy implications of the graph - data sent to the ads and analytics sites
+ - Traffic Manipulation
+   - blocking ads 
+       - DNS based ad blocker (2 days to 4 days)
+          - impact of app performance (2+ days)
+       - redirection of ad requests to our server
+          - quantify the amount of ad traffic
+       - Q) Why not a HTTP based ad blocker - to block traffic to these sites that may be over HTTPS
+   - modifying identifiers (2 days to 4 days)
+      - user agent in the strings
+      - Yahoo sending usernames and sql queries in HTTP requests! (Has someone reported this yet?) 
+      - IMEI numbers in payloads (are they still being sent out after appfence paper released the names of these apps/domains)
+   - caching using a proxy (2 days to 4 days)
+      - dynamic access control lists on squid for per user configs [ http://wiki.squid-cache.org/SquidFaq/SquidAcl ] 
+      - explore privoxy chaining with squid 
+      - setup depends on openvswitch 
+* Mobile Network 
+ - Route traffic to a custom server with and without VPN to measure the role of mobile providers.
+   - Assumption is VPN traffic is IPsec traffic therefore TCP, HTTP, and other layers are not visible to mobile provider 
+ - Experiments using Mobiperf with and without VPN 
+* 
