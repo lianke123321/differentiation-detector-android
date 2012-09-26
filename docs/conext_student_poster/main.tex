@@ -117,10 +117,10 @@ measuring and characterizing mobile traffic, and designing new
 in-network features to improve the mobile experience. For example, the
 comprehensive view of mobile traffic regardless of the wireless
 technology can help us determine how different operating systems and
-apps offload their traffic from 3G or 4G networks to Wi-Fi. For
-improving the user experience, we currently implement packet filters
+apps offload their traffic from 3G or 4G networks to Wi-Fi. To
+improve the user experience, we currently implement packet filters
 to block ads; such packet filters currently require
-jail-breaking the mobile phone. Furthermore, Meddle provides an ideal
+jail-breaking the mobile device. Furthermore, Meddle provides an ideal
 vantage point for separating mobile-network performance from
 server-side performance, thus improving bottleneck identification for
 mobile applications. \meddle also enables researchers to investigate
@@ -163,9 +163,9 @@ Utility to generate the required configuration file to create and
 manage a VPN tunnel. Once a user installs this configuration file on
 an iOS device, all the data traffic from that device is routed via the 
 \meddle servers. For Android devices, we use a modified Strongswan app
-because of some bugs related to reconnection in the native IPsec
+because of some bugs related to reconnection in the native VPN
 implementation. A user needs to enter the credentials only once, for
-the first time, while running the Strongswan app . \meddle thus
+the first time, while running the Strongswan app. \meddle thus
 requires minimal inputs from end users.    
 
 \section{Case Studies}
@@ -217,11 +217,11 @@ the traffic volume observed from two iPhone users, one in the US and
 the other in France, for 20 days from August 27, 2012. The two users
 generated a traffic of 2.65 GB that passed through our \meddle
 server. In \fref{tab:Usage}, we observe that the 3G traffic contributes
-to a very small fraction (less than 5\%) of the total traffic from the
+to a very small fraction of the total traffic from the
 two iPhones. We do not present results from Android devices because
-of the reconnection issues in the native VPN implementation on
-Android; we have resolved this issue on the Strongswan app that can be
-used to manage VPN tunnels on Android devices. 
+the native VPN implementation on Android has some reconnection issues~\cite{OnDemandAndroid};
+we recently resolved these issues by  modifying the Strongswan
+app, an alternative to the native VPN implementation.
 
 \textbf{Overhead.} We observe low overheads in terms of power
 consumption, data quota, and network latency, when tunnelling data
