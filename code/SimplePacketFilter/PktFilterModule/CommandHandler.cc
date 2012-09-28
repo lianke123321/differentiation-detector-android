@@ -163,14 +163,17 @@ bool CommandHandler::respondGetUserIpInfo()
 	}
 	if (false == mainPktFilter.getUserConfigs(ipAddress, userID, entry)) {
 		logError("Error in getting the userConfigs for the IP" << cmd->cmdIPUserInfo->ipAddress);
-		return false;
+		userID = -1;
+		memset(&entry, 0, sizeof(entry));
 	}
+
 	memset(&respIPUserInfo, 0, sizeof(respIPUserInfo_t));
 	memcpy(respIPUserInfo.ipAddress, cmd->cmdIPUserInfo->ipAddress, sizeof(respIPUserInfo.ipAddress));
 	respIPUserInfo.userID = userID;
 	respIPUserInfo.userNameLen = strnlen((const char *)respIPUserInfo.userName, sizeof(respIPUserInfo.userName)-1);
 	memcpy(respIPUserInfo.userName, entry.userName,  respIPUserInfo.userNameLen);
 
+	logDebug("UserName "<<respIPUserInfo.userName << " User ID:" << respIPUserInfo.userID << " for IP "<< cmd->cmdIPUserInfo->ipAddress);
 	respFrame = new CommandFrame(CMD_RESPIPUSERINFO, respIPUserInfo);
 	if (NULL == respFrame) {
 		logError("Error creating the response frame");
