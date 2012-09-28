@@ -10,7 +10,8 @@
 #define CMD_CREATETUNNEL 3
 #define CMD_CLOSETUNNEL 4
 #define CMD_READALLCONFS 5
-
+#define CMD_GETIPUSERINFO 6
+#define CMD_RESPIPUSERINFO 7
 #define USERNAMELEN_MAX 512
 
 struct cmdHeader {
@@ -29,20 +30,39 @@ struct cmdTunnel {
 
 typedef cmdTunnel cmdTunnel_t;
 
+struct cmdIPUserInfo {
+	uint8_t ipAddress[INET_ADDRSTRLEN];
+}__attribute__((packed));
+
+typedef cmdIPUserInfo cmdIPUserInfo_t;
+
+struct respIPUserInfo {
+	uint8_t ipAddress[INET_ADDRSTRLEN];
+	uint32_t userID;
+	uint32_t userNameLen;
+	uint8_t userName[USERNAMELEN_MAX];
+}__attribute__((packed));
+
+typedef respIPUserInfo respIPUserInfo_t;
+
 class CommandFrame {
 public:
 	uint32_t frameLen;
 	uint8_t * buffer;
 	cmdHeader_t *cmdHeader;
 	cmdTunnel_t *cmdTunnel;
+	cmdIPUserInfo_t *cmdIPUserInfo;
+	respIPUserInfo_t *respIPUserInfo;
 private:
 	void __parseCommand();
+	void __createFrame();
 public:
 	CommandFrame();
 	~CommandFrame();
 	CommandFrame(uint8_t* payload, uint32_t len);
-	CommandFrame(uint32_t cmd, cmdTunnel_t cmdCreate);
+	CommandFrame(uint32_t cmd, const cmdTunnel_t &cmdCreate);
 	CommandFrame(cmd_ack_t cmd);
+	CommandFrame(uint32_t cmd, const respIPUserInfo_t &resp);
 	friend std::ostream& operator<<(std::ostream& os, const CommandFrame& cmd);
 };
 

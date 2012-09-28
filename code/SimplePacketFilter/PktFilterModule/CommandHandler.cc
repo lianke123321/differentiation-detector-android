@@ -1,5 +1,6 @@
 #include "CommandHandler.h"
 #include "Logging.h"
+#include "UserConfigs.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -60,7 +61,7 @@ bool CommandHandler::setupCommandHandler(std::string socketPath)
 	return true;
 }
 
-CommandFrame* CommandHandler::recvCommand(uint32_t remoteFD)
+CommandFrame* CommandHandler::recvCommand()
 {
 	CommandFrame *ackFrame;
 	cmd_ack_t ack_data;
@@ -148,6 +149,42 @@ bool CommandHandler::processReadAllConfs()
 	return mainPktFilter.loadAllUserConfigs();
 }
 
+bool CommandHandler::respondGetUserIpInfo()
+{
+	in_addr_t ipAddress;
+	uint32_t userID, nwrite;
+	user_config_entry_t entry;
+	respIPUserInfo_t respIPUserInfo;
+	CommandFrame *respFrame = NULL;
+
+	if (inet_pton(AF_INET, (const char *)(cmd->cmdIPUserInfo->ipAddress), (void *) &ipAddress) < 0) {
+		logError("Error parsing the IP address");
+		return false;
+	}
+	if (false == mainPktFilter.getUserConfigs(ipAddress, userID, entry)) {
+		logError("Error in getting the userConfigs for the IP" << cmd->cmdIPUserInfo->ipAddress);
+		return false;
+	}
+	memset(&respIPUserInfo, 0, sizeof(respIPUserInfo_t));
+	memcpy(respIPUserInfo.ipAddress, cmd->cmdIPUserInfo->ipAddress, sizeof(respIPUserInfo.ipAddress));
+	respIPUserInfo.userID = userID;
+	respIPUserInfo.userNameLen = strnlen((const char *)respIPUserInfo.userName, sizeof(respIPUserInfo.userName)-1);
+	memcpy(respIPUserInfo.userName, entry.userName,  respIPUserInfo.userNameLen);
+
+	respFrame = new CommandFrame(CMD_RESPIPUSERINFO, respIPUserInfo);
+	if (NULL == respFrame) {
+		logError("Error creating the response frame");
+		return false;
+	}
+	nwrite = write(remoteFD, respFrame->buffer, respFrame->frameLen);
+	if (nwrite != respFrame->frameLen) {
+		logError("Incorrect bytes written in response to GetIPUserInfo");
+		return false;
+	}
+	delete respFrame;
+	return true;
+}
+
 bool CommandHandler::processCommand()
 {
 	bool ret;
@@ -165,6 +202,10 @@ bool CommandHandler::processCommand()
 		logDebug("Processing the command to read configs");
 		ret = processReadAllConfs();
 		break;
+	case CMD_GETIPUSERINFO:
+		logDebug("Got the command to get the User details for a given ip");
+		ret = respondGetUserIpInfo();
+		break;
 	default:
 		break;
 	}
@@ -173,8 +214,6 @@ bool CommandHandler::processCommand()
 
 bool CommandHandler::mainLoop()
 {
-	uint32_t remoteFD;
-
 	while(1) {
 		this->cmd = NULL;
 		// TODO:: Add pselect here with 100000 seconds and signal handler to ensure that thread receives signals quits
@@ -184,10 +223,11 @@ bool CommandHandler::mainLoop()
 			return cmd;
 		}
 		logDebug("Received a new connection request on " << remoteFD);
-		this->cmd = recvCommand(remoteFD);
+		this->cmd = recvCommand();
 		processCommand();
 		logDebug("Accepted a new connection: Reading for data on " << remoteFD);
 		close(remoteFD);
+		remoteFD = -1;
 		delete this->cmd;
 	}
 	return true;

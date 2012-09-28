@@ -48,6 +48,10 @@ inline void CommandFrame::__parseCommand()
 		logDebug("Parsing command to " << (cmdHeader->cmdType == CMD_CREATETUNNEL? "CREATE " : "CLOSE ") <<  "Tunnel");
 		cmdTunnel = (cmdTunnel_t *)(buffer + sizeof(cmdHeader_t));
 		break;
+	case CMD_GETIPUSERINFO:
+		logDebug("Parsing command to get IP Info");
+		cmdIPUserInfo = (cmdIPUserInfo_t *)(buffer + sizeof(cmdHeader_t));
+		break;
 	default:
 		logError("Command not supported");
 		break;
@@ -55,9 +59,8 @@ inline void CommandFrame::__parseCommand()
 	return;
 }
 
-CommandFrame::CommandFrame(uint32_t cmd, cmdTunnel_t tunCmd)
+inline void CommandFrame::__createFrame()
 {
-	frameLen = sizeof(cmdHeader_t) + sizeof(cmdTunnel_t);
 	buffer = new uint8_t [frameLen];
 	if (NULL == buffer) {
 		logError("Error allocating memory");
@@ -65,10 +68,19 @@ CommandFrame::CommandFrame(uint32_t cmd, cmdTunnel_t tunCmd)
 		frameLen = -1;
 		return;
 	}
-	logDebug("Allocated memory of FramLength " <<  frameLen);
 	memset(buffer, 0, frameLen);
 	cmdHeader = (cmdHeader_t *) (buffer);
 	cmdHeader->cmdLen = frameLen;
+	return;
+}
+
+CommandFrame::CommandFrame(uint32_t cmd, const cmdTunnel_t &tunCmd)
+{
+	frameLen = sizeof(cmdHeader_t) + sizeof(cmdTunnel_t);
+	__createFrame();
+	if (NULL==buffer) {
+		return;
+	}
 	cmdHeader->cmdType = cmd;
 	cmdTunnel = (cmdTunnel_t *)(buffer + sizeof(cmdHeader_t));
 	memcpy(cmdTunnel, &tunCmd, sizeof(cmdTunnel_t));
@@ -79,17 +91,24 @@ CommandFrame::CommandFrame(uint32_t cmd, cmdTunnel_t tunCmd)
 CommandFrame::CommandFrame(cmd_ack_t cmd)
 {
 	frameLen = sizeof(cmdHeader_t);
-	buffer = new uint8_t [frameLen];
+	__createFrame();
 	if (NULL == buffer) {
-			logError("Error allocating memory");
-			buffer = NULL;
-			frameLen = -1;
 			return;
 	}
-	memset(buffer, 0, frameLen);
-	cmdHeader = (cmdHeader_t *) (buffer);
-	cmdHeader->cmdLen = frameLen;
 	cmdHeader->cmdType = (uint32_t)cmd;
+	return;
+}
+
+CommandFrame::CommandFrame(uint32_t cmd, const respIPUserInfo_t &resp)
+{
+	frameLen = sizeof(cmdHeader_t) + sizeof(respIPUserInfo_t);
+	__createFrame();
+	if (NULL == buffer) {
+		return;
+	}
+	cmdHeader->cmdType = cmd;
+	respIPUserInfo = (respIPUserInfo_t *)(buffer + sizeof(cmdHeader_t));
+	memcpy(respIPUserInfo, &resp, sizeof(respIPUserInfo_t));
 	return;
 }
 
@@ -108,6 +127,9 @@ std::ostream& operator<<(std::ostream& os, const CommandFrame& cmd)
     	case CMD_CLOSETUNNEL:
     		os << (cmd.cmdHeader->cmdType == CMD_CREATETUNNEL? "CREATE " : "CLOSE ")
     		   << cmd.cmdTunnel->ipAddress << " " << cmd.cmdTunnel->userName << " " << cmd.cmdTunnel->userNameLen;
+    		break;
+    	case CMD_GETIPUSERINFO:
+    		os << "Get IP Info for IP :" << (cmd.cmdIPUserInfo->ipAddress);
     		break;
     	default:
     		os << "Command Not Found";

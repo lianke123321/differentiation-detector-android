@@ -14,11 +14,13 @@ private:
 	CommandFrame *cmd;
 	uint8_t lastRead[4096];
 	struct sockaddr_un localAddr;
+	uint32_t remoteFD;
 private:
-	CommandFrame * recvCommand(uint32_t remoteFD);
+	CommandFrame * recvCommand();
 	bool processCommand();
 	bool processTunnelCommand();
 	bool processReadAllConfs();
+	bool respondGetUserIpInfo();
 public:
 	CommandHandler();
 	~CommandHandler();
