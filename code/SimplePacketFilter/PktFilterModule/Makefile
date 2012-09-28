@@ -1,11 +1,10 @@
 CXXFLAGS = -O3 -g -Wall -fmessage-length=0
-LIBS= -lboost_thread  -lboost_date_time -lmysqlclient -lpthread -lz -lm -lrt -ldl
-LIBDIR = -L/usr/lib/x86_64-linux-gnu
+LIBS= -lboost_thread-mt  -lboost_date_time -lmysqlclient -lpthread -lz -lm -lrt -ldl
+LIBDIR = -L/usr/lib/x86_64-linux-gnu -L/usr/lib64/mysql/ -L/usr/lib64/
 SRC = $(wildcard $(PWD)/*.cc)
 OBJS = $(SRC:.cc=.o)
 # mysql_config --libs
 # -L/usr/lib/x86_64-linux-gnu -lmysqlclient -lpthread -lz -lm -lrt -ldl
-
 
 FILTERMAINSRC = $(PWD)/SignalUserUpDown.cc
 FILTERMAINOBJS = $(FILTERMAINSRC:.cc=.o)

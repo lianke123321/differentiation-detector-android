@@ -1,5 +1,6 @@
 #include "PacketFilterData.h"
 #include "Logging.h"
+#include <mysql/mysql.h>
 
 
 PacketFilterData::PacketFilterData()
@@ -107,3 +108,12 @@ bool PacketFilterData::disassociateIpFromUser(const std::string &userName, const
 	return true;
 }
 
+UserConfigs& PacketFilterData::getUserConfigs()
+{
+	return userConfigs;
+}
+
+IpUserMap& PacketFilterData::getIPMap()
+{
+	return ipMap;
+}

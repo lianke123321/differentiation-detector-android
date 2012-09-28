@@ -8,7 +8,7 @@
 class DatabaseManager
 {
 private:
-	MYSQL mysql;
+	MYSQL *mysql;
 public:
 	DatabaseManager();
 	~DatabaseManager();

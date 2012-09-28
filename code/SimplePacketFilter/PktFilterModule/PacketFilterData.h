@@ -27,6 +27,8 @@ public:
 	PacketFilterData();
 	~PacketFilterData();
 	bool loadAllUserConfigs();
+	UserConfigs& getUserConfigs();
+	IpUserMap& getIPMap();
 	bool connectToDB(std::string hostname, std::string dbUser, std::string dbPassword, std::string dbName);
 	bool getUserConfigs(in_addr_t addr, uint32_t &userID, user_config_entry_t &entry);
 	bool associateUserToIp(const std::string &userName, const in_addr_t &addr);

@@ -8,14 +8,14 @@
 #include "UserConfigs.h"
 #include "PacketFilterData.h"
 
-// Structure that has all objects to be kept global
-struct pktFilter {
-	UserConfigs userConfigs;
-	IpUserMap ipMap;
-	DatabaseManager dbManager;
-	boost::mutex filterLock;
-};
-typedef struct pktFilter pktFilter_t;
+//// Structure that has all objects to be kept global
+//struct pktFilter {
+//	UserConfigs userConfigs;
+//	IpUserMap ipMap;
+//	DatabaseManager dbManager;
+//	boost::mutex filterLock;
+//};
+//typedef struct pktFilter pktFilter_t;
 
 //TODO:: Move these to config file
 #define TUN_DEVICE "tun0"

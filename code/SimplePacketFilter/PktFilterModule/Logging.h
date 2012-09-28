@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#if 0
+#if 1
 #define logDebug(msg) do {				\
 	std::cout << __FILE__ << ":" << __func__ << ":"<<  __LINE__ << ":" << msg << std::endl;	\
 } while (0);

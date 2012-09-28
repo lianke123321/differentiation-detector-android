@@ -126,7 +126,7 @@ bool CommandHandler::processTunnelCommand()
 		return false;
 	}
 
-	logDebug("Prev Table" << mainPktFilter.ipMap);
+	logDebug("Prev Table" << mainPktFilter.getIPMap());
 	if (CMD_CREATETUNNEL == cmd->cmdHeader->cmdType) {
 		if (false == mainPktFilter.associateUserToIp(userName, ipAddress)) {
 			logError("Error adding the user" << cmd->cmdTunnel->userName);
@@ -138,7 +138,7 @@ bool CommandHandler::processTunnelCommand()
 			return false;
 		}
 	}
-	logDebug("New Table" << mainPktFilter.ipMap);
+	logDebug("New Table" << mainPktFilter.getIPMap());
 	// TODO release the lock here
 	return true;
 }
