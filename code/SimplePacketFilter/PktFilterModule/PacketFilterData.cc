@@ -72,9 +72,20 @@ bool PacketFilterData::getUserConfigs(in_addr_t addr, uint32_t& userID, user_con
 		logError("Error getting the configs for the userID" << userID);
 		return false;
 	}
+	logDebug("User configs are userID " << userID << " " << entry.userName << " " << entry.userID);
 	return true;
 }
 
+bool PacketFilterData::getUserID(in_addr_t addr, uint32_t& userID)
+{
+	TAKE_SCOPED_LOCK(filterLock);
+	if (false == ipMap.getUserID(addr, userID)) {
+		logError("Error in getting the user ID for the given IP");
+		return false;
+	}
+	logDebug("User ID is " << userID);
+	return true;
+}
 bool PacketFilterData::associateUserToIp(const std::string &userName, const in_addr_t &addr)
 {
 	uint32_t userID;

@@ -17,7 +17,9 @@ bool UserConfigs::getConfigById(uint32_t userID, user_config_entry_t& entry)
 {
 	idUserConfigIter=idUserConfigMap.find(userID);
 	if (idUserConfigIter != idUserConfigMap.end()) {
-		entry = idUserConfigIter->second;
+		memcpy((void *)(&entry), (void *)(&(idUserConfigIter->second)), sizeof(user_config_entry_t));
+		logDebug("Entry in the User Configs for ID " << userID << "  Name:" << entry.userName);
+		// entry = idUserConfigIter->second // Should this work!
 		return true;
 	}
 	memset((void *)&entry, 0, sizeof(entry));

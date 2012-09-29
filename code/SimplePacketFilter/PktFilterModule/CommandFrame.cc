@@ -131,6 +131,9 @@ std::ostream& operator<<(std::ostream& os, const CommandFrame& cmd)
     	case CMD_GETIPUSERINFO:
     		os << "Get IP Info for IP :" << (cmd.cmdIPUserInfo->ipAddress);
     		break;
+    	case CMD_RESPIPUSERINFO:
+    		os << "Providing response of User ID:" << cmd.respIPUserInfo->userID << " for  IP" << cmd.respIPUserInfo->ipAddress;
+    		break;
     	default:
     		os << "Command Not Found";
     		break;

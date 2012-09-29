@@ -170,7 +170,7 @@ bool CommandHandler::respondGetUserIpInfo()
 	memset(&respIPUserInfo, 0, sizeof(respIPUserInfo_t));
 	memcpy(respIPUserInfo.ipAddress, cmd->cmdIPUserInfo->ipAddress, sizeof(respIPUserInfo.ipAddress));
 	respIPUserInfo.userID = userID;
-	respIPUserInfo.userNameLen = strnlen((const char *)respIPUserInfo.userName, sizeof(respIPUserInfo.userName)-1);
+	respIPUserInfo.userNameLen = strnlen((const char *)entry.userName, sizeof(respIPUserInfo.userName)-1);
 	memcpy(respIPUserInfo.userName, entry.userName,  respIPUserInfo.userNameLen);
 
 	logDebug("UserName "<<respIPUserInfo.userName << " User ID:" << respIPUserInfo.userID << " for IP "<< cmd->cmdIPUserInfo->ipAddress);
@@ -179,11 +179,13 @@ bool CommandHandler::respondGetUserIpInfo()
 		logError("Error creating the response frame");
 		return false;
 	}
+	logDebug("Created the Frame, now we are writing the response" << respFrame);
 	nwrite = write(remoteFD, respFrame->buffer, respFrame->frameLen);
 	if (nwrite != respFrame->frameLen) {
 		logError("Incorrect bytes written in response to GetIPUserInfo");
 		return false;
 	}
+	logDebug("Wrote the response"<< respFrame)
 	delete respFrame;
 	return true;
 }
@@ -228,7 +230,7 @@ bool CommandHandler::mainLoop()
 		logDebug("Received a new connection request on " << remoteFD);
 		this->cmd = recvCommand();
 		processCommand();
-		logDebug("Accepted a new connection: Reading for data on " << remoteFD);
+		logDebug("Served a command received on socket " << remoteFD);
 		close(remoteFD);
 		remoteFD = -1;
 		delete this->cmd;
