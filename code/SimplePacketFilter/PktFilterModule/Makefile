@@ -25,7 +25,7 @@ distclean: clean
 	rm -f $(MAIN)	
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(SIGNALUSER) $(MAIN)
 
 $(MAIN): $(MAINOBJS)
 	$(CXX) $(LIBDIR) -o $(MAIN) $(MAINOBJS) $(LIBS) 
