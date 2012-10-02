@@ -11,14 +11,13 @@
 #include <netinet/udp.h>
 #include <iostream>
 #include "Logging.h"
- #include <sys/select.h>
+#include <sys/select.h>
 
 MeddleDaemon::MeddleDaemon()
 {
 	tunFrame = NULL;
 	return;
 }
-
 
 MeddleDaemon::~MeddleDaemon()
 {
@@ -41,7 +40,6 @@ bool MeddleDaemon:: setupTunnel(std::string deviceName, std::string ipAddress, s
 	this->routeMask = inet_addr(routeMask.c_str());
 	this->fwdNet = inet_addr(fwdNet.c_str());
 	this->revNet = inet_addr(revNet.c_str());
-
 	return true;
 }
 
@@ -55,17 +53,16 @@ inline void MeddleDaemon::__processIP()
 	if (((tunFrame->ip->daddr) & routeMask) == revNet) {
 		logDebug("Frame in Reverse Path");
 		tunFrame->framePath = tunFrame->framePath | FRAME_PATH_REV;
-		// in_addr_t orig_addr = __natAddr(tunFrame->ip->daddr, revNet, fwdNet);
 	}
 	return;
 }
 
 inline void MeddleDaemon::__processTCP()
 {
-	if (tunFrame->framePath & FRAME_PATH_FWD == FRAME_PATH_FWD) {
+	if (FRAME_PATH_FWD == ((tunFrame->framePath) & FRAME_PATH_FWD)) {
 		logDebug("Forward path TCP segment");
 	}
-	if (tunFrame->framePath & FRAME_PATH_REV == FRAME_PATH_REV) {
+	if (FRAME_PATH_REV == ((tunFrame->framePath) & FRAME_PATH_REV)) {
 		logDebug("Reverse Path TCP segment");
 	}
 	return;
@@ -73,11 +70,30 @@ inline void MeddleDaemon::__processTCP()
 
 inline void MeddleDaemon::__processUDP()
 {
-	if (tunFrame->framePath & FRAME_PATH_FWD == FRAME_PATH_FWD) {
-		logDebug("Forward path UDP packet");
+	in_addr_t pktHost;
+	static const uint16_t udp_port_dns = htons(53);
+
+	if (FRAME_PATH_FWD == ((tunFrame->framePath) & FRAME_PATH_FWD)) {
+		logDebug("Forward path UDP packet with dest port" << ntohs(tunFrame->udp->dest) << " IP " << tunFrame->ip->daddr << " " << this->defaultDnsIP);
+		if (((tunFrame->udp->dest) == udp_port_dns) && ((tunFrame->ip->daddr) == (this->defaultDnsIP))) {
+			pktHost = tunFrame->ip->saddr;
+			mainPktFilter.getUserConfigs(pktHost, tunFrame->userID, tunFrame->configEntry);
+			if (tunFrame->configEntry.filterAdsAnalytics) {
+				logDebug("The port is of a DNS port and the destination address is of our DNS server. The user has also enabled ad filtering. So redirect it to our filterDNS");
+				tunFrame->ip->daddr = this->filterDnsIP;
+			}
+		}
 	}
-	if (tunFrame->framePath & FRAME_PATH_REV == FRAME_PATH_REV) {
-		logDebug("Reverse Path UDP packet");
+	if (FRAME_PATH_REV == ((tunFrame->framePath) & FRAME_PATH_REV)) {
+		logDebug("Reverse Path UDP packet with source port " << ntohs(tunFrame->udp->source) << " " << tunFrame->ip->saddr << " " << this->filterDnsIP);
+		if (((tunFrame->udp->source) == udp_port_dns) && ((tunFrame->ip->saddr) == this->filterDnsIP)) {
+			// pktHost =  __natAddr(tunFrame->ip->daddr, revNet, fwdNet);
+			// mainPktFilter.getUserConfigs(pktHost, tunFrame->userID, tunFrame->configEntry);
+			// if (tunFrame->configEntry.filterAdsAnalytics) {
+				logDebug("The packet is coming from a DNS port and from our DNS server when filtering is enabled. Change the IP to the default DNS server");
+				tunFrame->ip->saddr = this->defaultDnsIP;
+			// }
+		}
 	}
 	return;
 }
@@ -89,14 +105,22 @@ inline in_addr_t MeddleDaemon::__natAddr(const in_addr_t &addr, const in_addr_t 
 
 inline void MeddleDaemon::__performNAT()
 {
-	if (FRAME_PATH_FWD == (tunFrame->framePath & FRAME_PATH_FWD)) {
+	if (FRAME_PATH_FWD == ((tunFrame->framePath) & FRAME_PATH_FWD)) {
 		tunFrame->ip->saddr = __natAddr(tunFrame->ip->saddr, fwdNet, revNet);
 	}
-	if (FRAME_PATH_REV == (tunFrame->framePath & FRAME_PATH_REV)) {
+	if (FRAME_PATH_REV == ((tunFrame->framePath) & FRAME_PATH_REV)) {
 		tunFrame->ip->daddr = __natAddr(tunFrame->ip->daddr, revNet, fwdNet);
 	}
 	tunFrame->validCheckSum = false;
 	return;
+}
+
+bool MeddleDaemon::setupDNS(std::string defaultDnsIP, std::string filterDnsIP)
+{
+	// TODO:: Perform the checks if required.
+	this->defaultDnsIP = inet_addr(defaultDnsIP.c_str());
+	this->filterDnsIP = inet_addr(filterDnsIP.c_str());
+	return true;
 }
 
 inline bool MeddleDaemon::meddleFrame()
@@ -123,30 +147,6 @@ inline bool MeddleDaemon::meddleFrame()
 	}
 	return true;
 }
-
-
-
-//inline void MeddleDaemon::__natSrc(in_addr_t currNet, in_addr_t newNet)
-//{
-//	// TODO:: Verify if you really need to do everything with htonl and ntohl
-//	in_addr_t srcaddr = tunFrame->ip->saddr;
-//	srcaddr = newNet | (currNet ^ srcaddr);
-//	tunFrame->ip->saddr = srcaddr;
-//	// TODO::
-//	// Fast update checksum based on IP change only
-//	tunFrame->validCheckSum = false;
-//	return;
-//}
-
-//inline void MeddleDaemon::__natDst(in_addr_t currNet,  in_addr_t newNet)
-//{
-//	in_addr_t dstaddr = tunFrame->ip->daddr;
-//	dstaddr = newNet | (currNet ^ dstaddr);
-//	tunFrame->ip->daddr = dstaddr;
-//	// TODO:: Fast update checksum based on IP change only
-//	tunFrame->validCheckSum = false;
-//	return;
-//}
 
 bool MeddleDaemon::mainLoop()
 {

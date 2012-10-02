@@ -60,7 +60,12 @@ int mainInit(MeddleDaemon &meddle, CommandHandler &cmd)
 		logError("Unable to setup the tunnel");
 		return -1;
 	}
+	logDebug("Setting up the DNS server to filter traffic");
 
+	if (false == meddle.setupDNS(DEFAULT_DNS_SERVER, FILTER_DNS_SERVER)) {
+		logError("Error in setting up the DNS");
+		return -1;
+	}
 	logDebug("Connecting to the Database");
 
 	if (false == mainPktFilter.connectToDB(DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME)) {
@@ -102,18 +107,18 @@ int main()
 
 		struct timespec tSpec;
 
-        /* handle SIGINT, SIGHUP ans SIGTERM in this handler */
-        sigemptyset(&sigSet);
-        sigaddset(&sigSet, SIGINT);
-        sigaddset(&sigSet, SIGHUP);
-        sigaddset(&sigSet, SIGTERM);
-        sigprocmask(SIG_BLOCK, &sigSet, NULL);
+		/* handle SIGINT, SIGHUP ans SIGTERM in this handler */
+		sigemptyset(&sigSet);
+		sigaddset(&sigSet, SIGINT);
+		sigaddset(&sigSet, SIGHUP);
+		sigaddset(&sigSet, SIGTERM);
+		sigprocmask(SIG_BLOCK, &sigSet, NULL);
 
 		// check if the threads are alive ...
-        tSpec.tv_sec = 10;
-        tSpec.tv_nsec = 0;
+		tSpec.tv_sec = 10;
+		tSpec.tv_nsec = 0;
 
-        logDebug("In Loop Waiting for " << tSpec.tv_sec << " seconds");
+		logDebug("In Loop Waiting for " << tSpec.tv_sec << " seconds");
 		sigVal = sigtimedwait(&sigSet, &sigInfo, &tSpec);
 
 		if ((sigVal < 0) && ((false == meddleThread.timed_join(boost::posix_time::seconds(0))) && (false == commandThread.timed_join(boost::posix_time::seconds(0))))) {

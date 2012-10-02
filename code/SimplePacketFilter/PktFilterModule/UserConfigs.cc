@@ -119,7 +119,7 @@ std::ostream& operator<<(std::ostream& os, const UserConfigs& userMapTable)
 	for(iter = userMapTable.idUserConfigMap.begin(); iter != userMapTable.idUserConfigMap.end(); iter++)
 	{
 		user_config_entry_t entry = iter->second;
-		os << "| " << entry.userID << " | " << entry.userName << " | " << entry.filterAdsAnalytics << std::endl;
+		os << "| " << entry.userID << " | " << entry.userName << " | " << (uint32_t)(entry.filterAdsAnalytics) << std::endl;
 	}
 	os << "-----------" << std::endl;
 	return os;

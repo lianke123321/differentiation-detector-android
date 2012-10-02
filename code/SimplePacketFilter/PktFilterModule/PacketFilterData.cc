@@ -56,6 +56,7 @@ bool PacketFilterData::loadAllUserConfigs()
 		TAKE_SCOPED_LOCK(filterLock);
 		userConfigs.addEntry(configVector[i]);
 	}
+	logDebug(userConfigs);
 	mysql_free_result(results);
 	return true;
 }
