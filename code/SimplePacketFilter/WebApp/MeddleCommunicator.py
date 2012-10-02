@@ -13,6 +13,7 @@ COMMAND_SOCKET_PATH = "/data/.meddleCmdSocket"
 #define USERNAMELEN_MAX 512
 CMD_ACK_POSITIVE = 1
 CMD_ACK_NEGATIVE = 2
+CMD_READALLCONFS = 5
 CMD_GETIPUSERINFO = 6
 CMD_RESPIPUSERINFO = 7
 
@@ -47,10 +48,9 @@ class IPUserInfo:
     
     def __init__ (self, ipAdd, uid, uname):
         self.ipAddress = ipAdd
-        self.userID = uid;
-        self.userName = uname       
-        
-    
+        self.userID = uid
+        self.userName = uname
+
 class MeddleCommunicator:
     sock = None
     sockPath = None 
@@ -66,7 +66,7 @@ class MeddleCommunicator:
             self.sock.connect(self.sockPath)
         except socket.error, msg:
             return False            
-        return True 
+        return True  
                        
     def __createHeader(self, cmdType, cmdLen):
         return struct.pack('@II', cmdType, cmdLen) # @ for native byte order 
@@ -86,19 +86,32 @@ class MeddleCommunicator:
             data = self.sock.recv(LEN_CMDACK + LEN_RESPUSERINFO)
             #print "Received an ACK/NACK"+str(len(data))+" "+str(LEN_CMDACK + LEN_RESPUSERINFO)        
             ackType, ackLen = struct.unpack('II',data[:LEN_CMDACK])
-            if (ackType != CMD_ACK_POSITIVE):
-                print "Did not receive ACK"                                  
-                return False
+            if (ackType != CMD_ACK_POSITIVE):                
+                return None
             data = data[LEN_CMDACK:];
             #print "Getting the response "+str(len(data))
             cmdType, cmdLen, ipAddress, userID, userNameLen, userName = struct.unpack('@II'+str(INET_ADDRSTRLEN)+'sII'+str(LEN_USERNAME)+'s',data)
             return IPUserInfo(ipAddress, userID, userName)            
             #print "IP " +str(ipAddress)+ " User ID"+str(userID)+"userNameLen:"+str(userNameLen)+"userName"+str(userName)             
         except socket.error, msg:
-            print msg
+            #print msg            
             return None
         return None
-        
+    
+    def commandReReadConfs(self):
+        hdr = self.__createHeader(CMD_READALLCONFS, LEN_HDR)
+        try:
+            if self.connectRemoteServer() == False:
+                return False
+            self.sock.send(hdr)
+            data = self.sock.recv(LEN_CMDACK);
+            ackType, ackLen = struct.unpack('II',data[:LEN_CMDACK])
+            if (ackType != CMD_ACK_POSITIVE):                
+                return False            
+        except socket.error, msg:
+            return False
+        return True
+    
     def closeConnection():
         self.sock.close()
 
