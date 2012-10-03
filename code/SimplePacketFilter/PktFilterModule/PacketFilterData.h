@@ -15,6 +15,7 @@
 #include <vector>
 #include <vector>
 #include <string>
+#include "Macros.h"
 
 class PacketFilterData
 {
@@ -36,7 +37,7 @@ public:
 	bool disassociateIpFromUser(const std::string &userName, const in_addr_t &addr);
 };
 
-#define TAKE_SCOPED_LOCK(lock) boost::mutex::scoped_lock scoped_lock(lock);
+
 
 
 #endif /* PACKETFILTERDATA_H_ */

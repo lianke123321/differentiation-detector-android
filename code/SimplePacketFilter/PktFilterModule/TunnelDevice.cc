@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <netinet/ip.h>
 #include "Logging.h"
+#include "Macros.h"
 
 TunnelDevice::TunnelDevice()
 {
@@ -48,6 +49,7 @@ bool TunnelDevice::createTunnel(std::string deviceName)
 	}
 	this->deviceName = ifr.ifr_name;
 	this->tunFD = fd;
+	this->wFD = dup(fd); // Writing on this file descriptor
 	logDebug("Created the device");
 	return true;
 }
@@ -56,7 +58,7 @@ bool TunnelDevice::assignIP(std::string ip_address, std::string netmask)
 {
 	struct ifreq ifr;
 	struct sockaddr_in sai;
-	uint32_t sockfd;                     /* socket fd we use to manipulate stuff with */
+	uint32_t sockfd;
 	char *p;
 
 	/* Create a channel to the NET kernel. */
@@ -126,15 +128,15 @@ bool TunnelDevice::assignIP(std::string ip_address, std::string netmask)
 TunnelFrame * TunnelDevice::readFrame()
 {
 	TunnelFrame *tunFrame = NULL;
-	uint8_t buffer[1<<16]; // FOR TSO MAX FRAME SIZE OF 16k thanks to tcp over ipv4
-	logDebug("Performing the read operation")
-	uint32_t nread = read(tunFD,buffer,sizeof(buffer));
+	 // FOR TSO MAX FRAME SIZE OF 16k thanks to tcp over ipv4
+	logDebug("Performing the read operation");
+	uint32_t nread = read(tunFD,readBuffer,sizeof(readBuffer));
 	if (nread == 0) {
 		logError("Error reading the frame");
 		return NULL;
 	}
 	logDebug("Read a frame, now creating the tun Frame")
-	tunFrame = new TunnelFrame(buffer, nread);
+	tunFrame = new TunnelFrame(readBuffer, nread);
 	logDebug("Created the tunFrame");
 	return tunFrame;
 }
@@ -142,19 +144,15 @@ TunnelFrame * TunnelDevice::readFrame()
 // ASsu
 bool TunnelDevice::writeFrame(TunnelFrame *tunFrame)
 {
-	uint8_t *buf = tunFrame->buffer;
-	uint32_t len = tunFrame->frameLen;
 	logDebug("Writing a frame now");
-	uint32_t nwrite = write(tunFD, buf, len );
-	if (nwrite != len) {
+	uint32_t nwrite = write(wFD, tunFrame->buffer, tunFrame->frameLen);
+	if (nwrite != tunFrame->frameLen) {
 		logError("Unable to the writeLen")
 		return false;
 	}
 	logDebug("Wrote a frame");
 	return true;
 }
-
-
 
 
 

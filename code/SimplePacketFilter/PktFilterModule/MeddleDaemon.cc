@@ -2,6 +2,8 @@
 #include "MeddleDaemon.h"
 #include "TunnelDevice.h"
 #include "TunnelFrame.h"
+#include "TunReaderWriter.h"
+#include "TunnelFrameQueue.h"
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -150,25 +152,42 @@ inline bool MeddleDaemon::meddleFrame()
 
 bool MeddleDaemon::mainLoop()
 {
+	// Create the reader and writer threads
+	// Wait from frames in the reader queue and write to writer queue
+	TunnelFrameQueue readerQueue;
+	TunnelFrameQueue writerQueue;
+	TunReaderWriter tunReader(TUN_RW_READER, &tunDevice, &readerQueue);
+	TunReaderWriter tunWriter(TUN_RW_WRITER, &tunDevice, &writerQueue);
+
+	boost::thread readerThread(&TunReaderWriter::mainLoop, &tunReader);
+
+	boost::thread writerThread(&TunReaderWriter::mainLoop, &tunWriter);
+
 	while(1)
 	{
-		logDebug("Waiting for the new Frame");
-		this->tunFrame = NULL;
-		if (NULL == (this->tunFrame = tunDevice.readFrame())) {
-			logError("Error reading Frame");
-			return false;
-		}
-		logDebug("Now Processing the Frame");
-		// Take the lock here
-		this->meddleFrame();
-		// Release the lock here
-		logDebug("Now Writing the Frame")
-		if (false == tunDevice.writeFrame(this->tunFrame)) {
-			logError("Error writing frame");
-			return false;
-		}
-		logDebug("Deleting the Frame");
-		delete tunFrame;
+
+		tunFrame = readerQueue.dequeue();
+		logDebug("Received a Frame from the reader queue at pointer" <<tunFrame);
+		meddleFrame();
+		logDebug("Writing a Frame to the writer queue");
+		writerQueue.enqueue(tunFrame);
+//		logDebug("Waiting for the new Frame");
+//		this->tunFrame = NULL;
+//		if (NULL == (this->tunFrame = tunDevice.readFrame())) {
+//			logError("Error reading Frame");
+//			return false;
+//		}
+//		logDebug("Now Processing the Frame");
+//		// Take the lock here
+//		this->meddleFrame();
+//		// Release the lock here
+//		logDebug("Now Writing the Frame")
+//		if (false == tunDevice.writeFrame(this->tunFrame)) {
+//			logError("Error writing frame");
+//			return false;
+//		}
+//		logDebug("Deleting the Frame");
+//		delete tunFrame;
 	}
 	return true;
 }

@@ -7,12 +7,11 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string>
-
+#include "TunnelFrameQueue.h"
 class MeddleDaemon
 {
 private:
 	TunnelDevice tunDevice;
-
 	in_addr_t fwdNet;
 	in_addr_t revNet;
 	in_addr_t routeMask;

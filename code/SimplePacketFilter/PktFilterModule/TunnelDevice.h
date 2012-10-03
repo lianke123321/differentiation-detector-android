@@ -5,14 +5,16 @@
 #include <string>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
-
 #include "TunnelFrame.h"
+#include <sys/select.h>
 
 #define DEFAULT_TUNNEL_FLAGS  IFF_TUN
+// Separate class to act like a wrapper for read writes.
 class TunnelDevice {
 public:
 	uint32_t tunFD;
+	uint32_t wFD;
+	uint8_t readBuffer[1<<16];
 private:
 	std::string deviceName;
 	in_addr_t ipAddress;
