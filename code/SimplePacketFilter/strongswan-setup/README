@@ -4,3 +4,5 @@ strongswan.conf - http://wiki.strongswan.org/projects/strongswan/wiki/Strongswan
 config - config parameters to compile strongswan -- worked with 5.0.0
 all the three files should be in the etc folder
 copy the certificates in ${IPSECPATH}/etc/ipsec.d/ a template ipsec.d is present in this folder
+#setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
+aa-complain /usr/sbin/tcpdump

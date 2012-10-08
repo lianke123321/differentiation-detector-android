@@ -62,9 +62,9 @@ function startEncPacketCapture()
 {
     stopEncPacketCapture
     echo "starting Capture" >> ${logFile}
-    { (tcpdump -i ${devCapture} -n ip host ${clientIP} -w - & echo $! >${lockName}) | gpg -o ${dumpName} -c --passphrase ${passPhrase} > /dev/null 2>&1 & } &
-#   tcpdump -i ${devCapture} -n ip host ${clientIP} -w ${dumpName} >> ${logFile} 2>&1  &
-#   echo $! >  ${lockName}
+    #{ (tcpdump -i ${devCapture} -n ip host ${clientIP} -w - & echo $! >${lockName}) | gpg -o ${dumpName} -c --passphrase ${passPhrase} > /dev/null 2>&1 & } &
+    tcpdump -i ${devCapture} -n ip host ${clientIP} -w ${dumpName} >> ${logFile} 2>&1  &
+    echo $! >  ${lockName}
     echo "Started Enc Packet capture" >> ${logFile} 
     cat ${lockName} >> ${logFile} 
 }
