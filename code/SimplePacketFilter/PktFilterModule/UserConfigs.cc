@@ -50,10 +50,10 @@ bool UserConfigs::addEntry(user_config_entry_t& entry)
 	// std::pair<std::map<uint32_t, user_config_entry_t>::iterator, bool> insertIDRet;
 	// std::pair<std::map<int8_t[USERNAMELEN], user_config_entry_t>::iterator, bool> insertNameRet;
 
-	logDebug("Attempting to add entry for user " << entry.userName << " with id " << entry.userID);
+	logError("Attempting to add entry for user " << entry.userName << " with id " << entry.userID);
 	insertIDRet = idUserConfigMap.insert(std::make_pair(entry.userID, entry));
 	if (insertIDRet.second == false) {
-		logDebug("Previous Entry already exists so removing it now");
+		logError("Previous Entry already exists so removing it now");
 		idUserConfigMap.erase(entry.userID);
 		insertIDRet = idUserConfigMap.insert(std::make_pair(entry.userID, entry));
 		if (insertIDRet.second == false) {
@@ -66,7 +66,7 @@ bool UserConfigs::addEntry(user_config_entry_t& entry)
 
 	insertNameRet = nameUserConfigMap.insert(std::make_pair(userName, entry));
 	if (insertIDRet.second == false) {
-		logDebug("Previous Entry already exists so removing it now");
+		logError("Previous Entry already exists so removing it now");
 		nameUserConfigMap.erase(userName);
 		insertNameRet = nameUserConfigMap.insert(std::make_pair(userName, entry));
 		if (insertNameRet.second == false) {

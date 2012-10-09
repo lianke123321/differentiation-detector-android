@@ -139,7 +139,7 @@ bool CommandHandler::processTunnelCommand()
 			return false;
 		}
 	}
-	logDebug("New Table" << mainPktFilter.getIPMap());
+	logError("New Table" << mainPktFilter.getIPMap());
 	// TODO release the lock here
 	return true;
 }
@@ -173,19 +173,19 @@ bool CommandHandler::respondGetUserIpInfo()
 	respIPUserInfo.userNameLen = strnlen((const char *)entry.userName, sizeof(respIPUserInfo.userName)-1);
 	memcpy(respIPUserInfo.userName, entry.userName,  respIPUserInfo.userNameLen);
 
-	logDebug("UserName "<<respIPUserInfo.userName << " User ID:" << respIPUserInfo.userID << " for IP "<< cmd->cmdIPUserInfo->ipAddress);
+	logError("UserName "<<respIPUserInfo.userName << " User ID:" << respIPUserInfo.userID << " for IP "<< cmd->cmdIPUserInfo->ipAddress);
 	respFrame = new CommandFrame(CMD_RESPIPUSERINFO, respIPUserInfo);
 	if (NULL == respFrame) {
 		logError("Error creating the response frame");
 		return false;
 	}
-	logDebug("Created the Frame, now we are writing the response" << respFrame);
+	logError("Created the Frame, now we are writing the response" << respFrame);
 	nwrite = write(remoteFD, respFrame->buffer, respFrame->frameLen);
 	if (nwrite != respFrame->frameLen) {
 		logError("Incorrect bytes written in response to GetIPUserInfo");
 		return false;
 	}
-	logDebug("Wrote the response"<< respFrame)
+	logError("Wrote the response"<< respFrame)
 	delete respFrame;
 	return true;
 }
@@ -200,15 +200,15 @@ bool CommandHandler::processCommand()
 	switch(cmd->cmdHeader->cmdType) {
 	case CMD_CREATETUNNEL:
 	case CMD_CLOSETUNNEL:
-		logDebug("Processing the Tunnel command now");
+		logError("Processing the Tunnel command now");
 		ret = processTunnelCommand();
 		break;
 	case CMD_READALLCONFS:
-		logDebug("Processing the command to read configs");
+		logError("Processing the command to read configs");
 		ret = processReadAllConfs();
 		break;
 	case CMD_GETIPUSERINFO:
-		logDebug("Got the command to get the User details for a given ip");
+		logError("Got the command to get the User details for a given ip");
 		ret = respondGetUserIpInfo();
 		break;
 	default:
@@ -227,10 +227,10 @@ bool CommandHandler::mainLoop()
 			logError("Error during the accept operation");
 			return cmd;
 		}
-		logDebug("Received a new connection request on " << remoteFD);
+		logError("Received a new connection request on " << remoteFD);
 		this->cmd = recvCommand();
 		processCommand();
-		logDebug("Served a command received on socket " << remoteFD);
+		logError("Served a command received on socket " << remoteFD);
 		close(remoteFD);
 		remoteFD = -1;
 		delete this->cmd;

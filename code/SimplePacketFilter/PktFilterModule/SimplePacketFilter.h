@@ -27,7 +27,7 @@
 #define COMMAND_SOCKET_PATH "/data/.meddleCmdSocket"
 
 #define DEFAULT_DNS_SERVER "128.208.4.1"
-#define FILTER_DNS_SERVER "128.208.4.7"
+#define FILTER_DNS_SERVER "128.208.4.186"
 
 #define DB_SERVER "localhost"
 #define DB_USER "meddle"

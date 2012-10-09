@@ -98,9 +98,10 @@ bool PacketFilterData::associateUserToIp(const std::string &userName, const in_a
 
 	boost::mutex::scoped_lock scoped_lock(filterLock); // lock is released automatically outside this scope
 	if (false == ipMap.addEntry(addr, userID)) {
-			logError("Error adding the user" << userName);
-			return false;
+		logError("Error adding the user" << userName);
+		return false;
 	}
+	logError("IP Map is" << ipMap);
 	return true;
 }
 
@@ -117,6 +118,7 @@ bool PacketFilterData::disassociateIpFromUser(const std::string &userName, const
 		logError("Error in removing the entry for ipAddress" << addr << " for user "<< userName);
 		return false;
 	}
+	logError("IP Map is " << ipMap);
 	return true;
 }
 
