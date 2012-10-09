@@ -77,13 +77,22 @@ class MeddleCommunicator:
         payload = struct.pack('@'+str(INET_ADDRSTRLEN)+'s', ipAddress)        
         return hdr+payload        
         
+    def __getData(self, length):
+        data = ""
+        while (len(data) < length):
+	    reqLen = length - len(data)  
+            tmpData = self.sock.recv(reqLen) 
+            data = data + tmpData
+        return tmpData
+ 
     def requestUserInfo(self, ipAddress):
         global LEN_RESPUSERINFO, LEN_CMDACK, INET_ADDRSTRLEN
         frame = self.__createIPUserRequestInfo(ipAddress)
         try:
             self.sock.send(frame)
             #print "Sent Frame"         
-            data = self.sock.recv(LEN_CMDACK + LEN_RESPUSERINFO)
+            data = self.__getData(LEN_CMDACK + LEN_RESPUSERINFO)
+            
             #print "Received an ACK/NACK"+str(len(data))+" "+str(LEN_CMDACK + LEN_RESPUSERINFO)        
             ackType, ackLen = struct.unpack('II',data[:LEN_CMDACK])
             if (ackType != CMD_ACK_POSITIVE):                

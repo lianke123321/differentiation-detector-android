@@ -49,7 +49,7 @@ class UserConfigs:
         page += """<form name="input" action=\""""+str(PAGE_UPDATECONFIGS)+"""\" method="POST">"""
         page += "Configuration options:"
         page += self.__htmlAds()
-        page += """<br/><input type="submit" value="Press to Submit and Update Settings"></form>"""
+        page += """<br/><input type="submit" id=\""""+str(CFG_SUBMIT_ID)+"""\" value=\""""+str(CFG_SUBMIT_STR)+"""\"></form>"""
         page += self.__footer()
         return page
     

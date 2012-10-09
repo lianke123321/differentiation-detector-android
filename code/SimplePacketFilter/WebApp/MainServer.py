@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import tornado.ioloop
 import tornado.web
 import ctypes
@@ -24,6 +25,9 @@ class CommonHandler(tornado.web.RequestHandler):
      
     def getIpInfo(self):
         remoteIP = self.request.remote_ip
+        if remoteIP.find(PRIV_NETWORK) == -1:
+            self.mainErr = ERR_NOUSER
+            return None        
         m = MeddleCommunicator.MeddleCommunicator()
         if (False == m.connectRemoteServer()):
             self.mainErr = ERR_CONN;
@@ -99,5 +103,5 @@ application = tornado.web.Application([
 ])
 
 if __name__ == "__main__":
-    application.listen(8888)
+    application.listen(80)
     tornado.ioloop.IOLoop.instance().start()
