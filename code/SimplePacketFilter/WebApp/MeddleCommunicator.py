@@ -1,6 +1,7 @@
 import socket
 import sys
 import struct
+import logging
 
 #TODO:: Add logging support
 
@@ -50,6 +51,8 @@ class IPUserInfo:
         self.ipAddress = ipAdd
         self.userID = uid
         self.userName = uname
+    def __str__(self):
+        return "IP:"+str(self.ipAddress)+":ID:"+str(self.userID)+":Name:"+str(self.userName)
 
 class MeddleCommunicator:
     sock = None
@@ -64,7 +67,9 @@ class MeddleCommunicator:
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:
             self.sock.connect(self.sockPath)
+            logging.warning("Connected to the Meddle server");
         except socket.error, msg:
+            logging.error(msg)
             return False            
         return True  
                        
@@ -95,7 +100,8 @@ class MeddleCommunicator:
             
             #print "Received an ACK/NACK"+str(len(data))+" "+str(LEN_CMDACK + LEN_RESPUSERINFO)        
             ackType, ackLen = struct.unpack('II',data[:LEN_CMDACK])
-            if (ackType != CMD_ACK_POSITIVE):                
+            if (ackType != CMD_ACK_POSITIVE):
+                logging.error("Did not receive a POSITIVE ack from the Meddle server")                
                 return None
             data = data[LEN_CMDACK:];
             #print "Getting the response "+str(len(data))
@@ -103,7 +109,7 @@ class MeddleCommunicator:
             return IPUserInfo(ipAddress, userID, userName)            
             #print "IP " +str(ipAddress)+ " User ID"+str(userID)+"userNameLen:"+str(userNameLen)+"userName"+str(userName)             
         except socket.error, msg:
-            #print msg            
+            logging.error(msg)
             return None
         return None
     
@@ -111,6 +117,7 @@ class MeddleCommunicator:
         hdr = self.__createHeader(CMD_READALLCONFS, LEN_HDR)
         try:
             if self.connectRemoteServer() == False:
+                logging.error("Unable to connect to the Meddle server")
                 return False
             self.sock.send(hdr)
             data = self.sock.recv(LEN_CMDACK);
@@ -118,11 +125,16 @@ class MeddleCommunicator:
             if (ackType != CMD_ACK_POSITIVE):                
                 return False            
         except socket.error, msg:
+            logging.error(msg)
             return False
         return True
     
-    def closeConnection():
-        self.sock.close()
+    def closeConnection(self):
+        try:
+            self.sock.close()
+        except socket.error, msg:
+            logging.error(msg)
+         
 
 if __name__ == "__main__":
     m = MeddleCommunicator();

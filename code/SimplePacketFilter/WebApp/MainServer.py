@@ -2,6 +2,7 @@
 import tornado.ioloop
 import tornado.web
 import ctypes
+import logging
 
 import MeddleCommunicator
 import UserConfigs
@@ -36,16 +37,20 @@ class CommonHandler(tornado.web.RequestHandler):
         if None == ipInfo:
             self.mainErr = ERR_NOUSER
 #            self.write("Unable to get user details for IP"+str(remoteIP))
+            m.closeConnection()
             return None
         if ipInfo.userID == ctypes.c_uint32(-1).value:
             self.mainErr = ERR_NOUSER
 #            self.write("Unable to get user details for IP"+str(remoteIP))
+            m.closeConnection()
             return None
+        m.closeConnection()
         return ipInfo
     
 class MainHandler(CommonHandler):
     
     def get(self):
+        logging.warning(self.request)
         self.mainErr = -1        
         self.dispPage(self.getIpInfo())
     
@@ -65,6 +70,7 @@ class MainHandler(CommonHandler):
 class UpdateConfigsHandler(CommonHandler):
     
     def post(self):
+        logging.warning(self.request)
         cfg_ads = self.get_argument(CFG_ADS_GRP, 'None')
         if cfg_ads == 'None':
             self.displayRedirect()
