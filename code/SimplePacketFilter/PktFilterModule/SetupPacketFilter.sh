@@ -1,4 +1,4 @@
-eth="eth0"
+eth="eth1"
 tun="tun0"
 tunIP="192.168.0.1"
 fwdNet="192.168.0.0/24"
@@ -13,6 +13,7 @@ setup()
     ./SimplePacketFilter > ${logName} 2>&1 &
     echo "Sleeping for the device to come up"
     sleep 5 
+
     # Disable the proxy arp
     echo "1" > /proc/sys/net/ipv4/conf/${tun}/proxy_arp
 
@@ -71,12 +72,15 @@ setup()
     
     # iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ${eth}  -j TCPMSS --set-mss 1250
     # iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ${tun}  -j TCPMSS --set-mss 1250
+
+    ./ipsec start
 }
 
 undo()
 {
     
     # All the above steps with s/add/del/g 
+    ./ipsec stop	
     iptables --flush
     iptables --flush -t nat
     iptables --flush -t mangle
