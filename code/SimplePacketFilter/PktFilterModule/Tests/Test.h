@@ -6,10 +6,10 @@
 
 void testRecvCommand()
 {
-	CommandHandler c;
+	MessageHandler c;
 	fd_set fds;
 	struct timeval tv;
-	CommandFrame *cmdFrame;
+	MessageFrame *cmdFrame;
 	int32_t retval;
 
 	while(1)
@@ -43,11 +43,11 @@ void testRecvCommand()
 #define USERNAME "HELLO"
 void testCreateCommand()
 {
-	cmdTunnel_t cmdCreate;
-	CommandSender c;
+	msgTunnel_t cmdCreate;
+	MessageSender c;
 	logDebug("Connected");
 
-	memset(&cmdCreate, 0, sizeof(cmdTunnel_t));
+	memset(&cmdCreate, 0, sizeof(msgTunnel_t));
 	strncpy((char *)(cmdCreate.ipAddress), IPADDRESS, sizeof(cmdCreate.ipAddress)-1);
 	strncpy((char *)(cmdCreate.userName), USERNAME, sizeof(cmdCreate.userName)-1);
 	cmdCreate.userNameLen = strlen(USERNAME);
@@ -60,11 +60,11 @@ void testCreateCommand()
 }
 void testCloseCommand()
 {
-	cmdTunnel_t cmdClose;
-	CommandSender c;
+	msgTunnel_t cmdClose;
+	MessageSender c;
 	logDebug("Connected");
 
-	memset(&cmdClose, 0, sizeof(cmdTunnel_t));
+	memset(&cmdClose, 0, sizeof(msgTunnel_t));
 	strncpy((char *)(cmdClose.ipAddress), IPADDRESS, sizeof(cmdClose.ipAddress)-1);
 	strncpy((char *)(cmdClose.userName), USERNAME, sizeof(cmdClose.userName)-1);
 	cmdClose.userNameLen = strlen(USERNAME);

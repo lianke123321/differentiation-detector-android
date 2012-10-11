@@ -3,6 +3,7 @@ import tornado.ioloop
 import tornado.web
 import ctypes
 import logging
+import socket
 
 import MeddleCommunicator
 import UserConfigs
@@ -11,24 +12,23 @@ from StringConstants import *
 
 ERR_CONN=1
 ERR_NOUSER=2
+ERR_OTHER=3
 
 class CommonHandler(tornado.web.RequestHandler):
-    mainErr = None    
+    mainErr = None
     
     def getERRPage(self):
-        page = TEMPLATE_PAGE_HEADER + "</head><body>"        
+        page = TEMPLATE_PAGE_HEADER + "</head><body>"                        
         if self.mainErr == ERR_CONN:
             page += "Unable to connect to the Packet Filter Server"
-        else:
+        elif self.mainErr == ERR_NOUSER:
             page += "This mobile device is currently not connected to Meddle. Please connect to Meddle to configure your settings"
-        page += TEMPLATE_PAGE_FOOTER   
+        else:
+            page += "Internal error on webserver. Please try again later."
+        page += TEMPLATE_PAGE_FOOTER
         return page
      
-    def getIpInfo(self):
-        remoteIP = self.request.remote_ip
-        if remoteIP.find(PRIV_NETWORK) == -1:
-            self.mainErr = ERR_NOUSER
-            return None        
+    def __getIPInfo(self, remoteIP):
         m = MeddleCommunicator.MeddleCommunicator()
         if (False == m.connectRemoteServer()):
             self.mainErr = ERR_CONN;
@@ -36,17 +36,29 @@ class CommonHandler(tornado.web.RequestHandler):
         ipInfo = m.requestUserInfo(remoteIP)
         if None == ipInfo:
             self.mainErr = ERR_NOUSER
-#            self.write("Unable to get user details for IP"+str(remoteIP))
+            logging.error("Unable to get the IP Info for ip"+str(remoteIP))
             m.closeConnection()
             return None
         if ipInfo.userID == ctypes.c_uint32(-1).value:
             self.mainErr = ERR_NOUSER
-#            self.write("Unable to get user details for IP"+str(remoteIP))
+            logging.error("No User found for the given IP:"+str(remoteIP))
             m.closeConnection()
             return None
         m.closeConnection()
         return ipInfo
     
+    def getIpInfo(self):
+        remoteIP = self.request.remote_ip
+        if remoteIP.find(PRIV_NETWORK) == -1:
+            self.mainErr = ERR_NOUSER
+            return None
+        try:
+            return self.__getIPInfo(remoteIP)
+        except (socket.error, IOError), msg:
+            self.mainErr == ERR_OTHER
+            logging.error("Received exception"+str(msg))
+        return None
+
 class MainHandler(CommonHandler):
     
     def get(self):
@@ -63,44 +75,53 @@ class MainHandler(CommonHandler):
             self.write("Error getting the configurations for user at IP"+str(self.request.remote_ip))
             return
         page = uConfig.displayConfigs()
-        self.write(page)
-        return            
+        if self._finished is False: 
+            self.write(page)
+        return
     
 
 class UpdateConfigsHandler(CommonHandler):
     
-    def post(self):
+    def __post(self):
         logging.warning(self.request)
+        retPage = ""
         cfg_ads = self.get_argument(CFG_ADS_GRP, 'None')
         if cfg_ads == 'None':
-            self.displayRedirect()
-            return
+            return self.__getRedirectPage()            
         ipInfo = self.getIpInfo()
         if ipInfo is None:
-            self.write(self.getERRPage())
-            return
+            return self.getERRPage()
         uConfig = UserConfigs.UserConfigs()  
         if False == uConfig.fetchConfigs(ipInfo.userID):
-            self.write("Error getting the configurations for user at IP"+str(self.request.remote_ip))
-            return
+            return __getNoUserPage()
         uConfig.updateAdsConfig(cfg_ads)
         uConfig.commitEntry()
-        self.displayPage()
         m = MeddleCommunicator.MeddleCommunicator()
+        retPage = self.__getResponsePage()
         if m.commandReReadConfs() == False:
-            self.write("Failed")
+            retPage += "Failed"
         else:
-            self.write("Success")
-        self.write("</body>")            
+            retPage += "Success"
+        retPage += TEMPLATE_PAGE_FOOTER
+        return retPage
+        
+    def post(self):
+        try:
+            retPage = self.__post()
+            self.write(retPage)
+        except (socket.error, IOError) , msg:
+            logging.error("Error in POST message"+str(msg))
+            self.write(self.getERRPage)
         return
     
-    def displayPage(self):
-        page = TEMPLATE_PAGE_HEADER + """<meta http-equiv="refresh" content="2;url=/"></head><body>Updating the Entry : """
-        self.write(page)
+    def __getResponsePage(self):
+        return TEMPLATE_PAGE_HEADER + """<meta http-equiv="refresh" content="1;url=/"></head><body>Updating the Entry : """
 
-    def displayRedirect(self):
-        page = TEMPLATE_PAGE_HEADER + """<meta http-equiv="refresh" content="1;url=/"><head><body>Redirecting to Home Page</body>"""
-        self.write(page)       
+    def __getRedirectPage(self):
+        return TEMPLATE_PAGE_HEADER + """<meta http-equiv="refresh" content="1;url=/"><head><body>Redirecting to Home Page</body>"""
+    
+    def __getNoUserPage(self):
+        return TEMPLATE_PAGE_HEADER + "Error getting the configurations for user at IP"+str(self.request.remote_ip) + TEMPLATE_PAGE_FOOTER
         
         
 application = tornado.web.Application([

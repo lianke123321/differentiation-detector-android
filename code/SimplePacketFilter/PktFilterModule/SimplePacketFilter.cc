@@ -6,7 +6,7 @@
 #include "Logging.h"
 #include "SimplePacketFilter.h"
 #include <boost/thread.hpp>
-#include "CommandHandler.h"
+#include "MessageHandler.h"
 #include "boost/date_time/local_time/local_time.hpp"
 
 /* The main file
@@ -44,11 +44,11 @@ void sigInit()
 }
 
 
-int mainInit(MeddleDaemon &meddle, CommandHandler &cmd)
+int mainInit(MeddleDaemon &meddle, MessageHandler &cmd)
 {
 	sigInit();
 	logDebug("Listening on "<< COMMAND_SOCKET_PATH << " for commands from other processes");
-	if (false == cmd.setupCommandHandler(COMMAND_SOCKET_PATH)) {
+	if (false == cmd.setupMessageHandler(COMMAND_SOCKET_PATH)) {
 		logError("Unable to setup the socket for receiving commands");
 		return -1;
 	}
@@ -87,7 +87,7 @@ PacketFilterData mainPktFilter;
 int main()
 {
 	MeddleDaemon meddle;
-	CommandHandler cmdHandler;
+	MessageHandler cmdHandler;
 
 	if (mainInit(meddle, cmdHandler) < 0) {
 		logError("Error in the setup");
@@ -96,14 +96,13 @@ int main()
 	logDebug("Create the worker threads")
 	boost::thread meddleThread(&MeddleDaemon::mainLoop, &meddle);
 
-	boost::thread commandThread(&CommandHandler::mainLoop, &cmdHandler);
+	boost::thread commandThread(&MessageHandler::mainLoop, &cmdHandler);
 
 	logDebug("Polling the health of the threads periodically and checking for signals");
 	while (1) {
 		sigset_t sigSet;
 		siginfo_t sigInfo;
 		int sigVal;
-
 
 		struct timespec tSpec;
 
