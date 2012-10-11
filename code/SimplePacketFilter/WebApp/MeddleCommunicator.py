@@ -7,16 +7,14 @@ import logging
 
 #define COMMAND_SOCKET_PATH "/data/.meddleCmdSocket"
 COMMAND_SOCKET_PATH = "/data/.meddleCmdSocket"
-#define CMD_ACK_POSITIVE 1
-#define CMD_ACK_NEGATIVE 2
-#define CMD_GETIPUSERINFO 6
-#define CMD_RESPIPUSERINFO 7
-#define USERNAMELEN_MAX 512
-CMD_ACK_POSITIVE = 1
-CMD_ACK_NEGATIVE = 2
-CMD_READALLCONFS = 5
-CMD_GETIPUSERINFO = 6
-CMD_RESPIPUSERINFO = 7
+
+#define MSG_CREATETUNNEL 1
+#define MSG_CLOSETUNNEL 2
+#define MSG_READALLCONFS 3
+#define MSG_GETIPUSERINFO 4
+#define MSG_RESPIPUSERINFO 5
+MSG_GETIPUSERINFO = 4
+MSG_RESPIPUSERINFO = 5
 
 INET_ADDRSTRLEN = 16
 LEN_HDR = 8
@@ -77,10 +75,10 @@ class MeddleCommunicator:
         return struct.pack('@II', cmdType, cmdLen) # @ for native byte order 
     
     def __createIPUserRequestInfo(self, ipAddress):
-        global CMD_GETIPUSERINFO, INET_ADDRSTRLEN       
-        hdr = self.__createHeader(CMD_GETIPUSERINFO, INET_ADDRSTRLEN + 4 + 4);        
+        global MSG_GETIPUSERINFO, INET_ADDRSTRLEN
+        hdr = self.__createHeader(MSG_GETIPUSERINFO, INET_ADDRSTRLEN + 4 + 4);
         payload = struct.pack('@'+str(INET_ADDRSTRLEN)+'s', ipAddress)        
-        return hdr+payload        
+        return hdr+payload
         
     def __getData(self, length):
         data = ""
@@ -91,22 +89,17 @@ class MeddleCommunicator:
         return tmpData
  
     def requestUserInfo(self, ipAddress):
-        global LEN_RESPUSERINFO, LEN_CMDACK, INET_ADDRSTRLEN
+        global LEN_RESPUSERINFO, INET_ADDRSTRLEN
         frame = self.__createIPUserRequestInfo(ipAddress)
         try:
             self.sock.send(frame)
             #print "Sent Frame"         
-            data = self.__getData(LEN_CMDACK + LEN_RESPUSERINFO)
-            
-            #print "Received an ACK/NACK"+str(len(data))+" "+str(LEN_CMDACK + LEN_RESPUSERINFO)        
-            ackType, ackLen = struct.unpack('II',data[:LEN_CMDACK])
-            if (ackType != CMD_ACK_POSITIVE):
-                logging.error("Did not receive a POSITIVE ack from the Meddle server")                
+            data = self.__getData(LEN_RESPUSERINFO)
+            if data is None:
+                logging.error("Error Getting the Info for user"+str(ipAddress))
                 return None
-            data = data[LEN_CMDACK:];
-            #print "Getting the response "+str(len(data))
             cmdType, cmdLen, ipAddress, userID, userNameLen, userName = struct.unpack('@II'+str(INET_ADDRSTRLEN)+'sII'+str(LEN_USERNAME)+'s',data)
-            return IPUserInfo(ipAddress, userID, userName)            
+            return IPUserInfo(ipAddress, userID, userName)
             #print "IP " +str(ipAddress)+ " User ID"+str(userID)+"userNameLen:"+str(userNameLen)+"userName"+str(userName)             
         except socket.error, msg:
             logging.error(msg)
@@ -122,8 +115,8 @@ class MeddleCommunicator:
             self.sock.send(hdr)
             data = self.sock.recv(LEN_CMDACK);
             ackType, ackLen = struct.unpack('II',data[:LEN_CMDACK])
-            if (ackType != CMD_ACK_POSITIVE):                
-                return False            
+            if (ackType != CMD_ACK_POSITIVE):
+                return False
         except socket.error, msg:
             logging.error(msg)
             return False
@@ -134,7 +127,6 @@ class MeddleCommunicator:
             self.sock.close()
         except socket.error, msg:
             logging.error(msg)
-         
 
 if __name__ == "__main__":
     m = MeddleCommunicator();
