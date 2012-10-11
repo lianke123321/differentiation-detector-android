@@ -13,8 +13,10 @@ COMMAND_SOCKET_PATH = "/data/.meddleCmdSocket"
 #define MSG_READALLCONFS 3
 #define MSG_GETIPUSERINFO 4
 #define MSG_RESPIPUSERINFO 5
+MSG_READALLCONFS = 3 
 MSG_GETIPUSERINFO = 4
 MSG_RESPIPUSERINFO = 5
+
 
 INET_ADDRSTRLEN = 16
 LEN_HDR = 8
@@ -107,16 +109,12 @@ class MeddleCommunicator:
         return None
     
     def commandReReadConfs(self):
-        hdr = self.__createHeader(CMD_READALLCONFS, LEN_HDR)
+        hdr = self.__createHeader(MSG_READALLCONFS, LEN_HDR)
         try:
             if self.connectRemoteServer() == False:
                 logging.error("Unable to connect to the Meddle server")
                 return False
             self.sock.send(hdr)
-            data = self.sock.recv(LEN_CMDACK);
-            ackType, ackLen = struct.unpack('II',data[:LEN_CMDACK])
-            if (ackType != CMD_ACK_POSITIVE):
-                return False
         except socket.error, msg:
             logging.error(msg)
             return False
