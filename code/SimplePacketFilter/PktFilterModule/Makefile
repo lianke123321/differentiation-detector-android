@@ -11,7 +11,7 @@ FILTERMAINOBJS = $(FILTERMAINSRC:.cc=.o)
 MAINOBJS = $(filter-out $(FILTERMAINOBJS), $(OBJS))
 MAIN = SimplePacketFilter
 
-FILTERSIGNALSRC = $(PWD)/SimplePacketFilter.cc $(PWD)/CommandHandler.cc $(PWD)/ReadDatabase.cc $(PWD)/MeddleDaemon.cc
+FILTERSIGNALSRC = $(PWD)/SimplePacketFilter.cc $(PWD)/MessageHandler.cc $(PWD)/ReadDatabase.cc $(PWD)/MeddleDaemon.cc
 FILTERSIGNALOBJS = $(FILTERSIGNALSRC:.cc=.o)
 SIGNALOBJS = $(filter-out $(FILTERSIGNALOBJS), $(OBJS))
 SIGNALUSER = SignalUserUpDown

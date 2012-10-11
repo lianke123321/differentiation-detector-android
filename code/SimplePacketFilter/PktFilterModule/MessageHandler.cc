@@ -1,4 +1,4 @@
-#include "CommandHandler.h"
+#include "MessageHandler.h"
 #include "Logging.h"
 #include "UserConfigs.h"
 #include <sys/types.h>
@@ -11,19 +11,19 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 
-CommandHandler::CommandHandler()
+MessageHandler::MessageHandler()
 {
 	sockFD = 0;
 }
 
-CommandHandler::~CommandHandler()
+MessageHandler::~MessageHandler()
 {
 	if (0 < sockFD) {
 		close(sockFD);
 	}
 }
 
-bool CommandHandler::setupCommandHandler(std::string socketPath)
+bool MessageHandler::setupMessageHandler(std::string socketPath)
 {
 	uint32_t len;
 
@@ -61,10 +61,8 @@ bool CommandHandler::setupCommandHandler(std::string socketPath)
 	return true;
 }
 
-CommandFrame* CommandHandler::recvCommand()
+MessageFrame* MessageHandler::recvCommand()
 {
-	CommandFrame *ackFrame;
-	cmd_ack_t ack_data;
 	uint32_t nRead, nwrite;
 	memset(lastRead, 0, sizeof(lastRead));
 
@@ -77,43 +75,17 @@ CommandFrame* CommandHandler::recvCommand()
 	}
 
 	logDebug("Now parsing the received bytes");
-	cmd = new CommandFrame(lastRead, nRead);
+	cmd = new MessageFrame(lastRead, nRead);
 	if (cmd == NULL) {
 		logError("Error creating the command");
 		cmd = NULL;
 		return cmd;
 	}
-	if (cmd->frameLen < 0) {
-		logError("Sending NACK because the command could not be parsed");
-		delete cmd;
-		ack_data = CMD_ACK_NEGATIVE;
-		ackFrame = new CommandFrame(ack_data);
-		if (ackFrame == NULL) {
-			logError("Error creating the ack Frame")
-		} else {
-			nwrite = write(remoteFD, ackFrame->buffer, ackFrame->frameLen);
-			delete ackFrame;
-		}
-		logError("Error creating Command Frame");
-		cmd = NULL;
-		return cmd;
-	}
-	logDebug("Received a command that can be interpreted therefore sending ACK");
-	ack_data = CMD_ACK_POSITIVE;
-	ackFrame = new CommandFrame(ack_data);
-	if (ackFrame == NULL) {
-		logError("Error creating the ACK frame");
-		// TODO:: should we continue sending the command as we have not acked it
-		// TODO:: This means retransmissions must not break system state.
-	} else {
-		nwrite = write(remoteFD, ackFrame->buffer, ackFrame->frameLen);
-		delete ackFrame;
-	}
 	logDebug("Received the command " << cmd);
 	return cmd;
 }
 
-bool CommandHandler::processTunnelCommand()
+bool MessageHandler::processTunnelCommand()
 {
 	// ignoring the name len for now
 	std::string userName((char *)(cmd->cmdTunnel->userName));
@@ -127,8 +99,8 @@ bool CommandHandler::processTunnelCommand()
 		return false;
 	}
 
-	logDebug("Prev Table" << mainPktFilter.getIPMap());
-	if (CMD_CREATETUNNEL == cmd->cmdHeader->cmdType) {
+	logInfo("Prev Table" << mainPktFilter.getIPMap());
+	if (MSG_CREATETUNNEL == cmd->cmdHeader->cmdType) {
 		if (false == mainPktFilter.associateUserToIp(userName, ipAddress)) {
 			logError("Error adding the user" << cmd->cmdTunnel->userName);
 			return false;
@@ -139,23 +111,23 @@ bool CommandHandler::processTunnelCommand()
 			return false;
 		}
 	}
-	logError("New Table" << mainPktFilter.getIPMap());
+	logInfo("New Table" << mainPktFilter.getIPMap());
 	// TODO release the lock here
 	return true;
 }
 
-bool CommandHandler::processReadAllConfs()
+bool MessageHandler::processReadAllConfs()
 {
 	return mainPktFilter.loadAllUserConfigs();
 }
 
-bool CommandHandler::respondGetUserIpInfo()
+bool MessageHandler::respondGetUserIpInfo()
 {
 	in_addr_t ipAddress;
 	uint32_t userID, nwrite;
 	user_config_entry_t entry;
-	respIPUserInfo_t respIPUserInfo;
-	CommandFrame *respFrame = NULL;
+	msgRespIPUserInfo_t respIPUserInfo;
+	MessageFrame *respFrame = NULL;
 
 	if (inet_pton(AF_INET, (const char *)(cmd->cmdIPUserInfo->ipAddress), (void *) &ipAddress) < 0) {
 		logError("Error parsing the IP address");
@@ -167,30 +139,30 @@ bool CommandHandler::respondGetUserIpInfo()
 		memset(&entry, 0, sizeof(entry));
 	}
 
-	memset(&respIPUserInfo, 0, sizeof(respIPUserInfo_t));
+	memset(&respIPUserInfo, 0, sizeof(msgRespIPUserInfo_t));
 	memcpy(respIPUserInfo.ipAddress, cmd->cmdIPUserInfo->ipAddress, sizeof(respIPUserInfo.ipAddress));
 	respIPUserInfo.userID = userID;
 	respIPUserInfo.userNameLen = strnlen((const char *)entry.userName, sizeof(respIPUserInfo.userName)-1);
 	memcpy(respIPUserInfo.userName, entry.userName,  respIPUserInfo.userNameLen);
 
-	logError("UserName "<<respIPUserInfo.userName << " User ID:" << respIPUserInfo.userID << " for IP "<< cmd->cmdIPUserInfo->ipAddress);
-	respFrame = new CommandFrame(CMD_RESPIPUSERINFO, respIPUserInfo);
+	logInfo("UserName "<<respIPUserInfo.userName << " User ID:" << respIPUserInfo.userID << " for IP "<< cmd->cmdIPUserInfo->ipAddress);
+	respFrame = new MessageFrame(MSG_RESPIPUSERINFO, respIPUserInfo);
 	if (NULL == respFrame) {
 		logError("Error creating the response frame");
 		return false;
 	}
-	logError("Created the Frame, now we are writing the response" << respFrame);
+	logInfo("Created the Frame, now we are writing the response" << respFrame);
 	nwrite = write(remoteFD, respFrame->buffer, respFrame->frameLen);
 	if (nwrite != respFrame->frameLen) {
 		logError("Incorrect bytes written in response to GetIPUserInfo");
 		return false;
 	}
-	logError("Wrote the response"<< respFrame)
+	logDebug("Wrote the response"<< respFrame)
 	delete respFrame;
 	return true;
 }
 
-bool CommandHandler::processCommand()
+bool MessageHandler::processCommand()
 {
 	bool ret;
 	if (NULL == cmd) {
@@ -198,17 +170,17 @@ bool CommandHandler::processCommand()
 		return false;
 	}
 	switch(cmd->cmdHeader->cmdType) {
-	case CMD_CREATETUNNEL:
-	case CMD_CLOSETUNNEL:
-		logError("Processing the Tunnel command now");
+	case MSG_CREATETUNNEL:
+	case MSG_CLOSETUNNEL:
+		logInfo("Processing the Tunnel command now");
 		ret = processTunnelCommand();
 		break;
-	case CMD_READALLCONFS:
-		logError("Processing the command to read configs");
+	case MSG_READALLCONFS:
+		logInfo("Processing the command to read configs");
 		ret = processReadAllConfs();
 		break;
-	case CMD_GETIPUSERINFO:
-		logError("Got the command to get the User details for a given ip");
+	case MSG_GETIPUSERINFO:
+		logInfo("Got the command to get the User details for a given ip");
 		ret = respondGetUserIpInfo();
 		break;
 	default:
@@ -217,7 +189,7 @@ bool CommandHandler::processCommand()
 	return ret;
 }
 
-bool CommandHandler::mainLoop()
+bool MessageHandler::mainLoop()
 {
 	while(1) {
 		this->cmd = NULL;
@@ -227,10 +199,11 @@ bool CommandHandler::mainLoop()
 			logError("Error during the accept operation");
 			return cmd;
 		}
-		logError("Received a new connection request on " << remoteFD);
+		logInfo("Received a new connection request on " << remoteFD);
 		this->cmd = recvCommand();
+		// TODO:: Multiple threads to process these commands
 		processCommand();
-		logError("Served a command received on socket " << remoteFD);
+		logInfo("Served a command received on socket " << remoteFD);
 		close(remoteFD);
 		remoteFD = -1;
 		delete this->cmd;

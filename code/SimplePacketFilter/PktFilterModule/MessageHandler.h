@@ -2,29 +2,29 @@
 #define COMMANDHANDLER_H_
 
 #include <stdint.h>
-#include "CommandFrame.h"
+#include "MessageFrame.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 
-class CommandHandler {
+class MessageHandler {
 public:
 	int32_t sockFD;
 private:
-	CommandFrame *cmd;
+	MessageFrame *cmd;
 	uint8_t lastRead[4096];
 	struct sockaddr_un localAddr;
 	uint32_t remoteFD;
 private:
-	CommandFrame * recvCommand();
+	MessageFrame * recvCommand();
 	bool processCommand();
 	bool processTunnelCommand();
 	bool processReadAllConfs();
 	bool respondGetUserIpInfo();
 public:
-	CommandHandler();
-	~CommandHandler();
-	bool setupCommandHandler(std::string socketPath);
+	MessageHandler();
+	~MessageHandler();
+	bool setupMessageHandler(std::string socketPath);
 	bool mainLoop();
 };
 #endif /* COMMANDHANDLER_H_ */
