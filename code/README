@@ -1,4 +1,4 @@
 README - this file
 AndroidVPN - code for the Android VPN client to use for Meddle
-baseline-tunnel - contains the files required to get a simple tunnel for monitoring packets.
-SimplePacketFilter - framework for meddling with packets
+baseline-tunnel - contains the first version of the files to get a simple tunnel for monitoring packets. -- This can be ignored and is used as a reference
+SimplePacketFilter - contains the current version of the setup to meddle with packets
