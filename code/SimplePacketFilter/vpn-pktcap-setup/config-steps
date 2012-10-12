@@ -1,0 +1,32 @@
+./configure --sysconfdir=/data/etc/ --prefix=/data/usr/ --libexecdir=/data/usr/lib --enable-openssl --enable-agent --enable-gcrypt --enable-integrity-test --enable-openssl --enable-eap-gtc --enable-eap-md5 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2 --enable-eap-identity --enable-md4 --enable-eap-radius --enable-socket-raw --enable-socket-dynamic
+
+make 
+make install
+cp -vRf ipsec.d/ /data/etc/
+
+
+# The next set of steps are to setup the permissions for packet capture
+
+addgroup meddle
+addgroup pcapread
+
+# Now add users depending on which group you want them to be. 
+# Pcapread is a "subset" of meddle. All members in meddle are in pcapread. Users in pcapread cannot read the traces
+
+lid -g meddle # users that can install meddle and read and write the pcapfiles
+lid -g pcapread # Users who can only read the pcap files
+
+mkdir -p /data/pcap-data/
+chown meddle.meddle pcap-data/ # The folder where the pcap files are placed
+
+# From http://ab.id.au/PosixCaps
+sudo /sbin/setcap cap_net_raw+eip /usr/sbin/tcpdump
+# Also add this for app armour. This is required only in the case of ubuntu/debian systems.
+aa-complain /usr/sbin/tcpdump
+# added the p in raw+eip based on http://fpmurphy.blogspot.com/2009/05/linux-security-capabilities.html
+
+# Configure gpg 
+mkdir /data/.gpg
+gpg --homedir=/data/.gpg/
+chown root.meddle /data/.gpg/
+
