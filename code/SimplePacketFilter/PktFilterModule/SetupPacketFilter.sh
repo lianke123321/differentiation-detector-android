@@ -8,9 +8,10 @@ gateway="128.208.4.100"
 ethNet="128.208.4.0/24"
 
 logName="/data/SimplePacketFilter.log"
+basePath="/data/usr/sbin/"
 setup()
 {
-    ./SimplePacketFilter > ${logName} 2>&1 &
+    ${basePath}/SimplePacketFilter > ${logName} 2>&1 &
     echo "Sleeping for the device to come up"
     sleep 5 
 
@@ -73,14 +74,14 @@ setup()
     # iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ${eth}  -j TCPMSS --set-mss 1250
     # iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ${tun}  -j TCPMSS --set-mss 1250
 
-    ./ipsec start
+    ${basePath}/ipsec start
 }
 
 undo()
 {
     
     # All the above steps with s/add/del/g 
-    ./ipsec stop	
+    ${basePath}/ipsec stop	
     iptables --flush
     iptables --flush -t nat
     iptables --flush -t mangle
@@ -107,7 +108,7 @@ undo()
     echo "1" > /proc/sys/net/ipv4/conf/${eth}/rp_filter
     echo "1" > /proc/sys/net/ipv4/conf/default/rp_filter
     
-    binPID=`pidof "./SimplePacketFilter"`
+    binPID=`pidof "${basePath}/SimplePacketFilter"`
     if [ $? -ne 1 ] && [ ${binPID} != "" ]
     then    
 	kill ${binPID}
