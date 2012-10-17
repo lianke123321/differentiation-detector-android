@@ -4,25 +4,45 @@ basePath="/data/pcap-data/"
 logFile="${basePath}/pkt-capt.log"
 signalCMD="/data/usr/sbin/SignalUserUpDown"
 
+function logState()
+{
+    echo "Env variables while signaling user ${PLUTO_VERB} " >> ${logFile}
+    printenv >> ${logFile}
+}
+
 function genParams()
 {
-    timeStamp=`date +%h-%d-%Y-%H-%M-%s`
     #TODO:: Assuming that the last field of the DN in the certificate is the login name of the client 
     clientID=`echo ${PLUTO_PEER_ID} | awk -F '=' '{print $NF}'`
     clientIP=`echo ${PLUTO_PEER_CLIENT} | awk -F '/' '{print $1}'`    
-    echo "Dump Name is ${dumpName}" >> ${logFile}
 }
 
 function signalUP()
 {
-    ${signalCMD} ${clientID} ${clientIP} up		
     echo "Signalling ${signalCMD} ${clientID} ${clientIP} up" >> ${logFile}
+    ${signalCMD} ${clientID} ${clientIP} up	
+    retV=$?	    
+    # TODO:: THE ERROR HANDLING NEEDS TO BE IMPROVED  
+    if [ ${retV} -ne 0 ];
+    then 
+       echo "Error in signalling the user ${clientID} ${clientIP} status ${PLUTO_VERB}" >> ${logFile}
+    else
+       echo "Success in setting the user ${clientID} ${clientIP} status ${PLUTO_VERB}" >> ${logFile}
+    fi   
 }
 
 function signalDown()
 {
-    ${signalCMD} ${clientID} ${clientIP} down
     echo "Signalling ${signalCMD} ${clientID} ${clientIP} down" >> ${logFile}
+    ${signalCMD} ${clientID} ${clientIP} down
+    retV=$?	    
+    # TODO:: THE ERROR HANDLING NEEDS TO BE IMPROVED  
+    if [ ${retV} -ne 0 ]
+    then
+       echo "Error in signalling the user ${clientID} ${clientIP} status ${PLUTO_VERB}" >> ${logFile}
+    else
+       echo "Success in setting the user ${clientID} ${clientIP} status ${PLUTO_VERB}" >> ${logFile}
+    fi   
 }
 
 function mainFunc()

@@ -133,5 +133,13 @@
 PATH="/sbin:/bin:/usr/sbin:/usr/bin:/home/arao/usr/sbin"
 export PATH
 
-/data/usr/lib/ipsec/signal-meddle.sh
-/data/usr/lib/ipsec/pkt-capture.sh 
+/data/usr/lib/ipsec/signal-meddle.sh > /dev/null 2>&1
+
+# http://www.mail-archive.com/bug-bash@gnu.org/msg08967.html
+# I have tested the program  given in the above URL in bash available with Ubuntu 12.04 and there is a bug reglated to signal handling of the current bash shell
+# The term signal is not passed to the tcpdump process and the parent pkt-capture.sh process. One reason is that the calling process, the ipsec process, has
+# masked the signals and the signal mask cannot be reset using trap. Because of this problem the only way to stop tcpdump is by pkill -9.
+# To address this problem the packet capture call is written in a ksh wrapper
+/data/usr/lib/ipsec/pkt-capture.sh > /dev/null 2>&1
+#( /data/usr/lib/ipsec/pkt-capt.py > /dev/null 2>&1 &) &
+

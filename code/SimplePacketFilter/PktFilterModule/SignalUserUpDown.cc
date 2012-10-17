@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 	// read the arguments <user-name> <ip-address> <up-client or down-client>
 	if (argc != 4) {
 		std::cout << argv[0] << " <userName> <ip-address> <up/down>" << std::endl;
-		return -1;
+		return 1;
 	}
 	userName = argv[1];
 	ipAddress = argv[2];
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 	// TODO:: code to check the arguments
 	if (false == checkArgs(userName, ipAddress, cmdType)) {
 		logError("Error in the input arguments");
-		return -1;
+		return 1;
 	}
 	cnt = 0;
 	while (cnt < 3) {

@@ -1,7 +1,15 @@
-http://dev.mysql.com/doc/refman/5.1/en/adding-users.html
+# Lines that begin with # are comments 
+# Lines that begin with $>  indicate bash prompt
+# Line that begin with mysql> indicate mysql prompt
+
+$> mysql_secure_installation
+
+# Set the root password and disable remote root login
+# Steps taken from http://dev.mysql.com/doc/refman/5.1/en/adding-users.html
 
 $> mysql --user=root -p 
-pass: <root password>
+pass: <root password> 
+# I have used root for the time being
 
 mysql> CREATE USER 'meddle'@'localhost' IDENTIFIED BY 'meddle';
 
@@ -12,5 +20,8 @@ mysql> CREATE DATABASE MeddleDB;
 $> mysql -u meddle -p MeddleDB
 Enter password: <meddle password>
 
-mysql> CREATE TABLE UserConfigs (userID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, userName VARCHAR(512), FilterAdsAnalytics INT NOT NULL DEFAULT 0, UNIQUE(userName)) ENGINE="InnoDB";
+mysql> CREATE TABLE UserConfigs (userID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, userName VARCHAR(512), filterAdsAnalytics INT NOT NULL DEFAULT 0, UNIQUE(userName)) ENGINE="InnoDB";
+
+# For each user add this entry to the table while creating users
+mysql> INSERT INTO UserConfigs VALUES (0, 'arao-ipod', 0);
 

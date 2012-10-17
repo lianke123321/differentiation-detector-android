@@ -1,0 +1,50 @@
+./configure --sysconfdir=/data/etc/ --prefix=/data/usr/ --libexecdir=/data/usr/lib --enable-openssl --enable-agent --enable-gcrypt --enable-integrity-test --enable-openssl --enable-eap-gtc --enable-eap-md5 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2 --enable-eap-identity --enable-md4 --enable-eap-radius --enable-socket-raw --enable-socket-dynamic
+
+make 
+make install
+cp -vRf ipsec.d/ /data/etc/
+
+
+# The next set of steps are to setup the permissions for packet capture
+
+addgroup meddle
+addgroup pcapread
+
+# Now add users depending on which group you want them to be. 
+# Pcapread is a "subset" of meddle. All members in meddle are in pcapread. Users in pcapread cannot read the traces
+
+lid -g meddle # users that can install meddle and read and write the pcapfiles
+lid -g pcapread # Users who can only read the pcap files
+
+mkdir -p /data/pcap-data/
+chown meddle.meddle pcap-data/ # The folder where the pcap files are placed
+
+# From http://ab.id.au/PosixCaps
+sudo /sbin/setcap cap_net_raw+eip /usr/sbin/tcpdump
+# Also add this for app armour. This is required only in the case of ubuntu/debian systems.
+aa-complain /usr/sbin/tcpdump
+# added the p in raw+eip based on http://fpmurphy.blogspot.com/2009/05/linux-security-capabilities.html
+
+# Configure gpg 
+mkdir /data/.gpg
+gpg --homedir=/data/.gpg/
+chown root.meddle /data/.gpg/
+
+# http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/gpg-cs.html
+gpg --homedir=/data/.gpg/ --gen-key
+# Add Meddle as the username
+# Remember the email address used.
+# Perform all the steps and set a password that you remember
+
+gpg --homedir=/data/.gpg/ --export "Meddle" > Meddle.key
+gpg --homedir=/data/.gpg/ --export-secret-key "Meddle" > Meddle.secret
+
+#To encrypt using the public key (Meddle.key)
+gpg --homedir=/data/.gpg --no-default-keyring --keyring /data/.gpg/Meddle.key -er Meddle -o abc.pcap.enc --trust-model always
+
+# To decrypt the file NOTE--DONOT FORGET THE PASSPHRASE DURING DECRYPTION
+gpg --homedir=/data/.gpg --no-default-keyring --secret-keyring /data/.gpg/Meddle.secret --keyring /data/.gpg/Meddle.key -o abc.pcap --passphrase "Meddle Key" --decrypt abc.pcap.enc
+
+#Install ksh as ksh was not installed on ubuntu
+#Copy the files with care. MAKE SURE YOU HAVE TAKEN A BACKUP
+

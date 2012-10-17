@@ -1,0 +1,3 @@
+Install the WebApp folder in /data/
+also make sure that python-mysqldb is installed
+start the MainServer.py
