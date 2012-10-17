@@ -5,7 +5,7 @@ PAGE_UPDATECONFIGS="updateConfigs"
 CFG_ADS_GRP= "cfg_ads"
 CFG_ADS_GRP_ENABLE_STR = "enable"
 CFG_ADS_GRP_DISABLE_STR = "disable"
-PRIV_NETWORK = "192.168.0"
+PRIV_NETWORK = "10.11."
 
 CFG_SUBMIT_ID="submitID"
 
