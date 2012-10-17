@@ -1,3 +1,5 @@
+Modify SimplePacketFilter.h for the addresses and netmasks used for forward and reverse paths
+Modify the SeuptPacketFilter.h for the ip addresses for forward and reverse paths
 make
 cp SignalUserUpDown SimplePacketFilter SetupPacketFilter.sh /data/usr/sbin/
 
