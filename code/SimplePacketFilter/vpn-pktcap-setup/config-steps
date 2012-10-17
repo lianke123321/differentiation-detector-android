@@ -43,7 +43,7 @@ gpg --homedir=/data/.gpg/ --export-secret-key "Meddle" > Meddle.secret
 gpg --homedir=/data/.gpg --no-default-keyring --keyring /data/.gpg/Meddle.key -er Meddle -o abc.pcap.enc --trust-model always
 
 # To decrypt the file NOTE--DONOT FORGET THE PASSPHRASE DURING DECRYPTION
-gpg --secret-keyring /data/.gpg/Meddle.secret --keyring /data/.gpg/Meddle.key -o abc.pcap --passphrase "Meddle Key" --decrypt abc.pcap.enc
+gpg --homedir=/data/.gpg --no-default-keyring --secret-keyring /data/.gpg/Meddle.secret --keyring /data/.gpg/Meddle.key -o abc.pcap --passphrase "Meddle Key" --decrypt abc.pcap.enc
 
 #Install ksh as ksh was not installed on ubuntu
 #Copy the files with care. MAKE SURE YOU HAVE TAKEN A BACKUP
