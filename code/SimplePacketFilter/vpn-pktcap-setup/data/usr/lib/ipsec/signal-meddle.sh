@@ -23,7 +23,8 @@ function signalUP()
     ${signalCMD} ${clientID} ${clientIP} up	
     retV=$?	    
     # TODO:: THE ERROR HANDLING NEEDS TO BE IMPROVED  
-    if [ ${retV} -ne 0 ]
+    if [ ${retV} -ne 0 ];
+    then 
        echo "Error in signalling the user ${clientID} ${clientIP} status ${PLUTO_VERB}" >> ${logFile}
     else
        echo "Success in setting the user ${clientID} ${clientIP} status ${PLUTO_VERB}" >> ${logFile}
@@ -37,6 +38,7 @@ function signalDown()
     retV=$?	    
     # TODO:: THE ERROR HANDLING NEEDS TO BE IMPROVED  
     if [ ${retV} -ne 0 ]
+    then
        echo "Error in signalling the user ${clientID} ${clientIP} status ${PLUTO_VERB}" >> ${logFile}
     else
        echo "Success in setting the user ${clientID} ${clientIP} status ${PLUTO_VERB}" >> ${logFile}

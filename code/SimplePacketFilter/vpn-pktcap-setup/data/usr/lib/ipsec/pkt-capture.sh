@@ -50,24 +50,25 @@ function stopLastTcpdump()
             # TODO:: CHECK IF THIS IS INDEED TCPDUMP .. check way to flush packets 
             reqPPID=${line} # The parent pid is of the ksh wrapper
             echo "Parent of the tcpdump process is ${reqPPID}" >> ${logFile}
-            for cnt in 1 2 3 
+            for cnt in 1 2 3 4 5 6 7 8 9 10 
             do 
                 reqPID=`pgrep -o -P ${reqPPID}` 
-                echo "Attempt 1 in kill the process ${reqPID}" >> ${logFile}  
+                echo "Attempt ${cnt} to kill the process ${reqPID}" >> ${logFile}  
                 reqStr=`ps axo pid,comm | grep ${reqPID} | grep "tcpdump"`
-                if [ ${reqStr} != "" ];
+                if [ "${reqStr}" != "" ];
                 then
                     echo "The PID we have ${reqPID} is of a tcpdump process" >> ${logFile}    
-                    kill -TERM ${reqPID}
+                    kill -TERM ${reqPID}                      
+                    sleep 0.001
                 fi
                 reqStr=`ps axo pid,comm | grep ${reqPID} | grep "tcpdump"`
-                if [ ${reqStr} == "" ];
+                if [ "${reqStr}" == "" ];
                 then
                     echo "We have killed the tcpdump process ${reqPID} " >> ${logFile}
                     break;
                 fi
             done
-            if [ ${cnt} -eq 3 ];
+            if [ ${cnt} -ge 10 ];
             then
                echo "Trying to kill the parent now ${reqPPID}" >> ${logFile} 
                pkill -TERM -P ${reqPPID}
