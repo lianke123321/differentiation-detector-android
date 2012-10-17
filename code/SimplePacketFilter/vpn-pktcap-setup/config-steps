@@ -36,12 +36,12 @@ gpg --homedir=/data/.gpg/ --gen-key
 # Remember the email address used.
 # Perform all the steps and set a password that you remember
 
-gpg --homedir=/home/arao/Desktop/gpg/ --export "Meddle" > Meddle.key
-gpg --homedir=/home/arao/Desktop/gpg/ --export-secret-key "Meddle" > Meddle.secret
+gpg --homedir=/data/.gpg/ --export "Meddle" > Meddle.key
+gpg --homedir=/data/.gpg/ --export-secret-key "Meddle" > Meddle.secret
 
 #To encrypt using the public key (Meddle.key)
-gpg --homedir=/home/arao/Desktop/gpg --no-default-keyring --keyring /home/arao/Desktop/gpg/Meddle.key -er Meddle -o abc.pcap.enc --trust-model always
+gpg --homedir=/data/.gpg --no-default-keyring --keyring /data/.gpg/Meddle.key -er Meddle -o abc.pcap.enc --trust-model always
 
 # To decrypt the file NOTE--DONOT FORGET THE PASSPHRASE DURING DECRYPTION
-gpg --secret-keyring /home/arao/Desktop/gpg/Meddle.secret --keyring /home/arao/Desktop/gpg/Meddle.key -o abc.pcap --passphrase Meddle --decrypt abc.pcap.enc
+gpg --secret-keyring /data/.gpg/Meddle.secret --keyring /data/.gpg/Meddle.key -o abc.pcap --passphrase "Meddle Key" --decrypt abc.pcap.enc
 

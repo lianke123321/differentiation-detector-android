@@ -4,7 +4,8 @@ export basePath="/data/pcap-data/"
 export logFile="${basePath}/pkt-capt.log"
 export ipLookUpFile="${basePath}/ipLookUp.txt"
 export devCapture="tun0"
-export passPhrase="Sc)08igrek"
+export encPublicKeyRing="/home/arao/Desktop/gpg/Meddle.key"
+export encPublicKeyID="Meddle"
 export TCPDUMP_BIN="/usr/sbin/tcpdump" 
 export GPG_BIN="/usr/bin/gpg"
 export GPG_HOME="/data/.gpg"
@@ -90,11 +91,7 @@ function startEncPacketCapture()
 {
     stopEncPacketCapture
     echo "starting Capture" >> ${logFile}
-    #{ (tcpdump -i ${devCapture} -n ip host ${clientIP} -w - & echo $! >${lockName}) | gpg -o ${dumpName} -c --passphrase ${passPhrase} > /dev/null 2>&1 & } &
-    echo "Starting Packet capture" >> ${logFile} 
-#   export ${TCPDUMP_BIN} ${devCapture} ${clientIP} ${GPG_BIN} ${GPG_HOME} ${dumpName} ${passPhrase} ${logFile} ${lockName}
     ( /data/usr/lib/ipsec/capture-wrapper.ksh > /dev/null 2>&1 & ) &
-    # ${TCPDUMP_BIN} -i ${devCapture} -n ip host ${clientIP} -w - | ${GPG_BIN} --homedir=${GPG_HOME} -o ${dumpName} -c --passphrase ${passPhrase} > /dev/null 2>&1
 }
 
 function updateIPLookUp()
