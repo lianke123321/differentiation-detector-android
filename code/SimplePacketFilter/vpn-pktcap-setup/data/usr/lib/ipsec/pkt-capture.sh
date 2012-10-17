@@ -4,11 +4,11 @@ export basePath="/data/pcap-data/"
 export logFile="${basePath}/pkt-capt.log"
 export ipLookUpFile="${basePath}/ipLookUp.txt"
 export devCapture="tun0"
-export encPublicKeyRing="/home/arao/Desktop/gpg/Meddle.key"
 export encPublicKeyID="Meddle"
 export TCPDUMP_BIN="/usr/sbin/tcpdump" 
 export GPG_BIN="/usr/bin/gpg"
 export GPG_HOME="/data/.gpg"
+export encPublicKeyRing="${GPG_HOME}/Meddle.key"
 
 function logState()
 {
