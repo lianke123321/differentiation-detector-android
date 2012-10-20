@@ -164,7 +164,7 @@ bool PacketFilterData::associateClientToServerIp(const uint32_t &userID, const s
 //	}
 // (userID INT NOT NULL PRIMARY KEY, remoteIpAddress VARCHAR(64) NOT NULL, serverIpAddress VARCHAR(64) NOT NULL, timestamp TIMESTAMP NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, startStopFlag BOOLEAN NOT NULL DEFAULT 0)
 	query.clear();
-	query << "INSERT INTO UserTunnelInfo VALUES (" << userID << ", \'" << clientTunnelIP << "\',\'" << clientRemoteIP << "\',\'" << serverIP << "\', CURRENT_TIMESTAMP, " << FLAG_STARTSTOP_START << " );";
+	query << "INSERT INTO UserTunnelInfo VALUES (0, " << userID << ", \'" << clientTunnelIP << "\',\'" << clientRemoteIP << "\',\'" << serverIP << "\', CURRENT_TIMESTAMP, " << FLAG_STARTSTOP_START << " );";
 	logInfo("Query " << query);
 	if (false == dbManager.execWriteQuery(query.str())) {
 		logError("Error in Insert" << query);
@@ -179,7 +179,7 @@ bool PacketFilterData::disassociateClientFromServerIp(const uint32_t & userID, c
 {
 	std::stringstream query;
 	query.clear();
-	query << "INSERT INTO UserTunnelInfo VALUES (" << userID << ", \'" << clientTunnelIP << "\',\'" << clientRemoteIP << "\',\'" << serverIP << "\', CURRENT_TIMESTAMP, " << FLAG_STARTSTOP_STOP << ");";
+	query << "INSERT INTO UserTunnelInfo VALUES (0, " << userID << ", \'" << clientTunnelIP << "\',\'" << clientRemoteIP << "\',\'" << serverIP << "\', CURRENT_TIMESTAMP, " << FLAG_STARTSTOP_STOP << ");";
 	logInfo("Query " << query);
 	if (false == dbManager.execWriteQuery(query.str())) {
 		logError("Error in Insert" << query);
