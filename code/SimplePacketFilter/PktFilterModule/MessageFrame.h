@@ -20,7 +20,9 @@ struct msgHeader {
 typedef struct msgHeader msgHeader_t;
 
 struct msgTunnel {
-	int8_t ipAddress[INET_ADDRSTRLEN]; // TODO:: this will break for IPv6
+	int8_t clientTunnelIpAddress[INET_ADDRSTRLEN]; // TODO:: this will break for IPv6
+	int8_t meddleServerIpAddress[INET_ADDRSTRLEN];
+	int8_t clientRemoteIpAddress[INET_ADDRSTRLEN];
 	uint32_t userNameLen; //placeholder ignored
 	int8_t userName[USERNAMELEN_MAX];
 }__attribute__((packed));

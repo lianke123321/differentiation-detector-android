@@ -28,14 +28,7 @@ bool UserConfigs::getConfigById(uint32_t userID, user_config_entry_t& entry)
 
 bool UserConfigs::getConfigByName(const std::string& userName, user_config_entry_t& entry)
 {
-
-//	uint32_t len = userName.length() < USERNAMELEN ? userName.length() : USERNAMELEN;
-
-//	memset(&userName, 0, USERNAMELEN);
-//	memcpy(srName, userName.c_str(), len);
-
 	nameUserConfigIter = nameUserConfigMap.find(userName);
-
 	if (nameUserConfigIter != nameUserConfigMap.end()) {
 		entry = nameUserConfigIter->second;
 		return true;
@@ -47,9 +40,6 @@ bool UserConfigs::getConfigByName(const std::string& userName, user_config_entry
 // Note this currently duplicates entry for fast access. This can give rise to problems of consistency if delete and add operations fail for one of the two maps.
 bool UserConfigs::addEntry(user_config_entry_t& entry)
 {
-	// std::pair<std::map<uint32_t, user_config_entry_t>::iterator, bool> insertIDRet;
-	// std::pair<std::map<int8_t[USERNAMELEN], user_config_entry_t>::iterator, bool> insertNameRet;
-
 	logError("Attempting to add entry for user " << entry.userName << " with id " << entry.userID);
 	insertIDRet = idUserConfigMap.insert(std::make_pair(entry.userID, entry));
 	if (insertIDRet.second == false) {
@@ -79,19 +69,33 @@ bool UserConfigs::addEntry(user_config_entry_t& entry)
 }
 
 // returns true even if entry is not present
-bool UserConfigs::deleteEntryByID(uint32_t userID)
+bool UserConfigs::removeEntryByID(uint32_t & userID)
 {
 	user_config_entry_t entry;
 	if (false == getConfigById(userID, entry)) {
+		logInfo("No point calling this delete because entry does not exist for the user" << userID);
 		return true;
 	}
 	// TODO::error checking to be done;
-	std::string userName = "a";
-	//std::string userName = entry.userName;
+	std::string userName = ((char *)(entry.userName));
 	nameUserConfigMap.erase(userName);
 	idUserConfigMap.erase(entry.userID);
 	return true;
 }
+
+bool UserConfigs::removeEntryByName(std::string &userName)
+{
+	user_config_entry_t entry;
+	if (false == getConfigByName(userName, entry)) {
+		logInfo("No point calling this delete because entry does not exist for the user" << userName);
+		return true;
+	}
+	// TODO::error checking to be done;
+	nameUserConfigMap.erase(userName);
+	idUserConfigMap.erase(entry.userID);
+	return true;
+}
+
 
 bool UserConfigs::updateEntry(user_config_entry_t& entry)
 {

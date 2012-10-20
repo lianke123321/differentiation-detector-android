@@ -25,3 +25,9 @@ mysql> CREATE TABLE UserConfigs (userID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 # For each user add this entry to the table while creating users
 mysql> INSERT INTO UserConfigs VALUES (0, 'arao-ipod', 0);
 
+mysql> CREATE TABLE UserTunnelInfo (userID INT NOT NULL, clientTunnelIpAddress VARCHAR(64) NOT NULL, clientRemoteIpAddress VARCHAR(64) NOT NULL, serverIpAddress VARCHAR(64) NOT NULL, timestamp TIMESTAMP NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, startStopFlag BOOLEAN NOT NULL DEFAULT 0);
+
+
+mysql> CREATE TABLE UserFilterAdsChange(userID INT NOT NULL PRIMARY KEY, timestamp TIMESTAMP NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, filterAdsAnalytics INT NOT NULL DEFAULT 0);
+
+

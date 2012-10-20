@@ -1,4 +1,5 @@
 #include "PacketFilterData.h"
+#include "SimplePacketFilter.h"
 #include "Logging.h"
 #include <mysql/mysql.h>
 
@@ -13,7 +14,7 @@ PacketFilterData::~PacketFilterData()
 {
 	// TODO Auto-generated destructor stub
 }
-bool PacketFilterData::connectToDB(std::string hostname, std::string dbUser, std::string dbPassword, std::string dbName)
+bool PacketFilterData::connectToDB(const std::string &hostname, const std::string &dbUser, const std::string &dbPassword, const std::string &dbName)
 {
 	if (false == dbManager.connectDB(hostname, dbUser, dbPassword, dbName)) {
 		logError("Error in connecting to the database");
@@ -22,17 +23,15 @@ bool PacketFilterData::connectToDB(std::string hostname, std::string dbUser, std
 	return true;
 }
 
-
-bool PacketFilterData::loadAllUserConfigs()
+bool PacketFilterData::__loadConfigs(std::string query)
 {
-	std::string query = "SELECT userID, userName, filterAdsAnalytics FROM UserConfigs;";
 	MYSQL_RES *results;
 	MYSQL_ROW row;
 	std::vector<user_config_entry_t> configVector;
 
 	logDebug("Executing query " << query);
 
-	if (false == dbManager.execFetchQuery(query, &results)) {
+	if (false == dbManager.execReadQuery(query, &results)) {
 		logError("Error reading confs");
 		return false;
 	}
@@ -59,6 +58,22 @@ bool PacketFilterData::loadAllUserConfigs()
 	logDebug(userConfigs);
 	mysql_free_result(results);
 	return true;
+}
+
+bool PacketFilterData::loadAllUserConfigs()
+{
+	// std::string query = "SELECT userID, userName, filterAdsAnalytics FROM UserConfigs;";
+	// return __loadConfigs(query);
+	logError("IF YOU CAN SEE THIS MESSAGE IT MEANS YOU DID NOT UNCOMMENT THE PREVIOUS LINES");
+	return true;
+}
+
+bool PacketFilterData::loadUserConfigs(const std::string &userName)
+{
+	std::stringstream query;
+	query.clear();
+	query << "SELECT userID, userName, filterAdsAnalytics FROM UserConfigs WHERE userName = \'" << userName << "\';";
+	return __loadConfigs(query.str());
 }
 
 bool PacketFilterData::getUserConfigs(in_addr_t addr, uint32_t& userID, user_config_entry_t& entry)
@@ -130,4 +145,45 @@ UserConfigs& PacketFilterData::getUserConfigs()
 IpUserMap& PacketFilterData::getIPMap()
 {
 	return ipMap;
+}
+
+bool PacketFilterData::associateClientToServerIp(const uint32_t &userID, const std::string &clientTunnelIP, const std::string &clientRemoteIP, std::string &serverIP)
+{
+	std::stringstream query;
+	//	query << "UPDATE UserServerInfo SET serverIPAddress = \"" << serverIP << "\" WHERE userID = " << userID << ";";
+	//	logInfo("Query " << query);
+	//	if (false == dbManager.execWriteQuery(query.str())) {
+//		logError("Error in associating the serverIP to user ID" << query);
+//		query << "INSERT INTO UserServerInfo VALUES (" << userID << ", \"" << serverIP << "\");";
+//		logInfo(" Trying to insert now :: Query "<< query)
+//		if (false == dbManager.execWriteQuery(query.str())) {
+//			logError("Error in Insert");
+//			return false;
+//		}
+//		logDebug("Insert works!! ");
+//	}
+// (userID INT NOT NULL PRIMARY KEY, remoteIpAddress VARCHAR(64) NOT NULL, serverIpAddress VARCHAR(64) NOT NULL, timestamp TIMESTAMP NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, startStopFlag BOOLEAN NOT NULL DEFAULT 0)
+	query.clear();
+	query << "INSERT INTO UserTunnelInfo VALUES (" << userID << ", \'" << clientTunnelIP << "\',\'" << clientRemoteIP << "\',\'" << serverIP << "\', CURRENT_TIMESTAMP, " << FLAG_STARTSTOP_START << " );";
+	logInfo("Query " << query);
+	if (false == dbManager.execWriteQuery(query.str())) {
+		logError("Error in Insert" << query);
+		return false;
+	}
+	return true;
+
+}
+
+
+bool PacketFilterData::disassociateClientFromServerIp(const uint32_t & userID, const std::string & clientTunnelIP, const std::string &clientRemoteIP, std::string & serverIP)
+{
+	std::stringstream query;
+	query.clear();
+	query << "INSERT INTO UserTunnelInfo VALUES (" << userID << ", \'" << clientTunnelIP << "\',\'" << clientRemoteIP << "\',\'" << serverIP << "\', CURRENT_TIMESTAMP, " << FLAG_STARTSTOP_STOP << ");";
+	logInfo("Query " << query);
+	if (false == dbManager.execWriteQuery(query.str())) {
+		logError("Error in Insert" << query);
+		return false;
+	}
+	return true;
 }

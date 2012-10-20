@@ -15,9 +15,8 @@ public:
 	bool connectDB(std::string hostname, std::string user, std::string password, std::string dbName);
 	bool closeDB();
 	bool flushDB();
-	bool execFetchQuery(std::string Query, MYSQL_RES **results);
-	// Add code for write query here as well.
-
+	bool execReadQuery(std::string Query, MYSQL_RES **results);
+	bool execWriteQuery(std::string Query);
 };
 
 #endif

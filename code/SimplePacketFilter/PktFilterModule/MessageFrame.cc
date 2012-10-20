@@ -123,7 +123,9 @@ std::ostream& operator<<(std::ostream& os, const MessageFrame& cmd)
     	case MSG_CREATETUNNEL:
     	case MSG_CLOSETUNNEL:
     		os << (cmd.cmdHeader->cmdType == MSG_CREATETUNNEL? "CREATE " : "CLOSE ")
-    		   << cmd.cmdTunnel->ipAddress << " " << cmd.cmdTunnel->userName << " " << cmd.cmdTunnel->userNameLen;
+    		   << cmd.cmdTunnel->clientTunnelIpAddress << " " << cmd.cmdTunnel->clientRemoteIpAddress << " "
+    		   << cmd.cmdTunnel->meddleServerIpAddress << " "
+    		   << cmd.cmdTunnel->userName << " " << cmd.cmdTunnel->userNameLen;
     		break;
     	case MSG_GETIPUSERINFO:
     		os << "Get IP Info for IP :" << (cmd.cmdIPUserInfo->ipAddress);

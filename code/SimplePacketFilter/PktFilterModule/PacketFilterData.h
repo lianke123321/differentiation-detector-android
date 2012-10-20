@@ -24,17 +24,21 @@ private:
 	UserConfigs userConfigs;
 	IpUserMap ipMap;
 	DatabaseManager dbManager;
+	bool __loadConfigs(std::string query);
 public:
 	PacketFilterData();
 	~PacketFilterData();
 	bool loadAllUserConfigs();
+	bool loadUserConfigs(const std::string &userName);
 	UserConfigs& getUserConfigs();
 	IpUserMap& getIPMap();
-	bool connectToDB(std::string hostname, std::string dbUser, std::string dbPassword, std::string dbName);
+	bool connectToDB(const std::string &hostname, const std::string &dbUser, const std::string &dbPassword, const std::string &dbName);
 	bool getUserConfigs(in_addr_t addr, uint32_t &userID, user_config_entry_t &entry);
 	bool getUserID(in_addr_t addr, uint32_t &userID);
 	bool associateUserToIp(const std::string &userName, const in_addr_t &addr);
 	bool disassociateIpFromUser(const std::string &userName, const in_addr_t &addr);
+	bool associateClientToServerIp(const uint32_t &userID, const std::string &clientTunnelIP, const std::string &clientRemoteIP, std::string &serverIP);
+	bool disassociateClientFromServerIp(const uint32_t & userID, const std::string &clientTunnelIP, const std::string &clientRemoteIP, std::string &serverIP);
 };
 
 

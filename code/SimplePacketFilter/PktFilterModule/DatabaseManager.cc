@@ -1,6 +1,7 @@
 #include "DatabaseManager.h"
 #include "Logging.h"
 #include <string>
+#include <stdint.h>
 #include <mysql/mysql.h>
 
 DatabaseManager::DatabaseManager()
@@ -38,9 +39,10 @@ bool DatabaseManager::flushDB()
 	return true;
 }
 
-bool DatabaseManager::execFetchQuery(std::string query, MYSQL_RES **results)
+bool DatabaseManager::execReadQuery(std::string query, MYSQL_RES **results)
 {
-	if (mysql_real_query(mysql, query.c_str(), query.length()) > 0) {
+	logDebug("Executing the query"<<query);
+	if (0 != mysql_real_query(mysql, query.c_str(), query.length())) {
 		logError("Error executing the query");
 		return false;
 	}
@@ -55,6 +57,19 @@ bool DatabaseManager::execFetchQuery(std::string query, MYSQL_RES **results)
 	return true;
 }
 
+bool DatabaseManager::execWriteQuery(std::string query)
+{
+	uint32_t cnt=0;
+	logDebug("Executing the query" << query);
+	while (cnt<5) { // At most 5 retries
+		if (0 == mysql_real_query(mysql, query.c_str(), query.length())) {
+			return true;
+		}
+		logError("Error executing the query; Retyring again" << query);
+		cnt = cnt + 1;
+	}
+	return false;
+}
 
 
 

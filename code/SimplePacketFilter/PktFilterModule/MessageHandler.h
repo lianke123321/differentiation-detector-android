@@ -19,6 +19,8 @@ private:
 	MessageFrame * recvCommand();
 	bool processCommand();
 	bool processTunnelCommand();
+	bool processCreateTunnelCommand();
+	bool processCloseTunnelCommand();
 	bool processReadAllConfs();
 	bool respondGetUserIpInfo();
 public:

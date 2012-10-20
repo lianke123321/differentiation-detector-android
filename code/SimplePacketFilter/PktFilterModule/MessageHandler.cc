@@ -85,36 +85,38 @@ MessageFrame* MessageHandler::recvCommand()
 	return cmd;
 }
 
-bool MessageHandler::processTunnelCommand()
-{
-	// ignoring the name len for now
-	std::string userName((char *)(cmd->cmdTunnel->userName));
-	uint32_t userID;
-
-	// TODO:: assuming IPv4 here and not performing any sanity checks
-	in_addr_t ipAddress;
-
-	if (inet_pton(AF_INET, (const char *)(cmd->cmdTunnel->ipAddress), (void *) &ipAddress) < 0) {
-		logError("Error parsing the IP address");
-		return false;
-	}
-
-	logInfo("Prev Table" << mainPktFilter.getIPMap());
-	if (MSG_CREATETUNNEL == cmd->cmdHeader->cmdType) {
-		if (false == mainPktFilter.associateUserToIp(userName, ipAddress)) {
-			logError("Error adding the user" << cmd->cmdTunnel->userName);
-			return false;
-		}
-	} else {
-		if (false == mainPktFilter.disassociateIpFromUser(userName, ipAddress)) {
-			logError("Error in removing the entry for ipAddress" << cmd->cmdTunnel->ipAddress << " for user "<< cmd->cmdTunnel->userName);
-			return false;
-		}
-	}
-	logInfo("New Table" << mainPktFilter.getIPMap());
-	// TODO release the lock here
-	return true;
-}
+//bool MessageHandler::processTunnelCommand()
+//{
+//	// ignoring the name len for now
+//	std::string userName((char *)(cmd->cmdTunnel->userName));
+//	uint32_t userID;
+//
+//	// TODO:: assuming IPv4 here and not performing any sanity checks
+//	in_addr_t ipAddress;
+//
+//	if (inet_pton(AF_INET, (const char *)(cmd->cmdTunnel->clientIpAddress), (void *) &ipAddress) < 0) {
+//		logError("Error parsing the IP address");
+//		return false;
+//	}
+//
+//	logInfo("Prev Table" << mainPktFilter.getIPMap());
+//	if (MSG_CREATETUNNEL == cmd->cmdHeader->cmdType) {
+//
+//		if (false == mainPktFilter.associateUserToIp(userName, ipAddress)) {
+//			logError("Error adding the user" << cmd->cmdTunnel->userName);
+//			return false;
+//		}
+//		if (false == )
+//	} else {
+//		if (false == mainPktFilter.disassociateIpFromUser(userName, ipAddress)) {
+//			logError("Error in removing the entry for ipAddress" << cmd->cmdTunnel->clientIpAddress << " for user "<< cmd->cmdTunnel->userName);
+//			return false;
+//		}
+//	}
+//	logInfo("New Table" << mainPktFilter.getIPMap());
+//	// TODO release the lock here
+//	return true;
+//}
 
 bool MessageHandler::processReadAllConfs()
 {
@@ -162,6 +164,92 @@ bool MessageHandler::respondGetUserIpInfo()
 	return true;
 }
 
+bool MessageHandler::processCloseTunnelCommand()
+{
+	// ignoring the name len for now
+	std::string userName((char *)(cmd->cmdTunnel->userName));
+	std::string clientTunnelIPStr((char *)cmd->cmdTunnel->clientTunnelIpAddress);
+	std::string clientRemoteIPStr((char *)cmd->cmdTunnel->clientRemoteIpAddress);
+	std::string serverIPStr((char *)cmd->cmdTunnel->meddleServerIpAddress);
+	uint32_t userID;
+	user_config_entry_t entry;
+	// TODO:: assuming IPv4 here and not performing any sanity checks
+	in_addr_t ipAddress;
+	if (inet_pton(AF_INET, (const char *)(cmd->cmdTunnel->clientTunnelIpAddress), (void *) &ipAddress) < 0) {
+		logError("Error parsing the IP address");
+		return false;
+	}
+	// Get the user configs before disassoc
+	memset(&entry, 0, sizeof(entry));
+	if (false == mainPktFilter.getUserConfigs(ipAddress, userID, entry)) {
+		logError("Error in getting the userConfigs for the IP" << cmd->cmdIPUserInfo->ipAddress << " Disassoc the User from IP");
+		if (false == mainPktFilter.disassociateIpFromUser(userName, ipAddress)) {
+			logError("Error dissociating the user");
+		}
+		logInfo("New Table after disasoc" << mainPktFilter.getIPMap());
+		return false;
+	}
+	logInfo("Prev Table" << mainPktFilter.getIPMap());
+	if (false == mainPktFilter.disassociateIpFromUser(userName, ipAddress)) {
+		logError("Error adding the user" << cmd->cmdTunnel->userName);
+		return false;
+	}
+	logInfo("New Table" << mainPktFilter.getIPMap());
+	if (false == mainPktFilter.disassociateClientFromServerIp(userID, clientTunnelIPStr, clientRemoteIPStr, serverIPStr)) {
+		logError("Error associating the client to the server IP" << clientTunnelIPStr << "<->" << serverIPStr);
+		return false;
+	}
+	// TODO release the lock here
+	return true;
+}
+
+bool MessageHandler::processCreateTunnelCommand()
+{
+	// ignoring the name len for now
+	std::string userName((char *)(cmd->cmdTunnel->userName));
+	std::string clientTunnelIPStr((char *)cmd->cmdTunnel->clientTunnelIpAddress); // Address in VPN Tunnel
+	std::string clientRemoteIPStr((char *)cmd->cmdTunnel->clientRemoteIpAddress); // Global IP of the Client
+	std::string serverIPStr((char *)cmd->cmdTunnel->meddleServerIpAddress); // Global IP of the server
+	uint32_t userID;
+	user_config_entry_t entry;
+	// TODO:: assuming IPv4 here and not performing any sanity checks
+	in_addr_t ipAddress;
+	if (inet_pton(AF_INET, (const char *)(cmd->cmdTunnel->clientTunnelIpAddress), (void *) &ipAddress) < 0) {
+		logError("Error parsing the IP address");
+		return false;
+	}
+	if (false == mainPktFilter.loadUserConfigs(userName)) {
+		logError("Error in reading the configs for the user " << userName);
+		return false;
+	}
+	logInfo("Prev Table" << mainPktFilter.getIPMap());
+	if (false == mainPktFilter.associateUserToIp(userName, ipAddress)) {
+		logError("Error adding the user" << cmd->cmdTunnel->userName);
+		return false;
+	}
+	// Read Configs here
+	logInfo("New Table" << mainPktFilter.getIPMap());
+	if (false == mainPktFilter.getUserConfigs(ipAddress, userID, entry)) {
+		logError("Error in getting the userConfigs for the IP" << cmd->cmdIPUserInfo->ipAddress << " Disassoc the User from IP");
+		if (false == mainPktFilter.disassociateIpFromUser(userName, ipAddress)) {
+			logError("Error dissociating the user");
+		}
+		logInfo("New Table after diss" << mainPktFilter.getIPMap());
+		return false;
+	}
+	if (false == mainPktFilter.associateClientToServerIp(userID, clientTunnelIPStr, clientRemoteIPStr, serverIPStr)) {
+		logError("Error associating the client to the server IP" << clientTunnelIPStr << "<->" << serverIPStr);
+		if (false == mainPktFilter.disassociateIpFromUser(userName, ipAddress)) {
+			logError("Error dissociating the user");
+		}
+		return false;
+	}
+
+	return true;
+}
+
+
+
 bool MessageHandler::processCommand()
 {
 	bool ret;
@@ -171,9 +259,12 @@ bool MessageHandler::processCommand()
 	}
 	switch(cmd->cmdHeader->cmdType) {
 	case MSG_CREATETUNNEL:
+		logInfo("Processing the Tunnel command now");
+		ret = processCreateTunnelCommand();
+		break;
 	case MSG_CLOSETUNNEL:
 		logInfo("Processing the Tunnel command now");
-		ret = processTunnelCommand();
+		ret = processCloseTunnelCommand();
 		break;
 	case MSG_READALLCONFS:
 		logInfo("Processing the command to read configs");
@@ -186,6 +277,7 @@ bool MessageHandler::processCommand()
 	default:
 		break;
 	}
+	// boo! i love ostriches who love these rets ;).
 	return ret;
 }
 
