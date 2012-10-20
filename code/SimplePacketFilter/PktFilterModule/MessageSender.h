@@ -10,7 +10,7 @@ class MessageSender
 public:
 	int32_t sockFD;
 private:
-	struct sockaddr_un addr;
+	struct sockaddr_in addr;
 public:
 	MessageSender();
 	~MessageSender();

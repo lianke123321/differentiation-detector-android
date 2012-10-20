@@ -13,7 +13,7 @@ public:
 private:
 	MessageFrame *cmd;
 	uint8_t lastRead[4096];
-	struct sockaddr_un localAddr;
+	struct sockaddr_in localAddr;
 	uint32_t remoteFD;
 private:
 	MessageFrame * recvCommand();
@@ -26,7 +26,7 @@ private:
 public:
 	MessageHandler();
 	~MessageHandler();
-	bool setupMessageHandler(std::string socketPath);
+	bool setupMessageHandler(uint16_t socketPort);
 	bool mainLoop();
 };
 #endif /* COMMANDHANDLER_H_ */

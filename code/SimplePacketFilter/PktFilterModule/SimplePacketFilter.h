@@ -24,7 +24,8 @@
 #define DEV_NETMASK "255.0.0.0" // The netmask used for the tun0 device
 #define ROUTE_NETMASK "255.255.0.0" // The Netmask used for the forward and reverse paths
 #define IP_ADDRESS "10.11.101.101"
-#define COMMAND_SOCKET_PATH "/data/.meddleCmdSocket"
+#define MEDDLE_MESSAGE_SOCKET_PORT 8192
+//#define COMMAND_SOCKET_PATH "/data/.meddleCmdSocket"
 
 #define DEFAULT_DNS_SERVER "128.208.4.1"
 #define FILTER_DNS_SERVER "128.208.4.186"

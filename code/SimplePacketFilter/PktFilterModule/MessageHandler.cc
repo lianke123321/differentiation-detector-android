@@ -18,35 +18,37 @@ MessageHandler::MessageHandler()
 
 MessageHandler::~MessageHandler()
 {
-	if (0 < sockFD) {
+	if (sockFD > 0) {
 		close(sockFD);
 	}
 }
 
-bool MessageHandler::setupMessageHandler(std::string socketPath)
+bool MessageHandler::setupMessageHandler(uint16_t sock_port)
 {
+	int32_t optVal = 1;
 	uint32_t len;
-
-	logDebug("The socket path is of length " << socketPath.length() << " and the max length is " << sizeof(localAddr.sun_path));
-	if (socketPath.length() > sizeof(localAddr.sun_path) - 1) {
-		logError("The socket path " << socketPath.length() << " has a length larger than the maximum length " << sizeof(localAddr.sun_path));
-		sockFD = -1;
-		return false;
-	}
-	logDebug("Now connecting the socket");
-	sockFD = socket(AF_UNIX, SOCK_STREAM, 0);
-	if (0 > sockFD ) {
+	logDebug("Now connecting the socket" << sock_port);
+	sockFD = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockFD < 0 ) {
 		logError("Error creating socket to read commands");
 		sockFD = -1;
 		return false;
 	}
-	memset(&localAddr, 0, sizeof(struct sockaddr_un));
-	localAddr.sun_family = AF_UNIX;
-	strncpy(localAddr.sun_path, socketPath.c_str(), sizeof(localAddr.sun_path)-1);
-	unlink(localAddr.sun_path);
-	len = strlen(localAddr.sun_path) + sizeof(localAddr.sun_family);
-	if (bind(sockFD, (struct sockaddr *)&localAddr, len) == -1) {
-		logError("Error in bind operation");
+
+	// Reuse the socket port -- required if the socket was not properly closed
+	if (0 != setsockopt(sockFD, SOL_SOCKET, SO_REUSEADDR, &optVal, sizeof(optVal))) {
+		logError("Error in setting the socket to reuse the address");
+		sockFD = -1;
+		return false;
+	}
+
+	memset(&localAddr, 0, sizeof(struct sockaddr_in));
+	localAddr.sin_family = PF_INET;
+	localAddr.sin_port = htons(sock_port);
+	localAddr.sin_addr.s_addr = INADDR_ANY;
+	len = sizeof(localAddr);
+	if (bind(sockFD, (struct sockaddr *)&localAddr, len) < 0) {
+		logError("Error in bind operation" << errno);
 		close(sockFD);
 		sockFD = -1;
 		return false;
@@ -84,39 +86,6 @@ MessageFrame* MessageHandler::recvCommand()
 	logDebug("Received the command " << cmd);
 	return cmd;
 }
-
-//bool MessageHandler::processTunnelCommand()
-//{
-//	// ignoring the name len for now
-//	std::string userName((char *)(cmd->cmdTunnel->userName));
-//	uint32_t userID;
-//
-//	// TODO:: assuming IPv4 here and not performing any sanity checks
-//	in_addr_t ipAddress;
-//
-//	if (inet_pton(AF_INET, (const char *)(cmd->cmdTunnel->clientIpAddress), (void *) &ipAddress) < 0) {
-//		logError("Error parsing the IP address");
-//		return false;
-//	}
-//
-//	logInfo("Prev Table" << mainPktFilter.getIPMap());
-//	if (MSG_CREATETUNNEL == cmd->cmdHeader->cmdType) {
-//
-//		if (false == mainPktFilter.associateUserToIp(userName, ipAddress)) {
-//			logError("Error adding the user" << cmd->cmdTunnel->userName);
-//			return false;
-//		}
-//		if (false == )
-//	} else {
-//		if (false == mainPktFilter.disassociateIpFromUser(userName, ipAddress)) {
-//			logError("Error in removing the entry for ipAddress" << cmd->cmdTunnel->clientIpAddress << " for user "<< cmd->cmdTunnel->userName);
-//			return false;
-//		}
-//	}
-//	logInfo("New Table" << mainPktFilter.getIPMap());
-//	// TODO release the lock here
-//	return true;
-//}
 
 bool MessageHandler::processReadAllConfs()
 {

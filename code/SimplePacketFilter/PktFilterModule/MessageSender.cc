@@ -11,22 +11,22 @@
 
 MessageSender::MessageSender()
 {
-	 if ((sockFD = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-		 sockFD = -1;
-		 logError("socket error");
-		 return;
+	 if ((sockFD = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+		sockFD = -1;
+		logError("socket error");
+		return;
 	 }
-	 logDebug("Created the Unix domain socket FD = " << sockFD);
-	 memset(&addr, 0, sizeof(addr));
-	 addr.sun_family = AF_UNIX;
-	 strncpy(addr.sun_path, COMMAND_SOCKET_PATH, sizeof(addr.sun_path)-1);
-	 logDebug("Connecting to the Socket at path " << COMMAND_SOCKET_PATH );
-	 if (connect(sockFD, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-		 logError("Connect error");
-		 sockFD = -1;
-		 return;
-	 }
-	 logDebug("Successfully connected to Unix socket");
+	logDebug("Created the socket FD = " << sockFD);
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(MEDDLE_MESSAGE_SOCKET_PORT);
+	inet_pton(AF_INET, "127.0.0.1", &(addr.sin_addr));
+	if (connect(sockFD, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+		logError("Connect error");
+		sockFD = -1;
+		return;
+	}
+	logDebug("Successfully connected to Unix socket");
 }
 
 MessageSender::~MessageSender()
