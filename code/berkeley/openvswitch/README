@@ -5,7 +5,7 @@ The server architecture with OpenVSwitch and POX are as follows:
 		   [mbox]  [mbox]	
 		    |  |    |  |	
 		 +--------------+	
-[tun0]=[tap0] == |     OVS	| == [tap1] == Click == [tun1] == MASQUERADE == [eth0]
+[vpn]=[vpn_tap] == |     OVS	| == [tap_egress] == Click == [tun_egress] == MASQUERADE == [eth0]
 	 	 +------ -------+
 		        |
 		     +-----+
@@ -14,7 +14,7 @@ The server architecture with OpenVSwitch and POX are as follows:
 
 
 Fixed Interfaces:
-[tun0] => OpenVPN (soon to be StrongSwan) endpoint
-[tap0] => OVS only sees Tap (not Tun) interfaces -- conversion from tun0.
-[tap1] => Output Interface for OpenVSwitch, converts to tun1 and then NAT.
-[tun1] => NOT connected to OpenVSwitch, directly wired to NAT at eth0
+[vpn] == (Not really: 00:01:01:01:01:03) => OpenVPN (soon to be StrongSwan) endpoint
+[vpn_tap] == 00:01:01:01:01:04, 1.0.0.4 => OVS only sees Tap (not Tun) interfaces -- conversion from vpn.
+[tap_egress] == 00:01:01:01:01:01, 1.0.0.2 => Output Interface for OpenVSwitch, converts to tun_egress and then NAT.
+[tun_egress] == 00:01:01:01:01:02, 1.0.0.3 => NOT connected to OpenVSwitch, directly wired to NAT at eth0
