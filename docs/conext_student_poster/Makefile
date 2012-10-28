@@ -1,16 +1,18 @@
 # sane targets
-DOCN = main
+DOCN = main-camera
 
 all: doc
 doc:
-	pdflatex $(DOCN).tex
-	pdflatex $(DOCN).tex
-	bibtex $(DOCN) || echo "ok"
-	pdflatex $(DOCN).tex
-	pdflatex $(DOCN).tex
+	latex $(DOCN).tex
+	latex $(DOCN).tex
+	bibtex $(DOCN)
+	latex $(DOCN).tex
+	latex $(DOCN).tex
+	dvips -t letter $(DOCN).dvi
+
 clean:
 	rm -f *.aux *.dvi *.idx *.ind *.log *.toc *.bak *.blg *.bbl
-	rm -f main.pdf
+	rm -f *.pdf *.ps
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
