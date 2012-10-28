@@ -30,11 +30,6 @@
 #define DEFAULT_DNS_SERVER "128.208.4.1"
 #define FILTER_DNS_SERVER "128.208.4.186"
 
-#define DB_SERVER "localhost"
-#define DB_USER "meddle"
-#define DB_PASSWORD "meddle"
-#define DB_NAME "MeddleDB"
-
 #define FLAG_STARTSTOP_START 1
 #define FLAG_STARTSTOP_STOP  0
 

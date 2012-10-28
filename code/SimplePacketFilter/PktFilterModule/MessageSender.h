@@ -15,6 +15,7 @@ public:
 	MessageSender();
 	~MessageSender();
 	bool sendCommand(const uint32_t &cmd, const msgTunnel_t &cmdCreate);
+	bool sendCommand(const msgLoadUserConfs_t &msgReadConfs, user_config_entry &entry);
 	bool recvIPInfo(const msgGetIPUserInfo_t &getInfo, msgRespIPUserInfo_t &respIP);
 };
 

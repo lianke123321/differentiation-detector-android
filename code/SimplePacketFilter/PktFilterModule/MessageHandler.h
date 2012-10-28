@@ -18,11 +18,11 @@ private:
 private:
 	MessageFrame * recvCommand();
 	bool processCommand();
-	bool processTunnelCommand();
 	bool processCreateTunnelCommand();
 	bool processCloseTunnelCommand();
 	bool processReadAllConfs();
 	bool respondGetUserIpInfo();
+	bool processReadUserConfs();
 public:
 	MessageHandler();
 	~MessageHandler();

@@ -4,12 +4,15 @@
 #include <stdint.h>
 #include <iostream>
 #include <arpa/inet.h>
+#include "UserConfigs.h"
 
 #define MSG_CREATETUNNEL 1
 #define MSG_CLOSETUNNEL 2
-#define MSG_READALLCONFS 3
+#define MSG_LOADALLCONFS 3
 #define MSG_GETIPUSERINFO 4
 #define MSG_RESPIPUSERINFO 5
+#define MSG_LOADUSERCONFS 6
+#define MSG_RESPUSERCONFS 7
 
 #define USERNAMELEN_MAX 512
 
@@ -26,14 +29,13 @@ struct msgTunnel {
 	uint32_t userNameLen; //placeholder ignored
 	int8_t userName[USERNAMELEN_MAX];
 }__attribute__((packed));
-
-typedef msgTunnel msgTunnel_t;
+typedef struct msgTunnel msgTunnel_t;
 
 struct msgIPUserInfo {
 	uint8_t ipAddress[INET_ADDRSTRLEN];
 }__attribute__((packed));
 
-typedef msgIPUserInfo msgGetIPUserInfo_t;
+typedef struct msgIPUserInfo msgGetIPUserInfo_t;
 
 struct respIPUserInfo {
 	uint8_t ipAddress[INET_ADDRSTRLEN];
@@ -41,8 +43,17 @@ struct respIPUserInfo {
 	uint32_t userNameLen;
 	uint8_t userName[USERNAMELEN_MAX];
 }__attribute__((packed));
+typedef struct respIPUserInfo msgRespIPUserInfo_t;
 
-typedef respIPUserInfo msgRespIPUserInfo_t;
+struct msgLoadUserConfs{
+	uint32_t userID;
+}__attribute__((packed));
+typedef struct msgLoadUserConfs msgLoadUserConfs_t;
+
+struct msgRespUserConfs {
+	user_config_entry_t entry;
+}__attribute__((packed));
+typedef struct msgRespUserConfs msgRespUserConfs_t;
 
 class MessageFrame {
 public:
@@ -52,16 +63,20 @@ public:
 	msgTunnel_t *cmdTunnel;
 	msgGetIPUserInfo_t *cmdIPUserInfo;
 	msgRespIPUserInfo_t *respIPUserInfo;
+	msgLoadUserConfs_t *loadUserConfs;
+	msgRespUserConfs_t *respUserConfs;
 private:
 	void __parseCommand();
-	void __createFrame();
+	void __createFrame(uint32_t cmd);
 public:
 	MessageFrame();
 	~MessageFrame();
 	MessageFrame(uint8_t* payload, uint32_t len);
 	MessageFrame(uint32_t cmd, const msgTunnel_t &cmdCreate);
-	MessageFrame(uint32_t cmd, const msgGetIPUserInfo_t &msgGet);
-	MessageFrame(uint32_t cmd, const msgRespIPUserInfo_t &resp);
+	MessageFrame(const msgGetIPUserInfo_t &msgGet);
+	MessageFrame(const msgRespIPUserInfo_t &resp);
+	MessageFrame(const msgLoadUserConfs_t &readUserConfs);
+	MessageFrame(const msgRespUserConfs_t &respUserConfs);
 	friend std::ostream& operator<<(std::ostream& os, const MessageFrame& cmd);
 };
 

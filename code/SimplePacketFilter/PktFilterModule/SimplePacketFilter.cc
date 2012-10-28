@@ -71,7 +71,7 @@ int mainInit(MeddleDaemon &meddle, MessageHandler &cmd)
 		logError("Error in loading the configs to memory");
 		return -1;
 	}
-	logDebug("Config Table is " << mainPktFilter.getUserConfigs());
+	logDebug("Config Table is " << mainPktFilter.getAllUserConfigs());
 	logDebug("We have done the initialization now time to meddle");
 
 	logDebug("Listening on "<< MEDDLE_MESSAGE_SOCKET_PORT << " for commands from other processes");

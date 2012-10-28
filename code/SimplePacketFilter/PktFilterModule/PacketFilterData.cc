@@ -76,7 +76,15 @@ bool PacketFilterData::loadUserConfigs(const std::string &userName)
 	return __loadConfigs(query.str());
 }
 
-bool PacketFilterData::getUserConfigs(in_addr_t addr, uint32_t& userID, user_config_entry_t& entry)
+bool PacketFilterData::loadUserConfigs(const uint32_t &userID)
+{
+	std::stringstream query;
+	query.clear();
+	query << "SELECT userID, userName, filterAdsAnalytics FROM UserConfigs WHERE userID = \'" << userID << "\';";
+	return __loadConfigs(query.str());
+}
+
+bool PacketFilterData::getUserConfigs(const in_addr_t &addr, uint32_t& userID, user_config_entry_t& entry)
 {
 	TAKE_SCOPED_LOCK(filterLock);
 	if (false == ipMap.getUserID(addr, userID)) {
@@ -92,7 +100,17 @@ bool PacketFilterData::getUserConfigs(in_addr_t addr, uint32_t& userID, user_con
 	return true;
 }
 
-bool PacketFilterData::getUserID(in_addr_t addr, uint32_t& userID)
+bool PacketFilterData::getUserConfigs(const uint32_t& userID, user_config_entry_t& entry)
+{
+	if (false == userConfigs.getConfigById(userID, entry)) {
+			logError("Error getting the configs for the userID" << userID);
+			return false;
+		}
+	logDebug("User configs for userID " << userID << " " << entry.userName << " " << entry.userID);
+	return true;
+}
+
+bool PacketFilterData::getUserID(const in_addr_t &addr, uint32_t& userID)
 {
 	TAKE_SCOPED_LOCK(filterLock);
 	if (false == ipMap.getUserID(addr, userID)) {
@@ -137,7 +155,7 @@ bool PacketFilterData::disassociateIpFromUser(const std::string &userName, const
 	return true;
 }
 
-UserConfigs& PacketFilterData::getUserConfigs()
+UserConfigs& PacketFilterData::getAllUserConfigs()
 {
 	return userConfigs;
 }

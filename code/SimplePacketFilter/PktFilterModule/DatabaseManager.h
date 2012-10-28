@@ -4,6 +4,12 @@
 #include <mysql/mysql.h>
 #include <string>
 
+//#define DB_SERVER "snowmane.cs.washington.edu"
+#define DB_SERVER "localhost"
+#define DB_USER "meddle"
+#define DB_PASSWORD "meddle"
+#define DB_NAME "MeddleDB"
+
 
 class DatabaseManager
 {
@@ -12,6 +18,7 @@ private:
 public:
 	DatabaseManager();
 	~DatabaseManager();
+	bool connectDB();
 	bool connectDB(std::string hostname, std::string user, std::string password, std::string dbName);
 	bool closeDB();
 	bool flushDB();

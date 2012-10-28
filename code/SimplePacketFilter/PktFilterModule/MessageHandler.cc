@@ -98,7 +98,6 @@ bool MessageHandler::respondGetUserIpInfo()
 	uint32_t userID, nwrite;
 	user_config_entry_t entry;
 	msgRespIPUserInfo_t respIPUserInfo;
-	MessageFrame *respFrame = NULL;
 
 	if (inet_pton(AF_INET, (const char *)(cmd->cmdIPUserInfo->ipAddress), (void *) &ipAddress) < 0) {
 		logError("Error parsing the IP address");
@@ -117,19 +116,18 @@ bool MessageHandler::respondGetUserIpInfo()
 	memcpy(respIPUserInfo.userName, entry.userName,  respIPUserInfo.userNameLen);
 
 	logInfo("UserName "<<respIPUserInfo.userName << " User ID:" << respIPUserInfo.userID << " for IP "<< cmd->cmdIPUserInfo->ipAddress);
-	respFrame = new MessageFrame(MSG_RESPIPUSERINFO, respIPUserInfo);
-	if (NULL == respFrame) {
+	MessageFrame respFrame = MessageFrame(respIPUserInfo);
+	if (NULL == respFrame.buffer) {
 		logError("Error creating the response frame");
 		return false;
 	}
 	logInfo("Created the Frame, now we are writing the response" << respFrame);
-	nwrite = write(remoteFD, respFrame->buffer, respFrame->frameLen);
-	if (nwrite != respFrame->frameLen) {
+	nwrite = write(remoteFD, respFrame.buffer, respFrame.frameLen);
+	if (nwrite != respFrame.frameLen) {
 		logError("Incorrect bytes written in response to GetIPUserInfo");
 		return false;
 	}
-	logDebug("Wrote the response"<< respFrame)
-	delete respFrame;
+	logDebug("Wrote the response"<< respFrame);
 	return true;
 }
 
@@ -176,9 +174,9 @@ bool MessageHandler::processCreateTunnelCommand()
 {
 	// ignoring the name len for now
 	std::string userName((char *)(cmd->cmdTunnel->userName));
-	std::string clientTunnelIPStr((char *)cmd->cmdTunnel->clientTunnelIpAddress); // Address in VPN Tunnel
-	std::string clientRemoteIPStr((char *)cmd->cmdTunnel->clientRemoteIpAddress); // Global IP of the Client
-	std::string serverIPStr((char *)cmd->cmdTunnel->meddleServerIpAddress); // Global IP of the server
+	std::string clientTunnelIPStr((char *)(cmd->cmdTunnel->clientTunnelIpAddress)); // Address in VPN Tunnel
+	std::string clientRemoteIPStr((char *)(cmd->cmdTunnel->clientRemoteIpAddress)); // Global IP of the Client
+	std::string serverIPStr((char *)(cmd->cmdTunnel->meddleServerIpAddress)); // Global IP of the server
 	uint32_t userID;
 	user_config_entry_t entry;
 	// TODO:: assuming IPv4 here and not performing any sanity checks
@@ -217,7 +215,37 @@ bool MessageHandler::processCreateTunnelCommand()
 	return true;
 }
 
+bool MessageHandler::processReadUserConfs()
+{
+	user_config_entry_t entry;
+	msgRespUserConfs resp;
+	uint32_t nwrite;
 
+	memset(&entry, 0, sizeof(entry));
+	if (false == mainPktFilter.loadUserConfigs(cmd->loadUserConfs->userID)) {
+		logError("Error in reading the configs for the user " << (cmd->loadUserConfs->userID));
+		entry.userID = -1;
+		return false;
+	} else {
+		if (false == mainPktFilter.getUserConfigs(cmd->loadUserConfs->userID, entry)) {
+			logError("Error getting configs for user ID"<<cmd->loadUserConfs->userID);
+		}
+	}
+	memcpy(&(resp.entry), &entry, sizeof(entry));
+	MessageFrame respFrame = MessageFrame(resp);
+	if (NULL == respFrame.buffer) {
+		logError("Error in the response frame");
+		return false;
+	}
+	logInfo("Created the Frame, now we are writing the response" << respFrame);
+	nwrite = write(remoteFD, respFrame.buffer, respFrame.frameLen);
+	if (nwrite != respFrame.frameLen) {
+		logError("Incorrect bytes written in response to processReadUserConfs");
+		return false;
+	}
+	logDebug("Wrote the response"<< respFrame);
+	return true;
+}
 
 bool MessageHandler::processCommand()
 {
@@ -235,7 +263,7 @@ bool MessageHandler::processCommand()
 		logInfo("Processing the Tunnel command now");
 		ret = processCloseTunnelCommand();
 		break;
-	case MSG_READALLCONFS:
+	case MSG_LOADALLCONFS:
 		logInfo("Processing the command to read configs");
 		ret = processReadAllConfs();
 		break;
@@ -243,12 +271,17 @@ bool MessageHandler::processCommand()
 		logInfo("Got the command to get the User details for a given ip");
 		ret = respondGetUserIpInfo();
 		break;
+	case MSG_LOADUSERCONFS:
+		logInfo("Got the command to load User configs for a given user");
+		ret = processReadUserConfs();
+		break;
 	default:
 		break;
 	}
 	// boo! i love ostriches who love these rets ;).
 	return ret;
 }
+
 
 bool MessageHandler::mainLoop()
 {

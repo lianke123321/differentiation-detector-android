@@ -43,13 +43,14 @@ bool UserConfigs::addEntry(user_config_entry_t& entry)
 	logError("Attempting to add entry for user " << entry.userName << " with id " << entry.userID);
 	insertIDRet = idUserConfigMap.insert(std::make_pair(entry.userID, entry));
 	if (insertIDRet.second == false) {
-		logError("Previous Entry already exists so removing it now");
+		logInfo("Previous Entry already exists so removing it now");
 		idUserConfigMap.erase(entry.userID);
 		insertIDRet = idUserConfigMap.insert(std::make_pair(entry.userID, entry));
 		if (insertIDRet.second == false) {
 			logError("Error inserting an entry to the Map");
 			return false;
 		}
+		logInfo("Succesfully added the entry");
 	}
 
 	std::string userName =((char *)(entry.userName)) ;
@@ -64,6 +65,7 @@ bool UserConfigs::addEntry(user_config_entry_t& entry)
 			// TODO:: call for removing
 			return false;
 		}
+		logInfo("Succesfully added the entry");
 	}
 	return true;
 }

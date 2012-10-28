@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
 	// read the arguments <user-name> <ip-address> <up-client or down-client>
 	if (argc != 6) {
-		logError(argv[0] << " <userName> <ip-address> <serverIP> <up/down>");
+		logError(argv[0] << " <userName> <tunnel-ip-address> <client-remote-IP> <server-IP> <up/down>");
 		return 1;
 	}
 	userName = argv[1];

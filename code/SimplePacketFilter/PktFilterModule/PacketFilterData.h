@@ -30,11 +30,13 @@ public:
 	~PacketFilterData();
 	bool loadAllUserConfigs();
 	bool loadUserConfigs(const std::string &userName);
-	UserConfigs& getUserConfigs();
+	bool loadUserConfigs(const uint32_t &userID);
+	UserConfigs& getAllUserConfigs();
 	IpUserMap& getIPMap();
 	bool connectToDB(const std::string &hostname, const std::string &dbUser, const std::string &dbPassword, const std::string &dbName);
-	bool getUserConfigs(in_addr_t addr, uint32_t &userID, user_config_entry_t &entry);
-	bool getUserID(in_addr_t addr, uint32_t &userID);
+	bool getUserConfigs(const in_addr_t &addr, uint32_t &userID, user_config_entry_t &entry);
+	bool getUserConfigs(const uint32_t &userID, user_config_entry_t &entry);
+	bool getUserID(const in_addr_t &addr, uint32_t &userID);
 	bool associateUserToIp(const std::string &userName, const in_addr_t &addr);
 	bool disassociateIpFromUser(const std::string &userName, const in_addr_t &addr);
 	bool associateClientToServerIp(const uint32_t &userID, const std::string &clientTunnelIP, const std::string &clientRemoteIP, std::string &serverIP);
