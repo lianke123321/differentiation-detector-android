@@ -65,7 +65,7 @@ bool MessageHandler::setupMessageHandler(uint16_t sock_port)
 
 MessageFrame* MessageHandler::recvCommand()
 {
-	uint32_t nRead, nwrite;
+	uint32_t nRead;
 	memset(lastRead, 0, sizeof(lastRead));
 
 	logDebug("Accepted a new connection: Reading for data on " << remoteFD);
@@ -105,7 +105,7 @@ bool MessageHandler::respondGetUserIpInfo()
 	}
 	if (false == mainPktFilter.getUserConfigs(ipAddress, userID, entry)) {
 		logError("Error in getting the userConfigs for the IP" << cmd->cmdIPUserInfo->ipAddress);
-		userID = -1;
+		userID = 0;
 		memset(&entry, 0, sizeof(entry));
 	}
 
@@ -276,6 +276,7 @@ bool MessageHandler::processCommand()
 		ret = processReadUserConfs();
 		break;
 	default:
+		ret = false;      
 		break;
 	}
 	// boo! i love ostriches who love these rets ;).

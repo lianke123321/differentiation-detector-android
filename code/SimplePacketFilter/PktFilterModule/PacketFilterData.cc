@@ -52,7 +52,7 @@ bool PacketFilterData::__loadConfigs(std::string query)
 		configVector.push_back(entry);
 	}
 
-	for(int i=0; i<configVector.size(); i=i+1) {
+	for(unsigned int i=0; i<configVector.size(); i=i+1) {
 		TAKE_SCOPED_LOCK(filterLock);
 		userConfigs.addEntry(configVector[i]);
 	}

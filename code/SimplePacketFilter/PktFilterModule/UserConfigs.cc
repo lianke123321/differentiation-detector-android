@@ -110,7 +110,7 @@ bool UserConfigs::getUserIdByName(const std::string& userName, uint32_t &userID)
 	user_config_entry_t entry;
 	if (false == getConfigByName(userName, entry)) {
 		logError("Error fetching the entry for userName"<< userName);
-		userID = -1;
+		userID = 0;
 		return false;
 	}
 	userID = entry.userID;

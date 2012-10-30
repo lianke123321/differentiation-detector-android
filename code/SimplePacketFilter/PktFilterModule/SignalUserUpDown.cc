@@ -74,7 +74,7 @@ bool verifyCommand(const std::string &userName, const std::string &clientTunnelI
 	msgGetIPUserInfo_t cmdGetIP;
 	msgRespIPUserInfo_t respIP;
 	bool ret;
-	uint32_t minlen = userName.length() < USERNAMELEN_MAX ? userName.length() : USERNAMELEN_MAX;
+	// uint32_t minlen = userName.length() < USERNAMELEN_MAX ? userName.length() : USERNAMELEN_MAX;
 	// Now send the commands
 	logDebug("Checking if the socket " << cmdSender.sockFD << " can be used");
 	if (cmdSender.sockFD < 0) {
@@ -99,7 +99,7 @@ bool verifyCommand(const std::string &userName, const std::string &clientTunnelI
 			ret = true;
 		}
 	} else if (cmdType == DOWNCLIENT_CMD) {
-		if (respIP.userID == -1) {
+		if (respIP.userID == 0) {
 			logInfo("Unable to find user; This implies that the User " << userName << " is now not bound to ip" << clientTunnelIpAddress);
 			ret = true;
 		}
