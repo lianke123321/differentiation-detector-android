@@ -3,21 +3,27 @@ tun="tun0"
 tunIP="10.11.101.101"
 fwdNet="10.11.0.0/16"
 revNet="10.101.0.0/16"
-
+natNet="10.0.0.0/8"
 gateway="128.208.4.100"
 ethNet="128.208.4.0/24"
 
 logName="/data/SimplePacketFilter.log"
 basePath="/data/usr/sbin/"
+
+
 setup()
 {
     # Make sure only snowmane and sounder can connect to the mysql database
     iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
-    iptables -D INPUT -p tcp --dport 3306 -j REJECT 
-    iptables -A INPUT -p tcp -s sounder.cs.washington.edu --dport 3306 -j ACCEPT
-    iptables -A INPUT -p tcp -s snowmane.cs.washington.edu --dport 3306 -j ACCEPT
-    iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
-    iptables -A INPUT -p tcp --dport 3306 -j REJECT
+    iptables -D INPUT -p tcp --dport 3306 -j REJECT
+
+ 
+    iptables -I INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -I INPUT -p tcp -s sounder.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -I INPUT -p tcp -s snowmane.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -I INPUT -p tcp -s meddle.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp ! -s ${natNet} --dport 3306 -j REJECT
+
     # Database ports should be opened before the packet filter starts on each machine
     # Make sure that this script runs first on sounder where the database is running
 
@@ -127,10 +133,13 @@ undo()
 
     # make sure that only localhost can connect to the IPTABLES after cleanup. This is to ensure existing code does not break
     # Reverse order to make sure existing code does not break
-    iptables -D INPUT -p tcp --dport 3306 -j REJECT
-    iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
-    iptables -D INPUT -p tcp -s sounder.cs.washington.edu --dport 3306 -j ACCEPT
+
+    iptables -D INPUT -p tcp ! -s ${natNet} --dport 3306 -j REJECT
+    iptables -D INPUT -p tcp -s sounder.cs.washington.edu  --dport 3306 -j ACCEPT
     iptables -D INPUT -p tcp -s snowmane.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp -s meddle.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+ 
     iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
     iptables -A INPUT -p tcp --dport 3306 -j REJECT
 }
