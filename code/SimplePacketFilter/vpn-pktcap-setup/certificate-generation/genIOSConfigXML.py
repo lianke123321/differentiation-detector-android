@@ -57,12 +57,12 @@ if __name__ == "__main__":
     # Check for the encoding
     orgName="University of Washington CSE"
     connDisplayName="Meddle VPN"
-    caName="snowmane CA"
-    serverHostName="snowmane.cs.washington.edu"
-    caCertPath ="./caCert.pem"
+    caName="Meddle CA"
+    serverHostName="meddle.cs.washington.edu"
+    caCertPath ="./ServerKeys/MeddleCACert.pem"
 
     clientName = sys.argv[1]
     clientPassword = sys.argv[2]
     
-    dumpConfXML(p12Path="./"+str(clientName)+".p12", clientName=clientName, clientPassword=clientPassword, serverHostName=serverHostName, caCertPath=caCertPath, orgName=orgName, connDisplayName=connDisplayName, caName=caName, xmlPath="./"+str(clientName)+".mobileconfig")
+    dumpConfXML(p12Path="./ClientCert/"+str(clientName)+".p12", clientName=clientName, clientPassword=clientPassword, serverHostName=serverHostName, caCertPath=caCertPath, orgName=orgName, connDisplayName=connDisplayName, caName=caName, xmlPath="./ClientCert/"+str(clientName)+".mobileconfig")
 
