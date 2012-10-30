@@ -2,6 +2,7 @@
 #include "SimplePacketFilter.h"
 #include "Logging.h"
 #include <mysql/mysql.h>
+#include <string.h>
 
 
 PacketFilterData::PacketFilterData()

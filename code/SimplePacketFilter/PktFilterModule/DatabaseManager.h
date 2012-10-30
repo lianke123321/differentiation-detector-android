@@ -5,7 +5,7 @@
 #include <string>
 
 //#define DB_SERVER "snowmane.cs.washington.edu"
-#define DB_SERVER "localhost"
+#define DB_SERVER "community.dyn.cs.washington.edu"
 #define DB_USER "meddle"
 #define DB_PASSWORD "meddle"
 #define DB_NAME "MeddleDB"
