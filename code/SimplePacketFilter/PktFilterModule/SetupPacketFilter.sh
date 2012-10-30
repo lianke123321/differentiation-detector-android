@@ -82,9 +82,10 @@ undo()
     
     # All the above steps with s/add/del/g 
     ${basePath}/ipsec stop	
-    iptables --flush
-    iptables --flush -t nat
-    iptables --flush -t mangle
+    iptables -D FORWARD -i tun+ -o ${eth} -j ACCEPT
+    iptables -D FORWARD -i ${eth} -o tun+ -j ACCEPT
+
+    iptables -t nat -D POSTROUTING -s ${revNet} -o ${eth} -j MASQUERADE
 
     ip rule del from ${fwdNet} to all lookup fwdpath prio 1000
     ip rule del from ${revNet} to all lookup depart prio 1001
