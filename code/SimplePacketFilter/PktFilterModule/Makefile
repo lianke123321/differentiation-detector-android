@@ -42,4 +42,4 @@ $(SIGNALCONFIG) : $(SIGNALCONFIGOBJS)
 	$(CXX) $(LIBDIR) -o $(SIGNALCONFIG) $(SIGNALCONFIGOBJS) $(LIBS)
 
 install: $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG)
-	sudo cp -vRf $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG) *.sh /data/usr/sbin/  
+	sudo cp -vRf $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG) /data/usr/sbin/  
