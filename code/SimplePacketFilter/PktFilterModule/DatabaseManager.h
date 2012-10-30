@@ -5,9 +5,9 @@
 #include <string>
 
 //#define DB_SERVER "snowmane.cs.washington.edu"
-#define DB_SERVER "localhost"
+#define DB_SERVER "sounder.cs.washington.edu"
 #define DB_USER "meddle"
-#define DB_PASSWORD "meddle"
+#define DB_PASSWORD "q@847#$6&4@RfbvD"
 #define DB_NAME "MeddleDB"
 
 
