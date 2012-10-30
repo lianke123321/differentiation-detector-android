@@ -43,7 +43,6 @@ bool MessageSender::sendCommand(const uint32_t &cmd, const msgTunnel_t &cmdTunne
 {
 	MessageFrame cmdFrame = MessageFrame(cmd, cmdTunnel);
 	uint32_t nwrite;
-	uint8_t buffer [4096];
 
 	if (NULL == cmdFrame.buffer || cmdFrame.frameLen < 0) {
 		logError("Error creating Frame");
@@ -62,8 +61,8 @@ bool MessageSender::sendCommand(const uint32_t &cmd, const msgTunnel_t &cmdTunne
 bool MessageSender::sendCommand(const msgLoadUserConfs_t &msgReadConfs, user_config_entry &entry)
 {
 	MessageFrame cmdFrame = MessageFrame(msgReadConfs);
-	int32_t nwrite, nread, offset;
-	int32_t reqRead = sizeof(msgHeader_t) + sizeof(msgRespUserConfs_t);
+	uint32_t nwrite, nread, offset;
+	uint32_t reqRead = sizeof(msgHeader_t) + sizeof(msgRespUserConfs_t);
 	uint8_t buffer [4096];
 
 	if (NULL == cmdFrame.buffer || cmdFrame.frameLen < 0) {
@@ -105,9 +104,9 @@ bool MessageSender::sendCommand(const msgLoadUserConfs_t &msgReadConfs, user_con
 
 bool MessageSender::recvIPInfo(const msgGetIPUserInfo_t &getInfo, msgRespIPUserInfo_t &respIP)
 {
-	int32_t nread, nwrite;
+	uint32_t nread, nwrite;
 	uint8_t buffer [4096];
-	int32_t reqRead = sizeof(msgHeader_t) + sizeof(msgRespIPUserInfo_t);
+	uint32_t reqRead = sizeof(msgHeader_t) + sizeof(msgRespIPUserInfo_t);
 	uint32_t offset=0;
 	MessageFrame cmdFrame = MessageFrame(getInfo);
 
