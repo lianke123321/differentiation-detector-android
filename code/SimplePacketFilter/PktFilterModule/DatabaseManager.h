@@ -4,6 +4,12 @@
 #include <mysql/mysql.h>
 #include <string>
 
+//#define DB_SERVER "snowmane.cs.washington.edu"
+#define DB_SERVER "sounder.cs.washington.edu"
+#define DB_USER "meddle"
+#define DB_PASSWORD "q@847#$6&4@RfbvD"
+#define DB_NAME "MeddleDB"
+
 
 class DatabaseManager
 {
@@ -12,12 +18,12 @@ private:
 public:
 	DatabaseManager();
 	~DatabaseManager();
+	bool connectDB();
 	bool connectDB(std::string hostname, std::string user, std::string password, std::string dbName);
 	bool closeDB();
 	bool flushDB();
-	bool execFetchQuery(std::string Query, MYSQL_RES **results);
-	// Add code for write query here as well.
-
+	bool execReadQuery(std::string Query, MYSQL_RES **results);
+	bool execWriteQuery(std::string Query);
 };
 
 #endif

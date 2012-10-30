@@ -20,7 +20,7 @@ function genParams()
 function signalUP()
 {
     echo "Signalling ${signalCMD} ${clientID} ${clientIP} up" >> ${logFile}
-    ${signalCMD} ${clientID} ${clientIP} up	
+    ${signalCMD} ${clientID} ${clientIP} ${PLUTO_PEER} ${PLUTO_ME} up >> ${logFile} 2>&1
     retV=$?	    
     # TODO:: THE ERROR HANDLING NEEDS TO BE IMPROVED  
     if [ ${retV} -ne 0 ];
@@ -34,7 +34,7 @@ function signalUP()
 function signalDown()
 {
     echo "Signalling ${signalCMD} ${clientID} ${clientIP} down" >> ${logFile}
-    ${signalCMD} ${clientID} ${clientIP} down
+    ${signalCMD} ${clientID} ${clientIP} ${PLUTO_PEER} ${PLUTO_ME} down >> ${logFile} 2>&1
     retV=$?	    
     # TODO:: THE ERROR HANDLING NEEDS TO BE IMPROVED  
     if [ ${retV} -ne 0 ]

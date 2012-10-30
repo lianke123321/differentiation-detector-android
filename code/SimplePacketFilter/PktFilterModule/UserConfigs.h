@@ -36,7 +36,8 @@ public:
 	bool getConfigById(uint32_t userID, user_config_entry_t &entry);
 	bool getConfigByName(const std::string &userName, user_config_entry_t &entry);\
 	bool addEntry(user_config_entry_t &entry);
-	bool deleteEntryByID(uint32_t userID);
+	bool removeEntryByID(uint32_t& userID);
+	bool removeEntryByName(std::string &userName);
 	bool getUserIdByName(const std::string &userName, uint32_t &userID);
 	bool updateEntry(user_config_entry_t &entry); // userID and userName is not modified, other entries are modified.
 	friend std::ostream& operator<<(std::ostream& os, const UserConfigs& userConfig);

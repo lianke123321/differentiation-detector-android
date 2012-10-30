@@ -1,4 +1,4 @@
-CXXFLAGS = -O3 -Wall -fmessage-length=0
+CXXFLAGS = -O3 -Wall -Werror -fmessage-length=0
 LIBS= -lboost_thread-mt  -lboost_date_time -lmysqlclient -lpthread -lz -lm -lrt -ldl
 LIBDIR = -L/usr/lib/x86_64-linux-gnu -L/usr/lib64/mysql/ -L/usr/lib64/
 SRC = $(wildcard $(PWD)/*.cc)
@@ -6,20 +6,25 @@ OBJS = $(SRC:.cc=.o)
 # mysql_config --libs
 # -L/usr/lib/x86_64-linux-gnu -lmysqlclient -lpthread -lz -lm -lrt -ldl
 
-FILTERMAINSRC = $(PWD)/SignalUserUpDown.cc
+FILTERMAINSRC = $(PWD)/SignalUserUpDown.cc $(PWD)/SignalConfigChange.cc
 FILTERMAINOBJS = $(FILTERMAINSRC:.cc=.o)
 MAINOBJS = $(filter-out $(FILTERMAINOBJS), $(OBJS))
 MAIN = SimplePacketFilter
 
-FILTERSIGNALSRC = $(PWD)/SimplePacketFilter.cc $(PWD)/MessageHandler.cc $(PWD)/ReadDatabase.cc $(PWD)/MeddleDaemon.cc
-FILTERSIGNALOBJS = $(FILTERSIGNALSRC:.cc=.o)
-SIGNALOBJS = $(filter-out $(FILTERSIGNALOBJS), $(OBJS))
+FILTERUSERSIGNALSRC = $(PWD)/SimplePacketFilter.cc $(PWD)/MessageHandler.cc $(PWD)/ReadDatabase.cc $(PWD)/MeddleDaemon.cc $(PWD)/SignalConfigChange.cc
+FILTERUSERSIGNALOBJS = $(FILTERUSERSIGNALSRC:.cc=.o)
+SIGNALUSEROBJS = $(filter-out $(FILTERUSERSIGNALOBJS), $(OBJS))
 SIGNALUSER = SignalUserUpDown
 
-%.o : %.cc
-	$(CXX) $(LIBS) $(CFLAGS) -c $<
+FILTERCONFIGSIGNALSRC = $(PWD)/SimplePacketFilter.cc $(PWD)/MessageHandler.cc $(PWD)/ReadDatabase.cc $(PWD)/MeddleDaemon.cc $(PWD)/SignalUserUpDown.cc
+FILTERCONFIGSIGNALOBJS = $(FILTERCONFIGSIGNALSRC:.cc=.o)
+SIGNALCONFIGOBJS = $(filter-out $(FILTERCONFIGSIGNALOBJS), $(OBJS))
+SIGNALCONFIG = SignalConfigChange
 
-all: $(MAIN) $(SIGNALUSER)
+%.o : %.cc
+	$(CXX) $(LIBS) $(CXXFLAGS) -c $<
+
+all: $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG)
 
 distclean: clean
 	rm -f $(MAIN)	
@@ -30,6 +35,11 @@ clean:
 $(MAIN): $(MAINOBJS)
 	$(CXX) $(LIBDIR) -o $(MAIN) $(MAINOBJS) $(LIBS) 
 
-$(SIGNALUSER) : $(SIGNALOBJS)
-	$(CXX) $(LIBDIR) -o $(SIGNALUSER) $(SIGNALOBJS) $(LIBS) 
+$(SIGNALUSER) : $(SIGNALUSEROBJS)
+	$(CXX) $(LIBDIR) -o $(SIGNALUSER) $(SIGNALUSEROBJS) $(LIBS)
 
+$(SIGNALCONFIG) : $(SIGNALCONFIGOBJS)
+	$(CXX) $(LIBDIR) -o $(SIGNALCONFIG) $(SIGNALCONFIGOBJS) $(LIBS)
+
+install: $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG)
+	sudo cp -vRf $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG) /data/usr/sbin/  

@@ -13,15 +13,35 @@ pass: <root password>
 
 mysql> CREATE USER 'meddle'@'localhost' IDENTIFIED BY 'meddle';
 
-mysql> GRANT ALL PRIVILEGES ON *.* TO 'meddle'@'localhost' WITH GRANT OPTION;
-
 mysql> CREATE DATABASE MeddleDB;
+
+
+mysql> GRANT ALL ON MeddleDB.* TO 'meddle'@'localhost' WITH GRANT OPTION;
+
+# FOR EACH meddle server. Avoid using meddle@*
+mysql> GRANT ALL ON MeddleDB.* to meddle@sounder.cs.washington.edu IDENTIFIED BY <meddle password>
+mysql> GRANT ALL ON MeddleDB.* to meddle@snowmane.cs.washington.edu IDENTIFIED BY <meddle password>
 
 $> mysql -u meddle -p MeddleDB
 Enter password: <meddle password>
 
+#http://stackoverflow.com/questions/1420839/cant-connect-to-mysql-server-error-111
+Edit /etc/mysql/my.cnf or the corresponding my.cnf for your mysql installation
+
+Add iptables rules to ensure no one 
+$> iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+$> iptables -A INPUT -p tcp --dport 3306 -j REJECT
+  
+
 mysql> CREATE TABLE UserConfigs (userID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, userName VARCHAR(512), filterAdsAnalytics INT NOT NULL DEFAULT 0, UNIQUE(userName)) ENGINE="InnoDB";
+
+mysql> CREATE TABLE UserTunnelInfo (rowID SERIAL PRIMARY KEY, userID INT NOT NULL, clientTunnelIpAddress VARCHAR(64) NOT NULL, clientRemoteIpAddress VARCHAR(64) NOT NULL, serverIpAddress VARCHAR(64) NOT NULL, timestamp TIMESTAMP NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, startStopFlag BOOLEAN NOT NULL DEFAULT 0) ENGINE="InnoDB"; 
+mysql> ALTER TABLE UserTunnelInfo ADD INDEX (timestamp);
 
 # For each user add this entry to the table while creating users
 mysql> INSERT INTO UserConfigs VALUES (0, 'arao-ipod', 0);
+
+
+#mysql> CREATE TABLE UserFilterAdsChange(userID INT NOT NULL PRIMARY KEY, timestamp TIMESTAMP NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, filterAdsAnalytics INT NOT NULL DEFAULT 0);
+
 

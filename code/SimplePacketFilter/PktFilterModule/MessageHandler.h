@@ -13,18 +13,20 @@ public:
 private:
 	MessageFrame *cmd;
 	uint8_t lastRead[4096];
-	struct sockaddr_un localAddr;
+	struct sockaddr_in localAddr;
 	uint32_t remoteFD;
 private:
 	MessageFrame * recvCommand();
 	bool processCommand();
-	bool processTunnelCommand();
+	bool processCreateTunnelCommand();
+	bool processCloseTunnelCommand();
 	bool processReadAllConfs();
 	bool respondGetUserIpInfo();
+	bool processReadUserConfs();
 public:
 	MessageHandler();
 	~MessageHandler();
-	bool setupMessageHandler(std::string socketPath);
+	bool setupMessageHandler(uint16_t socketPort);
 	bool mainLoop();
 };
 #endif /* COMMANDHANDLER_H_ */

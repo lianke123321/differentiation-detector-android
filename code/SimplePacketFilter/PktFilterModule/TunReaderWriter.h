@@ -4,6 +4,7 @@
 #include "TunnelDevice.h"
 #include "TunnelFrameQueue.h"
 
+#if 0
 #define TUN_RW_READER 1
 #define TUN_RW_WRITER 2
 
@@ -20,5 +21,6 @@ public:
 	void writerLoop();
 	void readerLoop();
 };
+#endif
 
 #endif /* TUNNELREADER_H_ */

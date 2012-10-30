@@ -1,8 +1,20 @@
-./configure --sysconfdir=/data/etc/ --prefix=/data/usr/ --libexecdir=/data/usr/lib --enable-openssl --enable-agent --enable-gcrypt --enable-integrity-test --enable-openssl --enable-eap-gtc --enable-eap-md5 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2 --enable-eap-identity --enable-md4 --enable-eap-radius --enable-socket-raw --enable-socket-dynamic
+Binaries to be installed
+* ksh
+* libboost
+* ethtool
+* tcpdump
+* iptables
+
+./configure --sysconfdir=/data/etc/ --prefix=/data/usr/ --libexecdir=/data/usr/lib --enable-openssl --enable-agent --enable-gcrypt --enable-integrity-test --enable-openssl --enable-eap-gtc --enable-eap-md5 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2 --enable-eap-identity --enable-md4 --enable-eap-radius --enable-socket-dynamic
 
 make 
 make install
 cp -vRf ipsec.d/ /data/etc/
+
+# Add the following lines to /etc/iproute2/rt_tables..TODO:: Find appropriate place to put these lines in this file
+5 depart
+6 fwdpath
+7 revpath
 
 
 # The next set of steps are to setup the permissions for packet capture

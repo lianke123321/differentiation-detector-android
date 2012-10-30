@@ -3,6 +3,7 @@
 #include "TunnelFrame.h"
 #include "TunnelFrameQueue.h"
 
+#if 0
 TunReaderWriter::~TunReaderWriter()
 {
 
@@ -66,3 +67,4 @@ bool TunReaderWriter::mainLoop()
 	}
 	return true;
 }
+#endif

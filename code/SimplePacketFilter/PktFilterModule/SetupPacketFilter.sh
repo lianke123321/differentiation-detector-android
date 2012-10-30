@@ -11,6 +11,16 @@ logName="/data/SimplePacketFilter.log"
 basePath="/data/usr/sbin/"
 setup()
 {
+    # Make sure only snowmane and sounder can connect to the mysql database
+    iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp --dport 3306 -j REJECT 
+    iptables -A INPUT -p tcp -s sounder.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp -s snowmane.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 3306 -j REJECT
+    # Database ports should be opened before the packet filter starts on each machine
+    # Make sure that this script runs first on sounder where the database is running
+
     ${basePath}/SimplePacketFilter > ${logName} 2>&1 &
     echo "Sleeping for the device to come up"
     sleep 5 
@@ -82,9 +92,10 @@ undo()
     
     # All the above steps with s/add/del/g 
     ${basePath}/ipsec stop	
-    iptables --flush
-    iptables --flush -t nat
-    iptables --flush -t mangle
+    iptables -D FORWARD -i tun+ -o ${eth} -j ACCEPT
+    iptables -D FORWARD -i ${eth} -o tun+ -j ACCEPT
+
+    iptables -t nat -D POSTROUTING -s ${revNet} -o ${eth} -j MASQUERADE
 
     ip rule del from ${fwdNet} to all lookup fwdpath prio 1000
     ip rule del from ${revNet} to all lookup depart prio 1001
@@ -113,6 +124,15 @@ undo()
     then    
 	kill ${binPID}
     fi		
+
+    # make sure that only localhost can connect to the IPTABLES after cleanup. This is to ensure existing code does not break
+    # Reverse order to make sure existing code does not break
+    iptables -D INPUT -p tcp --dport 3306 -j REJECT
+    iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp -s sounder.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp -s snowmane.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 3306 -j REJECT
 }
 
 if [ $# -ne "1" ];

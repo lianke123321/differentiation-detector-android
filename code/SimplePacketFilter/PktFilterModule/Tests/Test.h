@@ -1,6 +1,6 @@
-#include "CommandHandler.h"
-#include "CommandFrame.h"
-#include "CommandSender.h"
+#include "MessageHandler.h"
+#include "MessageFrame.h"
+#include "MessageSender.h"
 #include "Logging.h"
 #include <string.h>
 
@@ -48,13 +48,13 @@ void testCreateCommand()
 	logDebug("Connected");
 
 	memset(&cmdCreate, 0, sizeof(msgTunnel_t));
-	strncpy((char *)(cmdCreate.ipAddress), IPADDRESS, sizeof(cmdCreate.ipAddress)-1);
+	strncpy((char *)(cmdCreate.clientTunnelIpAddress), IPADDRESS, sizeof(cmdCreate.clientTunnelIpAddress)-1);
 	strncpy((char *)(cmdCreate.userName), USERNAME, sizeof(cmdCreate.userName)-1);
 	cmdCreate.userNameLen = strlen(USERNAME);
 	logDebug("Created Frame");
 	if (c.sockFD != -1) {
 		logDebug("Sending");
-		c.sendCommand(CMD_CREATETUNNEL,cmdCreate);
+		c.sendCommand(MSG_CREATETUNNEL,cmdCreate);
 	}
 	logDebug("Sent the message: test Successful");
 }
@@ -65,13 +65,13 @@ void testCloseCommand()
 	logDebug("Connected");
 
 	memset(&cmdClose, 0, sizeof(msgTunnel_t));
-	strncpy((char *)(cmdClose.ipAddress), IPADDRESS, sizeof(cmdClose.ipAddress)-1);
+	strncpy((char *)(cmdClose.clientTunnelIpAddress), IPADDRESS, sizeof(cmdClose.clientTunnelIpAddress)-1);
 	strncpy((char *)(cmdClose.userName), USERNAME, sizeof(cmdClose.userName)-1);
 	cmdClose.userNameLen = strlen(USERNAME);
 	logDebug("Created Frame");
 	if (c.sockFD != -1) {
 		logDebug("Sending");
-		c.sendCommand(CMD_CLOSETUNNEL,cmdClose);
+		c.sendCommand(MSG_CLOSETUNNEL,cmdClose);
 	}
 	logDebug("Sent the message: test Successful");
 }
