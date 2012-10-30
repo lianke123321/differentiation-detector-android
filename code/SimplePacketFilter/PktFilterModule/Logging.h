@@ -4,7 +4,7 @@
 #include <iostream>
 #include <time.h>
 
-#if 1
+#if 0
 #define logDebug(msg) do {				\
 	std::cout << time(NULL) << ":DBG:" << __FILE__ << ":" << __func__ << ":"<<  __LINE__ << ":" << msg << std::endl;	\
 } while (0);

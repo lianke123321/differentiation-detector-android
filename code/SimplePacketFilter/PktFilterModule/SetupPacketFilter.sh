@@ -74,6 +74,14 @@ setup()
     # iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ${eth}  -j TCPMSS --set-mss 1250
     # iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ${tun}  -j TCPMSS --set-mss 1250
 
+    # Make sure only snowmane and sounder can connect to the mysql database
+    iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp --dport 3306 -j REJECT 
+    iptables -A INPUT -p tcp -s sounder.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp -s snowmane.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 3306 -j REJECT
+
     ${basePath}/ipsec start
 }
 
@@ -86,6 +94,15 @@ undo()
     iptables -D FORWARD -i ${eth} -o tun+ -j ACCEPT
 
     iptables -t nat -D POSTROUTING -s ${revNet} -o ${eth} -j MASQUERADE
+
+    # make sure that only localhost can connect to the IPTABLES after cleanup. This is to ensure existing code does not break
+    # Reverse order to make sure existing code does not break
+    iptables -D INPUT -p tcp --dport 3306 -j REJECT
+    iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp -s sounder.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp -s snowmane.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 3306 -j REJECT
 
     ip rule del from ${fwdNet} to all lookup fwdpath prio 1000
     ip rule del from ${revNet} to all lookup depart prio 1001
