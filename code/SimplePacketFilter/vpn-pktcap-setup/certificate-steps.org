@@ -1,20 +1,20 @@
 * Generate the Certificates for the CA.
 
-  /home/arao/usr/sbin/ipsec pki --gen --outform pem > caKey.pem
+  /data/usr/sbin/ipsec pki --gen --outform pem > MeddleCAKey.pem
 
-  /home/arao/usr/sbin/ipsec pki --self --in caKey.pem --dn "C=US, O=snowmane, CN=snowmane CA" --ca --outform pem > caCert.pem
+  /data/usr/sbin/ipsec pki --self --in MeddleCAKey.pem --dn "C=US, O=Meddle, CN=Meddle CA" --ca --outform pem > MeddleCACert.pem
 
 * Generate the keys for the Server
 
-  /home/arao/usr/sbin/ipsec pki --gen --outform pem > serverKey.pem
+  /data/usr/sbin/ipsec pki --gen --outform pem > MeddleServerKey.pem
 
-  /home/arao/usr/sbin/ipsec pki --pub --in serverKey.pem | /home/arao/usr/sbin/ipsec pki --issue --cacert caCert.pem --cakey caKey.pem --dn "C=US, O=snowmane, CN=snowmane.cs.washington.edu" --san="snowmane.cs.washington.edu" --flag serverAuth --flag ikeIntermediate --outform pem > serverCert.pem
+  /data/usr/sbin/ipsec pki --pub --in MeddleServerKey.pem | /data/usr/sbin/ipsec pki --issue --cacert MeddleCACert.pem --cakey MeddleCAKey.pem --dn "C=US, O=Meddle, CN=meddle.cs.washington.edu" --san="meddle.cs.washington.edu" --flag serverAuth --flag ikeIntermediate --outform pem > MeddleServerCert.pem
 
 * Generate the keys for the Client
 
-  /home/arao/usr/sbin/ipsec pki --gen --outform pem > clientKey.pem
+  /data/usr/sbin/ipsec pki --gen --outform pem > clientKey.pem
 
-  /home/arao/usr/sbin/ipsec pki --pub --in clientKey.pem | /home/arao/usr/sbin/ipsec pki --issue --cacert caCert.pem --cakey caKey.pem --dn "C=US, O=snowmane, CN=client" --outform pem > clientCert.pem
+  /data/usr/sbin/ipsec pki --pub --in clientKey.pem | /data/usr/sbin/ipsec pki --issue --cacert caCert.pem --cakey caKey.pem --dn "C=US, O=snowmane, CN=client" --outform pem > clientCert.pem
 
   openssl pkcs12 -export -inkey clientKey.pem -in clientCert.pem -name "client" -certfile caCert.pem -caname "snowmane CA" -out clientCert.p12
 
