@@ -71,6 +71,7 @@ int mainInit(MeddleDaemon &meddle, MessageHandler &cmd)
 		logError("Error in loading the configs to memory");
 		return -1;
 	}
+	// TODO:: CHeck if this breaks the code.
 	logDebug("Config Table is " << mainPktFilter.getAllUserConfigs());
 	logDebug("We have done the initialization now time to meddle");
 
@@ -94,7 +95,7 @@ int main()
 		logError("Error in the setup");
 		return -1;
 	}
-	logDebug("Create the worker threads")
+	logDebug("Create the worker threads");
 	boost::thread meddleThread(&MeddleDaemon::mainLoop, &meddle);
 
 	boost::thread commandThread(&MessageHandler::mainLoop, &cmdHandler);

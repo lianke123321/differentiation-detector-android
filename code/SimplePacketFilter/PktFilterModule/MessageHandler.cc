@@ -42,7 +42,7 @@ bool MessageHandler::setupMessageHandler(uint16_t sock_port)
 		return false;
 	}
 
-	memset(&localAddr, 0, sizeof(struct sockaddr_in));
+	memset(&localAddr, 0, sizeof(localAddr));
 	localAddr.sin_family = PF_INET;
 	localAddr.sin_port = htons(sock_port);
 	localAddr.sin_addr.s_addr = INADDR_ANY;
@@ -65,7 +65,7 @@ bool MessageHandler::setupMessageHandler(uint16_t sock_port)
 
 MessageFrame* MessageHandler::recvCommand()
 {
-	uint32_t nRead;
+	int32_t nRead;
 	memset(lastRead, 0, sizeof(lastRead));
 
 	logDebug("Accepted a new connection: Reading for data on " << remoteFD);
@@ -77,13 +77,13 @@ MessageFrame* MessageHandler::recvCommand()
 	}
 
 	logDebug("Now parsing the received bytes");
-	cmd = new MessageFrame(lastRead, nRead);
+	cmd = new MessageFrame(lastRead, (uint32_t) nRead);
 	if (cmd == NULL) {
 		logError("Error creating the command");
 		cmd = NULL;
 		return cmd;
 	}
-	logDebug("Received the command " << cmd);
+	//logDebug("Received the command " << cmd);
 	return cmd;
 }
 
@@ -109,7 +109,7 @@ bool MessageHandler::respondGetUserIpInfo()
 		memset(&entry, 0, sizeof(entry));
 	}
 
-	memset(&respIPUserInfo, 0, sizeof(msgRespIPUserInfo_t));
+	memset(&respIPUserInfo, 0, sizeof(respIPUserInfo));
 	memcpy(respIPUserInfo.ipAddress, cmd->cmdIPUserInfo->ipAddress, sizeof(respIPUserInfo.ipAddress));
 	respIPUserInfo.userID = userID;
 	respIPUserInfo.userNameLen = strnlen((const char *)entry.userName, sizeof(respIPUserInfo.userName)-1);
@@ -224,14 +224,14 @@ bool MessageHandler::processReadUserConfs()
 	memset(&entry, 0, sizeof(entry));
 	if (false == mainPktFilter.loadUserConfigs(cmd->loadUserConfs->userID)) {
 		logError("Error in reading the configs for the user " << (cmd->loadUserConfs->userID));
-		entry.userID = -1;
+		entry.userID = 0;
 		return false;
 	} else {
 		if (false == mainPktFilter.getUserConfigs(cmd->loadUserConfs->userID, entry)) {
 			logError("Error getting configs for user ID"<<cmd->loadUserConfs->userID);
 		}
 	}
-	memcpy(&(resp.entry), &entry, sizeof(entry));
+	memcpy(&(resp.entry), &entry, sizeof(user_config_entry_t));
 	MessageFrame respFrame = MessageFrame(resp);
 	if (NULL == respFrame.buffer) {
 		logError("Error in the response frame");
@@ -276,7 +276,7 @@ bool MessageHandler::processCommand()
 		ret = processReadUserConfs();
 		break;
 	default:
-		ret = false;      
+		ret = false;
 		break;
 	}
 	// boo! i love ostriches who love these rets ;).

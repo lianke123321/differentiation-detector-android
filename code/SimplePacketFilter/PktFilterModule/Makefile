@@ -1,4 +1,4 @@
-CXXFLAGS = -O3 -Wall -Werror -fmessage-length=0
+CXXFLAGS = -Wall -Werror
 LIBS= -lboost_thread-mt  -lboost_date_time -lmysqlclient -lpthread -lz -lm -lrt -ldl
 LIBDIR = -L/usr/lib/x86_64-linux-gnu -L/usr/lib64/mysql/ -L/usr/lib64/
 SRC = $(wildcard $(PWD)/*.cc)

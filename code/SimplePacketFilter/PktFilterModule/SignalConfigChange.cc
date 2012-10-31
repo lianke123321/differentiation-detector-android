@@ -12,7 +12,7 @@ bool checkArgs(const std::string &userID, uint32_t &uID)
 		std::stringstream buff(userID);
 		buff >> uID;
 	} catch (...) { // Catch any exception
-		logError("Exception in conversion of input " << userID << " to integer")
+		logError("Exception in conversion of input " << userID << " to integer");
 		return false;
 	}
 	return true;
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 	for (cnt = 0; cnt < maxCnt; cnt = cnt + 1) {
 		ret = sendCommand(uID);
 		if (ret == true) {
-			logDebug("Message produced required results")
+			logDebug("Message produced required results");
 			break;
 		}
 		usleep(100);

@@ -90,14 +90,14 @@ setup()
     # iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ${eth}  -j TCPMSS --set-mss 1250
     # iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ${tun}  -j TCPMSS --set-mss 1250
 
-    ${basePath}/ipsec start
+#    ${basePath}/ipsec start
 }
 
 undo()
 {
     
     # All the above steps with s/add/del/g 
-    ${basePath}/ipsec stop	
+#    ${basePath}/ipsec stop	
     iptables -D FORWARD -i tun+ -o ${eth} -j ACCEPT
     iptables -D FORWARD -i ${eth} -o tun+ -j ACCEPT
 

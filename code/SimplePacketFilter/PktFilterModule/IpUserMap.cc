@@ -35,7 +35,7 @@ bool IpUserMap::addEntry(in_addr_t ipAddress, uint32_t userID)
 		ipMap.erase(ipAddress);
 		insertRet = ipMap.insert(std::make_pair(ipAddress, userID));
 		if (insertRet.second == false) {
-			logError("Error inserting an entry to the Map")
+			logError("Error inserting an entry to the Map");
 			return false;
 		}
 	}

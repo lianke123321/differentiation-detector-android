@@ -110,7 +110,7 @@ bool MessageSender::recvIPInfo(const msgGetIPUserInfo_t &getInfo, msgRespIPUserI
 	uint32_t offset=0;
 	MessageFrame cmdFrame = MessageFrame(getInfo);
 
-	memset(&respIP, 0, sizeof(msgRespIPUserInfo_t));
+	memset(&respIP, 0, sizeof(respIP));
 	if (NULL == cmdFrame.buffer || cmdFrame.frameLen < 0) {
 		logError("Error creating Frame");
 		return false;
