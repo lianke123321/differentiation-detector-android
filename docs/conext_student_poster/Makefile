@@ -8,7 +8,7 @@ doc:
 	bibtex $(DOCN)
 	latex $(DOCN).tex
 	latex $(DOCN).tex
-	dvips -t letter $(DOCN).dvi
+	dvips -P pdf -t letter -o $(DOCN).ps $(DOCN).dvi        
 
 clean:
 	rm -f *.aux *.dvi *.idx *.ind *.log *.toc *.bak *.blg *.bbl
