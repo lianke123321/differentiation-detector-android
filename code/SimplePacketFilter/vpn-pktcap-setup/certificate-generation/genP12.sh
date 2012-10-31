@@ -5,7 +5,7 @@
 # Assumes IPSEC and OPENSSL are defined and available
 
 
-IPSEC=`which ipsec`
+IPSEC="/data/usr/sbin/ipsec"
 OPENSSL=`which openssl`
 MYPID="$$"
 if [ $# -ne 2 ];
@@ -23,14 +23,15 @@ then
 fi
 
 #TODO:: Take all CA related info from a conf file or as arguments
-ipSecCertPath="/data/etc/ipsec.d/"
-caCert="${ipSecCertPath}/cacerts/caCert.pem"
-caKey="${ipSecCertPath}/private/caKey.pem"
-DNstr="C=US, O=snowmane, CN=${clientName}"
-caName="snowmane CA" # The name used in the certificate
-CERTPATH="./"
+ipSecCertPath="./ServerKeys/"
+caCert="${ipSecCertPath}/MeddleCACert.pem"
+caKey="${ipSecCertPath}/MeddleCAKey.pem"
+DNstr="C=US, O=Meddle, CN=${clientName}"
+caName="Meddle CA" # The name used in the certificate
+CERTPATH="./ClientCert/"
+mkdir -p ${CERTPATH}
 p12File="${CERTPATH}/${clientName}.p12"
-
+MYPID="" # TODO UNCOMMENT THIS IF DOING IN LARGE SCALE
 keyFile="${CERTPATH}/${clientName}Key${MYPID}.pem"
 certFile="${CERTPATH}/${clientName}Cert${MYPID}.pem"
 androidFile="${CERTPATH}/${clientName}.crt"
@@ -59,6 +60,7 @@ fi
 # Secure way is to use env variables
 "${OPENSSL}" pkcs12 -export -inkey "${keyFile}" -in "${certFile}" -name "${clientName}" -passout pass:"${clientPassword}" -certfile "${caCert}" -caname \""${caName}"\" -out "${p12File}"
 cp ${certFile} ${androidFile}
+python genIOSConfigXML.py ${clientName} ${clientPassword}
 # TODO:: check the p12 file
 # ${OPENSSL} pkcs12 -info -in ${p12File} -passin env:${clientPassword} TODO:: specify PEM key 
 
