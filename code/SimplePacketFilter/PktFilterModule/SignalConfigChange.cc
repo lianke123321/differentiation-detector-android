@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 		usleep(100);
 		logError("Retrying attempt" << cnt+1);
 	}
-	if (cnt < maxCnt) {
+	if (cnt >= maxCnt) {
 		return 1;
 	}
 	return 0;

@@ -22,8 +22,12 @@ MessageHandler::~MessageHandler()
 		close(sockFD);
 	}
 }
-
 bool MessageHandler::setupMessageHandler(uint16_t sock_port)
+{
+	return setupMessageHandler(sock_port, INADDR_ANY);
+}
+
+bool MessageHandler::setupMessageHandler(uint16_t sock_port, in_addr_t serverAddr)
 {
 	int32_t optVal = 1;
 	uint32_t len;
@@ -45,7 +49,7 @@ bool MessageHandler::setupMessageHandler(uint16_t sock_port)
 	memset(&localAddr, 0, sizeof(localAddr));
 	localAddr.sin_family = PF_INET;
 	localAddr.sin_port = htons(sock_port);
-	localAddr.sin_addr.s_addr = INADDR_ANY;
+	localAddr.sin_addr.s_addr = serverAddr;
 	len = sizeof(localAddr);
 	if (bind(sockFD, (struct sockaddr *)&localAddr, len) < 0) {
 		logError("Error in bind operation" << errno);
@@ -104,7 +108,7 @@ bool MessageHandler::respondGetUserIpInfo()
 		return false;
 	}
 	if (false == mainPktFilter.getUserConfigs(ipAddress, userID, entry)) {
-		logError("Error in getting the userConfigs for the IP" << cmd->cmdIPUserInfo->ipAddress);
+		logError("Error in getting the userConfigs for the IP " << cmd->cmdIPUserInfo->ipAddress);
 		userID = 0;
 		memset(&entry, 0, sizeof(entry));
 	}
@@ -149,7 +153,7 @@ bool MessageHandler::processCloseTunnelCommand()
 	// Get the user configs before disassoc
 	memset(&entry, 0, sizeof(entry));
 	if (false == mainPktFilter.getUserConfigs(ipAddress, userID, entry)) {
-		logError("Error in getting the userConfigs for the IP" << cmd->cmdIPUserInfo->ipAddress << " Disassoc the User from IP");
+		logError("Error in getting the userConfigs for the IP" << cmd->cmdTunnel->clientTunnelIpAddress << " Disassoc the User from IP");
 		if (false == mainPktFilter.disassociateIpFromUser(userName, ipAddress)) {
 			logError("Error dissociating the user");
 		}

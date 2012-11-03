@@ -30,7 +30,7 @@ distclean: clean
 	rm -f $(MAIN)	
 
 clean:
-	rm -f $(OBJS) $(SIGNALUSER) $(MAIN)
+	rm -f $(OBJS) $(SIGNALUSER) $(MAIN) $(SIGNALCONFIG)
 
 $(MAIN): $(MAINOBJS)
 	$(CXX) $(LIBDIR) -o $(MAIN) $(MAINOBJS) $(LIBS) 

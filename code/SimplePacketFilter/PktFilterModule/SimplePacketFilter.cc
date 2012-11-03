@@ -46,6 +46,7 @@ void sigInit()
 
 int mainInit(MeddleDaemon &meddle, MessageHandler &cmd)
 {
+	in_addr_t serverAddr;
 	sigInit();
 	logDebug("Creating a tunnel device" << TUN_DEVICE  <<
 			 " assigning it an IP " << IP_ADDRESS << " with mask " << ROUTE_NETMASK
@@ -75,8 +76,9 @@ int mainInit(MeddleDaemon &meddle, MessageHandler &cmd)
 	logDebug("Config Table is " << mainPktFilter.getAllUserConfigs());
 	logDebug("We have done the initialization now time to meddle");
 
+	inet_pton(AF_INET, MEDDLE_MESSAGE_SOCKET_ADDR, &serverAddr);
 	logDebug("Listening on "<< MEDDLE_MESSAGE_SOCKET_PORT << " for commands from other processes");
-	if (false == cmd.setupMessageHandler(MEDDLE_MESSAGE_SOCKET_PORT)) {
+	if (false == cmd.setupMessageHandler(MEDDLE_MESSAGE_SOCKET_PORT, serverAddr)) {
 		logError("Unable to setup the socket for receiving commands");
 		return -1;
 	}

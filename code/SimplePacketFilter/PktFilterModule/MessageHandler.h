@@ -27,6 +27,7 @@ public:
 	MessageHandler();
 	~MessageHandler();
 	bool setupMessageHandler(uint16_t socketPort);
+	bool setupMessageHandler(uint16_t sock_port, in_addr_t serverAddr);
 	bool mainLoop();
 };
 #endif /* COMMANDHANDLER_H_ */

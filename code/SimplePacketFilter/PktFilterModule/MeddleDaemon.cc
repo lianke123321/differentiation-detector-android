@@ -181,7 +181,7 @@ bool MeddleDaemon::mainLoop()
 			logError("Error reading Frame");
 			return false;
 		}
-		logDebug("Now Processing the Frame of length" <<tunFrame->frameLen << " at location " << static_cast<void*>(tunFrame->buffer) );
+		logDebug("Now Processing the Frame of length" <<tunFrame->frameLen << " at location " << static_cast<void*>(tunFrame->buffer));
 		meddleFrame();
 		logDebug("Now Writing the Frame of length");
 		if (false == tunDevice.writeFrame(tunFrame)) {
