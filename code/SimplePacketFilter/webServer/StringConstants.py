@@ -38,4 +38,4 @@ font-size: 1.25em;
 </style>
 """
 
-TEMPLATE_PAGE_FOOTER="""</body> """
+TEMPLATE_PAGE_FOOTER="""<br/><a href="http://meddle.cs.washington.edu/"> Click here to go back to meddle</a> </body>"""
