@@ -34,7 +34,7 @@ class UserConfigs:
             enabled = "selected"            
         else:            
             disabled = "selected"
-        adStr += """<select name="""+str(CFG_ADS_GRP)+""">"""      
+        adStr += """<select name="""+str(CFG_ADS_GRP)+""" onChange="this.form.submit()">"""      
         adStr += """ <option value = \""""+str(CFG_ADS_GRP_ENABLE_STR)+"""\""""+str(enabled)+"""> Enable</option>"""
         adStr += """ <option value = \""""+str(CFG_ADS_GRP_DISABLE_STR)+"""\""""+str(disabled)+"""> Disable</option>"""
         adStr += """</select></li><ul>"""
@@ -46,10 +46,11 @@ class UserConfigs:
     def displayConfigs(self):
         page = ""
         page += self.__header()
-        page += """<form name="input" action=\""""+str(PAGE_UPDATECONFIGS)+"""\" method="POST">"""
+        page += """<form name="input" action=\""""+str(PAGE_VIEWCONFIGS)+"""\" method="POST">"""
         page += "Configuration options:"
         page += self.__htmlAds()
-        page += """<br/><input type="submit" id=\""""+str(CFG_SUBMIT_ID)+"""\" value=\""""+str(CFG_SUBMIT_STR)+"""\"></form>"""
+        page += """<br/></form>"""
+        #page += """<br/><input type="submit" id=\""""+str(CFG_SUBMIT_ID)+"""\" value=\""""+str(CFG_SUBMIT_STR)+"""\"></form>"""
         page += self.__footer()
         return page
     
@@ -75,9 +76,14 @@ class UserConfigs:
          query = "UPDATE UserConfigs SET filterAdsAnalytics="+str(self.filterAdsAnalytics)+" WHERE userID="+str(self.userID)+ " ;"         
          dbCon = tornado.database.Connection(host=DB_HOSTNAME, database=DB_DBNAME, user=DB_USER, password=DB_PASSWORD)
          results = dbCon.execute(query)
+         query = "INSERT INTO UserConfigChange VALUES("+str(self.userID)+", CURRENT_TIMESTAMP, \"filterAdsAnalytics\", "+str(self.filterAdsAnalytics)+");"
+         results = dbCon.execute(query)
          dbCon.close()
          return 
-          
+     
+    def __str__(self):
+         return " "+str(self.userName)+ " " +str(self.userID)+" "+str(self.filterAdsAnalytics)
+
 if __name__ == "__main__":
     u = UserConfigs()
     u.fetchConfigs(1)

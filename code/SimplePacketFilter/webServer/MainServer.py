@@ -4,6 +4,8 @@ import tornado.web
 import ctypes
 import logging
 import socket
+import tornado.netutil
+import subprocess
 
 import MeddleCommunicator
 import UserConfigs
@@ -13,6 +15,9 @@ from StringConstants import *
 ERR_CONN=1
 ERR_NOUSER=2
 ERR_OTHER=3
+ERR_FAILUPDATE = 4
+
+
 
 class CommonHandler(tornado.web.RequestHandler):
     mainErr = None
@@ -23,6 +28,8 @@ class CommonHandler(tornado.web.RequestHandler):
             page += "Unable to connect to the Packet Filter Server"
         elif self.mainErr == ERR_NOUSER:
             page += "This mobile device is currently not connected to Meddle. Please connect to Meddle to configure your settings"
+        elif self.mainErr == ERR_FAILUPDATE:
+            page += "Error updating the configuration at the Meddle Server. Please try again."
         else:
             page += "Internal error on webserver. Please try again later."
         page += TEMPLATE_PAGE_FOOTER
@@ -59,11 +66,11 @@ class CommonHandler(tornado.web.RequestHandler):
             logging.error("Received exception"+str(msg))
         return None
 
-class MainHandler(CommonHandler):
+class ViewConfigsHandler(CommonHandler):
     
     def get(self):
         logging.warning(self.request)
-        self.mainErr = -1        
+        self.mainErr = -1
         self.dispPage(self.getIpInfo())
     
     def dispPage(self, ipInfo):
@@ -78,57 +85,65 @@ class MainHandler(CommonHandler):
         if self._finished is False: 
             self.write(page)
         return
-    
 
-class UpdateConfigsHandler(CommonHandler):
+
+    def __sendReloadMessage(self, ipInfo):
+        # http://stackoverflow.com/questions/325463/launch-a-shell-command-with-in-a-python-script-wait-for-the-termination-and-ret
+        command = SIGNAL_CONFIG_COMMAND_PATH + " " + str(ipInfo.userID)
+        logging.warning("Sending the command " +str(command))
+        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)        
+        process.wait()
+        logging.warning("The command returned with value"+str(process.returncode))
+        if process.returncode == 0:
+            return True
+        self.mainErr == ERR_FAILUPDATE
+        return False
+    
     
     def __post(self):
         logging.warning(self.request)
-        retPage = ""
         cfg_ads = self.get_argument(CFG_ADS_GRP, 'None')
-        if cfg_ads == 'None':
-            return self.__getRedirectPage()            
         ipInfo = self.getIpInfo()
+        logging.warning("IP info is "+str(ipInfo))
+        if cfg_ads == 'None' or ipInfo is None:
+            return self.dispPage(ipInfo)
         if ipInfo is None:
             return self.getERRPage()
-        uConfig = UserConfigs.UserConfigs()  
+        uConfig = UserConfigs.UserConfigs()
+        logging.debug(uConfig)
         if False == uConfig.fetchConfigs(ipInfo.userID):
-            return __getNoUserPage()
+            self.mainErr == ERR_NOUSER
+            return self.getERRPage()
         uConfig.updateAdsConfig(cfg_ads)
         uConfig.commitEntry()
-        m = MeddleCommunicator.MeddleCommunicator()
-        retPage = self.__getResponsePage()
-        if m.commandReReadConfs() == False:
-            retPage += "Failed"
-        else:
-            retPage += "Success"
-        retPage += TEMPLATE_PAGE_FOOTER
-        return retPage
+        if self.__sendReloadMessage(ipInfo) is False:
+            return self.getERRPage()
+        return self.dispPage(ipInfo)
         
     def post(self):
         try:
-            retPage = self.__post()
-            self.write(retPage)
+            self.__post()
         except (socket.error, IOError) , msg:
             logging.error("Error in POST message"+str(msg))
             self.write(self.getERRPage)
         return
-    
-    def __getResponsePage(self):
-        return TEMPLATE_PAGE_HEADER + """<meta http-equiv="refresh" content="1;url=/"></head><body>Updating the Entry : """
-
-    def __getRedirectPage(self):
-        return TEMPLATE_PAGE_HEADER + """<meta http-equiv="refresh" content="1;url=/"><head><body>Redirecting to Home Page</body>"""
-    
-    def __getNoUserPage(self):
-        return TEMPLATE_PAGE_HEADER + "Error getting the configurations for user at IP"+str(self.request.remote_ip) + TEMPLATE_PAGE_FOOTER
         
-        
-application = tornado.web.Application([
-    (r"/", MainHandler),
-    (r"/"+str(PAGE_UPDATECONFIGS), UpdateConfigsHandler)
-])
+class DefaultHandler(CommonHandler):
+    def get(self):
+        try:
+            self.render(STATICPATH+"/index.html")
+        except (socket.error, IOError), msg:
+            self.getERRPage()
+            
+            
+handlers = [(r"/",DefaultHandler),
+            (r""+str(PAGE_VIEWCONFIGS), ViewConfigsHandler),
+            (r"/(.+\..+)", tornado.web.StaticFileHandler, {'path': str(STATICPATH)})]
+settings = {}
+#settings = {'debug': True, 
+#            'static_path': os.path.join(STATICPATH)}
 
 if __name__ == "__main__":
+    application = tornado.web.Application(handlers, **settings)
     application.listen(80)
     tornado.ioloop.IOLoop.instance().start()

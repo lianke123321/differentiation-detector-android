@@ -1,6 +1,12 @@
-STR_TITLE="Meddle"
 
-PAGE_UPDATECONFIGS="updateConfigs"
+STATICPATH="/data/webPages"
+PAGE_DYNPATH="/dyn/"
+PAGE_SERVER_URL = "http://10.11.101.101"
+PAGE_UPDATECONFIGS=PAGE_DYNPATH+"updateConfigs"
+PAGE_VIEWCONFIGS=PAGE_DYNPATH+"viewConfigs"
+PAGE_STATIC_EXPR="^(dyn.*)"
+SIGNAL_CONFIG_COMMAND_PATH = "/data/usr/sbin/SignalConfigChange"
+STR_TITLE="Meddle"
 
 CFG_ADS_GRP= "cfg_ads"
 CFG_ADS_GRP_ENABLE_STR = "enable"
