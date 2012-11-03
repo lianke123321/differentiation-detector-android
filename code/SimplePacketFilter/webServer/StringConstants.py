@@ -15,9 +15,9 @@ PRIV_NETWORK = "10.11."
 
 CFG_SUBMIT_ID="submitID"
 
-DB_HOSTNAME = "localhost"
+DB_HOSTNAME = "sounder.cs.washington.edu"
 DB_USER = "meddle"
-DB_PASSWORD = "meddle"
+DB_PASSWORD = "q@847#$6&4@RfbvD"
 DB_DBNAME = "MeddleDB"
 
 CFG_SUBMIT_STR = "Save Settings"
