@@ -7,7 +7,7 @@ natNet="10.0.0.0/8"
 gateway="128.208.4.100"
 ethNet="128.208.4.0/24"
 
-logSuffix=`data +%s`
+logSuffix=`date  +%h-%d-%Y-%H-%M-%s`
 filterLogName="/data/SimplePacketFilter-"${logSuffix}".log"
 webServerLogName="/data/webServer-"${logSuffix}".log"
 basePath="/data/usr/sbin/"
