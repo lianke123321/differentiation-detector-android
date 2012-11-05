@@ -1,0 +1,73 @@
+\documentclass{sig-alternate-10pt}
+\usepackage{amsfonts,xspace}
+\usepackage{url}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{ifpdf}
+\usepackage[usenames,dvipsnames]{color}
+\newcommand{\tbd}[1]{}
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\eg}{{\it e.g.}}
+\newcommand{\etc}{{\it etc.}}
+\newcommand{\eat}[1]{}
+\usepackage[english,plain]{fancyref}
+\usepackage{times}
+\usepackage{rotating}
+\usepackage[labelformat=simple]{subfig}
+
+
+\newcommand{\mypara}[1]{\medskip\noindent{\bf {#1}:}~}
+\newcommand{\chk}{$\checkmark$}
+\newcommand{\dsh}{{\bf --}}
+\newcommand{\til}{{\bf\large \textasciitilde}}
+%\newcommand{\tbd}[1]{[{\color{red}{\bf{TBD: #1}}}]}
+\newcommand{\etal}{\emph{et~al.}}
+\newcommand{\meddle}{{Meddle}\xspace}
+\newcommand{\dsum}{\displaystyle\sum}
+\newcounter{packednmbr}
+
+\newenvironment{packedenumerate}{\begin{list}{\thepackednmbr.}{\usecounter{packednmbr}\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+\newenvironment{packeditemize}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+\newenvironment{packedtrivlist}{\begin{list}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+
+\renewcommand{\fref}{\Fref}
+\renewcommand\thesubfigure{~(\alph{subfigure})}
+
+\title{\meddle}
+
+\numberofauthors{6}
+\author{
+\alignauthor
+Ashwin Rao\\
+\affaddr{INRIA}
+\alignauthor        
+Justine Sherry\\
+\affaddr{UC Berkeley}
+\alignauthor
+Arnaud Legaut\\
+\affaddr{INRIA}
+\and
+\alignauthor 
+Arvind Krishnamurthy\\
+\affaddr{University of Washington}
+\alignauthor
+Walid Dabbous*\\
+\affaddr{INRIA}
+\alignauthor
+David Choffnes\\
+\affaddr{University of Washington}
+}
+
+\date{}
+\begin{document}	
+\maketitle
+
+\input{abstract}
+
+\input{introduction}
+
+\bibliographystyle{abbrv}
+\bibliography{biblio}
+
+\end{document}
