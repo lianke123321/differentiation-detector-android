@@ -83,7 +83,7 @@ David Choffnes\\
 \category{C.2}{Computer Communication Networks}{General} 
 
 \begin{keywords}
-Middlebox, Mobile, Transparency, Control.
+Mobile, Networking, Measurement, Middlebox, Performance.
 \end{keywords}
 
 \section{Introduction}
@@ -104,7 +104,7 @@ subscribe to network providers that can (and do) transparently modify,
 block or otherwise interfere with network
 traffic~\cite{wang:middleboxes}.  
 
-Researchers face a similar set of challenges for characterizing an
+Researchers face a similar set of challenges for characterizing 
 and experimenting with mobile systems. To characterize mobile traffic and
 design new protocols and services that are better tailored to the
 mobile environment, we would like a framework that allows us to
@@ -120,8 +120,8 @@ impractical. Furthermore, researchers generally have no ability to
 deploy solutions and services such as prefetching and security
 filters, that should be implemented in the network.
 
-In this poster, we present \meddle, a framework that combines Virtual
-Private Networks (VPNs) with middleboxes to provide an experimental
+In this poster, we present \meddle, a framework that combines virtual
+private networks (VPNs) with middleboxes to provide an experimental
 platform that aligns the interests of users and researchers. \meddle
 relies on VPN tunnels to access the mobile traffic regardless of the
 device, OS, wireless technology, and carrier. \meddle can thus provide
@@ -134,10 +134,10 @@ traffic.
 mobile traffic, and designing new in-network features to improve the
 mobile experience. For example, by accessing network traffic
 regardless of the wireless technology we can analyze how different
-operating systems and apps offload their traffic from 3G or 4G
+operating systems and apps offload their traffic from cellular
 networks to Wi-Fi. To improve the user experience, we implement packet
 filters to block ads; unlike existing packet filters for mobile
-devices, the packet filter provided by \meddle does not require
+devices, the packet filters provided by \meddle do not require
 jail-breaking the mobile device. Furthermore, Meddle provides a
 vantage point for separating mobile-network performance from
 server-side performance, thus improving bottleneck identification for
@@ -190,9 +190,10 @@ We believe that the research enabled by \meddle will form a positive
 feedback loop in which new, proven research artifacts become
 additional incentives for user adoption, thus enabling further
 research. We have a \meddle prototype which has been running
-since August 27, 2012. Our prototype currently serves different mobile
+since August 27, 2012. Our prototype currently serves mobile
 devices that include an Android phone, an iPhone, an iPad, and an iPod 
-Touch. These devices are being used by users that are part of an
+Touch. The particpants in our study are using their own devices to 
+interact with \meddle, as part of an
 IRB-approved study to characterize mobile traffic.
 
 \textbf{\meddle example.} We have implemented a DNS-based filter to
@@ -204,8 +205,10 @@ Android users in a large European ISP. Our ad blocking engine relies
 on the publicly available list of domains for ads and
 analytics~\cite{YoyoAds}; we augment this list of domains using the
 recent research on mobile ads~\cite{hornyack:appfence,
-  Leontiadis:2012:AdsMobile}. We observed a 0.05\% to 0.8\% reduction
-in total traffic at each mobile device due to our ad blocking engine.
+  Leontiadis:2012:AdsMobile}. From our initial deployment, we observed a 0.05\% to 0.8\% reduction
+in total traffic at each mobile device due to our ad blocking engine. We 
+are investigating whether this difference from previous work is due to incomplete filters, 
+user-specific behavior or other factors.
 
 \begin{table}
 \centering
@@ -213,7 +216,7 @@ in total traffic at each mobile device due to our ad blocking engine.
 \begin{tabular}{|l|l|l|l|l|}
 \hline
 {\bf Device} & {\bf Home} & {\bf Work} & {\bf Mobile} & {\bf Volume}\\
-    & {\bf (Wi-Fi)} & {\bf (Wi-Fi)} & {\bf (3G)} & {\bf (MB)}\\
+    & {\bf (Wi-Fi)} & {\bf (Wi-Fi)} & {\bf (Cell)} & {\bf (MB)}\\
 \hline
 Android & 38.6\% & 58.7\% & 2.7\%  & 436 MB\\
 \hline
@@ -225,8 +228,7 @@ iPad & 92.8\% & 7.2\% & N-A  & 812 MB\\
 \end{tabular}
 \end{small}
 \caption{Traffic share and volume from three devices when using Wi-fi at
-  home, Wi-Fi at work, or a 3G connection. \emph{\meddle can be used
-    for a plethora of user based studies because it provides a
+  home, Wi-Fi at work, or a cellular connection. \emph{\meddle provides a
     comprehensive view of mobile traffic regardless of the access
     technology.}} 
 \label{tab:Usage}
@@ -237,13 +239,14 @@ the traffic volume observed from an Android phone, an
 iPhone, and an iPad, for 15 days since October 16, 2012. The three users
 generated 1.35 GB of traffic that passed through our \meddle
 server. In \fref{tab:Usage}, we observe that the iPhone user consumes
-more 3G bandwidth compared to the Android user. We plan to use this
-comprehensive view of network traffic to investigate what fraction of
-the 3G traffic can be offloaded to the Wi-fi networks. We also plan to
-investigate the usage of apps when multiple access technologies are
-simultaneously available. Further, we note that the vast majority of
+more cellular bandwidth compared to the Android user.  Further, we note that the vast majority of
 mobile device traffic is traversing Wi-Fi networks instead of cellular
-networks. 
+networks. We plan to use this
+comprehensive view of network traffic to investigate the marginal impact of offloading 
+cellular traffic onto Wi-Fi networks. 
+%We also plan to
+%investigate the usage of apps when multiple access technologies are
+%simultaneously available.
 
 \textbf{Overhead.} We observe low overheads in terms of power
 consumption, data quota, and network latency, when tunneling data
