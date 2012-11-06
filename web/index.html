@@ -61,7 +61,35 @@
 	  	<p>	  		
 	  		Meddle currently works for Android (4.0+) and iOS devices. We are 
 	  		currently in private beta. To reserve a spot on the waiting list, 
-	  		submit your e-mail address here: <input type="text"></input>
+	  		submit your e-mail address here:
+			<form action="https://docs.google.com/spreadsheet/formResponse?formkey=dFVaMS1hYmNxZ2hwazMtQUYzbVpDMHc6MQ&amp;ifq" method="POST" id="ss-form">
+			<input type="text" name="entry.0.single" value="" class="ss-q-short" id="entry_0">
+			<input type="hidden" name="pageNumber" value="0">
+			<input type="hidden" name="backupCache" value="">
+			<input type="submit" name="submit" value="Submit">
+			<script type="text/javascript">
+      
+      (function() {
+var divs = document.getElementById('ss-form').
+getElementsByTagName('div');
+var numDivs = divs.length;
+for (var j = 0; j < numDivs; j++) {
+if (divs[j].className == 'errorbox-bad') {
+divs[j].lastChild.firstChild.lastChild.focus();
+return;
+}
+}
+for (var i = 0; i < numDivs; i++) {
+var div = divs[i];
+if (div.className == 'ss-form-entry' &&
+div.firstChild &&
+div.firstChild.className == 'ss-q-title') {
+div.lastChild.focus();
+return;
+}
+}
+})();
+      </script></form>
 	  		<br>
 	  		We will send you an invitation when capacity is available.
 	  	</p>
@@ -71,6 +99,10 @@
 	  		<p>
 	  		<a href="iOS.html" class="button">Install on iOS</a>
 	  	</p>
+	 	<h2>Already meddling your phone?</h2>
+	  <div>
+	  	<p> If you are viewing this page from a phone that is being served by one of our Meddle servers, then <a href="http://10.11.101.101/dyn/viewConfigs">click here to configure the Meddle services.</a></p>	  		
+	
 	  </div>
 
     <footer>
