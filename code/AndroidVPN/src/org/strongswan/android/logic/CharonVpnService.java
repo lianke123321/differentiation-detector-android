@@ -18,16 +18,16 @@
 package org.strongswan.android.logic;
 
 import java.io.File;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.strongswan.android.data.VpnProfile;
 import org.strongswan.android.data.VpnProfileDataSource;
@@ -37,6 +37,7 @@ import org.strongswan.android.ui.MainActivity;
 
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -44,12 +45,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.VpnService;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
+import android.security.KeyChain;
+import android.security.KeyChainException;
 import android.util.Log;
 
 public class CharonVpnService extends VpnService implements Runnable
@@ -62,6 +63,7 @@ public class CharonVpnService extends VpnService implements Runnable
 	private Thread mConnectionHandler;
 	private VpnProfile mCurrentProfile;
 	private volatile String mCurrentCertificateAlias;
+	private volatile String mCurrentUserCertificateAlias;
 	private VpnProfile mNextProfile;
 	private volatile boolean mProfileUpdated;
 	private volatile boolean mTerminate;
@@ -89,31 +91,22 @@ public class CharonVpnService extends VpnService implements Runnable
 			mConnectionHandler.start();
 		}
 	};
+	private CharonVpnService syncObject;
+	
 	private ConnectivityManager connectivityManger;
 	private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-        	if (syncObject==null) return;
+        	if (syncObject==null || mService==null) return;
         	synchronized (syncObject){
-	        	if (mCurrentProfile==null || !mCurrentProfile.isAutoReconnect()) {
-	        		// TODO: This isn't quite right. Need to update some state here
-	        		return;
-	        	}
-	            boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-	            boolean isNewAddress = mLastLocalAddress != null && getLocalIPv4Address() != mLastLocalAddress;
-	            if (!noConnectivity && syncObject != null && isNewAddress &&
-	            		mService.getState()==State.CONNECTED){
-	        	
-	            	mProfileUpdated = true;
-	            	mNextProfile = mCurrentProfile;
-	            	syncObject.notifyAll();
-	            }
+        		if (mService.getState() != State.CONNECTED && 
+						mService.getState() != State.CONNECTING)
+					connectToDefaultProfile();
+	            
 	        }
         }
 	};
-	private CharonVpnService syncObject;
-	private String mLastLocalAddress;
-	private boolean isUserGeneratedClose = false;
+	
 	
 
 	/**
@@ -142,13 +135,8 @@ public class CharonVpnService extends VpnService implements Runnable
 					String password = bundle.getString(VpnProfileDataSource.KEY_PASSWORD);
 					profile.setPassword(password);
 				}
-				setNextProfile(profile);
-
 			}
-			else{
-				isUserGeneratedClose = true;
-				setNextProfile(null);
-			}
+			setNextProfile(profile);
 		}
 		return START_NOT_STICKY;
 	}
@@ -165,7 +153,7 @@ public class CharonVpnService extends VpnService implements Runnable
 		/* the thread is started when the service is bound */
 		bindService(new Intent(this, VpnStateService.class),
 					mServiceConnection, Service.BIND_AUTO_CREATE);
-		
+		/* check if we need to start a connection after being offline */
 		registerReceiver(mConnReceiver, 
 	            new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 	}
@@ -174,7 +162,6 @@ public class CharonVpnService extends VpnService implements Runnable
 	public void onRevoke()
 	{	/* the system revoked the rights grated with the initial prepare() call.
 		 * called when the user clicks disconnect in the system's VPN dialog */
-		isUserGeneratedClose  = true;
 		setNextProfile(null);
 	}
 
@@ -205,7 +192,8 @@ public class CharonVpnService extends VpnService implements Runnable
 	 */
 	private void setNextProfile(VpnProfile profile)
 	{
-		synchronized (this)
+		if (syncObject==null) return;
+		synchronized (syncObject)
 		{
 			this.mNextProfile = profile;
 			mProfileUpdated = true;
@@ -216,9 +204,64 @@ public class CharonVpnService extends VpnService implements Runnable
 	@Override
 	public void run()
 	{
+		syncObject = this;
+		final Thread thisThread = Thread.currentThread();
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask(){
+
+			@Override
+			public void run() {
+//				if (mCurrentProfile != null && !mCurrentProfile.isAutoReconnect()) return;
+				synchronized (syncObject)
+				{
+					if (mService==null) return;
+					Log.i(TAG, "periodic restart check");
+					if (mService.getState() != State.CONNECTED && 
+							mService.getState() != State.CONNECTING)
+						connectToDefaultProfile();
+					
+
+
+					
+//					if ((mConnectStartTime != -1 && 
+//							mConnectStartTime < System.currentTimeMillis()-30*1000) || 
+//							mLastError != ErrorState.NO_ERROR || mService.getState()!=State.CONNECTED){
+//						Log.i(TAG, "restarting connection due to 30 seconds of no connection");
+//						//					TrustedCertificateManager.getInstance().reload();
+//						//					if (getLocalIPv4Address()!=null)
+//						//						deinitializeCharon();
+//						restartConnection();
+//						thisThread.interrupt();
+//					}
+				}
+
+			}}, 5000, 60*1000);
+		timer.scheduleAtFixedRate(new TimerTask(){
+
+			@Override
+			public void run() {
+		try{
+		    SocketAddress sockaddr = new InetSocketAddress("www.google.com", 80);
+
+            // Create an unbound socket
+            Socket sock = new Socket();
+
+            // This method will block no more than timeoutMs.
+            // If the timeout occurs, SocketTimeoutException is thrown.
+            int timeoutMs = 5000;   // 5 seconds
+            sock.connect(sockaddr, timeoutMs);
+            Log.i(TAG, "Google is reachable");
+            sock.close();
+            
+		}             
+		catch(Exception e){
+			Log.i(TAG, "Google not reachable! Restarting...");
+			connectToDefaultProfile();
+		}
+			}}, 5000, 15*60*1000);
+		
 		while (true)
 		{
-			syncObject = this;
 			synchronized (this)
 			{
 				try
@@ -241,13 +284,13 @@ public class CharonVpnService extends VpnService implements Runnable
 					}
 					else
 					{
-						isUserGeneratedClose = false;
 						mCurrentProfile = mNextProfile;
 						mNextProfile = null;
 
 						/* store this in a separate (volatile) variable to avoid
 						 * a possible deadlock during deinitialization */
 						mCurrentCertificateAlias = mCurrentProfile.getCertificateAlias();
+						mCurrentUserCertificateAlias = mCurrentProfile.getUserCertificateAlias();
 
 						setProfile(mCurrentProfile);
 						setError(ErrorState.NO_ERROR);
@@ -258,9 +301,7 @@ public class CharonVpnService extends VpnService implements Runnable
 						initializeCharon(builder, mLogFile);
 						Log.i(TAG, "charon started");
 
-						String local_address = getLocalIPv4Address();
-						mLastLocalAddress = local_address;
-						initiate(local_address != null ? local_address : "0.0.0.0",
+						initiate(mCurrentProfile.getVpnType().getIdentifier(),
 								 mCurrentProfile.getGateway(), mCurrentProfile.getUsername(),
 								 mCurrentProfile.getPassword());
 					}
@@ -269,11 +310,6 @@ public class CharonVpnService extends VpnService implements Runnable
 				{
 					stopCurrentConnection();
 					setState(State.DISABLED);
-					synchronized (syncObject){
-		            	mProfileUpdated = true;
-		            	mNextProfile = mCurrentProfile;
-		            	syncObject.notifyAll();
-	            	}
 				}
 			}
 		}
@@ -290,31 +326,9 @@ public class CharonVpnService extends VpnService implements Runnable
 			{
 				setState(State.DISCONNECTING);
 				mIsDisconnecting = true;
-//				try {
-//					new AsyncTask(){
-//
-//						@Override
-//						protected Object doInBackground(Object... params) {
-							deinitializeCharon();
-//							return null;
-//						}}.get(10000, TimeUnit.MILLISECONDS);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} catch (ExecutionException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} catch (TimeoutException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-				
+				deinitializeCharon();
 				Log.i(TAG, "charon stopped");
-				if (mCurrentProfile.isAutoReconnect() && !isUserGeneratedClose){
-					mNextProfile = mCurrentProfile;
-				}
 				mCurrentProfile = null;
-	
 			}
 		}
 	}
@@ -378,30 +392,17 @@ public class CharonVpnService extends VpnService implements Runnable
 	 */
 	private void setErrorDisconnect(ErrorState error)
 	{
-		
-			
-			if (!mCurrentProfile.isAutoReconnect()) {
-				synchronized (syncObject){
-		        	mProfileUpdated = true;
-		        	mNextProfile = mCurrentProfile;
-		        	syncObject.notifyAll();
-		    	}
-			} else {
-				synchronized (mServiceLock)
+		synchronized (mServiceLock)
+		{
+			if (mService != null)
+			{
+				mService.setError(error);
+				if (!mIsDisconnecting)
 				{
-					if (mService != null)
-					{
-						mService.setError(error);
-						if (!mIsDisconnecting)
-						{
-							mService.disconnect();
-						}
-					}
+					mService.disconnect();
 				}
 			}
-			
-			
-
+		}
 	}
 
 	/**
@@ -415,23 +416,7 @@ public class CharonVpnService extends VpnService implements Runnable
 		switch (status)
 		{
 			case STATE_CHILD_SA_DOWN:
-				if (!mCurrentProfile.isAutoReconnect()) {
-					synchronized (syncObject){
-			        	mProfileUpdated = true;
-			        	mNextProfile = mCurrentProfile;
-			        	syncObject.notifyAll();
-			    	}
-				} else {
-				synchronized (mServiceLock)
-				{
-					/* if we are not actively disconnecting we assume the remote terminated
-					 * the connection and call disconnect() to deinitialize charon properly */
-					if (mService != null && !mIsDisconnecting)
-					{
-						mService.disconnect();
-					}
-				}
-				}
+				/* we ignore this as we use closeaction=restart */
 				break;
 			case STATE_CHILD_SA_UP:
 				setState(State.CONNECTED);
@@ -515,6 +500,50 @@ public class CharonVpnService extends VpnService implements Runnable
 	}
 
 	/**
+	 * Function called via JNI to get a list containing the DER encoded certificates
+	 * of the user selected certificate chain (beginning with the user certificate).
+	 *
+	 * Since this method is called from a thread of charon's thread pool we are safe
+	 * to call methods on KeyChain directly.
+	 *
+	 * @return list containing the certificates (first element is the user certificate)
+	 * @throws InterruptedException
+	 * @throws KeyChainException
+	 * @throws CertificateEncodingException
+	 */
+	private byte[][] getUserCertificate() throws KeyChainException, InterruptedException, CertificateEncodingException
+	{
+		ArrayList<byte[]> encodings = new ArrayList<byte[]>();
+		X509Certificate[] chain = KeyChain.getCertificateChain(getApplicationContext(), mCurrentUserCertificateAlias);
+		if (chain == null || chain.length == 0)
+		{
+			return null;
+		}
+		for (X509Certificate cert : chain)
+		{
+			encodings.add(cert.getEncoded());
+		}
+		return encodings.toArray(new byte[encodings.size()][]);
+	}
+
+	/**
+	 * Function called via JNI to get the private key the user selected.
+	 *
+	 * Since this method is called from a thread of charon's thread pool we are safe
+	 * to call methods on KeyChain directly.
+	 *
+	 * @return the private key
+	 * @throws InterruptedException
+	 * @throws KeyChainException
+	 * @throws CertificateEncodingException
+	 */
+	private PrivateKey getUserKey() throws KeyChainException, InterruptedException
+	{
+		return KeyChain.getPrivateKey(getApplicationContext(), mCurrentUserCertificateAlias);
+
+	}
+
+	/**
 	 * Initialization of charon, provided by libandroidbridge.so
 	 *
 	 * @param builder BuilderAdapter for this connection
@@ -530,41 +559,7 @@ public class CharonVpnService extends VpnService implements Runnable
 	/**
 	 * Initiate VPN, provided by libandroidbridge.so
 	 */
-	public native void initiate(String local_address, String gateway,
-								String username, String password);
-
-	/**
-	 * Helper function that retrieves a local IPv4 address.
-	 *
-	 * @return string representation of an IPv4 address, or null if none found
-	 */
-	private static String getLocalIPv4Address()
-	{
-		try
-		{
-			Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
-			while (en.hasMoreElements())
-			{
-				NetworkInterface intf = en.nextElement();
-
-				Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses();
-				while (enumIpAddr.hasMoreElements())
-				{
-					InetAddress inetAddress = enumIpAddr.nextElement();
-					if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4)
-					{
-						return inetAddress.getHostAddress().toString();
-					}
-				}
-			}
-		}
-		catch (SocketException ex)
-		{
-			ex.printStackTrace();
-			return null;
-		}
-		return null;
-	}
+	public native void initiate(String type, String gateway, String username, String password);
 
 	/**
 	 * Adapter for VpnService.Builder which is used to access it safely via JNI.
@@ -572,27 +567,35 @@ public class CharonVpnService extends VpnService implements Runnable
 	 */
 	public class BuilderAdapter
 	{
-		VpnService.Builder builder;
+		private final String mName;
+		private VpnService.Builder mBuilder;
 
 		public BuilderAdapter(String name)
 		{
-			builder = new CharonVpnService.Builder();
-			builder.setSession(name);
+			mName = name;
+			mBuilder = createBuilder(name);
+		}
+
+		private VpnService.Builder createBuilder(String name)
+		{
+			VpnService.Builder builder = new CharonVpnService.Builder();
+			builder.setSession(mName);
 
 			/* even though the option displayed in the system dialog says "Configure"
 			 * we just use our main Activity */
 			Context context = getApplicationContext();
 			Intent intent = new Intent(context, MainActivity.class);
 			PendingIntent pending = PendingIntent.getActivity(context, 0, intent,
-															  Intent.FLAG_ACTIVITY_NEW_TASK);
+															  PendingIntent.FLAG_UPDATE_CURRENT);
 			builder.setConfigureIntent(pending);
+			return builder;
 		}
 
 		public synchronized boolean addAddress(String address, int prefixLength)
 		{
 			try
 			{
-				builder.addAddress(address, prefixLength);
+				mBuilder.addAddress(address, prefixLength);
 			}
 			catch (IllegalArgumentException ex)
 			{
@@ -605,7 +608,7 @@ public class CharonVpnService extends VpnService implements Runnable
 		{
 			try
 			{
-				builder.addDnsServer(address);
+				mBuilder.addDnsServer(address);
 			}
 			catch (IllegalArgumentException ex)
 			{
@@ -618,7 +621,7 @@ public class CharonVpnService extends VpnService implements Runnable
 		{
 			try
 			{
-				builder.addRoute(address, prefixLength);
+				mBuilder.addRoute(address, prefixLength);
 			}
 			catch (IllegalArgumentException ex)
 			{
@@ -631,7 +634,7 @@ public class CharonVpnService extends VpnService implements Runnable
 		{
 			try
 			{
-				builder.addSearchDomain(domain);
+				mBuilder.addSearchDomain(domain);
 			}
 			catch (IllegalArgumentException ex)
 			{
@@ -644,7 +647,7 @@ public class CharonVpnService extends VpnService implements Runnable
 		{
 			try
 			{
-				builder.setMtu(mtu);
+				mBuilder.setMtu(mtu);
 			}
 			catch (IllegalArgumentException ex)
 			{
@@ -658,7 +661,7 @@ public class CharonVpnService extends VpnService implements Runnable
 			ParcelFileDescriptor fd;
 			try
 			{
-				fd = builder.establish();
+				fd = mBuilder.establish();
 			}
 			catch (Exception ex)
 			{
@@ -669,9 +672,43 @@ public class CharonVpnService extends VpnService implements Runnable
 			{
 				return -1;
 			}
+			/* now that the TUN device is created we don't need the current
+			 * builder anymore, but we might need another when reestablishing */
+			mBuilder = createBuilder(mName);
 			return fd.detachFd();
 		}
 	}
+	
+	private void connectToDefaultProfile(){
+		Context context = getApplicationContext();
+		Log.i(TAG, "preparing service");
+		Intent intent2 = VpnService.prepare(context);
+		if (intent2 != null)
+		{
+			try
+			{
+				Intent newIntent = new Intent(context, MainActivity.class);
+				newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				context.startActivity(newIntent);
+			}
+			catch (ActivityNotFoundException ex)
+			{
+				/* it seems some devices, even though they come with Android 4,
+				 * don't have the VPN components built into the system image.
+				 * com.android.vpndialogs/com.android.vpndialogs.ConfirmDialog
+				 * will not be found then */
+//				showVpnNotSupportedError();
+			}
+		}
+
+		/* cached list of profiles used as backend for the ListView */
+		List<VpnProfile> mVpnProfiles = mDataSource.getAllVpnProfiles();
+		if (mVpnProfiles.size() > 0){
+			VpnProfile profile = mVpnProfiles.get(0);
+			setNextProfile(profile);
+		}
+	}
+
 
 	/*
 	 * The libraries are extracted to /data/data/org.strongswan.android/...

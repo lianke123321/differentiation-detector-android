@@ -17,6 +17,9 @@
 
 package org.strongswan.android.ui;
 
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.List;
+
 import org.strongswan.android.R;
 import org.strongswan.android.data.VpnProfile;
 import org.strongswan.android.data.VpnProfileDataSource;
@@ -26,18 +29,16 @@ import org.strongswan.android.ui.VpnProfileListFragment.OnVpnProfileSelectedList
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.VpnService;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -51,11 +52,10 @@ import android.widget.EditText;
 public class MainActivity extends Activity implements OnVpnProfileSelectedListener
 {
 	public static final String CONTACT_EMAIL = "android@strongswan.org";
-	private static final String SHOW_ERROR_DIALOG = "errordialog";
 	private static final int PREPARE_VPN_SERVICE = 0;
 
-	private VpnProfile activeProfile;
-	private AlertDialog mErrorDialog;
+	private Bundle mProfileInfo;
+	private PendingIntent restartIntent;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -67,31 +67,33 @@ public class MainActivity extends Activity implements OnVpnProfileSelectedListen
 		ActionBar bar = getActionBar();
 		bar.setDisplayShowTitleEnabled(false);
 
-		if (savedInstanceState != null && savedInstanceState.getBoolean(SHOW_ERROR_DIALOG))
-		{
-			showVpnNotSupportedError();
-		}
-
 		/* load CA certificates in a background task */
 		new CertificateLoadTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, false);
 		
-	}
+		Context context = this.getApplicationContext();
+		VpnProfileDataSource mDataSource = new VpnProfileDataSource(context);
+		mDataSource.open();
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState)
-	{
-		super.onSaveInstanceState(outState);
-		outState.putBoolean(SHOW_ERROR_DIALOG, mErrorDialog != null);
-	}
-
-	@Override
-	protected void onDestroy()
-	{
-		super.onDestroy();
-		if (mErrorDialog != null)
-		{	/* avoid any errors about leaked windows */
-			mErrorDialog.dismiss();
+		/* cached list of profiles used as backend for the ListView */
+		List<VpnProfile> mVpnProfiles = mDataSource.getAllVpnProfiles();
+		VpnProfile activeProfile = null;
+		if (mVpnProfiles.size()>0) {
+			activeProfile = mVpnProfiles.get(0);
+			onVpnProfileSelected(activeProfile);
 		}
+		
+		restartIntent = PendingIntent.getActivity(this.getBaseContext(), 0,
+	            new Intent(getIntent()), getIntent().getFlags());
+		
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(){
+
+			@Override
+			public void uncaughtException(Thread thread, Throwable ex) {
+				AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+				mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 2000, restartIntent);
+				System.exit(2);
+				
+			}});
 	}
 
 	@Override
@@ -121,10 +123,13 @@ public class MainActivity extends Activity implements OnVpnProfileSelectedListen
 	/**
 	 * Prepare the VpnService. If this succeeds the current VPN profile is
 	 * started.
+	 * @param profileInfo a bundle containing the information about the profile to be started
 	 */
-	protected void prepareVpnService()
+	protected void prepareVpnService(Bundle profileInfo)
 	{
 		Intent intent = VpnService.prepare(this);
+		/* store profile info until the user grants us permission */
+		mProfileInfo = profileInfo;
 		if (intent != null)
 		{
 			try
@@ -137,11 +142,11 @@ public class MainActivity extends Activity implements OnVpnProfileSelectedListen
 				 * don't have the VPN components built into the system image.
 				 * com.android.vpndialogs/com.android.vpndialogs.ConfirmDialog
 				 * will not be found then */
-				showVpnNotSupportedError();
+				new VpnNotSupportedError().show(getFragmentManager(), "ErrorDialog");
 			}
 		}
 		else
-		{
+		{	/* user already granted permission to use VpnService */
 			onActivityResult(PREPARE_VPN_SERVICE, RESULT_OK, null);
 		}
 	}
@@ -152,12 +157,10 @@ public class MainActivity extends Activity implements OnVpnProfileSelectedListen
 		switch (requestCode)
 		{
 			case PREPARE_VPN_SERVICE:
-				if (resultCode == RESULT_OK && activeProfile != null)
+				if (resultCode == RESULT_OK && mProfileInfo != null)
 				{
 					Intent intent = new Intent(this, CharonVpnService.class);
-					intent.putExtra(VpnProfileDataSource.KEY_ID, activeProfile.getId());
-					/* submit the password as the profile might not store one */
-					intent.putExtra(VpnProfileDataSource.KEY_PASSWORD, activeProfile.getPassword());
+					intent.putExtras(mProfileInfo);
 					this.startService(intent);
 				}
 				break;
@@ -169,34 +172,21 @@ public class MainActivity extends Activity implements OnVpnProfileSelectedListen
 	@Override
 	public void onVpnProfileSelected(VpnProfile profile)
 	{
-		activeProfile = profile;
-		if (activeProfile.getPassword() == null)
+		Bundle profileInfo = new Bundle();
+		profileInfo.putLong(VpnProfileDataSource.KEY_ID, profile.getId());
+		profileInfo.putString(VpnProfileDataSource.KEY_USERNAME, profile.getUsername());
+		if (profile.getVpnType().getRequiresUsernamePassword() &&
+			profile.getPassword() == null)
 		{
-			new LoginDialog().show(getFragmentManager(), "LoginDialog");
+			LoginDialog login = new LoginDialog();
+			login.setArguments(profileInfo);
+			login.show(getFragmentManager(), "LoginDialog");
 		}
 		else
 		{
-			prepareVpnService();
+			profileInfo.putString(VpnProfileDataSource.KEY_PASSWORD, profile.getPassword());
+			prepareVpnService(profileInfo);
 		}
-	}
-
-	/**
-	 * Show an error dialog if case the device lacks VPN support.
-	 */
-	private void showVpnNotSupportedError()
-	{
-		mErrorDialog = new AlertDialog.Builder(this)
-			.setTitle(R.string.vpn_not_supported_title)
-			.setMessage(getString(R.string.vpn_not_supported))
-			.setCancelable(false)
-			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int id)
-				{
-					mErrorDialog = null;
-					dialog.dismiss();
-				}
-			}).show();
 	}
 
 	/**
@@ -225,28 +215,32 @@ public class MainActivity extends Activity implements OnVpnProfileSelectedListen
 		}
 	}
 
-	private class LoginDialog extends DialogFragment
+	/**
+	 * Class that displays a login dialog and initiates the selected VPN
+	 * profile if the user confirms the dialog.
+	 */
+	public static class LoginDialog extends DialogFragment
 	{
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState)
 		{
-			LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			final Bundle profileInfo = getArguments();
+			LayoutInflater inflater = getActivity().getLayoutInflater();
 			View view = inflater.inflate(R.layout.login_dialog, null);
 			EditText username = (EditText)view.findViewById(R.id.username);
-			username.setText(activeProfile.getUsername());
+			username.setText(profileInfo.getString(VpnProfileDataSource.KEY_USERNAME));
 			final EditText password = (EditText)view.findViewById(R.id.password);
 
-			Builder adb = new AlertDialog.Builder(MainActivity.this);
+			Builder adb = new AlertDialog.Builder(getActivity());
 			adb.setView(view);
 			adb.setTitle(getString(R.string.login_title));
 			adb.setPositiveButton(R.string.login_confirm, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int whichButton)
 				{
-					/* let's work on a clone of the profile when updating the password */
-					activeProfile = activeProfile.clone();
-					activeProfile.setPassword(password.getText().toString().trim());
-					prepareVpnService();
+					MainActivity activity = (MainActivity)getActivity();
+					profileInfo.putString(VpnProfileDataSource.KEY_PASSWORD, password.getText().toString().trim());
+					activity.prepareVpnService(profileInfo);
 				}
 			});
 			adb.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -259,29 +253,27 @@ public class MainActivity extends Activity implements OnVpnProfileSelectedListen
 			return adb.create();
 		}
 	}
-	
-	private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-//            String reason = intent.getStringExtra(ConnectivityManager.EXTRA_REASON);
-//                        boolean isFailover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
-//            
-//            NetworkInfo currentNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-//            NetworkInfo otherNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);
-            
-            
-                        
-            // do application-specific task(s) based on the current network state, such 
-            // as enabling queuing of HTTP requests when currentNetworkInfo is connected etc.
-        }
-    };
-    
-    /*
-     * method to be invoked to register the receiver
-     */
-    private void registerReceivers() {    
-        registerReceiver(mConnReceiver, 
-            new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-    }
+
+	/**
+	 * Class representing an error message which is displayed if VpnService is
+	 * not supported on the current device.
+	 */
+	public static class VpnNotSupportedError extends DialogFragment
+	{
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState)
+		{
+			return new AlertDialog.Builder(getActivity())
+				.setTitle(R.string.vpn_not_supported_title)
+				.setMessage(getString(R.string.vpn_not_supported))
+				.setCancelable(false)
+				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id)
+					{
+						dialog.dismiss();
+					}
+				}).create();
+		}
+	}
 }

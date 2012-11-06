@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 
 public class VpnProfileDataSource
@@ -34,10 +35,12 @@ public class VpnProfileDataSource
 	public static final String KEY_ID = "_id";
 	public static final String KEY_NAME = "name";
 	public static final String KEY_GATEWAY = "gateway";
+	public static final String KEY_VPN_TYPE = "vpn_type";
 	public static final String KEY_USERNAME = "username";
 	public static final String KEY_PASSWORD = "password";
-	public static final String KEY_CERTIFICATE = "certificate";
 	public static final String KEY_RECONNECT = "auto_reconnect";
+	public static final String KEY_CERTIFICATE = "certificate";
+	public static final String KEY_USER_CERTIFICATE = "user_certificate";
 
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDatabase;
@@ -46,26 +49,30 @@ public class VpnProfileDataSource
 	private static final String DATABASE_NAME = "strongswan.db";
 	private static final String TABLE_VPNPROFILE = "vpnprofile";
 
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 5;
 
 	public static final String DATABASE_CREATE =
 							"CREATE TABLE " + TABLE_VPNPROFILE + " (" +
 								KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 								KEY_NAME + " TEXT NOT NULL," +
 								KEY_GATEWAY + " TEXT NOT NULL," +
-								KEY_USERNAME + " TEXT NOT NULL," +
+								KEY_VPN_TYPE + " TEXT NOT NULL," +
+								KEY_USERNAME + " TEXT," +
 								KEY_PASSWORD + " TEXT," +
 								KEY_CERTIFICATE + " TEXT," +
+								KEY_USER_CERTIFICATE + " TEXT," +
 								KEY_RECONNECT + " TEXT" +
 							");";
-	private final String[] ALL_COLUMNS = new String[] {
+	private static final String[] ALL_COLUMNS = new String[] {
 								KEY_ID,
 								KEY_NAME,
 								KEY_GATEWAY,
+								KEY_VPN_TYPE,
 								KEY_USERNAME,
 								KEY_PASSWORD,
 								KEY_CERTIFICATE,
-								KEY_RECONNECT
+								KEY_USER_CERTIFICATE,
+								KEY_RECONNECT,
 							};
 
 	private static class DatabaseHelper extends SQLiteOpenHelper
@@ -85,9 +92,45 @@ public class VpnProfileDataSource
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
 		{
 			Log.w(TAG, "Upgrading database from version " + oldVersion +
-					   " to " + newVersion + ", which will destroy all old data");
-			db.execSQL("DROP TABLE IF EXISTS " + TABLE_VPNPROFILE);
-			onCreate(db);
+				  " to " + newVersion);
+			if (oldVersion < 2)
+			{
+				db.execSQL("ALTER TABLE " + TABLE_VPNPROFILE + " ADD " + KEY_USER_CERTIFICATE +
+						   " TEXT;");
+			}
+			if (oldVersion < 3)
+			{
+				db.execSQL("ALTER TABLE " + TABLE_VPNPROFILE + " ADD " + KEY_VPN_TYPE +
+						   " TEXT DEFAULT '';");
+			}
+			if (oldVersion < 4)
+			{	/* remove NOT NULL constraint from username column */
+				updateColumns(db);
+			}
+			if (oldVersion < 5)
+			{
+				db.execSQL("ALTER TABLE " + TABLE_VPNPROFILE + " ADD " + KEY_RECONNECT +
+						   " TEXT DEFAULT '';");
+			}
+		}
+
+		private void updateColumns(SQLiteDatabase db)
+		{
+			db.beginTransaction();
+			try
+			{
+				db.execSQL("ALTER TABLE " + TABLE_VPNPROFILE + " RENAME TO tmp_" + TABLE_VPNPROFILE + ";");
+				db.execSQL(DATABASE_CREATE);
+				StringBuilder insert = new StringBuilder("INSERT INTO " + TABLE_VPNPROFILE + " SELECT ");
+				SQLiteQueryBuilder.appendColumns(insert, ALL_COLUMNS);
+				db.execSQL(insert.append(" FROM tmp_" + TABLE_VPNPROFILE + ";").toString());
+				db.execSQL("DROP TABLE tmp_" + TABLE_VPNPROFILE + ";");
+				db.setTransactionSuccessful();
+			}
+			finally
+			{
+				db.endTransaction();
+			}
 		}
 	}
 
@@ -215,10 +258,12 @@ public class VpnProfileDataSource
 		profile.setId(cursor.getLong(cursor.getColumnIndex(KEY_ID)));
 		profile.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
 		profile.setGateway(cursor.getString(cursor.getColumnIndex(KEY_GATEWAY)));
+		profile.setVpnType(VpnType.fromIdentifier(cursor.getString(cursor.getColumnIndex(KEY_VPN_TYPE))));
 		profile.setUsername(cursor.getString(cursor.getColumnIndex(KEY_USERNAME)));
 		profile.setPassword(cursor.getString(cursor.getColumnIndex(KEY_PASSWORD)));
+		profile.setAutoReconnect(cursor.getString(cursor.getColumnIndex(KEY_RECONNECT))=="true");
 		profile.setCertificateAlias(cursor.getString(cursor.getColumnIndex(KEY_CERTIFICATE)));
-		profile.setAutoReconnect(cursor.getString(cursor.getColumnIndex(KEY_RECONNECT)).equals("True"));
+		profile.setUserCertificateAlias(cursor.getString(cursor.getColumnIndex(KEY_USER_CERTIFICATE)));
 		return profile;
 	}
 
@@ -227,10 +272,12 @@ public class VpnProfileDataSource
 		ContentValues values = new ContentValues();
 		values.put(KEY_NAME, profile.getName());
 		values.put(KEY_GATEWAY, profile.getGateway());
+		values.put(KEY_VPN_TYPE, profile.getVpnType().getIdentifier());
 		values.put(KEY_USERNAME, profile.getUsername());
 		values.put(KEY_PASSWORD, profile.getPassword());
 		values.put(KEY_CERTIFICATE, profile.getCertificateAlias());
-		values.put(KEY_RECONNECT, profile.isAutoReconnect() ? "True" : "False");
+		values.put(KEY_USER_CERTIFICATE, profile.getUserCertificateAlias());
+		values.put(KEY_RECONNECT, profile.getAutoReconnect());
 		return values;
 	}
 }
