@@ -19,7 +19,7 @@ class UserConfigs:
         return
     
     def __header(self):        
-        hstr = TEMPLATE_PAGE_HEADER+"""</head><body>"""
+        hstr = TEMPLATE_PAGE_HEADER
         return hstr
     
     def __footer(self):        

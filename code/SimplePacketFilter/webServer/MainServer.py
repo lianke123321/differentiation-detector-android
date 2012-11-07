@@ -11,25 +11,31 @@ import MeddleCommunicator
 import UserConfigs
 
 from StringConstants import *
+from recaptcha.client import captcha
+import urllib
+import httplib
+import smtplib
 
 ERR_CONN=1
 ERR_NOUSER=2
 ERR_OTHER=3
 ERR_FAILUPDATE = 4
-
+ERR_CAPTCHA = 5
 
 
 class CommonHandler(tornado.web.RequestHandler):
     mainErr = None
     
     def getERRPage(self):
-        page = TEMPLATE_PAGE_HEADER + "</head><body>"                        
+        page = TEMPLATE_PAGE_HEADER                        
         if self.mainErr == ERR_CONN:
             page += "Unable to connect to the Packet Filter Server"
         elif self.mainErr == ERR_NOUSER:
             page += "This mobile device is currently not connected to Meddle. Please connect to Meddle to configure your settings"
         elif self.mainErr == ERR_FAILUPDATE:
             page += "Error updating the configuration at the Meddle Server. Please try again."
+        elif self.mainErr == ERR_CAPTCHA:
+            page += "Captcha Error! Please try again"
         else:
             page += "Internal error on webserver. Please try again later."
         page += TEMPLATE_PAGE_FOOTER
@@ -133,11 +139,67 @@ class DefaultHandler(CommonHandler):
         try:
             self.render(STATICPATH+"/index.html")
         except (socket.error, IOError), msg:
-            self.getERRPage()
+            self.write(self.getERRPage())
             
             
+class SignUpHandler(CommonHandler):
+    def __getThanksPage(self):
+        page = TEMPLATE_PAGE_HEADER
+        page += "<p>Thank you for your interest.</p>"
+        page += "<p><a href=\"http://meddle.cs.washington.edu\">Click here to return to home page</a></p> "
+        page += TEMPLATE_PAGE_FOOTER
+        return page
+        
+    def __verifyCaptcha(self):
+        global STR_CAPTCHA_PRIV_KEY
+        
+        logging.warning(self.request)
+        recaptcha_challenge_field = self.get_argument('recaptcha_challenge_field', 'None')
+        recaptcha_response_field = self.get_argument('recaptcha_response_field', 'None')
+        logging.warning(str(recaptcha_challenge_field) + " " + str(recaptcha_response_field))
+        response = captcha.submit(recaptcha_challenge_field, recaptcha_response_field, STR_CAPTCHA_PRIV_KEY, self.request.remote_ip)
+        if response.is_valid is True:
+            logging.warning("Got a valid response")
+            return True
+        self.mainErr = ERR_CAPTCHA
+        return False
+     
+    def __serveNewInterest(self):
+        emailAddress = self.get_argument('interestEmail', 'None')
+        query = "INSERT INTO InterestedUsers VALUES (0, CURRENT_TIMESTAMP, "+str(emailAddress)+", 0 );"
+        dbCon = tornado.database.Connection(host=DB_HOSTNAME, database=DB_DBNAME, user=DB_USER, password=DB_PASSWORD)
+        results = dbCon.execute(query)
+        dbCon.close()
+        
+        emailMsg = emailMsg.replace(TEMPLATE_INTEREST_EMAIL_SUBMITTER, emailAddress)
+        emailMsg = TEMPLATE_INTEREST_EMAIL_HDR
+        smtp = smtplib.SMTP('localhost')
+        smtpserver.sendmail(TEMPLATE_INTEREST_EMAIL_SENDER, TEMPLATE_INTEREST_EMAIL_HANDLERS, emailMsg)
+        return
+        
+    def __post(self):
+        retVal = self.__verifyCaptcha()
+        if retVal == False:
+            self.mainErr = ERR_CAPTCHA
+            return self.getERRPage()
+        self.__serveNewInterest()
+        
+        #logging.warning(self.request.body)
+        return self.__getThanksPage()
+    
+    def post(self):
+         try:
+             ret = self.__post()
+             logging.error(ret)
+             self.write(ret)
+         except(socket.error, IOError) , msg:
+             self.write(self.getERRPage())
+         return
+             
+                
 handlers = [(r"/",DefaultHandler),
             (r""+str(PAGE_VIEWCONFIGS), ViewConfigsHandler),
+            (r"/dyn/signupCaptcha", SignUpHandler),
             (r"/(.+\..+)", tornado.web.StaticFileHandler, {'path': str(STATICPATH)})]
 settings = {}
 #settings = {'debug': True, 
