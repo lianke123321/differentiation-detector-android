@@ -42,6 +42,7 @@ mysql> CREATE TABLE UserTunnelInfo (rowID SERIAL PRIMARY KEY, userID INT NOT NUL
 mysql> INSERT INTO UserConfigs VALUES (0, 'arao-ipod', 0);
 
 
-mysql> CREATE TABLE UserConfigChange(userID INT NOT NULL,  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, configVariable VARCHAR (512), newValue VARCHAR (512));
+mysql> CREATE TABLE UserConfigChange(userID INT NOT NULL,  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, configVariable VARCHAR (512), newValue VARCHAR (512)) ENGINE="InnoDB";
 
+mysql> CREATE TABLE InterestedUsers(rowID SERIAL PRIMARY KEY, timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, emailAddress VARCHAR (512), responded BOOLEAN NOT NULL DEFAULT 0) ENGINE="InnoDB";  
 
