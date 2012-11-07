@@ -188,7 +188,7 @@ class SignUpHandler(CommonHandler):
         emailMsg = TEMPLATE_INTEREST_EMAIL_BODY
         emailMsg = emailMsg.replace(TEMPLATE_INTEREST_EMAIL_SUBMITTER, emailAddress)
         smtp = smtplib.SMTP('localhost')
-        smtpserver.sendmail(TEMPLATE_INTEREST_EMAIL_SENDER, TEMPLATE_INTEREST_EMAIL_HANDLERS, emailMsg)
+        smtp.sendmail(TEMPLATE_INTEREST_EMAIL_SENDER, TEMPLATE_INTEREST_EMAIL_HANDLERS, emailMsg)
         return
         
     def __post(self):
