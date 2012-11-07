@@ -26,6 +26,7 @@ ERR_NOUSER=2
 ERR_OTHER=3
 ERR_FAILUPDATE = 4
 ERR_CAPTCHA = 5
+ERR_EMAIL = 6
 
 
 class CommonHandler(tornado.web.RequestHandler):
