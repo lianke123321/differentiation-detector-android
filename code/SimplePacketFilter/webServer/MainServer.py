@@ -157,22 +157,25 @@ class SignUpHandler(CommonHandler):
         page += TEMPLATE_PAGE_FOOTER
         return page
         
-    def __verifyCaptcha(self):
+    def __verifyInput(self):
         global STR_CAPTCHA_PRIV_KEY
         
         recaptcha_challenge_field = self.get_argument('recaptcha_challenge_field', 'None')
         recaptcha_response_field = self.get_argument('recaptcha_response_field', 'None')
         logging.warning(str(recaptcha_challenge_field) + " " + str(recaptcha_response_field))
         response = captcha.submit(recaptcha_challenge_field, recaptcha_response_field, STR_CAPTCHA_PRIV_KEY, self.request.remote_ip)
-        if response.is_valid is True:
-            logging.warning("Got a valid response")
-            emailAddress = self.get_argument('interestEmail', 'None')
-            if self.__validateEmail(emailAddress) is True:
-                return True
+        if response.is_valid is False:
+            logging.warning("CAPTCHA Error")
+            self.mainErr = ERR_CAPTCHA
+            return False
+
+        logging.warning("Got a valid response")
+        emailAddress = self.get_argument('interestEmail', 'None')
+        if self.__validateEmail(emailAddress) is False:
             logging.warning("Error in entered email address:"+str(emailAddress));
             self.mainErr = ERR_EMAIL
-        self.mainErr = ERR_CAPTCHA
-        return False
+            return False 
+        return True
      
     def __validateEmail(self, emailAddr):
         return bool(email_re.match(emailAddr))
@@ -192,9 +195,8 @@ class SignUpHandler(CommonHandler):
         return
         
     def __post(self):
-        retVal = self.__verifyCaptcha()
+        retVal = self.__verifyInput()
         if retVal == False:
-            self.mainErr = ERR_CAPTCHA
             return self.getERRPage()
         self.__serveNewInterest()
         return self.__getThanksPage()
@@ -203,9 +205,9 @@ class SignUpHandler(CommonHandler):
          try:
              logging.warning(self.request)
              ret = self.__post()
-             logging.error(ret)
              self.write(ret)
-         except(socket.error, IOError) , msg:
+         except:
+             logging.error("Exception! Need to improve handling :)")
              self.write(self.getERRPage())
          return
              
