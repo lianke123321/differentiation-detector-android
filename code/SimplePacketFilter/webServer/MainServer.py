@@ -185,6 +185,7 @@ class SignUpHandler(CommonHandler):
         results = dbCon.execute(query)
         dbCon.close()
         
+        emailMsg = TEMPLATE_INTEREST_EMAIL_BODY
         emailMsg = emailMsg.replace(TEMPLATE_INTEREST_EMAIL_SUBMITTER, emailAddress)
         emailMsg = TEMPLATE_INTEREST_EMAIL_HDR
         smtp = smtplib.SMTP('localhost')
