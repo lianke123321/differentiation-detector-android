@@ -15,6 +15,11 @@ from recaptcha.client import captcha
 import urllib
 import httplib
 import smtplib
+# THE PROBLEM HERE IS THAT SOUNDER HAS AN OLDER VERSION OF DJANGO RUNNING 
+try:
+    from django.core.validators import email_re
+except:
+    from django.forms.fields import email_re
 
 ERR_CONN=1
 ERR_NOUSER=2
@@ -35,7 +40,9 @@ class CommonHandler(tornado.web.RequestHandler):
         elif self.mainErr == ERR_FAILUPDATE:
             page += "Error updating the configuration at the Meddle Server. Please try again."
         elif self.mainErr == ERR_CAPTCHA:
-            page += "Captcha Error! Please try again"
+            page += "Oops! We encountered a captcha error! Please try again."
+        elif self.mainErr == ERR_EMAIL:
+            page += "We encountered an error while validating your email! Please try again."
         else:
             page += "Internal error on webserver. Please try again later."
         page += TEMPLATE_PAGE_FOOTER
@@ -153,20 +160,27 @@ class SignUpHandler(CommonHandler):
     def __verifyCaptcha(self):
         global STR_CAPTCHA_PRIV_KEY
         
-        logging.warning(self.request)
         recaptcha_challenge_field = self.get_argument('recaptcha_challenge_field', 'None')
         recaptcha_response_field = self.get_argument('recaptcha_response_field', 'None')
         logging.warning(str(recaptcha_challenge_field) + " " + str(recaptcha_response_field))
         response = captcha.submit(recaptcha_challenge_field, recaptcha_response_field, STR_CAPTCHA_PRIV_KEY, self.request.remote_ip)
         if response.is_valid is True:
             logging.warning("Got a valid response")
-            return True
+            emailAddress = self.get_argument('interestEmail', 'None')
+            if self.__validateEmail(emailAddress) is True:
+                return True
+            logging.warning("Error in entered email address:"+str(emailAddress));
+            self.mainErr = ERR_EMAIL
         self.mainErr = ERR_CAPTCHA
         return False
      
+    def __validateEmail(self, emailAddr):
+        return bool(email_re.match(emailAddr))
+    
     def __serveNewInterest(self):
         emailAddress = self.get_argument('interestEmail', 'None')
-        query = "INSERT INTO InterestedUsers VALUES (0, CURRENT_TIMESTAMP, "+str(emailAddress)+", 0 );"
+        query = "INSERT INTO InterestedUsers VALUES (0, CURRENT_TIMESTAMP, '"+str(emailAddress)+"', 0 );"
+        logging.debug("Query");
         dbCon = tornado.database.Connection(host=DB_HOSTNAME, database=DB_DBNAME, user=DB_USER, password=DB_PASSWORD)
         results = dbCon.execute(query)
         dbCon.close()
@@ -183,12 +197,11 @@ class SignUpHandler(CommonHandler):
             self.mainErr = ERR_CAPTCHA
             return self.getERRPage()
         self.__serveNewInterest()
-        
-        #logging.warning(self.request.body)
         return self.__getThanksPage()
     
     def post(self):
          try:
+             logging.warning(self.request)
              ret = self.__post()
              logging.error(ret)
              self.write(ret)
