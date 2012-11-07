@@ -125,35 +125,9 @@
 	  		Meddle currently works for Android (4.0+) and iOS devices. We are 
 	  		currently in private beta. To reserve a spot on the waiting list, 
 	  		submit your e-mail address here:
-<!--			<form action="https://docs.google.com/spreadsheet/formResponse?formkey=dFVaMS1hYmNxZ2hwazMtQUYzbVpDMHc6MQ&amp;ifq" method="POST" id="ss-form"> -->
 			<form action="/dyn/signupCaptcha" method="POST" id="ss-form">  
-			<input type="text" name="entry.0.single" value="" class="ss-q-short" id="entry_0">
-			<input type="hidden" name="pageNumber" value="0">
-			<input type="hidden" name="backupCache" value=""> 
 			<input type="text" name="interestEmail" value="" id="interestEmail"> 
 			<input type="submit" name="submit" value="Submit">
-			<script type="text/javascript">      
-(function() {
-var divs = document.getElementById('ss-form').
-getElementsByTagName('div');
-var numDivs = divs.length;
-for (var j = 0; j < numDivs; j++) {
-if (divs[j].className == 'errorbox-bad') {
-divs[j].lastChild.firstChild.lastChild.focus();
-return;
-}
-}
-for (var i = 0; i < numDivs; i++) {
-var div = divs[i];
-if (div.className == 'ss-form-entry' &&
-div.firstChild &&
-div.firstChild.className == 'ss-q-title') {
-div.lastChild.focus();
-return;
-}
-}
-})();
-      </script> 
 			<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6LdcvNgSAAAAADqDCQoPKBMKmUf6L-eosFFEPmK3"> </script>
 			<noscript>
 			  <iframe src="http://www.google.com/recaptcha/api/noscript?k=6LdcvNgSAAAAADqDCQoPKBMKmUf6L-eosFFEPmK3" height="300" width="500" frameborder="0"></iframe><br>
