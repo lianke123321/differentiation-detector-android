@@ -19,8 +19,8 @@ package org.strongswan.android.data;
 
 public class VpnProfile implements Cloneable
 {
-	private String mName, mGateway, mUsername, mPassword, mCertificate;
-	private boolean autoReconnect;
+	private String mName, mGateway, mUsername, mPassword, mCertificate, mUserCertificate, mAutoReconnect;
+	private VpnType mVpnType;
 	private long mId = -1;
 
 	public long getId()
@@ -53,6 +53,16 @@ public class VpnProfile implements Cloneable
 		this.mGateway = gateway;
 	}
 
+	public VpnType getVpnType()
+	{
+		return mVpnType;
+	}
+
+	public void setVpnType(VpnType type)
+	{
+		this.mVpnType = type;
+	}
+
 	public String getUsername()
 	{
 		return mUsername;
@@ -78,9 +88,19 @@ public class VpnProfile implements Cloneable
 		return mCertificate;
 	}
 
-	public void setCertificateAlias(String certificate)
+	public void setCertificateAlias(String alias)
 	{
-		this.mCertificate = certificate;
+		this.mCertificate = alias;
+	}
+
+	public String getUserCertificateAlias()
+	{
+		return mUserCertificate;
+	}
+
+	public void setUserCertificateAlias(String alias)
+	{
+		this.mUserCertificate = alias;
 	}
 
 	@Override
@@ -112,11 +132,11 @@ public class VpnProfile implements Cloneable
 		}
 	}
 
-	public boolean isAutoReconnect() {
-		return autoReconnect;
+	public String getAutoReconnect() {
+		return mAutoReconnect;
 	}
 
-	public void setAutoReconnect(boolean autoReconnect) {
-		this.autoReconnect = autoReconnect;
+	public void setAutoReconnect(Boolean mAutoReconnect) {
+		this.mAutoReconnect = mAutoReconnect.toString();
 	}
 }
