@@ -92,9 +92,9 @@ TEMPLATE_PAGE_HEADER = """<head>
               Logged in as <a href="#" class="navbar-link">Username</a>
             </p> -->
             <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="about.html">About</a></li>
-              <li><a href="contact.html">Contact</a></li>
+              <li class="active"><a href="http://meddle.cs.washington.edu/">Home</a></li>
+              <li><a href="http://meddle.cs.washington.edu/about.html">About</a></li>
+              <li><a href="http://meddle.cs.washington.edu/contact.html">Contact</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
