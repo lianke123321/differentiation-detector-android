@@ -22,15 +22,15 @@ DB_DBNAME = "MeddleDB"
 
 CFG_SUBMIT_STR = "Save Settings"
 
-TEMPLATE_INTEREST_EMAIL_SUBMITTER = "STR_INTEREST_EMAIL"
-TEMPLATE_INTEREST_EMAIL_HANDLERS = "arao@cs.uw.edu, choffnes@cs.uw.edu"
-TEMPLATE_INTEREST_EMAIL_SENDER = "arao@cs.uw.edu"
-TEMPLATE_INTEREST_EMAIL_BODY = """From: """+TEMPLATE_INTEREST_EMAIL_SENDER+"""
-To: """+ TEMPLATE_INTEREST_EMAIL_HANDLERS + """
-Subject: Meddle Interest from address """ + TEMPLATE_INTEREST_EMAIL_SUBMITTER + """
-
-Please respond to this interest.
-"""
+#TEMPLATE_INTEREST_EMAIL_SUBMITTER = "STR_INTEREST_EMAIL"
+#TEMPLATE_INTEREST_EMAIL_HANDLERS = "arao@cs.uw.edu, choffnes@cs.uw.edu"
+#TEMPLATE_INTEREST_EMAIL_SENDER = "arao@cs.uw.edu"
+#TEMPLATE_INTEREST_EMAIL_BODY = """From: """+TEMPLATE_INTEREST_EMAIL_SENDER+"""
+#To: """+ TEMPLATE_INTEREST_EMAIL_HANDLERS + """
+#Subject: Meddle Interest from address """ + TEMPLATE_INTEREST_EMAIL_SUBMITTER + """
+#
+#Please respond to this interest.
+#"""
 
 
 

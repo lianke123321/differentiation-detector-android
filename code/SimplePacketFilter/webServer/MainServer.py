@@ -14,7 +14,7 @@ from StringConstants import *
 from recaptcha.client import captcha
 import urllib
 import httplib
-import smtplib
+#import smtplib
 # THE PROBLEM HERE IS THAT SOUNDER HAS AN OLDER VERSION OF DJANGO RUNNING 
 try:
     from django.core.validators import email_re
@@ -184,15 +184,15 @@ class SignUpHandler(CommonHandler):
     def __serveNewInterest(self):
         emailAddress = self.get_argument('interestEmail', 'None')
         query = "INSERT INTO InterestedUsers VALUES (0, CURRENT_TIMESTAMP, '"+str(emailAddress)+"', 0 );"
-        logging.debug("Query");
+        logging.warning(query);
         dbCon = tornado.database.Connection(host=DB_HOSTNAME, database=DB_DBNAME, user=DB_USER, password=DB_PASSWORD)
         results = dbCon.execute(query)
         dbCon.close()
         
-        emailMsg = TEMPLATE_INTEREST_EMAIL_BODY
-        emailMsg = emailMsg.replace(TEMPLATE_INTEREST_EMAIL_SUBMITTER, emailAddress)
-        smtp = smtplib.SMTP('localhost')
-        smtp.sendmail(TEMPLATE_INTEREST_EMAIL_SENDER, TEMPLATE_INTEREST_EMAIL_HANDLERS, emailMsg)
+        #emailMsg = TEMPLATE_INTEREST_EMAIL_BODY
+        #emailMsg = emailMsg.replace(TEMPLATE_INTEREST_EMAIL_SUBMITTER, emailAddress)
+        #smtp = smtplib.SMTP('localhost')
+        #smtp.sendmail(TEMPLATE_INTEREST_EMAIL_SENDER, TEMPLATE_INTEREST_EMAIL_HANDLERS, emailMsg)
         return
         
     def __post(self):
