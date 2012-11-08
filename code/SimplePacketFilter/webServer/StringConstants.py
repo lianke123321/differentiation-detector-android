@@ -22,15 +22,15 @@ DB_DBNAME = "MeddleDB"
 
 CFG_SUBMIT_STR = "Save Settings"
 
-TEMPLATE_INTEREST_EMAIL_SUBMITTER = "STR_INTEREST_EMAIL"
-TEMPLATE_INTEREST_EMAIL_HANDLERS = "arao@cs.uw.edu, choffnes@cs.uw.edu"
-TEMPLATE_INTEREST_EMAIL_SENDER = "arao@cs.uw.edu"
-TEMPLATE_INTEREST_EMAIL_BODY = """From: """+TEMPLATE_INTEREST_EMAIL_SENDER+"""
-To: """+ TEMPLATE_INTEREST_EMAIL_HANDLERS + """
-Subject: Meddle Interest from address """ + TEMPLATE_INTEREST_EMAIL_SUBMITTER + """
-
-Please respond to this interest.
-"""
+#TEMPLATE_INTEREST_EMAIL_SUBMITTER = "STR_INTEREST_EMAIL"
+#TEMPLATE_INTEREST_EMAIL_HANDLERS = "arao@cs.uw.edu, choffnes@cs.uw.edu"
+#TEMPLATE_INTEREST_EMAIL_SENDER = "arao@cs.uw.edu"
+#TEMPLATE_INTEREST_EMAIL_BODY = """From: """+TEMPLATE_INTEREST_EMAIL_SENDER+"""
+#To: """+ TEMPLATE_INTEREST_EMAIL_HANDLERS + """
+#Subject: Meddle Interest from address """ + TEMPLATE_INTEREST_EMAIL_SUBMITTER + """
+#
+#Please respond to this interest.
+#"""
 
 
 
@@ -92,9 +92,9 @@ TEMPLATE_PAGE_HEADER = """<head>
               Logged in as <a href="#" class="navbar-link">Username</a>
             </p> -->
             <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="about.html">About</a></li>
-              <li><a href="contact.html">Contact</a></li>
+              <li class="active"><a href="http://meddle.cs.washington.edu/">Home</a></li>
+              <li><a href="http://meddle.cs.washington.edu/about.html">About</a></li>
+              <li><a href="http://meddle.cs.washington.edu/contact.html">Contact</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>

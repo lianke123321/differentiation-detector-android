@@ -27,7 +27,8 @@ class UserConfigs:
         return fstr
     
     def __htmlAds(self):
-        adStr = "<ul><li>Filtering Ads and Analytics:"
+        # 	
+        adStr = "<ul><li>When your phone contacts an ad server, Meddle should "
         enabled = ""
         disabled = ""
         if self.filterAdsAnalytics == 1:
@@ -35,19 +36,16 @@ class UserConfigs:
         else:            
             disabled = "selected"
         adStr += """<select name="""+str(CFG_ADS_GRP)+""" onChange="this.form.submit()">"""      
-        adStr += """ <option value = \""""+str(CFG_ADS_GRP_ENABLE_STR)+"""\""""+str(enabled)+"""> Enable</option>"""
-        adStr += """ <option value = \""""+str(CFG_ADS_GRP_DISABLE_STR)+"""\""""+str(disabled)+"""> Disable</option>"""
-        adStr += """</select></li><ul>"""
-        #adStr += """ <li> <input type="radio" name="""+str(CFG_ADS_GRP)+""" value=\""""+str(CFG_ADS_GRP_ENABLE_STR)+"""\""""+str(enabled)+"""> Enable Ad Filtering</li>"""
-        #adStr += """ <li> <input type="radio" name="""+str(CFG_ADS_GRP)+""" value=\""""+str(CFG_ADS_GRP_DISABLE_STR)+"""\""""+str(disabled)+"""> Disable Ad Filtering</li>"""
-        #adStr += "</ul>"        
+        adStr += """ <option value = \""""+str(CFG_ADS_GRP_ENABLE_STR)+"""\""""+str(enabled)+""">block ads</option>"""
+        adStr += """ <option value = \""""+str(CFG_ADS_GRP_DISABLE_STR)+"""\""""+str(disabled)+""">allow ads</option>"""
+        adStr += """</select>.</li><ul>"""
         return adStr
     
     def displayConfigs(self):
         page = ""
         page += self.__header()
         page += """<form name="input" action=\""""+str(PAGE_VIEWCONFIGS)+"""\" method="POST">"""
-        page += "Configuration options:"
+        page += "Meddle Policy"
         page += self.__htmlAds()
         page += """<br/></form>"""
         #page += """<br/><input type="submit" id=\""""+str(CFG_SUBMIT_ID)+"""\" value=\""""+str(CFG_SUBMIT_STR)+"""\"></form>"""
@@ -87,5 +85,4 @@ class UserConfigs:
 if __name__ == "__main__":
     u = UserConfigs()
     u.fetchConfigs(1)
-    print u.displayConfigs()
-        
+    print u.displayConfigs()        
