@@ -8,13 +8,15 @@
 IPSEC="/data/usr/sbin/ipsec"
 OPENSSL=`which openssl`
 MYPID="$$"
-if [ $# -ne 2 ];
-then
-    echo "${MYPID}::$0 <clientName> <clienPassword>"
-    exit 1    	 
-fi
-clientName="$1"
-clientPassword="$2"
+#if [ $# -ne 2 ];
+#hen
+#   echo "${MYPID}::$0 <clientName> <clienPassword>"
+#   exit 1    	 
+#fi
+tmpID=`date +%s | sha1sum | cut -b -10`
+tmpPass=`echo ${tmpID} | cut -b -5`
+clientName="$tmpID"
+clientPassword="$tmpPass"
 
 if [ "${IPSEC}" == "" ] || [ "${OPENSSL}" == "" ];
 then
@@ -61,6 +63,7 @@ fi
 "${OPENSSL}" pkcs12 -export -inkey "${keyFile}" -in "${certFile}" -name "${clientName}" -passout pass:"${clientPassword}" -certfile "${caCert}" -caname \""${caName}"\" -out "${p12File}"
 cp ${certFile} ${androidFile}
 python genIOSConfigXML.py ${clientName} ${clientPassword}
+echo "Created ${clientName} ${clientPassword}"
 # TODO:: check the p12 file
 # ${OPENSSL} pkcs12 -info -in ${p12File} -passin env:${clientPassword} TODO:: specify PEM key 
 

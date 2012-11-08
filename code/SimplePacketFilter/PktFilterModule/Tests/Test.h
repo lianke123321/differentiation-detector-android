@@ -23,7 +23,7 @@ void testRecvCommand()
 		if (retval == -1) {
 			logDebug("select()");
 		} else if (retval) {
-			logDebug("Data is available now.\n");
+			logDebug("Data is available now");
 			if (FD_ISSET(c.sockFD, &fds) ) {
 				/* FD_ISSET(0, &rfds) will be true. */
 				cmdFrame = c.recvCommand;

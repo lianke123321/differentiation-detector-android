@@ -30,15 +30,15 @@ MeddleDaemon::~MeddleDaemon()
 
 bool MeddleDaemon:: setupTunnel(std::string deviceName, std::string ipAddress, std::string netMask, std::string routeMask, std::string fwdNet, std::string revNet)
 {
-	logDebug("Creating Tunnel")
+	logDebug("Creating Tunnel");
 	if (false == tunDevice.createTunnel(deviceName)) {
 		return false;
 	}
-	logDebug("Assigning IP address to the Tunnel")
+	logDebug("Assigning IP address to the Tunnel");
 	if (false == tunDevice.assignIP(ipAddress, netMask)) {
 		return false;
 	}
-	logDebug("Assigning masks for forward and reverse paths")
+	logDebug("Assigning masks for forward and reverse paths");
 	this->routeMask = inet_addr(routeMask.c_str());
 	this->fwdNet = inet_addr(fwdNet.c_str());
 	this->revNet = inet_addr(revNet.c_str());
@@ -50,7 +50,6 @@ inline void MeddleDaemon::__processIP()
 	if (((tunFrame->ip->saddr) & routeMask) == fwdNet) {
 		logDebug("Frame in Forward Path");
 		tunFrame->framePath = tunFrame->framePath | FRAME_PATH_FWD;
-
 	}
 	if (((tunFrame->ip->daddr) & routeMask) == revNet) {
 		logDebug("Frame in Reverse Path");
@@ -61,13 +60,13 @@ inline void MeddleDaemon::__processIP()
 
 inline void MeddleDaemon::__processTCP()
 {
-	if (FRAME_PATH_FWD == ((tunFrame->framePath) & FRAME_PATH_FWD)) {
-		logDebug("Forward path TCP segment");
-	}
-	if (FRAME_PATH_REV == ((tunFrame->framePath) & FRAME_PATH_REV)) {
-		logDebug("Reverse Path TCP segment");
-	}
 	return;
+	//if (FRAME_PATH_FWD == ((tunFrame->framePath) & FRAME_PATH_FWD)) {
+	//	logDebug("Forward path TCP segment");
+	//}
+	//if (FRAME_PATH_REV == ((tunFrame->framePath) & FRAME_PATH_REV)) {
+	//	logDebug("Reverse Path TCP segment");
+	//}
 }
 
 inline void MeddleDaemon::__processUDP()
@@ -89,12 +88,8 @@ inline void MeddleDaemon::__processUDP()
 	if (FRAME_PATH_REV == ((tunFrame->framePath) & FRAME_PATH_REV)) {
 		logDebug("Reverse Path UDP packet with source port " << ntohs(tunFrame->udp->source) << " " << tunFrame->ip->saddr << " " << this->filterDnsIP);
 		if (((tunFrame->udp->source) == udp_port_dns) && ((tunFrame->ip->saddr) == this->filterDnsIP)) {
-			// pktHost =  __natAddr(tunFrame->ip->daddr, revNet, fwdNet);
-			// mainPktFilter.getUserConfigs(pktHost, tunFrame->userID, tunFrame->configEntry);
-			// if (tunFrame->configEntry.filterAdsAnalytics) {
-				logDebug("The packet is coming from a DNS port and from our DNS server when filtering is enabled. Change the IP to the default DNS server");
-				tunFrame->ip->saddr = this->defaultDnsIP;
-			// }
+			logDebug("The packet is coming from a DNS port and from our DNS server when filtering is enabled. Change the IP to the default DNS server");
+			tunFrame->ip->saddr = this->defaultDnsIP;
 		}
 	}
 	return;
@@ -186,14 +181,14 @@ bool MeddleDaemon::mainLoop()
 			logError("Error reading Frame");
 			return false;
 		}
-		logDebug("Now Processing the Frame");
+		logDebug("Now Processing the Frame of length" <<tunFrame->frameLen << " at location " << static_cast<void*>(tunFrame->buffer));
 		meddleFrame();
-		logDebug("Now Writing the Frame")
+		logDebug("Now Writing the Frame of length");
 		if (false == tunDevice.writeFrame(tunFrame)) {
-			logError("Error writing frame");
+			logError("Error writing frame of length" << tunFrame->frameLen);
 			return false;
 		}
-		logDebug("Deleting the Frame");
+		logDebug("Deleting the Frame of length" << tunFrame->frameLen << " at location " << static_cast<void*>(tunFrame->buffer));
 		delete tunFrame;
 	}
 	return true;

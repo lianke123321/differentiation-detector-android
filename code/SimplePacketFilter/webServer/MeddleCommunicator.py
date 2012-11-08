@@ -6,43 +6,36 @@ import logging
 #TODO:: Add logging support
 
 #define COMMAND_SOCKET_PATH "/data/.meddleCmdSocket"
-COMMAND_SOCKET_PATH = "/data/.meddleCmdSocket"
+MESSAGE_SOCKET_ADDR = "127.0.0.1"
+MESSAGE_SOCKET_PORT = 12321 
 
 #define MSG_CREATETUNNEL 1
 #define MSG_CLOSETUNNEL 2
-#define MSG_READALLCONFS 3
+#define MSG_LOADALLCONFS 3
 #define MSG_GETIPUSERINFO 4
 #define MSG_RESPIPUSERINFO 5
-MSG_READALLCONFS = 3 
+#define MSG_LOADUSERCONFS 6
+#define MSG_RESPUSERCONFS 7
 MSG_GETIPUSERINFO = 4
 MSG_RESPIPUSERINFO = 5
-
 
 INET_ADDRSTRLEN = 16
 LEN_HDR = 8
 LEN_USERNAME = 512
-LEN_CMDACK = LEN_HDR # 4+4
 LEN_RESPUSERINFO = LEN_HDR+INET_ADDRSTRLEN + 4 + 4 + LEN_USERNAME
-#struct cmdHeader {
-#    uint32_t cmdType;
-#    uint32_t cmdLen; //placeholder ignored
-#}__attribute__((packed));
-#typedef struct cmdHeader cmdHeader_t;
 
-#struct cmdIPUserInfo {
+#struct msgIPUserInfo {
 #    uint8_t ipAddress[INET_ADDRSTRLEN];
 #}__attribute__((packed));
-#
-#typedef cmdIPUserInfo cmdIPUserInfo_t;
-
+#typedef struct msgIPUserInfo msgGetIPUserInfo_t;
 #struct respIPUserInfo {
 #    uint8_t ipAddress[INET_ADDRSTRLEN];
 #    uint32_t userID;
 #    uint32_t userNameLen;
 #    uint8_t userName[USERNAMELEN_MAX];
 #}__attribute__((packed));
+#typedef struct respIPUserInfo msgRespIPUserInfo_t;
 
-#typedef respIPUserInfo respIPUserInfo_t;
 
 class IPUserInfo:
     ipAddress, userID, userName = None, None, None
@@ -56,21 +49,23 @@ class IPUserInfo:
 
 class MeddleCommunicator:
     sock = None
-    sockPath = None 
+    sockAddr = None 
         
     def __init__ (self):
-        global COMMAND_SOCKET_PATH
+        global MESSAGE_SOCKET_ADDR, MESSAGE_SOCKET_PORT
         self.sock = -1;
-        self.sockPath = COMMAND_SOCKET_PATH;
-            
-    def connectRemoteServer(self):        
-        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.sockAddr = (MESSAGE_SOCKET_ADDR, MESSAGE_SOCKET_PORT)
+        logging.error("Connecting to "+str(self.sockAddr))
+         
+    def connectRemoteServer(self):
+        self.sock = socket.socket()#socket.AF_INET, socket.SOCK_STREAM)
         try:
-            self.sock.connect(self.sockPath)
+            logging.warning("Connecting to "+str(self.sockAddr))
+            self.sock.connect(self.sockAddr)
             logging.warning("Connected to the Meddle server");
         except socket.error, msg:
             logging.error(msg)
-            return False            
+            return False
         return True  
                        
     def __createHeader(self, cmdType, cmdLen):
@@ -79,13 +74,13 @@ class MeddleCommunicator:
     def __createIPUserRequestInfo(self, ipAddress):
         global MSG_GETIPUSERINFO, INET_ADDRSTRLEN
         hdr = self.__createHeader(MSG_GETIPUSERINFO, INET_ADDRSTRLEN + 4 + 4);
-        payload = struct.pack('@'+str(INET_ADDRSTRLEN)+'s', ipAddress)        
+        payload = struct.pack('@'+str(INET_ADDRSTRLEN)+'s', ipAddress)
         return hdr+payload
         
     def __getData(self, length):
         data = ""
         while (len(data) < length):
-	    reqLen = length - len(data)  
+            reqLen = length - len(data)  
             tmpData = self.sock.recv(reqLen) 
             data = data + tmpData
         return tmpData
@@ -108,18 +103,6 @@ class MeddleCommunicator:
             return None
         return None
     
-    def commandReReadConfs(self):
-        hdr = self.__createHeader(MSG_READALLCONFS, LEN_HDR)
-        try:
-            if self.connectRemoteServer() == False:
-                logging.error("Unable to connect to the Meddle server")
-                return False
-            self.sock.send(hdr)
-        except socket.error, msg:
-            logging.error(msg)
-            return False
-        return True
-    
     def closeConnection(self):
         try:
             self.sock.close()
@@ -127,7 +110,9 @@ class MeddleCommunicator:
             logging.error(msg)
 
 if __name__ == "__main__":
+    #logging.Logger.setLevel(logging.DEBUG)
     m = MeddleCommunicator();
-    ipAddress = "192.168.0.3"
     m.connectRemoteServer()
-    m.requestUserInfo(ipAddress)
+    ipAddress = "10.11.3.3"
+    print m.requestUserInfo(ipAddress)
+
