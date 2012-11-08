@@ -93,14 +93,62 @@
 
 		<h2>How does Meddle work?</h2>
     <div>
-      <p>It's magic.</p>
+      <p>Meddle, a framework that combines virtual
+private networks (VPNs) with middleboxes to provide an experimental
+platform that aligns the interests of users and researchers. Meddle
+relies on VPN tunnels to access the mobile traffic regardless of the
+device, OS, wireless technology, and carrier. Meddle can thus provide
+a continuous and comprehensive view of how mobile devices interact
+with the Internet. Once packets arrive at a Meddle server, we use a
+variety of middlebox approaches to interpose on mobile-device
+traffic. </p>
+
+<p>Meddle offers new opportunities for measuring and characterizing
+mobile traffic, and designing new in-network features to improve the
+mobile experience. For example, by accessing network traffic
+regardless of the wireless technology we can analyze how different
+operating systems and apps offload their traffic from cellular
+networks to Wi-Fi. To improve the user experience, we implement packet
+filters to block ads; unlike existing packet filters for mobile
+devices, the packet filters provided by Meddle do not require
+jail-breaking the mobile device. Furthermore, Meddle provides a
+vantage point for separating mobile-network performance from
+server-side performance, thus improving bottleneck identification for
+mobile applications. Meddle also enables researchers to investigate
+what-if scenarios for the impact of new middleboxes as if they were
+deployed in carrier networks. For example, Meddle can be used to
+deploy anonymization systems such as <a href="">Privad</a>.  
+</p>
       
-    
+   <div style="float:right"> <p><a href="img/meddle-servers-full.png"><img src="img/meddle-servers-small.png" width="350"></a><br><i>Architecture for Meddle. Click image for full version.</i></a></p></div>
+
+<p></p>Meddle uses VPNs as a portable mechanism to tunnel the data traffic
+from mobile devices to a machine where users and researchers can exert
+control over network flows. VPNs also reduce the barrier to entry for
+deploying Meddle because Android, BlackBerry, and iOS, which represent more than 86% of
+the mobile device market, have native VPN
+support. As shown in the above figure, when a mobile device
+connects to the Internet, we tunnel its traffic via a nearby Meddle
+server in a similar way to how CDNs use DNS to redirect Web
+clients to nearby content caches. On each
+Meddle server we implement custom services for users such as
+packet filtering, caching, and intrusion detection. Meddle thus takes
+two well-known technologies -- VPNs and middleboxes -- and combines
+them in unintended ways for the mobile environment. </p>
+
     </div>
     
     		<h2>Technical details</h2>
     <div>
-      <p>Papers! </p>
+      <p>We are in the early stages of Meddle development, so we provide only 
+      	a few white paper summaries at the moment. We will updated the list 
+      	below as Meddle matures.</p>
+      	
+      	<ul>
+      		<li> <i>Meddle: Middleboxes for Increased Transparency and Control of
+  Mobile Traffic</i>. To appear in the CoNEXT 2012 Student Workshop. <a href="papers/conext-poster.pdf" class="btn">Download PDF</a>
+      		
+      	</ul>
       
     
     </div>
