@@ -71,7 +71,7 @@ bool TunnelDevice::assignIP(std::string ip_address, std::string netmask)
 	/* use the given interface/device name */
 	strncpy(ifr.ifr_name, this->deviceName.c_str(), IFNAMSIZ);
 
-	memset(&sai, 0, sizeof(struct sockaddr));
+	memset(&sai, 0, sizeof(sai));
 	sai.sin_family = AF_INET;
 	sai.sin_port = 0;
 	sai.sin_addr.s_addr = inet_addr(ip_address.c_str());
@@ -130,13 +130,13 @@ TunnelFrame * TunnelDevice::readFrame()
 	TunnelFrame *tunFrame = NULL;
 	 // FOR TSO MAX FRAME SIZE OF 16k thanks to tcp over ipv4
 	logDebug("Performing the read operation");
-	uint32_t nread = read(tunFD,readBuffer,sizeof(readBuffer));
-	if (nread == 0) {
+	int32_t nread = read(tunFD,readBuffer,sizeof(readBuffer));
+	if (nread <= 0) {
 		logError("Error reading the frame");
 		return NULL;
 	}
-	logDebug("Read a frame, now creating the tun Frame")
-	tunFrame = new TunnelFrame(readBuffer, nread);
+	logDebug("Read a frame, now creating the tun Frame");
+	tunFrame = new TunnelFrame(readBuffer, (uint32_t)nread);
 	logDebug("Created the tunFrame");
 	return tunFrame;
 }
@@ -145,9 +145,9 @@ TunnelFrame * TunnelDevice::readFrame()
 bool TunnelDevice::writeFrame(TunnelFrame *tunFrame)
 {
 	logDebug("Writing a frame now");
-	uint32_t nwrite = write(wFD, tunFrame->buffer, tunFrame->frameLen);
-	if (nwrite != tunFrame->frameLen) {
-		logError("Unable to the writeLen")
+	int32_t nwrite = write(wFD, tunFrame->buffer, tunFrame->frameLen);
+	if ((uint32_t)nwrite != tunFrame->frameLen) {
+		logError("Unable to the writeLen");
 		return false;
 	}
 	logDebug("Wrote a frame");

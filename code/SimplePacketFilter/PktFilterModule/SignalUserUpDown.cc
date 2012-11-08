@@ -45,7 +45,7 @@ bool sendCommand(const std::string &userName, const std::string &clientTunnelIpA
 	}
 
 	logDebug("Creating the command " << cmdType << " for "<< clientTunnelIpAddress << " user:" << userName);
-	memset(&cmdTunnel, 0, sizeof(msgTunnel_t));
+	memset(&cmdTunnel, 0, sizeof(cmdTunnel));
 	strncpy((char *)(cmdTunnel.clientTunnelIpAddress), (const char *)(clientTunnelIpAddress.c_str()), clientTunnelIpAddress.length());
 	strncpy((char *)(cmdTunnel.clientRemoteIpAddress), (const char *)(clientRemoteIpAddress.c_str()), serverIP.length());
 	strncpy((char *)(cmdTunnel.meddleServerIpAddress), (const char *)(serverIP.c_str()), serverIP.length());
@@ -59,7 +59,7 @@ bool sendCommand(const std::string &userName, const std::string &clientTunnelIpA
 		ret = cmdSender.sendCommand(MSG_CLOSETUNNEL, cmdTunnel);
 		logInfo("Sent Command "<<  MSG_CLOSETUNNEL);
 	} else {
-		logDebug("Unknown command");
+		logError("Unknown command");
 		ret = false;
 	}
 	if (ret == false) {
@@ -81,7 +81,7 @@ bool verifyCommand(const std::string &userName, const std::string &clientTunnelI
 		logError("Error opening socket to send command");
 		return false;
 	}
-	memset(&cmdGetIP, 0, sizeof(msgGetIPUserInfo_t));
+	memset(&cmdGetIP, 0, sizeof(cmdGetIP));
 	strncpy((char *)cmdGetIP.ipAddress, (const char *)(clientTunnelIpAddress.c_str()), clientTunnelIpAddress.length());
 	logInfo("Verify the command " << cmdType << " for "<< clientTunnelIpAddress << " user:" << userName);
 	ret = cmdSender.recvIPInfo(cmdGetIP, respIP);
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		cnt = cnt + 1;
-		logError("Retrying attempt" << cnt)
+		logError("Retrying attempt" << cnt);
 	}
 	if (cnt < 3) {
 		return 0;

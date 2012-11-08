@@ -12,11 +12,17 @@
 
 MessageSender::MessageSender()
 {
-	 if ((sockFD = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+	std::string serverIP = "127.0.0.1";
+	connectToServer(serverIP);
+}
+
+inline void MessageSender::connectToServer(std::string serverIP)
+{
+	if ((sockFD = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		sockFD = -1;
 		logError("socket error");
 		return;
-	 }
+	}
 	logDebug("Created the socket FD = " << sockFD);
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
@@ -28,6 +34,12 @@ MessageSender::MessageSender()
 		return;
 	}
 	logDebug("Successfully connected to socket");
+	return;
+}
+
+MessageSender::MessageSender(std::string serverIP)
+{
+	connectToServer(serverIP);
 }
 
 MessageSender::~MessageSender()
@@ -110,7 +122,7 @@ bool MessageSender::recvIPInfo(const msgGetIPUserInfo_t &getInfo, msgRespIPUserI
 	uint32_t offset=0;
 	MessageFrame cmdFrame = MessageFrame(getInfo);
 
-	memset(&respIP, 0, sizeof(msgRespIPUserInfo_t));
+	memset(&respIP, 0, sizeof(respIP));
 	if (NULL == cmdFrame.buffer || cmdFrame.frameLen < 0) {
 		logError("Error creating Frame");
 		return false;

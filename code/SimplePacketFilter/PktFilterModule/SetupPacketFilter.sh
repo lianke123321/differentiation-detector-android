@@ -7,27 +7,44 @@ natNet="10.0.0.0/8"
 gateway="128.208.4.100"
 ethNet="128.208.4.0/24"
 
-logName="/data/SimplePacketFilter.log"
+logSuffix=`date  +%h-%d-%Y-%H-%M-%s`
+filterLogName="/data/SimplePacketFilter-"${logSuffix}".log"
+webServerLogName="/data/webServer-"${logSuffix}".log"
 basePath="/data/usr/sbin/"
+webServerCommand="/data/webServer/MainServer.py"
 
 
-setup()
+enableMySqlIpTables()
 {
-    # Make sure only snowmane and sounder can connect to the mysql database
     iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
     iptables -D INPUT -p tcp --dport 3306 -j REJECT
 
- 
     iptables -I INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
     iptables -I INPUT -p tcp -s sounder.cs.washington.edu --dport 3306 -j ACCEPT
     iptables -I INPUT -p tcp -s snowmane.cs.washington.edu --dport 3306 -j ACCEPT
     iptables -I INPUT -p tcp -s meddle.cs.washington.edu --dport 3306 -j ACCEPT
-    iptables -A INPUT -p tcp ! -s ${natNet} --dport 3306 -j REJECT
+    iptables -A INPUT -p tcp ! -s ${natNet} --dport 3306 -j REJECT    
+}    
 
-    # Database ports should be opened before the packet filter starts on each machine
-    # Make sure that this script runs first on sounder where the database is running
+disableMySqlIpTables()
+{
+    iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp --dport 3306 -j REJECT
+        
+    iptables -D INPUT -p tcp ! -s ${natNet} --dport 3306 -j REJECT
+    iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp -s sounder.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp -s snowmane.cs.washington.edu --dport 3306 -j ACCEPT
+    iptables -D INPUT -p tcp -s meddle.cs.washington.edu --dport 3306 -j ACCEPT
 
-    ${basePath}/SimplePacketFilter > ${logName} 2>&1 &
+    iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 3306 -j REJECT    
+}
+
+
+startPacketFilter()
+{
+    ${basePath}/SimplePacketFilter > ${filterLogName} 2>&1 &
     echo "Sleeping for the device to come up"
     sleep 5 
 
@@ -85,31 +102,26 @@ setup()
 
     # Enable the NAT
     iptables -t nat -A POSTROUTING -s ${revNet} -o ${eth} -j MASQUERADE
-    # Reduce the MSS to support the IPsec headers in the response.  We do not want to fragment on this machine.
     
+    # Reduce the MSS to support the IPsec headers in the response.  We do not want to fragment on this machine.
     # iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ${eth}  -j TCPMSS --set-mss 1250
     # iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ${tun}  -j TCPMSS --set-mss 1250
-
-    ${basePath}/ipsec start
+    # Disabled MSS for now
 }
 
-undo()
+stopPacketFilter()
 {
-    
-    # All the above steps with s/add/del/g 
-    ${basePath}/ipsec stop	
-    iptables -D FORWARD -i tun+ -o ${eth} -j ACCEPT
-    iptables -D FORWARD -i ${eth} -o tun+ -j ACCEPT
-
     iptables -t nat -D POSTROUTING -s ${revNet} -o ${eth} -j MASQUERADE
 
+    iptables -D FORWARD -i tun+ -o ${eth} -j ACCEPT
+    iptables -D FORWARD -i ${eth} -o tun+ -j ACCEPT
+    
     ip rule del from ${fwdNet} to all lookup fwdpath prio 1000
     ip rule del from ${revNet} to all lookup depart prio 1001
     ip rule del from all to ${revNet} lookup revpath prio 1002
     ip rule del from ${ethNet} to ${revNet} lookup revpath prio 1003 # Specific to DN # Specific to DNSS
     ip rule del from all to ${fwdNet} lookup depart prio 1004
     ip rule del from ${ethNet} to all lookup depart prio 1005
-
 
     ip route del default via ${tunIP} dev ${tun} table fwdpath
     ip route del ${fwdNet} dev ${tun} table fwdpath
@@ -129,19 +141,43 @@ undo()
     if [ $? -ne 1 ] && [ ${binPID} != "" ]
     then    
 	kill ${binPID}
-    fi		
+    fi
+}
 
-    # make sure that only localhost can connect to the IPTABLES after cleanup. This is to ensure existing code does not break
-    # Reverse order to make sure existing code does not break
+startIPSec()
+{
+    ${basePath}/ipsec start
+}
 
-    iptables -D INPUT -p tcp ! -s ${natNet} --dport 3306 -j REJECT
-    iptables -D INPUT -p tcp -s sounder.cs.washington.edu  --dport 3306 -j ACCEPT
-    iptables -D INPUT -p tcp -s snowmane.cs.washington.edu --dport 3306 -j ACCEPT
-    iptables -D INPUT -p tcp -s meddle.cs.washington.edu --dport 3306 -j ACCEPT
-    iptables -D INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
- 
-    iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
-    iptables -A INPUT -p tcp --dport 3306 -j REJECT
+stopIPSec()
+{
+    ${basePath}/ipsec stop
+}
+
+startWebServer()
+{
+    echo "Manually Start the webserver if not running with the command ${webServerCommand} > ${webServerLogName} 2>&1" 
+}
+
+stopWebServer()
+{
+    echo "Manually Stop the Webserver"
+}
+
+startMeddle()
+{
+    enableMySqlIpTables
+    startPacketFilter
+    startIPSec
+    startWebServer
+}
+
+stopMeddle()
+{  
+    stopIPSec
+    stopPacketFilter
+    disableMySqlIpTables
+    stopWebServer
 }
 
 if [ $# -ne "1" ];
@@ -150,8 +186,8 @@ then
 else
     if [ $1 == "1" ];
     then
-	setup
+	startMeddle
     else
-	undo
+	stopMeddle
     fi
 fi

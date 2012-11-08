@@ -39,15 +39,15 @@ public:
 	uint32_t userID; // The user ID for this frame;
 	user_config_entry_t configEntry;
 private:
-	void __fillProxy(proxy_iphdr_t *proxy_hdr, uint16_t len);
+	void __fillProxy(proxy_iphdr_t &proxy_hdr, const uint16_t len);
 	bool __updateIpChecksum();
 	bool __updateTcpChecksum();
 	bool __updateUdpChecksum();
-	uint32_t __computeSum16(uint8_t *data, uint32_t len);
+	uint32_t __computeSum16(uint8_t *data, const uint32_t len);
 	__sum16 __wrapSum16(uint32_t csum);
 public:
 	TunnelFrame();
-	TunnelFrame(uint8_t* payload, uint32_t len);
+	TunnelFrame(uint8_t* payload, const uint32_t len);
 	~TunnelFrame();
 	uint8_t *getBuffer();
 	uint32_t getFrameLen();

@@ -14,7 +14,7 @@ MessageFrame::~MessageFrame()
 	logDebug("Deleting the allocated buffer"<< static_cast<void*>(buffer));
 	if (NULL != buffer) {
 		delete buffer;
-		logDebug("Done Deleting"<< static_cast<void*>(buffer));
+		// logDebug("Done Deleting"<< static_cast<void*>(buffer));
 	}
 	logDebug("Cleaning up pointers in Frame");
 	buffer = NULL;frameLen = 0;	cmdHeader = NULL; cmdTunnel = NULL;
@@ -24,15 +24,22 @@ MessageFrame::~MessageFrame()
 MessageFrame::MessageFrame(uint8_t *payload, uint32_t len)
 {
 	frameLen = len;
+	if (frameLen <  1) {
+		frameLen = 1;
+	}
 	buffer = new uint8_t[frameLen];
 	if (NULL == buffer) {
 		logError("Error allocation memory for the buffer");
 		buffer = NULL;
-		frameLen = -1;
+		frameLen = 0;
 		return;
 	}
 	logDebug("Allocated Memory for the Frame of length"<< frameLen);
-	memcpy(buffer, payload, len);
+	if (NULL == payload) {
+		memset(buffer, 0, frameLen);
+	} else {
+		memcpy(buffer, payload, len);
+	}
 	__parseCommand();
 }
 
@@ -71,11 +78,14 @@ inline void MessageFrame::__parseCommand()
 
 inline void MessageFrame::__createFrame(uint32_t cmd)
 {
+	if (frameLen < 0) {
+		frameLen = 1;
+	}
 	buffer = new uint8_t [frameLen];
 	if (NULL == buffer) {
 		logError("Error allocating memory");
 		buffer = NULL;
-		frameLen = -1;
+		frameLen = 0;
 		return;
 	}
 	memset(buffer, 0, frameLen);
