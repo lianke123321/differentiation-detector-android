@@ -1,0 +1,49 @@
+%\vspace{-0.7em}
+\section{Related Work}
+
+\meddle builds upon two existing technologies: VPNs and middleboxes. 
+In our current implementation, we rely on an IPsec~\cite{rfc:ipsec} implementation 
+to tunnel traffics to \meddle servers. Sherry et al.~\cite{sherry:middleboxes} explore the opportunities 
+enabled by moving middleboxes to the cloud, which includes simplifying management 
+for enterprise network administrators. In contrast, our work focuses on the mobile capabilities 
+software middleboxes enable rather than a redirection architecture for enterprise networks. 
+
+\meddle provides researchers with a cross-platform, cross-carrier technique 
+for capturing network usage patterns from mobile devices. Previous work 
+used on-demand active measurements to characterize network measurements~\cite{wang:middleboxes,speedtest}; 
+however, these measurements are restricted to the point at which users run 
+the tests. Gerber et al.~\cite{gerber:passivespeed} use passive measurements alone 
+to estimate transfer rates in a single carrier's network; \meddle 
+will enable such analysis across multiple carriers.
+
+We expect to use \meddle to investigate security and privacy issues in the 
+traffic that mobile devices generate. By monitoring and controlling 
+information at lower layers in the software stack, previous work~\cite{enck:taintdroid,hornyack:appfence,wsj:apps-watching-you} has shown 
+that existing apps leak significant private information. In \meddle, we take 
+this downward mobility to an extreme, moving off the end-host entirely and 
+eliminating the restrictions of a lab setting.
+
+The CloneCloud~\cite{chun:clonecloud} and MAUI~\cite{cuervo:maui} projects explored the space of moving functionality 
+from mobile devices into the cloud. By interposing on user traffic, \meddle will allow us to explore some of this 
+functionality without requiring device modifications.
+
+%\vspace{-0.7em}
+\section{Conclusion}
+We described \meddle, a platform for users to regain control of their mobile 
+network traffic while giving researchers a foothold to deploy new mobile network 
+services and to characterize usage behaviors in the wild. We showed that the overheads 
+for \meddle are low and that \meddle can easily scale to thousands of users. We are currently using our  
+prototype \meddle architecture to build out a system for public deployment.
+%In this work, we described an approach we call \meddle that empowers users and researchers with new 
+%control over mobile network traffic. We used network and power measurements to 
+%demonstrate that the overhead of using \meddle for mobile devices is relatively low, and that 
+%our approach should scale reasonably well in terms of supporting thousands of users with 
+%a collection of PlanetLab hosts and/or EC2 instances. Our future work entails using 
+%this platform to experiment with alternative performance-enhancing interposition techniques, 
+%to explore the limits of how much control we can enforce with middleboxes and 
+%to investigate how to combine functionality from on-device apps with \meddle to 
+%provide new mobile network measurements and services.
+
+%%% Local Variables: 
+%%% TeX-master: "hotnets-meddle-middle.tex"
+%%% End:

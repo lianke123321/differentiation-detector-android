@@ -1,0 +1,172 @@
+\vspace{-0.7em}
+\section{Meddle Examples}
+\label{sec:apps}
+
+In this section, we discuss several new applications and research directions that \meddle enables 
+in mobile systems. We separate these into two categories: (1) direct user incentives that 
+will encourage broad adoption and thus provide a large subscriber base for 
+experimentation and (2) research questions that can be answered using \meddle as a platform.
+
+\subsection{Direct User Incentives}
+To be useful for characterization and for evaluating new protocols and services over mobile networks, 
+we would like to have a large, diverse user population that adopts \meddle and becomes available 
+for testing experimental features. Similar to previous work in wired networks~\cite{choffnes:ono}, we 
+believe that direct incentives are essential for user adoption. We now list several incentives that 
+we believe to be generally appealing for users. A common feature of the following examples is 
+that they require raw access to network traffic, something not available by default on today's mobile OSes.
+%These serve as a a necessary part of the feature set 
+%to ensure that \meddle attracts a representative set of users with which to conduct experiments.
+
+%DRC: Changed the text
+%\tbdal{I believe we need to make a distinction between Browser based
+%  ad-blocking that is not novel, and device-wide ad-blocking that is,
+%  to the best of my knowledge, new. No need to understate what we propose.}
+\noindent\textbf{Privacy and Security.} Enck et al.~\cite{enck:taintdroid} show that many apps send data such as location and unique identifiers (IMEI) in the clear to third parties. We can use \meddle to search for known patterns of personally identifiable information and automatically strip or replace them with placeholders~\cite{hornyack:appfence}. We can also allow users to observe how the installed apps use the network and with whom these apps share (or leak) information, a system similar to Mozilla Collusion~\cite{collusion}. In addition, a system like \meddle can host a service like the anonymization proxy described in Privad~\cite{guha:privad}. 
+
+
+\noindent\textbf{Ad blocking.} In the desktop environment, users often install ad-blocking extensions to Web 
+browsers to 
+block content loaded by known ad servers.\footnote{For example, AdBlock[Plus] (ABP) has been installed by more than 20 million users.} 
+ This not only removes what are usually annoying 
+images or animations, but also speeds Web page load time by reducing the number of 
+objects fetched. In the mobile environment, only Firefox Mobile provides the ability to install 
+ad-blocking extensions; however, there is no solution that applies to the myriad other apps 
+that display ads. Using 
+rules similar to tools like AdBlock, \meddle can simply block requests, rewrite Web pages or return zero-size objects 
+for known ad servers. In this environment, the functionality 
+will not only improve performance and privacy but can potentially save on power and data quota that otherwise 
+would be wasted on fetching ad content.
+
+\tbdal{Based on what already exist in terms of parental control on the
+  device, I believe this is the weakest incentive. My feeling is that
+  if we need space, removing this incentive will not weaken the
+  submission. Possibly, we can merge with the next point (privacy and security).}
+
+\noindent\textbf{Parental controls.} Most mobile devices provide some
+form of parental controls, e.g., on iOS devices, parents can set which
+apps can be used, whether new apps can be installed and what type of
+content can be viewed. However, these controls do not provide the
+ability to filter based on network protocols or to limit network
+usage. Using \meddle, we can augment existing parental controls (which
+prevent modifying phone settings) by enforcing fine-grained bandwidth
+quotas and otherwise shape network usage based on time of day,
+protocols and sites being contacted.
+
+\subsection{Research Directions}
+%\tbdal{we need to be careful on who is doing the research. If it us it
+%is fine because Meddle is op-in therefore, we can ask the informed
+%consent to each Meddle user, which is ethically acceptable (we need to
+%say so somewhere in the document). If it is other researchers, they
+%are additional ethical and 
+%legal issues. By keeping the ambiguity that any researcher can access
+%and benefit from Meddle might lead ethically sensitive researchers
+%to raise a red flag. Your discussion in section 5 is fine, but you can
+%already point to it at this point of the text.}
+Most research in mobile networks currently occurs at the edge (by installing new OSes or apps 
+on devices) or behind closed doors of carrier networks. By exporting user traffic outside 
+these closed networks, \meddle re-opens the network and makes it available for 
+experimentation. In this section, 
+we focus on a subset of interesting research directions \meddle enables. \S~\ref{sec:discuss} addresses the important ethical and privacy 
+concerns when experimenting with human subjects. 
+
+\noindent\textbf{Network usage characterization.} Previous work that examined the network usage of 
+mobile devices and apps is limited to lab studies or small campus deployments~\cite{enck:taintdroid,wsj:apps-watching-you}. 
+With \meddle, researchers have the opportunity to collect network usage information from 
+a large number of users worldwide without deploying any new hardware. 
+Network traffic will enter \meddle regardless of where the user accesses the network, providing 
+a continuous view of how mobile devices interact with the network. 
+%This allows us to identify 
+%opportunities to reduce power consumption~\cite{qian:periodic}, 
+%improve privacy and security by watching the watchers and improve performance by 
+%identifying and optimizing for popular network usage patterns. 
+Further, \meddle provides an 
+ideal vantage point for separating mobile-network performance from server-side performance, 
+thus improving bottleneck identification for mobile applications.
+
+\noindent\textbf{Content coalescing, caching and prefetching.} Several existing Web browsers for mobile 
+devices~\cite{silk,opera-mini,google-spdy} have explored alternative points in the design space for offloading the work 
+of caching Web content, processing the DOM for display and prefetching pages to reduce 
+latencies. While it seems clear that these approaches work in at least some real scenarios, it 
+is unclear which approach is best when faced with typical user interactions. In fact, it is not clear 
+\emph{a priori} that any single approach for Web acceleration is optimal; e.g., perhaps the right 
+combination of approaches depends both on the website and user behavior. With a large collection 
+of traces gathered from \meddle, researchers have the unique opportunity to evaluate the 
+effectiveness of these accelerators based on traffic ``in the wild." 
+%Importantly, \meddle allows 
+%researchers to test these hypotheses based on empirical data rather than on intuition alone.
+
+\noindent\textbf{Mobile offloading.} The mobile environment offers
+numerous opportunities for adopting a model with functionality
+``split" between mobile devices and wired, well-provisioned
+servers~\cite{chun:clonecloud,cuervo:maui}. Ideally, the servers would
+be placed inside carrier networks, thus reducing the round-trip times;
+in \meddle we can simulate this approach and evaluate what-if
+scenarios by using \meddle servers.
+
+We envision that most of the interesting opportunities for mobile
+offloading will come at the intersection of severe constraints for
+mobile devices (power, data volume quota and latencies) and the
+applications that extensively exercise those constraints. For instance,
+distributed hash tables (DHTs) are an example of a distributed service
+that has become critical for a variety of applications from P2P
+communication to content caching and anonymous networking.  Due to the
+nature of the key-value store, each request for the value at a key
+entails a significant number of network operations. Using a
+split-application model, mobile device need only send a request for a
+key to the server-side and the server can perform all the network
+operations required to locate the value without consuming mobile
+network bandwidth.
+
+
+%As another example, \meddle presents an opportunity to
+%  evaluate a new split application design in which the local
+%  application is only an execution environment for code fetched
+%  from the cloud. This split application design improves 
+%  flexibility in the design, download, and update of the application,
+%  with a deployment model that shortcuts the application stores. This
+%  split application design might also significantly simplify
+%  applications portability, with the local application serving as a
+%  virtual machine. 
+%\tbd{DRC: What is the cost/benefit analysis here? Stores already 
+%provide upgradeability but can slow deployment. The split model 
+%speeds deployment but potentially adds huge security problems. 
+%I think we may need to say something so we don't leave the 
+%obvious questions unaddressed.}
+%\tbdal{I agree, I propose to remove this last paragraph, as we need to
+%save space, and we would need much more space to make it clear and robust.}
+
+%Custom blocking/filtering: Ad blocking, parental controls
+%
+%Acceleration: Rewrite web traffic, prefetch content, compress, interpose SPDY
+%
+%Security: Filter unsolicited traffic
+%
+%Power: Change packet timings, block unwanted traffic, compress data
+%Arnaud: Do you know a study that shows how power is used among the mobile components? DRC: Yes, eProf by Charlie Hu's group. I'm having lunch with him tomorrow. 
+%
+%Performance characterization: Isolate server performance from mobile performance
+%
+%Usage characterization: Where is traffic going, what are people doing in the wild? What are apps doing, how does it differ across platforms?
+%
+%Generally: This allows us to simulate having a box in a mobile carrier's data center, something previously unavailable because they are closed networks. 
+
+% From Arnaud - code injection: 
+%  What I am talking about is different from partitioning computation,
+% it is closer to the notion of code injection (for the good), in which an application editor can inject
+% code for a new application in a container application hosted by the mobile device.
+% The questions are:
+% -what is the minimum functionality (API) the container application must offer in order to be able to run
+% code?
+% -is it possible to make a container application look like a regular application so that it cannot be blocked
+% by the application store?
+% -how to securely run code in the container application?
+% -is it possible to inject code on the fly, and does it make sense?
+
+%From Dave: Another model is putting the network-intensive parts of apps in \meddle, similar to the split browser models but more general than that.
+%From Arnaud:  Which kind of service using prefetching and caching that can benefit several applications would make sense?
+%From Dave: Most apps use HTTP and Chrome does extensive prefetching, so there seems to be opportunities otherwise Chrome is being wasteful. Fortunately, \meddle gives us a platform in which to evaluate this. 
+
+
+%%% Local Variables: 
+%%% TeX-master: "hotnets-meddle-middle.tex"
+%%% End:
