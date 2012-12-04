@@ -6,7 +6,7 @@
 \usepackage{subfigure}
 \usepackage{ifpdf}
 \usepackage[usenames,dvipsnames]{color}
-\newcommand{\tbd}[1]{}
+%\newcommand{\tbd}[1]{}
 \newcommand{\ie}{{\it i.e.}}
 \newcommand{\eg}{{\it e.g.}}
 \newcommand{\etc}{{\it etc.}}
@@ -15,13 +15,13 @@
 \usepackage{times}
 \usepackage{rotating}
 \usepackage[labelformat=simple]{subfig}
-
+\usepackage{multirow}
 
 \newcommand{\mypara}[1]{\medskip\noindent{\bf {#1}:}~}
 \newcommand{\chk}{$\checkmark$}
 \newcommand{\dsh}{{\bf --}}
 \newcommand{\til}{{\bf\large \textasciitilde}}
-%\newcommand{\tbd}[1]{[{\color{red}{\bf{TBD: #1}}}]}
+\newcommand{\tbd}[1]{[{\color{red}{\bf{TBD: #1}}}]}
 \newcommand{\etal}{\emph{et~al.}}
 \newcommand{\meddle}{{Meddle}\xspace}
 \newcommand{\dsum}{\displaystyle\sum}
@@ -34,26 +34,30 @@
 \renewcommand{\fref}{\Fref}
 \renewcommand\thesubfigure{~(\alph{subfigure})}
 
-\title{\meddle}
+\title{Transparency and Control for Mobile Network Traffic Using Meddle}
 
-\numberofauthors{6}
+\numberofauthors{8}
 \author{
 \alignauthor
 Ashwin Rao\\
 \affaddr{INRIA}
+\alignauthor
+Amy Tang\\
+\affaddr{UC Berkeley}
 \alignauthor        
 Justine Sherry\\
 \affaddr{UC Berkeley}
-\alignauthor
-Arnaud Legaut\\
-\affaddr{INRIA}
 \and
+\alignauthor
+Arnaud Legout\\
+\affaddr{INRIA}
+\alignauthor
+Walid Dabbous\\
+\affaddr{INRIA}
 \alignauthor 
 Arvind Krishnamurthy\\
 \affaddr{University of Washington}
-\alignauthor
-Walid Dabbous*\\
-\affaddr{INRIA}
+\and
 \alignauthor
 David Choffnes\\
 \affaddr{University of Washington}
@@ -67,7 +71,46 @@ David Choffnes\\
 
 \input{introduction}
 
+\input{measurements}
+
 \bibliographystyle{abbrv}
 \bibliography{biblio}
 
 \end{document}
+
+\begin{comment}
+
+[[1]]
+  oper_sys proto service sort_order  num_flows   upanddown
+1  Android   tcp    http          1 0.14873135 0.743161248
+2  Android   tcp     ssl          2 0.37196187 0.243558798
+3  Android   udp                  3 0.40503108 0.009736399
+4  Android   tcp   other          4 0.02088602 0.002212797
+5  Android other                  5 0.05338968 0.001330757
+
+[[2]]
+  oper_sys proto service sort_order  num_flows    upanddown
+1      iOS   tcp    http          1 0.16066258 8.199631e-01
+2      iOS   tcp     ssl          2 0.37646863 1.730939e-01
+3      iOS   udp                  3 0.42336602 4.962026e-03
+4      iOS   tcp   other          4 0.01130392 1.887129e-03
+5      iOS other                  5 0.02819885 9.384894e-05
+
+Traffic Share per Technology in bytes
+[[1]]
+  proto service sort_order orig_ip_bytes resp_ip_bytes    upanddown  num_flows upanddown_med
+1   tcp    http          1  2.037205e-02  8.148594e-01 8.352315e-01 0.16903049  8.127815e-01
+2   tcp     ssl          2  6.684516e-02  9.142296e-02 1.582681e-01 0.38176865  1.790630e-01
+3   udp                  3  1.138886e-03  3.728491e-03 4.867377e-03 0.41419786  5.656573e-03
+4   tcp   other          4  4.376426e-04  1.112469e-03 1.550112e-03 0.01375129  1.247389e-03
+5 other                  5  7.908798e-05  3.840691e-06 8.292867e-05 0.02125172  8.737062e-05
+
+[[2]]
+  proto service sort_order orig_ip_bytes resp_ip_bytes   upanddown  num_flows upanddown_med
+1   tcp    http          1   0.022709343  0.5387596448 0.561468988 0.13029002  0.4819883289
+2   tcp     ssl          2   0.088185532  0.3261125974 0.414298130 0.36132171  0.4080785193
+3   udp                  3   0.004677570  0.0121104795 0.016788049 0.41568438  0.0200971765
+4   tcp   other          4   0.001868316  0.0024866839 0.004355000 0.01943862  0.0025214824
+5 other                  5   0.002696138  0.0003936954 0.003089833 0.07326527  0.0002920705
+
+\end{comment}
