@@ -1,0 +1,563 @@
+Bulk mode; whois.cymru.com [2012-11-22 23:47:01 +0000]
+NA      | 10.150.73.121    | NA                  |    |          |            | NA
+NA      | 172.28.7.16      | NA                  |    |          |            | NA
+NA      | 172.28.7.24      | NA                  |    |          |            | NA
+NA      | 172.28.7.27      | NA                  |    |          |            | NA
+NA      | 172.28.7.28      | NA                  |    |          |            | NA
+NA      | 172.28.7.40      | NA                  |    |          |            | NA
+NA      | 172.28.7.50      | NA                  |    |          |            | NA
+NA      | 172.28.7.58      | NA                  |    |          |            | NA
+NA      | 172.28.7.60      | NA                  |    |          |            | NA
+NA      | 172.28.7.61      | NA                  |    |          |            | NA
+NA      | 172.28.7.64      | NA                  |    |          |            | NA
+NA      | 172.28.7.71      | NA                  |    |          |            | NA
+NA      | 172.28.7.83      | NA                  |    |          |            | NA
+NA      | 172.28.7.84      | NA                  |    |          |            | NA
+NA      | 172.28.7.87      | NA                  |    |          |            | NA
+NA      | 172.28.7.92      | NA                  |    |          |            | NA
+NA      | 172.28.7.93      | NA                  |    |          |            | NA
+NA      | 172.28.7.97      | NA                  |    |          |            | NA
+25      | 136.152.151.141  | 136.152.0.0/16      | US | arin     | 1991-03-06 | UCB - University of California at Berkeley
+73      | 128.208.184.87   | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.201.118  | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.201.59   | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.110    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.133    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.138    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.141    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.155    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.158    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.174    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.181    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.191    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.208    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.213    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.216    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.225    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.252    | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.42     | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.43     | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.46     | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.53     | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.57     | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.7      | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.80     | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.83     | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.89     | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.208.7.90     | 128.208.0.0/16      | US | arin     | 1987-03-05 | WASHINGTON-AS - University of Washington
+73      | 128.95.141.204   | 128.95.0.0/16       | US | arin     | 1986-01-13 | WASHINGTON-AS - University of Washington
+73      | 140.142.144.228  | 140.142.0.0/16      | US | arin     | 1990-04-24 | WASHINGTON-AS - University of Washington
+73      | 140.142.144.243  | 140.142.0.0/16      | US | arin     | 1990-04-24 | WASHINGTON-AS - University of Washington
+73      | 140.142.179.175  | 140.142.0.0/16      | US | arin     | 1990-04-24 | WASHINGTON-AS - University of Washington
+73      | 173.250.135.207  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.139.33   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.148.128  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.148.161  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.152.141  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.152.176  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.158.13   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.158.140  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.158.142  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.158.233  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.158.32   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.158.82   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.159.135  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.159.137  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.159.162  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.159.168  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.159.170  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.159.29   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.159.53   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.159.78   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.160.85   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.173.104  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.173.128  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.173.137  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.173.169  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.173.23   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.173.235  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.173.252  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.173.35   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.173.94   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.181.211  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.185.158  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.187.251  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.188.146  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.188.168  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.188.205  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.188.217  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.188.233  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.188.240  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.188.250  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.188.28   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.188.78   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.189.136  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.189.166  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.189.182  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.189.191  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.189.193  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.189.230  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.189.35   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.189.4    | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.189.50   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.194.40   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.197.220  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.197.24   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.201.110  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.202.112  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.202.170  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.202.191  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.202.78   | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.205.125  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 173.250.205.191  | 173.250.128.0/17    | US | arin     | 2010-06-08 | WASHINGTON-AS - University of Washington
+73      | 69.91.134.229    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.135.126    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.10     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.114    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.120    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.121    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.122    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.133    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.150    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.16     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.168    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.170    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.28     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.63     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.136.82     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.137.107    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.137.17     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.137.198    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.137.233    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.137.49     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.140.115    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.142.201    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.148.145    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.152.104    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.152.135    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.152.207    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.152.220    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.152.235    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.152.25     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.152.252    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.152.34     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.152.99     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.153.105    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.153.116    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.153.133    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.153.2      | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.153.222    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.153.229    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.153.53     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.153.72     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.153.86     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.156.106    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.156.107    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.156.17     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.156.191    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.156.38     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.156.64     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.157.116    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.157.118    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.157.12     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.157.221    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.157.226    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.157.43     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.173.193    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.176.15     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.176.180    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.176.197    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.176.208    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.176.219    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.176.232    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.176.53     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.176.83     | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.177.220    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.178.198    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.179.192    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+73      | 69.91.185.120    | 69.91.128.0/17      | US | arin     | 2005-12-22 | WASHINGTON-AS - University of Washington
+209     | 174.24.131.231   | 174.16.0.0/12       | US | arin     | 2009-02-17 | ASN-QWEST-US NOVARTIS-DMZ-US
+209     | 174.24.158.200   | 174.16.0.0/12       | US | arin     | 2009-02-17 | ASN-QWEST-US NOVARTIS-DMZ-US
+209     | 198.134.88.95    | 198.134.88.0/21     | US | arin     | 1993-04-01 | ASN-QWEST-US NOVARTIS-DMZ-US
+209     | 198.134.89.5     | 198.134.88.0/21     | US | arin     | 1993-04-01 | ASN-QWEST-US NOVARTIS-DMZ-US
+209     | 65.112.22.66     | 65.112.0.0/12       | US | arin     | 2001-01-04 | ASN-QWEST-US NOVARTIS-DMZ-US
+209     | 67.148.102.249   | 67.148.0.0/16       | US | arin     | 2002-12-17 | ASN-QWEST-US NOVARTIS-DMZ-US
+2200    | 193.51.208.134   | 193.48.0.0/14       | FR | ripencc  | 1993-09-01 | FR-RENATER Reseau National de telecommunications pour la Technologie
+2200    | 193.51.208.175   | 193.48.0.0/14       | FR | ripencc  | 1993-09-01 | FR-RENATER Reseau National de telecommunications pour la Technologie
+2200    | 193.51.208.208   | 193.48.0.0/14       | FR | ripencc  | 1993-09-01 | FR-RENATER Reseau National de telecommunications pour la Technologie
+7015    | 24.91.49.66      | 24.91.0.0/17        | US | arin     | 2000-04-26 | COMCAST-7015 - Comcast Cable Communications Holdings, Inc
+7132    | 76.202.212.103   | 76.192.0.0/12       | US | arin     | 2006-09-15 | SBIS-AS - AT&T Internet Services
+10425   | 209.117.47.248   | 209.117.40.0/21     | US | arin     | 2001-01-02 | AWG-BOS - Advanced Wireless Group, LLC
+12322   | 82.238.188.18    | 82.224.0.0/12       | FR | ripencc  | 2003-11-04 | PROXAD Free SAS
+20057   | 166.134.0.143    | 166.134.0.0/15      | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.134.54.175   | 166.134.0.0/15      | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.135.134.90   | 166.134.0.0/15      | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.135.250.93   | 166.134.0.0/15      | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.96.148   | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.96.159   | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.96.235   | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.97.103   | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.97.126   | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.97.178   | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.97.197   | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.97.87    | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.98.205   | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.99.188   | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.99.34    | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.137.99.5     | 166.137.96.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.100.52   | 166.147.100.0/22    | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.80.129   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.80.171   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.80.229   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.80.69    | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.80.89    | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.81.110   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.81.157   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.81.68    | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.81.76    | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.81.93    | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.82.119   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.82.121   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.82.227   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.82.24    | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.82.249   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.82.32    | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.82.8     | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.83.106   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.83.142   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.83.174   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.83.176   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.83.210   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.83.227   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.83.249   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.83.250   | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.83.55    | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.83.82    | 166.147.80.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.108   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.114   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.153   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.174   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.191   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.21    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.212   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.219   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.223   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.232   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.233   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.254   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.92.31    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.117   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.131   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.140   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.15    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.153   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.158   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.166   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.176   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.178   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.179   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.182   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.186   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.191   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.244   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.49    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.50    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.63    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.64    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.69    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.8     | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.93.88    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.13    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.130   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.133   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.136   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.154   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.167   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.187   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.20    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.215   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.216   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.248   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.27    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.33    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.53    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.58    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.94.97    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.100   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.108   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.155   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.164   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.170   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.211   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.230   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.232   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.24    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.244   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.25    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.253   | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.32    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.40    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.68    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.7     | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.147.95.89    | 166.147.92.0/22     | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.191.240.24   | 166.190.0.0/15      | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.191.29.180   | 166.190.0.0/15      | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 166.191.35.29    | 166.190.0.0/15      | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 198.228.193.250  | 198.228.192.0/22    | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 198.228.195.236  | 198.228.192.0/22    | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 198.228.195.59   | 198.228.192.0/22    | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 198.228.197.205  | 198.228.196.0/22    | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 198.228.197.228  | 198.228.196.0/22    | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 198.228.197.89   | 198.228.196.0/22    | US | arin     | 1993-07-09 | AT&T Wireless Service
+20057   | 32.153.232.175   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.154.142.162   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.154.233.250   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.154.242.226   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.154.62.165    | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.154.87.152    | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.155.128.237   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.155.205.229   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.155.210.112   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.156.126.245   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.156.221.232   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.156.254.99    | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.156.91.177    | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.157.130.0     | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.157.170.167   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.159.240.208   | 32.152.0.0/13       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.172.247.61    | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.172.89.20     | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.173.112.20    | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.173.139.53    | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.173.226.187   | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.173.70.129    | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.173.81.178    | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.174.106.228   | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.174.118.59    | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.174.142.220   | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.174.149.48    | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.174.159.9     | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.174.175.106   | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.174.72.12     | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.174.79.235    | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.175.199.124   | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+20057   | 32.175.222.223   | 32.172.0.0/14       | US | arin     | 1990-05-30 | AT&T Wireless Service
+21928   | 208.54.32.128    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.129    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.130    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.131    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.133    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.134    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.135    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.138    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.140    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.142    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.143    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.145    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.147    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.148    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.151    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.156    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.158    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.159    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.160    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.162    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.164    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.166    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.167    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.168    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.169    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.172    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.173    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.175    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.176    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.177    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.178    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.180    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.182    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.185    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.186    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.187    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.188    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.189    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.190    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.192    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.196    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.198    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.199    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.200    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.201    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.202    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.203    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.206    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.210    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.212    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.213    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.214    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.218    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.219    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.220    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.221    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.223    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.224    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.225    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.226    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.227    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.229    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.230    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.231    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.232    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.233    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.234    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.235    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.237    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.238    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.239    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.240    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.241    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.242    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.243    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.245    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.247    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.249    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.251    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.252    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.253    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.254    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.32.255    | 208.54.0.0/18       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.128    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.129    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.131    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.132    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.137    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.141    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.163    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.178    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.180    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.184    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.186    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.187    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.193    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.200    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.201    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.205    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.209    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.218    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.224    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.228    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.230    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.235    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.243    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.247    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.252    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.36.253    | 208.54.36.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.37.131    | 208.54.37.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.37.150    | 208.54.37.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.37.154    | 208.54.37.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.37.164    | 208.54.37.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.37.171    | 208.54.37.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.37.199    | 208.54.37.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.37.245    | 208.54.37.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.37.247    | 208.54.37.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.4.141     | 208.54.4.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.4.253     | 208.54.4.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.40.220    | 208.54.40.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.45.231    | 208.54.45.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.130     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.136     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.159     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.165     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.168     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.172     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.174     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.175     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.180     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.181     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.183     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.195     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.224     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.226     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.233     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.234     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.237     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.248     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.5.249     | 208.54.5.0/24       | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.80.131    | 208.54.80.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.80.136    | 208.54.80.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.80.162    | 208.54.80.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.80.190    | 208.54.80.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.80.203    | 208.54.80.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.80.232    | 208.54.80.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.86.167    | 208.54.86.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.86.183    | 208.54.86.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.86.247    | 208.54.86.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.86.254    | 208.54.86.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.87.146    | 208.54.87.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.87.164    | 208.54.87.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.87.180    | 208.54.87.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.87.195    | 208.54.87.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.87.201    | 208.54.87.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.87.204    | 208.54.87.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.87.234    | 208.54.87.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+21928   | 208.54.87.243    | 208.54.87.0/24      | US | arin     | 1999-08-10 | T-MOBILE-AS21928 - T-Mobile USA, Inc.
+22140   | 206.29.182.185   | 206.29.180.0/22     | US | arin     | 2005-12-12 | T-MOBILE-AS22140 - T-Mobile USA, Inc.
+22394   | 174.233.128.141  | 174.233.128.0/18    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.233.128.3    | 174.233.128.0/18    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.233.128.32   | 174.233.128.0/18    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.233.128.5    | 174.233.128.0/18    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.233.130.101  | 174.233.128.0/18    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.233.131.6    | 174.233.128.0/18    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.233.133.80   | 174.233.128.0/18    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.192.127  | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.192.51   | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.193.149  | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.193.176  | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.194.134  | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.194.179  | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.194.48   | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.195.152  | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.196.154  | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.196.9    | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.196.94   | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.197.38   | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.198.199  | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.199.178  | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.199.53   | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.199.9    | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.200.20   | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.201.59   | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.202.7    | 174.253.192.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.208.252  | 174.253.208.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.209.66   | 174.253.208.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.210.128  | 174.253.208.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.210.155  | 174.253.208.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.210.198  | 174.253.208.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.211.5    | 174.253.208.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.253.211.53   | 174.253.208.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.255.160.95   | 174.255.160.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.255.161.133  | 174.255.160.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.255.162.84   | 174.255.160.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.255.163.159  | 174.255.160.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.255.163.18   | 174.255.160.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 174.255.179.225  | 174.255.176.0/20    | US | arin     | 2008-12-16 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 70.197.3.168     | 70.197.0.0/18       | US | arin     | 2004-06-10 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 70.197.3.26      | 70.197.0.0/18       | US | arin     | 2004-06-10 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 70.197.5.48      | 70.197.0.0/18       | US | arin     | 2004-06-10 | CELLCO - Cellco Partnership DBA Verizon Wireless
+22394   | 70.197.7.26      | 70.197.0.0/18       | US | arin     | 2004-06-10 | CELLCO - Cellco Partnership DBA Verizon Wireless
+28708   | 90.84.144.126    | 90.84.144.0/23      | FR | ripencc  | 2006-03-02 | ORANGEFR-PORTAL-AS France Telecom S.A.
+28708   | 90.84.144.52     | 90.84.144.0/23      | FR | ripencc  | 2006-03-02 | ORANGEFR-PORTAL-AS France Telecom S.A.
+28708   | 90.84.144.9      | 90.84.144.0/23      | FR | ripencc  | 2006-03-02 | ORANGEFR-PORTAL-AS France Telecom S.A.
+28708   | 90.84.146.200    | 90.84.146.0/24      | FR | ripencc  | 2006-03-02 | ORANGEFR-PORTAL-AS France Telecom S.A.
+33491   | 24.7.250.107     | 24.7.224.0/19       | US | arin     | 2003-10-06 | COMCAST-33491 - Comcast Cable Communications, Inc.
+33650   | 174.61.182.145   | 174.61.128.0/17     | US | arin     | 2008-11-18 | COMCAST-33650 - Comcast Cable Communications, Inc.
+33650   | 24.18.178.112    | 24.16.0.0/14        | US | arin     | 2003-12-08 | COMCAST-33650 - Comcast Cable Communications, Inc.
+33650   | 24.19.52.203     | 24.16.0.0/14        | US | arin     | 2003-12-08 | COMCAST-33650 - Comcast Cable Communications, Inc.
+33650   | 24.19.59.238     | 24.16.0.0/14        | US | arin     | 2003-12-08 | COMCAST-33650 - Comcast Cable Communications, Inc.
+33650   | 50.135.254.50    | 50.135.128.0/17     | US | arin     | 2010-10-21 | COMCAST-33650 - Comcast Cable Communications, Inc.
+33650   | 67.171.16.186    | 67.171.0.0/18       | US | arin     | 2002-12-16 | COMCAST-33650 - Comcast Cable Communications, Inc.
+33650   | 67.183.109.47    | 67.183.0.0/16       | US | arin     | 2002-12-16 | COMCAST-33650 - Comcast Cable Communications, Inc.
+33650   | 71.227.155.251   | 71.227.128.0/17     | US | arin     | 2005-04-15 | COMCAST-33650 - Comcast Cable Communications, Inc.
+33650   | 76.121.4.27      | 76.121.0.0/16       | US | arin     | 2007-01-02 | COMCAST-33650 - Comcast Cable Communications, Inc.
+33650   | 76.22.40.63      | 76.22.0.0/17        | US | arin     | 2006-06-28 | COMCAST-33650 - Comcast Cable Communications, Inc.
+33650   | 76.28.238.85     | 76.28.128.0/17      | US | arin     | 2006-06-28 | COMCAST-33650 - Comcast Cable Communications, Inc.
+46375   | 50.0.142.172     | 50.0.128.0/20       | US | arin     | 2010-07-06 | AS-SONICTELECOM - Sonic Telecom LLC
