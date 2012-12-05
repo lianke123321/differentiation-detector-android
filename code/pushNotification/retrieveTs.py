@@ -6,7 +6,7 @@ import os
 rootDir = r'C:\Backup\INRIA\Research\Meddle\code\pushNotification\Traces'
 expeList = ['iphone_wifi_3g_unplug_novpn', 'iphone_wifi_3g_unplug_vpn', 
             'iphone_wifi_3g_unplug_novpn_run2', 'iphone_wifi_unplug_vpn', 
-            'iphone_wifi_unplug_novpn']
+            'iphone_wifi_unplug_novpn', 'iphone_wifi_3g_unplug_vpn_run2']
 
 for expeName in expeList:
     f = open(os.path.join(rootDir, expeName + '.txt' ), 'r')
