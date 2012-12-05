@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{subfigure}
 \usepackage{ifpdf}
+\usepackage{epstopdf}
 \usepackage[usenames,dvipsnames]{color}
 %\newcommand{\tbd}[1]{}
 \newcommand{\ie}{{\it i.e.}}
@@ -71,10 +72,14 @@ David Choffnes\\
 
 \input{introduction}
 
-\input{measurements}
+%AL: commented out because the latex document cannot compile due to
+%the lack of this file
+%\input{measurements}
 
 \bibliographystyle{abbrv}
 \bibliography{biblio}
+
+\input{pushNotifications}
 
 \end{document}
 
