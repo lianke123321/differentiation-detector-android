@@ -6,10 +6,19 @@
  - Include walled garden sentence 
  - Things to highlight
    - cross platform/provider/OS* 
-   - low barrier to entry
    - platform to implement new services and features and not just a measurement platform
+   - low barrier to entry
 * System Architecture
 ** System Goals
+
+DRC: These are the things I think we need to emphasize as key features
+
+Portable (Cross platform, access technology, provider w/o needing app or rooting)
+Continuous/Pervasive (always on)
+Passive (low cost, real traffic)
+Control
+
+
  - Increase transparency of the opaque mobile ecosystem
    + Opaque because
      - tied to OS, service provider
@@ -17,13 +26,17 @@
      - no knowledge of what service providers are doing
        - Trip wire 
      - only way to address somes of these issues is to root the phone, but this cannot shed light on what carriers are doing
+   + Allow users to ensure they are getting what they pay for
+   + Prevent and/or monitor carrier interference
+   + Understand network footprint of apps and devices over time
  - Expose control knobs to enable users to tune the traffic 
-   + Control knobs exists on home gateways and people use it 
+   + Control knobs exists on home gateways and people use it (DRC: Not sure we can prove anything about this)
       - Firewalls on home gateways but none for mobile - direct exposure to internet 
-      - Control knobs to filtering traffic given by iOS but details not publicly available 
+	DRC: This isn't true. Mobile networks are in a sense a giant firewall.
+      - Control knobs to filtering traffic given by iOS but details not publicly available (DRC: Mainly, these knobs are coarse-grained and insufficiently expressive to meet the intended goals of parental controls.)
  - Have a low barrier to entry
-   + Users do not want to violate terms of service 
-   + Rooting/Jailbreaking issues - not easy, ROMs may not be available for device,
+   + Users do not want to violate terms of service (DRC: They want to, but are afraid to :-)
+   + Rooting/Jailbreaking issues - not easy, ROMs may not be available for device, opens device to huge security risks
  - VPN based middleboxes to achieve each of these goals
 ** System Descripton
  - VPN based middlebox
