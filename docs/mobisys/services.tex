@@ -1,4 +1,59 @@
-\section{Transparency and Control}
+\section{Controlling Mobile Traffic}
+In this section, we use two case studies to highlight some of the 
+advantages \meddle provides as a new point of control 
+for mobile networking traffic. We then discuss several new applications 
+we are currently building.
+
+\subsection{Packet Filtering}
+Packet filtering is a common technique implemented in 
+today's middleboxes. These can be used for implementing 
+security policies, censoring content or preventing applications 
+from harming the network (\eg, P2P). In \meddle, we use 
+packet filtering to enable a number of features that are 
+currently either unavailable or poorly implemented.
+
+\noindent\textbf{Device-wide ad blocking.} Content and service providers 
+typically use revenue from advertisements to cover their costs, enabling 
+``free'' access for users. Given the additional costs in terms of data volume, 
+battery consumption and potentially reduced privacy from tracking, it is unclear 
+just how ``free'' these services truly are. Vallina-Rodriguez~\etal~\cite{Vallina-rodriguez:2012:AdCache} observe
+that ads account for 5\% of daily traffic from more than 50\% of
+Android users in a large European ISP. 
+
+There is no current standard for opting 
+out of unsolicited advertising; those that exist for tracking are not widely supported. 
+Not surprisingly, many users have turned to software that blocks ad and analytic servers. 
+For example, more than 20\,million users have installed 
+AdBlockPlus~\footnote{http://www.adblockplus.org}, one of several tools for this purpose. 
+Unlike the desktop environment, mobile device browsers do not provide support for 
+ad blocking; further, most interactions occur inside of apps where browser plugins 
+cannot help. 
+
+\meddle makes it easy to implement an efficient, device-wide ad blocker. 
+In our current implementation, we use a DNS-based filter to
+block ads, analytics, and mediation sites.\footnote{The service is disabled by default, so users must 
+opt in to enable blocking.} A key feature of our solutions is that it works 
+regardless of whether SSL is used because DNS requests occur out of band 
+from the secure connection. Further, the response from the DNS request is {\tt localhost}, 
+meaning that devices will generate no external network traffic when failing 
+to resolve the ad servers. 
+
+\tbd{Ashwin: Insert graph for ad traffic.}
+
+Our ad blocking engine relies on a publicly available list of domains for ads and
+analytics~\cite{YoyoAds}; we augment this list of domains using 
+recent research on mobile ads~\cite{hornyack:appfence,
+  Leontiadis:2012:AdsMobile}. From our initial deployment, we observed a 0.05\% to 0.8\% reduction
+in total traffic at each mobile device due to our ad blocking engine. 
+\tbd{Ashwin: is this still true?}
+In addition to the DNS-based filter, we are currently implementing a filter that blocks 
+requests for URLs matching a regular expression, as done by AdBlockPlus.
+
+\subsection{Traffic Manipulation}
+Web tripnet stuff.
+
+\subsection{New Applications}
+
 Example Apps (highlight things we can do with meddle)
  - Begin with a sentence/intro-para on using middleboxes to offloading activities and offer device wide services
  - Middlebox based packet monitoring 
@@ -7,7 +62,7 @@ Example Apps (highlight things we can do with meddle)
       - actual users
       - Network traffic characterization
          - Longitudinal study of network traffic
-         - undersbehavior of apps
+         - understand behavior of apps
  - Device wide services - service like packet filtering that is not limited to an app 
      - Ad blocking
      - Platform for malware detection and blocking
