@@ -11,9 +11,28 @@ is easy to deploy on servers. Manually installing a VPN generally requires filli
 fields on a Android phone, and the VPN configuration can be
 distributed using a single file on iOS. 
 
-\noindent\textbf{iPhone support.} TODO iphone details
+\tbd{Ashwin: Insert primer on VPNs.}
 
-\noindent\textbf{Android support.} TODO android details
+\noindent\textbf{iPhone support.} We support \meddle on iOS using the ``VPN On-Demand'' feature, 
+introduced in version 3.0 of the OS. This was originally intended to allow enterprises to 
+ensure their employees' devices always establish a VPN connection before contacting 
+a specified set of domains. Using trial-and-error, we discovered that VPN On-Demand uses 
+suffix matching to determine which domains require a VPN connection. 
+
+We use each alphanumeric character as the set of domains that require a VPN 
+connection. This ensures that a connection is established before \emph{any} network 
+activity.
+
+\noindent\textbf{Android support.} As of Android 4.2, Android supports 
+``always on'' VPN connections that ensure all traffic is always tunneled. 
+At the time of writing, this has been released only for one week and only 
+for a subset of Android devices so we have not extensively tested the 
+effectiveness of the solution. 
+
+Instead, we rely on a feature that allows apps to manage VPN connections, 
+introduced in Android 4.0. We modified the StrongSwan implementation of 
+a VPN client to ensure that the VPN reconnects each time the preferred 
+network changes (\eg, when a device switches from cellular to WiFi). 
 
 \noindent\textbf{Server-side implementation.} In our current implementation, \meddle 
 uses native IPsec, implemented via StrongSwan~\cite{strongswan}, to establish VPN tunnels 
@@ -36,9 +55,8 @@ privacy from carriers.
 
 An interesting research question is whether it is possible to \emph{reduce} power consumption using \meddle. For example, Qian et al~\cite{qian:rrc,qian:aro,qian:periodic} found that traffic shaping (a service that \meddle provides) can significantly reduce the power consumed by devices when periodic application traffic and radio resource timers are out of sync.
 
-\tbdal{Is it possible to assess the power consumption based on the
-  same experiment as Data consumption? This way we can factorize the
-  explanation. }
+\tbd{Ashwin: Add newer analysis}
+  
 \noindent\textbf{Data consumption.} IPsec encapsulation slightly inflates packet sizes, in addition to
 preventing carrier middleboxes from applying their own compression. We
 measured the overhead of the tunnel in terms of data overhead from IPsec 
@@ -95,13 +113,33 @@ support 250 simultaneous users (saturating their download capacity)
 for every 1 Gbps of bandwidth at the server.
 
 \subsection{Current Deployment}
+The analysis in the following sections rely on data gathered from 
+our current prototype deployment. This consists of \meddle servers at the University of Washington, 
+UC Berkeley and INRIA, along with 20 devices from 14 users participating 
+in an IRB-approved study. 
 
-** Dataset description
- - IRB based study from September 2012
-   - full packet captured
-   - num of Android, iOS devices - type of device (phone/tablet)
-   - num of service providers
-   - Total volume of traffic
+\noindent\textbf{Summary statistics.} \meddle has been running 
+since September 2012. The deployment includes 8 Android devices 
+and 12 iOS devices (4 iPads, 7 iPhones and 1 iPod Touch). These 
+devices connect to \meddle via 15 different service providers, 
+XX of which are cellular providers. Together, our users have 
+generated 30.2\,GB of traffic since November 1, 2012. 
+
+\noindent\textbf{Data collected.}
+We collect full packet traces from these users 
+(with informed written consent) and we code the data using random identifiers 
+to protect identities. We do not attempt to decrypt any SSL traffic, 
+and all packet traces are encrypted using a public key before being 
+stored on disk. The private decryption key is stored on a separate server. 
+Users may opt out and choose to delete their data at any time. 
+
+While this fine-grained data is useful for informing the design of meddlebox solutions (\eg, 
+identifying and stripping personally identifiable information from unencrypted 
+HTTP traffic), it can be prohibitive for a large-scale study. In the next phase of 
+our deployment (currently under IRB review) we will capture only packet headers 
+and lengths. With a lower privacy risk, we believe we can recruit a larger number 
+of users and obtain informed consent via a Web site. 
+
    
 
  
