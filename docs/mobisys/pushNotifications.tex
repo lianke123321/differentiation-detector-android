@@ -152,28 +152,6 @@ further explore this issue.
 
 \begin{figure}
 \centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_vpn_interTs.eps}
-  \caption{Distribution of the interarrival times of Ethernet frames
-    for a one hour experiment with an idle \iphone{} unplugged, with \wifi{} and 3G
-    enabled, and VPN enabled. For each bin of 1 second, we count
-    the number of interarrivals in that bin.}
-  \label{fig:push_w3v_interTs}
-\end{figure}
-
-\begin{figure}
-\centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_vpn_ts.eps}
-  \caption{Cumulative distribution of the Ethernet frames
-          arrival with time for a one hour experiment with an idle
-          \iphone{} unplugged, with \wifi{} and 3G enabled, and VPN
-          enabled.}
-  \label{fig:push_w3v_ts}
-\end{figure}
-
-
-
-\begin{figure}
-\centering
         \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_unplug_vpn_interTs.eps}
   \caption{Distribution of the interarrival times of Ethernet frames
     for a one hour experiment with an idle \iphone{} unplugged, with \wifi{}
@@ -192,8 +170,46 @@ further explore this issue.
   \label{fig:push_wv_ts}
 \end{figure}
 
+We performed a third set of experiments with the VPN enabled. This set
+of experiment shows the impact of using \meddle on the traffic pattern
+and the power management policy. We see in
+Fig.~\ref{fig:push_wv_interTs} and Fig.~\ref{fig:push_wv_ts} that
+there is no noticeable differences when enabling \meddle with \wifi{} only. However,
+when enabling both \wifi and 3G the frames interarrival time
+(Fig.~\ref{fig:push_w3v_interTs}) and the cumulative arrival of frames
+(Fig.~\ref{fig:push_w3v_ts}) is significantly different. 
+\tbd{It will probably be too short for the deadline, but I need to see
+on the meddle logs what are these 3G messages. I cannot get them from
+my setup. I guess that the VPN is using keep alive message every 45
+seconds. As the 3G connection never sleep, receiving such a packet
+trigger the wake-up of the \wifi{} interface. When 3G is disabled, the
+keep alive messages cannot prevent the \wifi{} interface to
+sleep. Ashwin, if you are aware of such a timer in your VPN config, we
+can safely state my guess in the paper.}
 
 
+
+
+
+\begin{figure}
+\centering
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_vpn_interTs.eps}
+  \caption{Distribution of the interarrival times of Ethernet frames
+    for a one hour experiment with an idle \iphone{} unplugged, with \wifi{} and 3G
+    enabled, and VPN enabled. For each bin of 1 second, we count
+    the number of interarrivals in that bin.}
+  \label{fig:push_w3v_interTs}
+\end{figure}
+
+\begin{figure}
+\centering
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_vpn_ts.eps}
+  \caption{Cumulative distribution of the Ethernet frames
+          arrival with time for a one hour experiment with an idle
+          \iphone{} unplugged, with \wifi{} and 3G enabled, and VPN
+          enabled.}
+  \label{fig:push_w3v_ts}
+\end{figure}
 
 
 %%% Local Variables: 
