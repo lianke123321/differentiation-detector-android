@@ -24,7 +24,8 @@
 \newcommand{\til}{{\bf\large \textasciitilde}}
 \newcommand{\tbd}[1]{[{\color{red}{\bf{TBD: #1}}}]}
 \newcommand{\etal}{\emph{et~al.}}
-\newcommand{\meddle}{{Meddle}\xspace}
+\newcommand{\meddle}{{\emph{Meddle}}\xspace}
+\newcommand{\meddleT}{{Meddle}\xspace}
 \newcommand{\dsum}{\displaystyle\sum}
 \newcounter{packednmbr}
 
@@ -35,7 +36,7 @@
 \renewcommand{\fref}{\Fref}
 \renewcommand\thesubfigure{~(\alph{subfigure})}
 
-\title{Transparency and Control for Mobile Network Traffic}
+\title{Meddle: Transparency and Control for Mobile Network Traffic}
 
 \numberofauthors{8}
 \author{
@@ -72,9 +73,17 @@ David Choffnes\\
 
 \input{introduction}
 
-%AL: commented out because the latex document cannot compile due to
-%the lack of this file
+\input{architecture}
+
+\input{deployment}
+
 \input{measurements}
+
+\input{services}
+
+\input{discussion}
+
+\input{related}
 
 \bibliographystyle{abbrv}
 \bibliography{biblio}
