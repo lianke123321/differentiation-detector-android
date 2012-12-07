@@ -20,7 +20,7 @@ M_IUN_interTs = load([rootDir, 'Traces\', expeName, '_interTs.txt']);
 M_IUN_Ts = load([rootDir, 'Traces\', expeName, '_ts.txt']);
 
 figure;
-hist(M_IUN_interTs,600);
+hist(M_IUN_interTs,max(M_IUN_interTs));
 globalplotdefs;
 xlabel('Inter-arrival time (s)');
 ylabel('Number');
@@ -46,7 +46,7 @@ M_IUN_interTs = load([rootDir, 'Traces\', expeName, '_interTs.txt']);
 M_IUN_Ts = load([rootDir, 'Traces\', expeName, '_ts.txt']);
 
 figure;
-hist(M_IUN_interTs,600);
+hist(M_IUN_interTs,max(M_IUN_interTs));
 globalplotdefs;
 xlabel('Inter-arrival time (s)');
 ylabel('Number');
@@ -72,7 +72,7 @@ M_IUN_interTs = load([rootDir, 'Traces\', expeName, '_interTs.txt']);
 M_IUN_Ts = load([rootDir, 'Traces\', expeName, '_ts.txt']);
 
 figure;
-hist(M_IUN_interTs,600);
+hist(M_IUN_interTs,max(M_IUN_interTs));
 globalplotdefs;
 xlabel('Inter-arrival time (s)');
 ylabel('Number');
@@ -98,7 +98,7 @@ M_IUN_interTs = load([rootDir, 'Traces\', expeName, '_interTs.txt']);
 M_IUN_Ts = load([rootDir, 'Traces\', expeName, '_ts.txt']);
 
 figure;
-hist(M_IUN_interTs,600);
+hist(M_IUN_interTs,max(M_IUN_interTs));
 globalplotdefs;
 xlabel('Inter-arrival time (s)');
 ylabel('Number');
@@ -124,7 +124,7 @@ M_IUN_interTs = load([rootDir, 'Traces\', expeName, '_interTs.txt']);
 M_IUN_Ts = load([rootDir, 'Traces\', expeName, '_ts.txt']);
 
 figure;
-hist(M_IUN_interTs,600);
+hist(M_IUN_interTs,max(M_IUN_interTs));
 globalplotdefs;
 xlabel('Inter-arrival time (s)');
 ylabel('Number');
@@ -150,7 +150,7 @@ M_IUN_interTs = load([rootDir, 'Traces\', expeName, '_interTs.txt']);
 M_IUN_Ts = load([rootDir, 'Traces\', expeName, '_ts.txt']);
 
 figure;
-hist(M_IUN_interTs,600);
+hist(M_IUN_interTs,max(M_IUN_interTs));
 globalplotdefs;
 xlabel('Inter-arrival time (s)');
 ylabel('Number');
@@ -176,7 +176,7 @@ M_IUN_interTs = load([rootDir, 'Traces\', expeName, '_interTs.txt']);
 M_IUN_Ts = load([rootDir, 'Traces\', expeName, '_ts.txt']);
 
 figure;
-hist(M_IUN_interTs,600);
+hist(M_IUN_interTs,max(M_IUN_interTs));
 globalplotdefs;
 xlabel('Inter-arrival time (s)');
 ylabel('Number');
@@ -202,7 +202,7 @@ M_IUN_interTs = load([rootDir, 'Traces\', expeName, '_interTs.txt']);
 M_IUN_Ts = load([rootDir, 'Traces\', expeName, '_ts.txt']);
 
 figure;
-hist(M_IUN_interTs,600);
+hist(M_IUN_interTs,max(M_IUN_interTs));
 globalplotdefs;
 xlabel('Inter-arrival time (s)');
 ylabel('Number');
