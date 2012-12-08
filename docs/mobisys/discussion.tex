@@ -1,17 +1,74 @@
 \section{Discussion}
-
-Privacy
-
-Acceptable use
-
-ISP objections
-
-Scalability
-
-Pigeonholing traffic for monitoring ISPs
-
-Limitations
- - only network traffic (nothing on device)
- - not all traffic is captured
- - cost?
+In this section, we discuss several key issues and limitations for an indirection-based 
+deployment such as \meddle.
+\tbd{This needs serious rewriting. Dave is in a hurry today.}
  
+\noindent\textbf{Privacy and trust.} As discussed in Section~\ref{subsec:currdeploy}, we 
+collect traces from users as part of an IRB-approved study. We take great care in 
+protecting user privacy -- data is encrypted before being stored, the private key is 
+not stored on the server where data is recorded and any PII accidentally sent in the 
+clear is stripped from our datasets as soon as we identify it. 
+
+Regardless, users may still be uncomfortable with sending all their traffic through a 
+\meddle service, be it in a hosting center or in the cloud. We are making all of 
+our code open source so that users can install \meddle on servers in their 
+own networks (\eg, in their home network). Users may opt to use this option instead. 
+As researchers, we will lose valuable trace data; however, users will also be responsible 
+for updating \meddle to include the latest new features and bug fixes. We expect 
+that most users interested in running \meddle will be content with using our hosted 
+\meddle service with anonymized packet headers being collected. 
+
+\noindent\textbf{Acceptable use.} Similar to any service providing Internet access, 
+\meddle needs an acceptable use policy (AUP) to ensure that we are not liable for 
+user activity. We model our AUP after the one provided by EC2, one of our potential 
+hosting providers. Users are informed of this AUP at install time. If we are notified 
+of an AUP violation, we can isolate the user generating the traffic because each 
+user is given separate certificate-based credentials.
+
+\noindent\textbf{ISP objections.} Many mobile carriers deploy in-network middleboxes 
+for traffic engineering purposes. By tunneling \emph{all} traffic, these boxes lose the 
+ability to implement ISPs' policies, which can lead to suboptimal performance for 
+other users sharing the network. 
+
+We believe such concerns are either overblown or misguided. First, we do not 
+expect \emph{every} device to run \meddle. If we were to attract even 1\% of 
+mobile users that would be a surprisingly huge success. Thus we do not expect 
+\meddle to significantly impact overall traffic in a mobile network. Second, if \meddle 
+traffic were to become a significant traffic engineering challenge, we argue that 
+such information, and the policies that address this challenge, need to be 
+transparent to users. The current model of transparent middleboxes is not 
+in the spirit of an open Internet.
+
+\noindent\textbf{Scalability and reliability.} If successful, \meddle will 
+face scalability and reliability problems as the number of users increases. 
+We believe that, in return for valuable measurement and experimentation data, 
+we can justify funding to support some number of thousands of users. For a 
+larger deployment, we may have to consider a paid service or alternative 
+economic models. By running the service in the cloud and using DNS-based 
+redirection, we expect service unavailability to be relatively rare. Importantly, 
+we expect that mobile connectivity in general will be less reliable than connections 
+to \meddle servers.
+
+\noindent\textbf{Limitations.} We believe that \meddle enables a large number 
+of interesting studies and experiments in the mobile environment. However, we 
+do not claim it is a panacea. 
+
+First, \meddle captures only network traffic. It does 
+not allow us to gain access to sensors on the device, information about what 
+apps are running or control over those apps on the device. An interesting question 
+is what are the limits of what one can infer from a device's network traffic alone. 
+We have shown that iOS network traffic exhibits clear, identifiable differences 
+when plugged in versus running on battery, lending evidence that we can successfully 
+infer properties of the phone previously available only by querying from an app 
+on the device. Likewise, we used SSL certificates to distinguish which app generates 
+requests to a CDN.
+
+Second, \meddle may miss some data traffic. For example, we identified that 
+iOS push was using signaling on a circuit-switched channel (SMS). We believe 
+the volume of ``missing'' traffic is small; however, it remains to be seen how 
+this holds generally and over time. As mobile networks transition to all-IP, it will 
+be interesting to see if an approach like \meddle can capture all of a device's traffic.
+
+Last, \meddle incurs costs that may dissuade adoption. We discussed several of the 
+overheads based on establishing a VPN tunnel. One area of future work is to improve 
+VPN protocols to reduce the time to establish a connection. 

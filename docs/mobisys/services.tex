@@ -49,28 +49,119 @@ in total traffic at each mobile device due to our ad blocking engine.
 In addition to the DNS-based filter, we are currently implementing a filter that blocks 
 requests for URLs matching a regular expression, as done by AdBlockPlus.
 
+\tbd{Mention Privad gateway}
+
+\noindent\textbf{Do not disturb.} 
+Many users do not turn off their devices at night, even while asleep. In our study, we found that 
+\tbd{XX}\% of devices were active for at least one entire 24-hour period. Network 
+traffic occurring during those periods is generally not helpful for the user; worse, 
+such traffic may cause audible alerts that wake up the user. In part to address this, 
+iOS 6 introduced a ``Do not disturb'' feature that silences the phone and \emph{reduces} 
+network activity. We are unaware of such support on Android.
+
+\meddle enables a cross-platform and cross-device ``Do not disturb'' for network 
+traffic. Users specify the hours when traffic should be blocked and the corresponding 
+meddlebox will drop all traffic. Further, users can specify hosts that should \emph{not} be 
+blocked. 
+
+\noindent\textbf{Parental controls.} 
+Existing parental controls for mobile devices tend to focus on which apps a user 
+cannot run. For example, a parent can block the Facebook app on an iOS device. 
+To the best of our knowledge, there is no way to prevent a user from using a 
+Web browser to access the Facebook site, unless all Web browser activity is blocked. 
+
+In general, this would be too prohibitive. Using \meddle, we can blacklist traffic for 
+all IPs known to belong to a content or service provider. For example, to block 
+Facebook we would block IPs belonging to Facebook, as well as any traffic using Facebook 
+SSL certificates (\eg, for accessing content hosted by CDNs). 
+
 \subsection{Traffic Manipulation}
-Web tripnet stuff.
+An advantage of \meddle is that it provides isolation from carriers' in-network 
+middleboxes, which may block, modify or shape certain network traffic. However, 
+toward the goal of improving transparency in mobile networks (especially for 
+non-\meddle users), we would like to be able to identify when, how and what 
+network traffic is subject to carrier manipulation. 
+
+In this section, we describe how we use \meddle to detect HTTP interference via 
+in-flight Web page changes. We believe our technique 
+is general to other protocols. 
+
+The problem of HTTP interference was highlighted 
+by Reis et al.~\cite{reis:tripwires}. The authors demonstrated that although a small 
+precent of users were affected by in-flight changes, those changes tended to introduce 
+vulnerabilities such as overflows and cross-site scripting (XSS) attacks. They proposed and deployed 
+\emph{Web Tripwires}, Javascript code that detects in-flight page changes. The main 
+limitation of this study is that the approach works only for sites that include a tripwire on their 
+own pages.
+
+\noindent\textbf{Web Tripnets.} Using \meddle, we extended tripwires to alleviate this 
+limitation. Namely, we use \meddle to inject a tripwire on \emph{any} page without requiring 
+support from Web site developers -- an approach we call a \emph{Web Tripnet}.
+
+Because the \meddle connection is encrypted, the device's 
+provider cannot alter the page in flight. To detect whether the carrier would have manipulated the 
+page without \meddle, we use a pigeonhole approach. Specifically, we configure the VPN to send 
+traffic for a particular site in the clear. When the client attempts to visit that site, it is  
+redirected (using DNS) to a transparent proxy that forwards the request to the intended server, 
+retrieves the Web page and delivers it to the device in the clear (thus exposing it to carrier manipulation). 
+Upon receiving the page over an unencrypted channel, the device's browser sends both 
+versions of the Web page (tunneled and untunneled) to the \meddle server for analysis. 
+
+\noindent\textbf{Experimental Results.} We conducted a survey of ISP HTTP injection using two US carriers (Verizon and T-Mobile) 
+and one French carrier (XXX). To determine if the user agent can impact manipulation from 
+carriers, we tested using Android, iOS and a desktop (tethered) browser. We tested the top 
+100 sites according to Alexa, in addition to a random sample of 100 of the 10,000 most popular 
+sites. Our analysis did not identify any carrier manipulation. This is not entirely surprising, 
+since most manipulation identified by Reis et al. occurred due to software installed inside 
+a user's network.
+
+An interesting observation is that 
+we found one example where Facebook over Verizon included a promotional link specific to 
+Verizon, even when the connection was proxies through a host at the University of Washington. 
+Further analysis showed that the Squid proxy's {\tt X-Forwarded-For} field was being populated 
+with an address in Verizon's network, and Facebook was modifying the page accordingly. When 
+we removed the {\tt X-Forwarded-For} field, the promotional link no longer appeared. 
 
 \subsection{New Applications}
 
-Example Apps (highlight things we can do with meddle)
- - Begin with a sentence/intro-para on using middleboxes to offloading activities and offer device wide services
- - Middlebox based packet monitoring 
-      - cross * possible
-      - passive - real traffic 24x7 
-      - actual users
-      - Network traffic characterization
-         - Longitudinal study of network traffic
-         - understand behavior of apps
- - Device wide services - service like packet filtering that is not limited to an app 
-     - Ad blocking
-     - Platform for malware detection and blocking
-     - Parental controls 
- - Deployment of new protocols and services 
-   - Users can opt in for specific service
-   - Mobile story for services like FreeDOM, CCNs, etc.
-   - service in a VM where users opt in for services
- - Generic Proxy
-   - Privad
-   - Anti-censorship
+\meddle allows researchers to explore the space of applications that offload 
+networking traffic from mobile devices to server where power and data quota 
+are less scarce. We envision several important applications that can benefit 
+from our approach.
+
+\begin{itemize}
+\item \textbf{P2P offloading.} P2P services tend to benefit from multiple connections 
+and symmetric bandwidth contributions from participating hosts. Both of these are 
+costly in the mobile environment. \meddle can ease these costs by offloading the 
+logic for maintaining P2P connections to a meddlebox.
+\item \textbf{Privad.}  Instead of simply blocking ads, \meddle is an ideal location 
+to deploy anonymizing systems that support targeted advertising, as suggested by 
+Guha et al.~\cite{guha:privad}. 
+\item \textbf{Tor.} \meddle improves privacy in mobile networking by encrypting the 
+connection from the mobile device to the \meddle server. We can further improve 
+privacy and anonymity by providing a Tor meddlebox that establishes and manages 
+onion-routed connections.
+
+\end{itemize}
+
+
+%Example Apps (highlight things we can do with meddle)
+% - Begin with a sentence/intro-para on using middleboxes to offloading activities and offer device wide services
+% - Middlebox based packet monitoring 
+%      - cross * possible
+%      - passive - real traffic 24x7 
+%      - actual users
+%      - Network traffic characterization
+%         - Longitudinal study of network traffic
+%         - understand behavior of apps
+% - Device wide services - service like packet filtering that is not limited to an app 
+%     - Ad blocking
+%     - Platform for malware detection and blocking
+%     - Parental controls 
+% - Deployment of new protocols and services 
+%   - Users can opt in for specific service
+%   - Mobile story for services like FreeDOM, CCNs, etc.
+%   - service in a VM where users opt in for services
+% - Generic Proxy
+%   - Privad
+%   - Anti-censorship

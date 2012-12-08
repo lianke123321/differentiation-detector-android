@@ -320,7 +320,7 @@
 % If we have an email, inside a "shared affiliation" then we need the following instead
 \def\email#1{{{\eaddfnt{\par #1}}}}       % revised  - GM - 11/30/2006
 
-\def\addauthorsection{\ifnum\originalaucount>3
+\def\addauthorsection{\ifnum\originalaucount>13
     \section{Additional Authors}\the\addauthors
   \fi}
 
