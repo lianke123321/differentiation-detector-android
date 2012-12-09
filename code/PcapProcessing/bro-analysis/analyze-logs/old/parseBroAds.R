@@ -64,7 +64,7 @@ getAdData <- function(httpData, connData, adData) {
 
 parseAdData <- function (adData, userDir) {  
   print(userDir)
-  fName <- paste(userDir, "/http.log", sep="");
+  fName <- paste(userDir, "/http.log.ann", sep="");
   if (file.exists(fName) == FALSE) {
     print(fName);
     return(NA);
@@ -75,7 +75,7 @@ parseAdData <- function (adData, userDir) {
     return(NA);
   }
   print("Read the httpData")
-  fName <- paste(userDir, "/conn.log", sep="");
+  fName <- paste(userDir, "/conn.log.ann", sep="");
   if (file.exists(fName) == FALSE) {
     print(fName);
     return(NA);

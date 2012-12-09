@@ -126,7 +126,8 @@ plotFractionFlows <- function (x) {
   }
   xval <- paste(tmpy$proto, tmpy$service)
   yval <- ytot[[1]]$upanddown;
-  pdf(file=paste(plotsDir,"deviceTrafficShare.pdf", sep=""));
+  #pdf(file=paste(plotsDir,"deviceTrafficShare.pdf", sep=""));
+  tiff(file=paste(plotsDir,"deviceTrafficShare.tiff", sep=""))
   par(newpar);
   plot(1:length(xval), yval, pch=1, xlim=c(1,length(xval)), ylim=c(0,1),
        xaxt="n", xaxs="r", yaxs="r",
@@ -143,7 +144,7 @@ plotFractionFlows <- function (x) {
   axis(1, at=1:length(xval), lab=xval, las=1)
   # Grid before legend to avoid grid inside the legend
   grid(lwd=2)
-  legendText <- c("Android Volume", "iOS Volume", "Android Flows", "iOS Flows")
+  legendText <- c("Android (Volume)", "iOS (Volume)", "Android (Flows)", "iOS (Flows)")
   legend(x=2,y=1,legend=legendText, pch=c(1,2,3,4), box.lwd=1)
   dev.off()
   ytot;
@@ -201,10 +202,13 @@ plotTechUploadDownloads <- function (x) {
     i<-i+1;
   }
   
-  pdf(file=paste(plotsDir,"technologyProtocolShare.pdf", sep=""));
+  #pdf(file=paste(plotsDir,"technologyProtocolShare.pdf", sep=""));
+  tiff(file=paste(plotsDir,"technologyProtocolShare.tiff", sep=""))
+  #legendText<-c(paste(techList[1], "total (aggregate)"), paste(techList[1], "upload (aggregate)"), paste(techList[1], "total (median)"),
+  #              paste(techList[2], "total (aggregate)"), paste(techList[2], "upload (aggregate)"), paste(techList[2], "total (median)"))
+  legendText<-c(paste(techList[1], "(aggregate)"), paste(techList[1], "(median)"),
+                paste(techList[2], "(aggregate)"), paste(techList[2], "(median)"))
   
-  legendText<-c(paste(techList[1], "total (aggregate)"), paste(techList[1], "upload (aggregate)"), paste(techList[1], "total (median)"),
-                paste(techList[2], "total (aggregate)"), paste(techList[2], "upload (aggregate)"), paste(techList[2], "total (median)"))
   xval <- paste(tmpy$proto, tmpy$service)
   #yval <- ytot[[1]]$orig_ip_bytes;
   yval <- ytot[[1]]$upanddown
@@ -213,8 +217,8 @@ plotTechUploadDownloads <- function (x) {
        xaxt="n", xaxs="r", yaxs="r",
        xlab="Protocol", ylab="Fraction of traffic volume for a technology");
   
-  yval <- ytot[[1]]$orig_ip_bytes;
-  points(1:length(xval), yval, pch=2)
+  #yval <- ytot[[1]]$orig_ip_bytes;
+  #points(1:length(xval), yval, pch=2)
  
   yval <- ytot[[1]]$upanddown_med;
   points(1:length(xval), yval, pch=11)
@@ -222,15 +226,15 @@ plotTechUploadDownloads <- function (x) {
   yval <- ytot[[2]]$upanddown;
   points(1:length(xval), yval, pch=3) 
   
-  yval <- ytot[[2]]$orig_ip_bytes;
-  points(1:length(xval), yval, pch=0)
+  #yval <- ytot[[2]]$orig_ip_bytes;
+  #points(1:length(xval), yval, pch=0)
  
   yval <- ytot[[2]]$upanddown_med;
   points(1:length(xval), yval, pch=4)
   
   axis(1, at=1:length(xval), lab=xval, las=0)
   grid(lwd=2);
-  legend(x=2,y=1,legend=legendText, pch=c(1,2,11,3,0,4), box.lwd=1)
+  legend(x=2,y=1,legend=legendText, pch=c(1,11,3,4), box.lwd=1)
   dev.off()
   ytot;
 }
@@ -310,8 +314,10 @@ plotTechShare <- function (x) {
   tmpymed<-aggregate(tmpysumNotTab[c("upanddown")],
                      by=list(sort_order=tmpysumNotTab$sort_order, technology=tmpysumNotTab$technology), 
                      FUN=median)
+  
   tmpymed <- tmpymed[order(tmpymed$sort_order),]
   tmpy$upanddown_mednottab <- tmpymed$upanddown
+  
   
   # take the max of this fraction  
   tmpymed<-aggregate(tmpysumNotTab[c("upanddown")],
@@ -327,8 +333,10 @@ plotTechShare <- function (x) {
   tmpymed <- tmpymed[order(tmpymed$sort_order),]
   tmpy$upanddown_min <- tmpymed$upanddown
   
-  pdf(file=paste(plotsDir,"technologyShare.pdf", sep=""));
-  
+  #pdf(file=paste(plotsDir,"technologyShare.pdf", sep=""));
+  #eps(file=paste(plotsDir,"technologyShare.eps", sep=""));
+  #png(file=paste(plotsDir,"technologyShare.png", sep=""))
+  tiff(file=paste(plotsDir,"technologyShare.tiff", sep=""))
   legendText<-c("max (w/o tablets)", "aggregate (with tablets)", "median (with tablets)", "median (w/o tablets)", "min (w/o tablets)");
   xval <- c("Wi-Fi", "Cellular");
   #yval <- ytot[[1]]$orig_ip_bytes;
@@ -353,6 +361,7 @@ plotTechShare <- function (x) {
   axis(1, at=1:length(xval), lab=xval, las=0)
   grid(lwd=2);
   legend(x=1.2,y=1,legend=legendText, pch=c(0,1,3,5, 4), box.lwd=1)
+  #dev.copy(png, paste(plotsDir,"technologyShare.png", sep=""));
   dev.off();
   tmpy;
 }
