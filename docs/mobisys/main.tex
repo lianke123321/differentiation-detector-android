@@ -30,6 +30,9 @@
 \newcounter{packednmbr}
 \newcommand{\iphone}{iPhone}
 \newcommand{\wifi}{Wi-Fi}
+\newcommand{\postfigspace}{0em}
+\newcommand{\figcapspace}{0em}
+
 
 \newenvironment{packedenumerate}{\begin{list}{\thepackednmbr.}{\usecounter{packednmbr}\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
 \newenvironment{packeditemize}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
@@ -92,7 +95,7 @@ David Choffnes\\
 \bibliographystyle{abbrv}
 \bibliography{biblio}
 
-\input{pushNotifications}
+%\input{pushNotifications}
 
 \end{document}
 

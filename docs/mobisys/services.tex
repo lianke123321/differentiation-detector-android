@@ -98,14 +98,32 @@ own pages.
 limitation. Namely, we use \meddle to inject a tripwire on \emph{any} page without requiring 
 support from Web site developers -- an approach we call a \emph{Web Tripnet}.
 
-Because the \meddle connection is encrypted, the device's 
-provider cannot alter the page in flight. To detect whether the carrier would have manipulated the 
-page without \meddle, we use a pigeonhole approach. Specifically, we configure the VPN to send 
-traffic for a particular site in the clear. When the client attempts to visit that site, it is  
-redirected (using DNS) to a transparent proxy that forwards the request to the intended server, 
+When enabled, the Web tripnet works as follows (depicted in Fig.~\ref{fig:tripnet}). First, the device requests a Web page via 
+HTTP (1). Because the \meddle connection is encrypted, the device's 
+provider cannot alter the page in flight. When the Web server response arrives at 
+the \meddle server (2), we insert a Web tripwire before forwarding the response to the user. 
+
+To detect whether the carrier would have manipulated the 
+page without \meddle, we create a \emph{pigeonhole} by configuring the device's VPN settings to send 
+traffic for a particular site in the clear. When the Web tripwire attempts to load another copy 
+of the Web page (3), the request is redirected (using DNS) to a transparent proxy that forwards the request to the intended server, 
 retrieves the Web page and delivers it to the device in the clear (thus exposing it to carrier manipulation). 
 Upon receiving the page over an unencrypted channel, the device's browser sends both 
 versions of the Web page (tunneled and untunneled) to the \meddle server for analysis. 
+
+\begin{figure}
+\centering
+        \includegraphics[width=\linewidth]{figs/tripnet.pdf}
+\vspace{\figcapspace}
+  \caption{Overview of the \meddle Web tripnet. A Web page is loaded 
+through the VPN tunnel, where a meddlebox inserts a Web tripwire. The 
+tripwire causes the browser to reload the Web page using the address of a
+transparent proxy server that is accessed using an unencrypted connection. 
+After the proxied version of the page is loaded, a message is sent to the user if 
+the pages differ due to ISP interference. }
+  \label{fig:tripnet}
+\vspace{\postfigspace}
+\end{figure}
 
 \noindent\textbf{Experimental Results.} We conducted a survey of ISP HTTP injection using two US carriers (Verizon and T-Mobile) 
 and one French carrier (XXX). To determine if the user agent can impact manipulation from 
