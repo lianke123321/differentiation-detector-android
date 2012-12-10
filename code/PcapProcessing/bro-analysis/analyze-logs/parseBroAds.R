@@ -242,7 +242,7 @@ getAdTrafficData <- function (userLogsDir) {
   adCumul <- read.table
   adData <- aggregate(adData[c("V3", "V5", "V11", "V12")],
                       by=list(V2=adData$V2),
-                      FUN=max); # Take the median of the bytes (HACK)
+                      FUN=max); # Take the max of the bytes for a given connID (HACK)
   
   #aggrTechCumulBytes <- aggregate(connData[c("orig_ip_bytes", "resp_ip_bytes")], 
   #                            by=list(user_id=connData$user_id, technology=connData$technology),
@@ -259,16 +259,16 @@ getAdTrafficData <- function (userLogsDir) {
         sum(connData[connData$technology=="Cellular",]$orig_ip_bytes),
         sum(connData[connData$technology=="Cellular",]$resp_ip_bytes),
         sum(connData[connData$technology=="Cellular",]$totBytes),
-        sum(connData[connData$technology=="Wi-Fi",]$orig_ip_bytes),
-        sum(connData[connData$technology=="Wi-Fi",]$resp_ip_bytes),
-        sum(connData[connData$technology=="Wi-Fi",]$totBytes),
+        sum(connData[connData$technology!="Cellular",]$orig_ip_bytes),
+        sum(connData[connData$technology!="Cellular",]$resp_ip_bytes),
+        sum(connData[connData$technology!="Cellular",]$totBytes),
         sum(aggrAdBytes$totBytes),
         sum(aggrAdBytes[aggrAdBytes$V5=="Cellular",]$V11),
         sum(aggrAdBytes[aggrAdBytes$V5=="Cellular",]$V12),
         sum(aggrAdBytes[aggrAdBytes$V5=="Cellular",]$totBytes),
-        sum(aggrAdBytes[aggrAdBytes$V5=="Wi-Fi",]$V11),
-        sum(aggrAdBytes[aggrAdBytes$V5=="Wi-Fi",]$V12),
-        sum(aggrAdBytes[aggrAdBytes$V5=="Wi-Fi",]$totBytes));
+        sum(aggrAdBytes[aggrAdBytes$V5!="Cellular",]$V11),
+        sum(aggrAdBytes[aggrAdBytes$V5!="Cellular",]$V12),
+        sum(aggrAdBytes[aggrAdBytes$V5!="Cellular",]$totBytes));
   x;
 }
 
@@ -280,11 +280,22 @@ for (userLogsDir in list.dirs(broLogsDir, recursive=FALSE)) {
   i<-i+1;
 }
 plotAdMatrix<-plotAdMatrix[1:i-1,]
+plotAdMatrix[,2] <- as.numeric(plotAdMatrix[,2])
+plotAdMatrix[,9] <- as.numeric(plotAdMatrix[,9])
+plotAdMatrix[,12] <- as.numeric(plotAdMatrix[,12])
+plotAdMatrix[,15] <- as.numeric(plotAdMatrix[,15])
+plotAdMatrix[,5] <- as.numeric(plotAdMatrix[,5])
+plotAdMatrix[,8] <- as.numeric(plotAdMatrix[,8])
+
+plotAdMatrix<-plotAdMatrix[order(as.numeric(plotAdMatrix[,2]), decreasing=TRUE),]
+plotAdMatrix<-plotAdMatrix[plotAdMatrix[,1]!="arnaud-iphone",]
+
 filtAdMatrix <- plotAdMatrix[as.numeric(plotAdMatrix[,2])>(100*10^6), ];
-pdf(paste(plotsDir,"/ad"))
+#filtAdMatrix <- plotAdMatrix;
+pdf(paste(plotsDir,"/userAdsShare.pdf", sep=""))
 par(newpar)
 plot(1:length(filtAdMatrix[,1]), 100*as.numeric(filtAdMatrix[,9])/as.numeric(filtAdMatrix[,2]),
-     pch="+",
+     pch="+", xaxs="r", yaxs="r",
      ylim=c(0,4),
      xlim=c(0, length(filtAdMatrix[,1])+1),
      xlab="User (ordered by total traffic volume)",
@@ -292,12 +303,14 @@ plot(1:length(filtAdMatrix[,1]), 100*as.numeric(filtAdMatrix[,9])/as.numeric(fil
 points(100*as.numeric(filtAdMatrix[,12])/as.numeric(filtAdMatrix[,5]), pch="v")
 textVectors <- (as.numeric(filtAdMatrix[,12])/as.numeric(filtAdMatrix[,15]))/(as.numeric(filtAdMatrix[,5])/as.numeric(filtAdMatrix[,8]))
 textVectors <- round(100*textVectors)/100;
-textVectors[is.na(textVectors)] <- "N/A"
+textVectors[is.na(textVectors)] <- "-"
 textVectors <- paste("(", textVectors,")", sep="")
-text(x=1:length(filtAdMatrix[,1]), y=3.5,
+text(x=1:length(filtAdMatrix[,1]), y=3.8,
      labels=textVectors, xpd=TRUE, srt=90)
 grid(lwd=1)
-legend(x=7, y=3, legend=c("Aggregate", "Cellular"), pch=c("+", "v"));
+legend(x=1, y=1.5, legend=c("Aggregate", "Cellular"), pch=c("+", "v"));
+dev.off();
+
        
 
 

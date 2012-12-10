@@ -227,6 +227,10 @@ plotIOSPushForUsers <- function(appleConnData) {
     aggrDiff <- aggregate(diffsTable[c("diffValue")], by=list(hour=diffsTable$hour), FUN=median)
   
     plot(diffsTable$hour, diffsTable$diffValue, ylim=c(0, 1800))
+    # Where did my code for hour based analysis where I account for hours not present go!!!!!
+    # I remember saving it yesterday night!! The code below is wrong. It does not account for time
+    # intervals when the no tunnel was established. The median should account for 0s if tunnel was
+    # established during the day but was not established when do not disturb is being implemented
     
     #tmpAggr <- aggregate(diffsTable[c("diffValue")], by=list(hour=diffsTable$hour), FUN=quantile, probs=0.25)
     #aggrDiff$q25 <- tmpAggr$diffValue;

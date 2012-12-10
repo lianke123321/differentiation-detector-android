@@ -12,14 +12,17 @@ for uDir in ${decryptDir}/*;
 do
     uName=`basename ${uDir}`
     echo ${uName}
-    if [ "${uName}" != "will-ipad" ];
-    then
-        continue
-    fi 
+    #if [ "${uName}" != "will-ipad" ];
+    #then
+    #    continue
+    #fi 
     broUDir=${broDir}/${uName}
     mkdir -p ${broUDir}
     rm -f ${tmpDir}/*
     cp -vRf ${currDir}/bro-headers/* ${broUDir}
+
+    cnt=1
+    totCnt=1
     for fName in ${uDir}/*.pcap*;
     do
 	cd ${tmpDir}
@@ -30,7 +33,8 @@ do
 	#echo ${globalIP} ${localIP}
         for logFile in *.log;
 	do
-            sed -e s/"${localIP}"/"${globalIP}"/g ${logFile} >> ${broUDir}/${logFile}
+            sed -e s/"${localIP}"/"${globalIP}"/g ${logFile} > ${logFile}.tmp
+            cat ${logFile}.tmp >> ${broUDir}/${logFile}
 	done
         # Will not work for traceroutes/sshs to localmachines, etc .. will not work for x.10.11.x
         #cnt=`grep -c "10\.11\." ${broUDir}/conn.log`
@@ -41,6 +45,13 @@ do
         #   cat ${tmpDir}/http.log
         #   exit 
         #fi
+        cnt=$((cnt+1))
+        if [ $cnt -gt 25 ] ;
+        then
+            totCnt=$((totCnt+cnt))
+            echo $totCnt
+            cnt=1
+        fi
 	cd - > /dev/null 2>&1
     done
     cd ${broUDir}

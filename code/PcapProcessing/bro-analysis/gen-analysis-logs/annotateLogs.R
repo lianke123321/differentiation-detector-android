@@ -31,7 +31,7 @@ getIPData <- function () {
   technology <- rep(gCellularStr, nrow(cellData))
   
   # Hardcoded entries here!!!
-  sigWifi <- c("university", "cable", "comcast", "renater", "sonic", "PROXAD", "at&t\ internet", "qwest")
+  sigWifi <- c("integra", "internet4", "inria", "covad", "deutsche", "megapath",  "core", "dummy", "university", "cable", "comcast", "renater", "sonic", "PROXAD", "at&t\ internet", "qwest", "microsoft", "wayport")
   for (sig in sigWifi) {
     technology[grep(sig, cellData$isp_info, ignore.case=TRUE)] <- gWifiStr
   }

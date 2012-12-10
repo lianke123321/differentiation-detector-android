@@ -94,3 +94,49 @@ iphoneConns <- getSignatureConns(facebookSigs, iphoneHttpData, iphoneSSLData);
 droidConns <- getSignatureConns(facebookSigs, droidHttpData, droidSSLData);
 
 
+getFrequencies <- function (connData, serviceConns) {
+  i<-1;
+  reqRows <- NULL;
+  for (uid in connData$uid) {
+    if (uid %in% serviceConns) {
+      reqRows <- append(reqRows, i)
+    }
+    i<-i+1;
+    if (i%%1000==0){
+      print (i);
+    }
+  }
+  reqConnEntries <- connData[reqRows,];
+  reqConnEntries$tot_bytes <- reqConnEntries$orig_ip_bytes + reqConnEntries$resp_ip_bytes;
+  reqConnEntries$ts_date <- as.POSIXlt(as.numeric(reqConnEntries$ts), tz="America/Los_Angeles", origin = "1970-01-01") 
+  reqConnEntries$yday <- reqConnEntries$ts_date$yday;
+  # We now have the the required connections. Now get the distribution per day
+  aggrConns <- aggregate(reqConnEntries[c("tot_bytes")], 
+                         by=list(yday=reqConnEntries$yday),
+                         FUN=length); 
+  aggrConns;
+}
+
+droidFreqs <- getFrequencies(droidConnData, droidConns);
+ipadFreqs <- getFrequencies(ipadConnData, ipadConns);
+iphoneFreqs <- getFrequencies(iphoneConnData, iphoneConns)
+
+reqDays <- NULL;
+entries <- matrix(nrow=10000, ncol=4)
+i<-1;
+for (droidday in union(union(droidFreqs$yday, ipadFreqs$yday), iphoneFreqs$yday)) {
+  print(droidday)
+  if ((droidday %in% droidFreqs$yday) & (droidday %in% ipadFreqs$yday ) & (droidday %in% iphoneFreqs$yday)) {
+    entries[i,] <- c(droidday, 
+                 droidFreqs[droidFreqs$yday==droidday,]$tot_bytes,
+                 iphoneFreqs[iphoneFreqs$yday==droidday,]$tot_bytes,
+                 ipadFreqs[ipadFreqs$yday==droidday,]$tot_bytes);
+    i<-i+1;
+  }
+}
+entries <- entries[1:i-1,];
+median(droidFreqs$tot_bytes)
+median(ipadFreqs$tot_bytes)
+median(iphoneFreqs$tot_bytes)
+
+
