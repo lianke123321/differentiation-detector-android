@@ -2,7 +2,6 @@
 \label{sec:discussion}
 In this section, we discuss several key issues and limitations for an indirection-based 
 deployment such as \meddle.
-\tbd{This needs serious rewriting. Dave is in a hurry today.}
  
 \noindent\textbf{Privacy and trust.} As discussed in Section~\ref{subsec:currdeploy}, we 
 collect traces from users as part of an IRB-approved study. We take great care in 
@@ -10,11 +9,17 @@ protecting user privacy -- data is encrypted before being stored, the private ke
 not stored on the server where data is recorded and any PII accidentally sent in the 
 clear is stripped from our datasets as soon as we identify it. 
 
+While this fine-grained data is useful for informing the design of meddlebox solutions (\eg, 
+identifying and stripping personally identifiable information from unencrypted 
+HTTP traffic), it can be prohibitive for a large-scale study. In the next phase of 
+our deployment (currently under IRB review) we will capture only packet headers 
+and lengths. With a lower privacy risk, we believe we can recruit a larger number 
+of users and obtain informed consent via a Web site. 
+
 Regardless, users may still be uncomfortable with sending all their traffic through a 
 \meddle service, be it in a hosting center or in the cloud. We are making all of 
 our code open source so that users can install \meddle on servers in their 
-own networks (\eg, in their home network). Users may opt to use this option instead. 
-As researchers, we will lose valuable trace data; however, users will also be responsible 
+own networks (\eg, in their home network). Users may opt to use this option instead; however, they will also be responsible 
 for updating \meddle to include the latest new features and bug fixes. We expect 
 that most users interested in running \meddle will be content with using our hosted 
 \meddle service with anonymized packet headers being collected. 
