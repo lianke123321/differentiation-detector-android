@@ -268,6 +268,7 @@ appleTimes<- as.POSIXlt(as.numeric(appleConnData$ts), tz="America/Los_Angeles", 
 appleConnData$ts_date <- appleTimes;
 fName <- paste(broAggDir, "/appleConn.txt", sep="");
 write.table(appleConnData, fName, sep="\t", quote=F, col.names=c(colnames(appleConnData)), row.names=FALSE)
+
 pushTimes<-getNightPushTimes(iosUsers, iosConnData)
 userPushFlowFraction <- getPushFlowRatio(iosUsers, iosConnData)
 for (i in 1:length(userTsDiffs)) {
