@@ -205,32 +205,57 @@ We explicitly verified all provided documentation and confirmed that
 all statements are true with the exception of the notification behavior 
 with an iPad. The documentation states that the iPad will always 
 remain associated with a \wifi AP, even if it is not plugged in. Our 
-experience show this is not the case on an iPad 2.
+experience shows this is not the case on an iPad 2.
 
-\tbd{Are we sure that devices are getting SMS notifications to connect to an apple server?}
-When a push notification is received, the iOS device connects to port
-5223 of a nearby Apple server. For each iOS device in our dataset, we
-logged the timestamp at which these connections were established. From
-this set of connections, we then selected the connections established
-between midnight and 6 am of the users local time. For each user, we
-computed the median of time interval between successive
-connections. We observe this median to be in the range of 190 seconds
-to 590 seconds. This time interval depends on the different apps for
-which the user has enabled notifications. 
-\tbd{Add figure}
+We now further investigated 
+the behavior of iOS push over time for three characteristic users. Figure~\ref{fig:pushHourly} 
+plots this in terms of median number of push notifications received per 
+user per hour. During the period, all users were in the same time zone.
 
-A user can disable notifications for specific time intervals on
-devices running iOS 6. In our dataset, three devices had notification
-disabled during different time intervals. During these time intervals
-we did not observe any traffic for notifications.
+\begin{figure}
+\centering
+        \includegraphics[width=\linewidth]{./plots/iosPushHourDistrib.pdf}
+  \caption{Median number of push notifications seen per hour for three devices.}
+  \label{fig:pushHourly}
+\end{figure}
+
+First, the figure shows that all three users see significant numbers of push 
+notifications even in idle, overnight periods. It is unclear what the value of 
+such traffic is. Second, we clearly see significant differences in the volume 
+of traffic among users. User 1 has registered to receive push notifications 
+from multiple apps, while Users 2 and 3 have not. Last, we note that even 
+with iOS 6's ``do not disturb'' (DND) feature, push notifications continue to be 
+sent during DND periods. Specifically, User 2 has enabled DND between 
+midnight and 7am, but there is no noticeable change in APNS traffic.
+In summary, we can use \meddle to help understand the network 
+behavior of closed systems; further, we identify several opportunities 
+where we believe the OS can reduce or eliminate push traffic (during idle periods).
+
+
+% DRC: This contradicts results presented later.
+%\tbd{Are we sure that devices are getting SMS notifications to connect to an apple server?}
+%When a push notification is received, the iOS device connects to port
+%5223 of a nearby Apple server. For each iOS device in our dataset, we
+%logged the timestamp at which these connections were established. From
+%this set of connections, we then selected the connections established
+%between midnight and 6 am of the users local time. For each user, we
+%computed the median of time interval between successive
+%connections. We observe this median to be in the range of 190 seconds
+%to 590 seconds. This time interval depends on the different apps for
+%which the user has enabled notifications. 
+%\tbd{Add figure}
+%
+%A user can disable notifications for specific time intervals on
+%devices running iOS 6. In our dataset, three devices had notification
+%disabled during different time intervals. During these time intervals
+%we did not observe any traffic for notifications.
 
 \noindent\textbf{Interaction between \meddle and the power management
   policy on iOS.}
 In the remainder of this section, we perform controlled experiments 
-to understand the interaction between \meddle{}, in particular the VPN
-connection between the device and the meddlebox, and the power
+to understand the interaction between \meddle's VPN connection and the power
 management policy on iOS. In summary, we find that the impact of the VPN depends 
-on the power state and network interfaces used (\wifi or 3G) on the
+on the power state and network interfaces used (\wifi or cellular) on the
 device -- but we show that the current power management policy on iOS
 might adversely impact the energy consumption when the APNS is heavily used.
 Further, we find that the changes in traffic patterns are relatively 
@@ -249,7 +274,7 @@ and the \iphone{}. Each experiment lasts for around 1 hour.
 \centering
         \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_plug_novpn_interTs.eps}
   \caption{Distribution of the interarrival times of Ethernet frames
-    for a one hour experiment with an idle \iphone{} plugged-in, with \wifi{} and 3G
+    for a one hour experiment with an idle \iphone{} plugged-in, with \wifi{} and cellular
     enabled, and no VPN enabled. For each bin of 1 second, we count
     the number of interarrivals in that bin.}
   \label{fig:push_w3p_interTs}
@@ -269,7 +294,7 @@ and the \iphone{}. Each experiment lasts for around 1 hour.
 \centering
         \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_plug_vpn_interTs.eps}
   \caption{Distribution of the interarrival times of Ethernet frames
-    for a one hour experiment with an idle \iphone{} plugged-in, with \wifi{} and 3G
+    for a one hour experiment with an idle \iphone{} plugged-in, with \wifi{} and cellular
     enabled, and VPN enabled. For each bin of 1 second, we count
     the number of interarrivals in that bin.}
   \label{fig:push_w3pv_interTs}
@@ -285,7 +310,7 @@ and the \iphone{}. Each experiment lasts for around 1 hour.
 %  \label{fig:push_w3pv_ts}
 %\end{figure}
 
-\emph{Behavior when plugged in.} When an \iphone{} is plugged-in, it always remains associated with the
+\noindent\emph{Behavior when plugged in.} When an \iphone{} is plugged-in, it always remains associated with the
 \wifi{} access point if \wifi{} is enabled on the device. We performed
 a first set of experiments to observe the traffic to and from an idle
 \iphone{}. We see in Fig.~\ref{fig:push_w3p_interTs} and
@@ -315,19 +340,10 @@ omitted for space reasons.)
 %  \label{fig:push_w3_interTs}
 %\end{figure}
 
-\begin{figure}
-\centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_novpn_ts.eps}
-  \caption{Cumulative distribution of the Ethernet frames
-          arrival with time for a one hour experiment with an idle
-          \iphone{} unplugged, with \wifi{} and 3G enabled, and no VPN
-          enabled.}
-  \label{fig:push_w3_ts}
-\end{figure}
 
-\emph{Behavior when on battery.} 
+\noindent\emph{Behavior when on battery.} 
 In a second set of experiments, we consider a default \iphone{}
-setting with 3G and \wifi{} enabled, and the \iphone{} unplugged. This
+setting with cellular and \wifi{} enabled, and the \iphone{} unplugged. This
 corresponds to a typical setting for a user on move.  We observed 
 relatively large interarrival times for frames in this case (many on the order of 100s of 
 seconds). These cases correspond to
@@ -336,6 +352,15 @@ associated to the access point for energy saving.
 
 
 
+\begin{figure}
+\centering
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_novpn_ts.eps}
+  \caption{Cumulative distribution of the Ethernet frames
+          arrival with time for a one hour experiment with an idle
+          \iphone{} unplugged, with \wifi{} and cellular enabled, and no VPN
+          enabled.}
+  \label{fig:push_w3_ts}
+\end{figure}
 
 %\begin{figure}
 %\centering
@@ -359,21 +384,21 @@ associated to the access point for energy saving.
 
 Surprisingly, even though the \iphone{} is idle, the traffic pattern
 is not regular (Fig.~\ref{fig:push_w3_ts}). To
-understand this irregularity, we made a new experiment with 3G
+understand this irregularity, we made a new experiment with cellular
 disabled. The largest
 interarrival is still in the order of 550 seconds, as in the case with
-3G enabled, but we have less variety in the interarrival times. This
+cellular enabled, but we have less variety in the interarrival times. This
 is confirmed by Fig.~\ref{fig:push_w_ts} that shows a regular
 succession of short periods during which frames are exchanged and long
 periods during which the wifi interface is not associated to the
 access point.
 
-Therefore, there is an evidence that the 3G connection triggers
+Therefore, there is an evidence that the cellular connection triggers
 the association of the \iphone{} \wifi interface with the access
-point. This is confirmed by experiments we performed with iMessage
-that is using the push notification infrastructure of Apple. When both
-3G and \wifi{} are enabled on an \iphone{}, a permanent connection to
-the push notification infrastructure of Apple is setup on the 3G
+point. This is confirmed by experiments we performed with iMessage, 
+which uses the push notification infrastructure of Apple. When both
+cellular and \wifi{} are enabled on an \iphone{}, a permanent connection to
+the push notification infrastructure of Apple is setup on the cellular
 interface. Each time an iMessage is received, it is piggybacked on the
 push notification message (when short enough). Interestingly, the \wifi{}
 interface is always woken-up even if no payload is sent on it. We
@@ -381,10 +406,9 @@ don't know the exact reason for this behavior, but it may have an
 adverse impact of battery life for users with frequent push
 notifications, \eg, heavy users of SMS, twitter, facebook, games, \etc
 
-In summary, whereas the APNS has been designed to provide push
-notifications for iOS that is aggressive preventing applications
-running in the background for power saving, \emph{the systematic wake up of
-the wifi interface might lead to an unecessary severe increase in power
+In summary, APNS allows apps to interact with the user despite a strict energy-saving policy that 
+prevents apps running in the background; however, \emph{the systematic wake up of
+the wifi interface might lead to an unnecessary severe increase in power
 consumption}. 
 
 
@@ -410,23 +434,23 @@ consumption}.
 
 
 
-\emph{Behavior when \meddle is enabled.} We performed a third set of experiments with the VPN enabled. This set
+\noindent\emph{Behavior when \meddle is enabled.} We performed a third set of experiments with the VPN enabled. This set
 of experiments shows the interaction between \meddle 
 and the power management policy. We see in
 %Fig.~\ref{fig:push_wv_interTs} and 
 Fig.~\ref{fig:push_wv_ts} that
 there is no noticeable differences when enabling \meddle with \wifi{} only. However,
-when enabling both \wifi and 3G the frames interarrival time
+when enabling both \wifi and cellular the frames interarrival time
 %(Fig.~\ref{fig:push_w3v_interTs}) 
 and the cumulative arrival of frames (Fig.~\ref{fig:push_w3v_ts}) is
 significantly different. This difference between scenarios with and
-without 3G is due to the persistence of the 3G connection. Indeed, on
-the one hand, if messages are sent to the device when 3G is disabled,
+without cellular is due to the persistence of the cellular connection. Indeed, on
+the one hand, if messages are sent to the device when the cellular connection is disabled,
 they will be lost if the \wifi interface is sleeping. Therefore, the
 \wifi association periods are triggered by an internal device policy
-only. On the other hand, when the 3G connection is enabled, all
+only. On the other hand, when the cellular connection is enabled, all
 messages sent to the device will be received. If the \wifi interface
-is sleeping, messages received on the 3G interface will wake up the
+is sleeping, messages received on the cellular interface will wake up the
 \wifi interface. In that case, the \wifi association periods are not
 only triggered by an internal device policy, but by external events
 too, which explains the very different interarrival times seen in
@@ -434,16 +458,16 @@ Fig.~\ref{fig:push_w3_ts} and Fig.~\ref{fig:push_w_ts}, and in
 Fig.~\ref{fig:push_wv_ts} and Fig.~\ref{fig:push_w3v_ts}.
 
 The main question that remains is: what are these messages received on
-the 3G interface? In Fig.~\ref{fig:push_w3v_ts}, we observe a pattern
+the cellular interface? In Fig.~\ref{fig:push_w3v_ts}, we observe a pattern
 with a periodicity of around 45 seconds. This pattern does not exist
 when the VPN is disabled as shown in Fig.~\ref{fig:push_w3_ts}. We
 conclude that this periodicity is mostly due to keep alive messages of the
-VPN. In Fig.~\ref{fig:push_w3_ts}, we observe what looks like
+VPN for NAT traversal. In Fig.~\ref{fig:push_w3_ts}, we observe what looks like
 a random wake up of the \wifi interface when the VPN is disabled. We
 explored tcpdump traces for this scenario and for the scenario with
 the VPN enabled, looking for messages that explain the apparent
 randomness, but we did not find any such messages. Therefore, we guess
-that packets that do not use the VPN tunnel are received on the 3G
+that packets that do not use the VPN tunnel are received on the cellular 
 interface. Such packets might be sent by the cellular provider to the
 device. 
 
@@ -458,7 +482,7 @@ device.
 % can safely state my guess in the paper.}
 
 In conclusion, though \meddle appears to capture all IP traffic it may
-miss traffic in the circuit switched network.
+miss traffic in the circuit switched network when a cellular connection is enabled.
 
 \begin{figure}
 \centering
@@ -475,31 +499,11 @@ miss traffic in the circuit switched network.
         \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_vpn_ts.eps}
   \caption{Cumulative distribution of the Ethernet frames
           arrival with time for a one hour experiment with an idle
-          \iphone{} unplugged, with \wifi{} and 3G enabled, and VPN
+          \iphone{} unplugged, with \wifi{} and cellular enabled, and VPN
           enabled.}
   \label{fig:push_w3v_ts}
 \end{figure}
 
-\noindent\textbf{Time-of-day impact on push.} We now investigate 
-the behavior of iOS push over time for three characteristic users. Figure~\ref{fig:pushHourly} 
-plots this in terms of median number of push notifications received per 
-user per hour. During the period, all users were in the same time zone.
-
-\begin{figure}
-\centering
-        \includegraphics[width=\linewidth]{./plots/iosPushHourDistrib.pdf}
-  \caption{Median number of push notifications seen per hour for three devices.}
-  \label{fig:pushHourly}
-\end{figure}
-
-First, the figure shows that all three users see significant numbers of push 
-notifications even in idle, overnight periods. It is unclear what the value of 
-such traffic is. Second, we clearly see significant differences in the volume 
-of traffic among users. User 1 has registered to receive push notifications 
-from multiple apps, while Users 2 and 3 have not. Last, we note that even 
-with iOS 6's ``do not disturb'' (DND) feature, push notifications continue to be 
-sent during DND periods. Specifically, User 2 has enabled DND between 
-midnight and 7am, but there is no noticeable change in APNS traffic.
 
 \subsection{Case Study: Longitudinal Measurements - Google Search }
 \label{sec:case-study-google}
