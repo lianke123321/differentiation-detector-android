@@ -3,6 +3,7 @@
 In this section, we discuss the motivation for \meddle, describe our goals for the 
 system and present an architecture to meet those goals.
 
+\subsection{Motivation}
 \meddle is motivated by the fact that users and researchers currently 
 have a limited view -- if any -- into how devices and apps generate network 
 traffic. In addition, there are few mechanisms available for shaping, modifying 
@@ -12,16 +13,17 @@ This can be harmful to users, as apps may generate sufficient traffic
 to cause overage charges on cell phone bills. Even when the volume of
 traffic is small, a periodic network activity can quickly deplete
 battery charge by preventing power management policy of the device to
-correctly operate. Further, apps can use the network to leak personal
-information or track users without consent.
+correctly operate~\cite{qian:periodic}. Further, apps can use the network to leak personal
+information or track users without consent~\cite{hornyack:appfence}.
 
-Researchers  are in a similar bind. It is common 
+Researchers  likewise suffer from a lack of visibility and control over 
+network traffic. It is common 
 to use testbeds or proprietary ISP datasets to reveal network usage 
 and its impact on data quota, battery life and privacy. However, the 
 coverage and representativeness of these results can by limited by 
 the use of i) a single carrier's network, ii) a small testbed with 
 a single, custom operating system and iii) a single access technology 
-(cellular or WiFi). Once a problem with network traffic has been identified, 
+(cellular or WiFi). Once researchers identify a problem with network traffic, 
 addressing it can be challenging. OS developers are slow to 
 adopt changes, app developers may be unwilling to modify their code 
 and carriers often have no incentive to deploy new in-network 
@@ -83,10 +85,10 @@ and isolation. Specifically, major
  mobile OSes provide built-in VPN functionality for enterprise
  customers to enable access to resources in
  the enterprise's private network for employees ``on the road". 
-In \meddle, we use VPNs as a portable mechanism\footnote{Android, BlackBerry and iOS all support VPNs natively, representing more than 86\% of the mobile device market\cite{gartner-phone-share}.} to tunnel traffic from mobile devices to a machine outside of the carrier's network for the purpose of analysis and interposition. 
+In \meddle, we use VPNs as a portable mechanism\footnote{Android, BlackBerry and iOS and Windows 8 all support VPNs natively, representing more than 86\% of the mobile device market\cite{gartner-phone-share}.} to tunnel traffic from mobile devices to a machine outside of the carrier's network for the purpose of analysis and interposition. 
 
 We use software-middlebox techniques to meet the goal of providing control over network traffic in the mobile 
-environment. Middleboxes are traditionally used in managed networks (e.g., in enterprises and ISPs) to implement policies and enhanced services over IP. In \meddle, we use middleboxes as a mechanism not only to implement custom policies and services for users and service providers, but also for measuring networks and experimenting with alternative protocols for the mobile environment without requiring access to mobile carrier networks. 
+environment~\cite{sherry:middleboxes}. Middleboxes are traditionally used in managed networks (e.g., in enterprises and ISPs) to implement policies and enhanced services over IP. In \meddle, we use middleboxes as a mechanism not only to implement custom policies and services for users and service providers, but also for measuring networks and experimenting with alternative protocols for the mobile environment without requiring access to mobile carrier networks. 
 
 %\tbdal{here it would be good to introduce which VPN technology is
 %  used, give a reference to it, explain that it is an open VPN
@@ -118,7 +120,7 @@ given device.
 \vspace{\postfigspace}
 \end{figure}
 
-When a device attempts to connect to \meddle, we direct it to a nearby 
+In the distributed scenario, when a device attempts to connect to \meddle, we direct it to a nearby 
 \meddle server in a similar way to how the Akamai CDN uses DNS to redirect 
 Web clients to nearby content caches~\cite{akamai:cdn}. 
 To optimize for performance, the service can send VPN clients to a 
@@ -137,12 +139,18 @@ The system maintains a per-device and per-user profile
 to determine the set of services that will operate on the tunnel's 
 network traffic. 
 
-\tbd{Discuss the interior of a meddlebox.}
+Meddleboxes are monolithic in our current implementation, meaning 
+that all meddlebox features are within the same \meddle server. When deployed 
+in the cloud and at scale, this could lead to suboptimal scaling because 
+users might adopt meddlebox features unevenly. To address this, we are 
+developing a cloud-based distributed meddelbox deployment where each service runs 
+in its own virtual machine (VM) and a user's traffic is routed through a series of these VMs using a 
+software-defined network to set up per-user routes on demand.
 
 While the \meddle architecture is straightforward, there are a 
 number of challenges we must address in building a viable deployment. 
 In the next section, we describe how we achieve continuous monitoring 
-of network traffic across platforms, demonstrate that the power, data-volume and latency 
+of network traffic across platforms, then demonstrate that the power, data-volume and latency 
 overheads are reasonably small.
 
 
