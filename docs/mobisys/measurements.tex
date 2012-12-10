@@ -540,17 +540,31 @@ system's default browser has not made the change to HTTPS for searches.
 %  to desktop sentence.}
 
 
-\subsection{Case Study Filtering Intrusive Traffic}
+\subsection{Case Study: Misbehaving Apps and Filtering}
 \label{sec:case-study-filtering}
 
-\subsection{Case Study Traffic Optimization - Compression}
+    Smartphone users are often faced with the decision whether or not to trust an app downloaded from the iPhone App Store or the Android Market.
+    While the user can access some information a priori regarding the app's behavior, \eg{} via reading reviews or inspecting the permissions requested,they ultimately can not know the app's behavior without installing it.
+    While some undesirable app behavior is readily apparent -- \eg{} pushing advertisements to the notifications bar, installing unwanted third-party software, \etc{} -- the app's network behavior remains invisible to the user even after installation.
+    With this in mind, we used {\it Meddle} to perform a short app-by-app analysis of network usage behavior.
+    
+    To start, we defined the network usage properties we desired from a `well behaved' app:
+    \begin{itemize}
+        \item Protection of personally identifiable information (PII): transmitting PII only when required for application functionality, and if transmitting PII, doing so over HTTPS rather than HTTP.
+        \item Conservation of power and data quota by making only necessary use of network.
+        \item Communication only with servers needed for the applications intended purpose, with preferably a limited number of entities contacted by the app overall.
+    \end{itemize}
+    We then downloaded six of the most popular apps from the Android Market, installed them on an fresh install of Android \tbd{x.y.z}. 
+    One was a popular game, one was the app for a widely used image sharing site, one was a `weather' app, one was a settings management app, one was the app for a popular movie, and the final was a risqu\'{e} app serving various images. 
+
+    The movie app, the settings app, and the game app easily fit our provider.
+    Over 30 minutes of active use with the movie app, the phone contacted Amazon, Google, and a single CDN provider; the average inter-packet transmission time was \tbd{x}.
+    Over 30 minutes of active use with the settings app, the phone contacted Amazon, Google, a hosting service, and two CDN services; the average inter-packet transmission time was \tbd{y}.
+    Over 30 minutes of active use with the game app, the phone contacted only Google and Amazon; while the average inter-packet transmision time was higher (\tbd{z}), we presume this was needed for updating the game scoreboard at the end of each game.\tbd{Amy, is this a reasonable estimate?}
+\subsection{Case Study: Traffic Optimization - Compression}
 \label{sec:case-study-compression}
 
 \tbd{Ashwin: point out cases where compression hurts. also show how much is already compressed.}
-
-\subsection{Case Study Suspicious Apps}
-\label{sec:case-study-susp}
-
 
 
 
