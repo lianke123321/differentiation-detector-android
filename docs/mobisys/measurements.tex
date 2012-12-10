@@ -290,8 +290,11 @@ a first set of experiments to observe the traffic to and from an idle
 Fig.~\ref{fig:push_w3pv_interTs} that the largest interarrival between
 two frames is in the order of 10 seconds for both the VPN and no VPN
 scenarios. We also observe no noticeable difference in the arrival of
-frames with time for both the VPN (see Fig.~\ref{fig:push_w3pv_ts} and
-no VPN (see Fig.~\ref{fig:push_w3p_ts}) scenarios. \emph{Thus, it 
+frames with time for both the VPN. (The corresponding figures are 
+omitted for space reasons.)
+%(see Fig.~\ref{fig:push_w3pv_ts} and
+%no VPN (see Fig.~\ref{fig:push_w3p_ts}) scenarios. 
+\emph{Thus, it 
 appears that the VPN connection has no noticeable impact on 
 network traffic generated for APNS when the device is plugged in.}
 
@@ -324,9 +327,9 @@ network traffic generated for APNS when the device is plugged in.}
 \emph{Behavior when on battery.} 
 In a second set of experiments, we consider a default \iphone{}
 setting with 3G and \wifi{} enabled, and the \iphone{} unplugged. This
-corresponds to a typical setting for a user on move.  We observe in
-Fig.~\ref{fig:push_w3_interTs} some very large interarrival
-times for frames. All interarrival times larger than 10 seconds correspond to
+corresponds to a typical setting for a user on move.  We observed 
+relatively large interarrival times for frames in this case (many on the order of 100s of 
+seconds). These cases correspond to
 periods during which the \wifi interface of the \iphone{} is not
 associated to the access point for energy saving. 
 
@@ -356,7 +359,7 @@ associated to the access point for energy saving.
 Surprisingly, even though \iphone{} is idle, the traffic pattern
 is not regular (Fig.~\ref{fig:push_w3_ts}). To
 understand this irregularity, we made a new experiment with 3G
-disabled. We observe in Fig.~\ref{fig:push_w_interTs} that the largest
+disabled. The largest
 interarrival is still in the order of 550 seconds, as in the case with
 3G enabled, but we have less variety in the interarrival times. This
 is confirmed by Fig.~\ref{fig:push_w_ts} that shows a regular
@@ -405,10 +408,12 @@ that, in turn, causes IP traffic to occur.
 \emph{Behavior when switching access technologies.} We performed a third set of experiments with the VPN enabled. This set
 of experiment shows the impact of using \meddle on the traffic pattern
 and the power management policy. We see in
-Fig.~\ref{fig:push_wv_interTs} and Fig.~\ref{fig:push_wv_ts} that
+%Fig.~\ref{fig:push_wv_interTs} and 
+Fig.~\ref{fig:push_wv_ts} that
 there is no noticeable differences when enabling \meddle with \wifi{} only. However,
 when enabling both \wifi and 3G the frames interarrival time
-(Fig.~\ref{fig:push_w3v_interTs}) and the cumulative arrival of frames
+%(Fig.~\ref{fig:push_w3v_interTs}) 
+and the cumulative arrival of frames
 (Fig.~\ref{fig:push_w3v_ts}) is significantly different. 
 \tbd{It will probably be too short for the deadline, but I need to see
 on the meddle logs what are these 3G messages. I cannot get them from
@@ -439,6 +444,27 @@ can safely state my guess in the paper.}
   \label{fig:push_w3v_ts}
 \end{figure}
 
+\noindent\textbf{Time-of-day impact on push.} We now investigate 
+the behavior of iOS push over time for three characteristic users. Figure~\ref{fig:pushHourly} 
+plots this in terms of median number of push notifications received per 
+user per hour. During the period, all users were in the same time zone.
+
+\begin{figure}
+\centering
+        \includegraphics[width=\linewidth]{./plots/iosPushHourDistrib.pdf}
+  \caption{Median number of push notifications seen per hour for three devices.}
+  \label{fig:pushHourly}
+\end{figure}
+
+First, the figure shows that all three users see significant numbers of push 
+notifications even in idle, overnight periods. It is unclear what the value of 
+such traffic is. Second, we clearly see significant differences in the volume 
+of traffic among users. User 1 has registered to receive push notifications 
+from multiple apps, while Users 2 and 3 have not. Last, we note that even 
+with iOS 6's ``do not disturb'' (DND) feature, push notifications continue to be 
+sent during DND periods. Specifically, User 2 has enabled DND between 
+midnight and 7am, but there is no noticeable change in APNS traffic.
+
 \subsection{Case Study: Longitudinal Measurements - Google Search }
 \label{sec:case-study-google}
 
@@ -457,39 +483,61 @@ can safely state my guess in the paper.}
 % 1353489969.953698       7S1qUBBGGUg     24.19.59.238    45867   173.194.79.138  80      11      GET     suggestqueries.google.com       /complete/search?hl=en&ds=yt&client=androidyt&hjson=t&oe=UTF-8&q=awesome+to+    -       Apache-HttpClient/UNAVAILABLE (java 1.4)        0       383     200     OK      -       -       -       (empty) -       -       -       -       -       application/json; charset=UTF-8 chunked text/plain      -       -
 
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|c|c|l|}
-\hline
-Time & Bytes & Query \tabularnewline
- & Downloaded & String\tabularnewline
-\hline 
-1353489965.97 & 356 & a \tabularnewline
-\hline
-1353489966.19& 321 & aw\tabularnewline
-\hline
-1353489966.47& 300 & awe\tabularnewline
-\hline
-1353489966.88& 301 & awes\tabularnewline
-\hline
-1353489967.36& 302 & aweso\tabularnewline
-\hline
-\end{tabular}
-\end{center}
-\caption{Table}
-\label{tab:ExampleGoogleSearch}
-\end{table}
-We now use Google search as an example of longitudinal studies that
-are possible using using Meddle.
+%\begin{table}
+%\begin{center}
+%\begin{tabular}{|c|c|l|}
+%\hline
+%Time & Bytes & Query \tabularnewline
+% & Downloaded & String\tabularnewline
+%\hline 
+%1353489965.97 & 356 & a \tabularnewline
+%\hline
+%1353489966.19& 321 & aw\tabularnewline
+%\hline
+%1353489966.47& 300 & awe\tabularnewline
+%\hline
+%1353489966.88& 301 & awes\tabularnewline
+%\hline
+%1353489967.36& 302 & aweso\tabularnewline
+%\hline
+%\end{tabular}
+%\end{center}
+%\caption{Table}
+%\label{tab:ExampleGoogleSearch}
+%\end{table}
+A key advantage of our approach is that we can monitor app behavior 
+over time and as updates occur. This can lead to surprising or otherwise 
+unpublicized revelations about network activity.
 
-In \fref{tab:ExampleGoogleSearch} we present a sample search session on
-Android 4.0. During this sesssion, we observe that each key stroke by
-the user resulted in a unique GET query made to a Google server. We
-observe similar behavior on Android 4.0, Android 4.1, and Android 4.2
+One prominent example is Google searches from mobile devices. In the 
+desktop environment, we have grown accustomed to these searches 
+occurring over HTTPS connections, which protects user privacy from 
+carriers and from other users at open \wifi hotspots. 
+
+In the mobile environment, however, we noticed that the default 
+browsers on iOS and Android send user queries in the clear. In fact, 
+each letter is sent as the user types it for the purpose of Google Suggestions. 
+We
+observed this behavior on Android 4.0, Android 4.1, and Android 4.2
 \tbd{confirm}. In the case of iOS devices we observed search queries
-in the clear on devices running iOS 5. On devices running iOS 6 we
-observe that search queries take place over SSL. \tbd{Privacy similar
-  to desktop sentence.}
+in the clear on devices running iOS 5. 
+
+Interestingly, as of iOS 6 these searches are now sent in the clear, addressing 
+a significant privacy vulnerability. To the best of our knowledge this 
+change has not been publicized. Surprisingly, Google's own operating 
+system's default browser has not made the change to HTTPS for searches.
+
+%We now use Google search as an example of longitudinal studies that
+%are possible using using Meddle.
+%
+%In \fref{tab:ExampleGoogleSearch} we present a sample search session on
+%Android 4.0. During this sesssion, we observe that each key stroke by
+%the user resulted in a unique GET query made to a Google server. We
+%observe similar behavior on Android 4.0, Android 4.1, and Android 4.2
+%\tbd{confirm}. In the case of iOS devices we observed search queries
+%in the clear on devices running iOS 5. On devices running iOS 6 we
+%observe that search queries take place over SSL. \tbd{Privacy similar
+%  to desktop sentence.}
 
 
 \subsection{Case Study Filtering Intrusive Traffic}
@@ -497,6 +545,8 @@ observe that search queries take place over SSL. \tbd{Privacy similar
 
 \subsection{Case Study Traffic Optimization - Compression}
 \label{sec:case-study-compression}
+
+\tbd{Ashwin: point out cases where compression hurts. also show how much is already compressed.}
 
 \subsection{Case Study Suspicious Apps}
 \label{sec:case-study-susp}
