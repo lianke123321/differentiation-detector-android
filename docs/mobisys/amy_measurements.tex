@@ -20,8 +20,8 @@ it is more difficult to determine which traffic is strictly necessary for app fu
 at a \meddle server. 
     With this in mind, we used \meddle to perform a short app-by-app analysis of network usage behavior.
     
-       We downloaded five of the most popular apps from the Android Market and installed them on an fresh install of Android 4.1.
-       The apps fall into the following categories: two popular games,a weather app, a settings 
+       We downloaded six of the most popular apps from the Android Market and installed them on an fresh install of Android 4.1.
+       The apps fall into the following categories: a mainstream image-sharing app, two popular games,a weather app, a settings 
         management app, and a risqu\'{e} app serving various images. We interacted with each app for between 7 and 15 minutes 
         to understand network behavior when the app is being used.
 
@@ -33,18 +33,18 @@ at a \meddle server.
     The settings app and the game apps contacted a limited number of third parties.
     The settings app contacted Amazon, Google, a hosting service, and two CDN services.
     One game app contacted only Amazon, Google, and a single CDN provider, the other contacted only Amazon, Google, a private server belonging to the game developer, and three CDN/Ad services.
-    The weather app and the risqu\'{e} app both contacted a large number of third party services; the weather app contacted 10 and the risqu\'{e} app contacted 19. 
+    The weather app, the image app, and the risqu\'{e} app both contacted a large number of third party services; the weather app contacted 10 and the risqu\'{e} app contacted 19. 
 
    \noindent{\bf Resource Consumption.}
    Finally, we considered resource consumption towards both battery life and data caps.
-    The risqu\'{e} app by far made the most impact towards data cap consumption: on average, it consumed 23.37 Kb per second of use.
-    This is not entirely surprising, given that the app was serving images, but this figure is magnified by the fact that the app downloaded and installed several additional (unrequested) apps to the phone.
+    The risqu\'{e} app and the image app by far made the most impact towards data cap consumption: on average, the risqu\'{e} app accessed 23.37 Kb per second of use and the image app accessed 22.84 Kbps.
+    Both apps were downloading large numbers of image files.
     The weather app and settings app consumed 4.49 Kbps and 6.27 Kbps respectively; the games apps had much more limited bandwidth consumption with only 1.5 and 1.7 Kbps consumed each.
 
     To evaluate behavior towards battery life, we considered the fraction of 30-second intervals during which no traffic was sent by the phone, rather than the amount of traffic sent overall. 
     We require this different metric because, \eg{} small amounts of traffic, sent frequently leave the radio on for an extended period of time, thus bandwidth is not the best indicator of radio use.
     The games apps, which were the best performers in terms of bandwidth consumption, were some of the worst performers in terms of radio usage: 78\% and 66\% of 30-second intervals generated network traffic.
-    However, the worst performer overall was the settings app, which generated traffic during 85\% of 30-second intervals.
+    The worst performers overall were the settings app and the image app, which both generated traffic during 85\% of 30-second intervals.
     The weather app, and the risqu\'{e} app generated traffic during 23\% and 49\% of 30-second intervals respectively.
 
     \noindent{\bf Summary.}
