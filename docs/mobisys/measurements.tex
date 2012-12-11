@@ -654,7 +654,37 @@ at a \meddle server.
 \subsection{Case Study: Traffic Optimization - Compression}
 \label{sec:case-study-compression}
 
-\tbd{Ashwin: point out cases where compression hurts. also show how much is already compressed.}
+In our data set we observed that 42.45\% of the all the HTTP flows (1.06\% by volume) have 
+a mime-type of "text." This implies that the content can be potentially compressed by the 
+remote server. We observe that 38\% of the flows (3.42\% by volume) that have a mime-type 
+of "text" are compressed. We also observe that compression is counter productive for 4\% of 
+the all the flows that have a mime-type of "text". This is because the volume of data after 
+compression is larger than the volume before compression. In Table~\ref{tab:compression} we present the top 5 
+sources of traffic for which compression is counterproductive. What is surprising is that 
+compression of google search responses can be counter-productive for the user in terms 
+of power consumption.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Android} & \textbf{iOS} \tabularnewline
+\hline
+mercuryapps.foxnews.com & www.engadget.com \tabularnewline
+\hline
+www.google.com & itunes.apple.com \tabularnewline
+\hline
+www.quora.com & iadctest.qwapi.com \tabularnewline
+\hline
+opml.radiotime.com & www.google.com \tabularnewline
+\hline
+www.pandora.com & beacon.flipboard.com  \tabularnewline
+\hline
+\end{tabular}
+\caption{Top five sites using counterproductive compression.}
+\label{tab:compression}
+\end{center}
+\end{table}
 
 
 
