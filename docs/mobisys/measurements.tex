@@ -392,7 +392,7 @@ is not regular (Fig.~\ref{fig:push_w3_ts}). To
 understand this irregularity, we made a new experiment with cellular
 disabled. The largest
 interarrival is still in the order of 550 seconds, as in the case with
-cellular enabled, but we observe a smaller variance in the interarrival times. This
+cellular enabled, but we have less variety in the interarrival times. This
 is confirmed by Fig.~\ref{fig:push_w_ts} that shows a regular
 succession of short periods during which frames are exchanged and long
 periods during which the wifi interface is not associated to the
@@ -614,8 +614,8 @@ change has not been publicized.
 %  to desktop sentence.}
 
 
-%\subsection{Case Study: Misbehaving Apps}
-%\label{sec:case-study-filtering}
+\subsection{Case Study: Misbehaving Apps}
+\label{sec:case-study-filtering}
 \input{amy_measurements}
 
 \subsection{Case Study: Traffic Optimization}
@@ -627,7 +627,8 @@ to use their compression proxies.
 
 In our data set we observed that 42.45\% of the all the HTTP flows (1.06\% by volume) have 
 a mime-type of ``text.'' This implies that the content can be potentially compressed by the 
-remote server. We observe that 38\% of such flows (3.42\% by volume) are, in fact, compressed. 
+remote server. 
+%We observe that 38\% of such flows (3.42\% by volume) are, in fact, compressed. 
 Importantly, our analysis reveals that 23\% of HTTP flows are uncompressed, and these flows 
 contribute only 0.5\% of our users' total data. Thus, we believe there are few meaningful 
 opportunities for injecting compression at a meddlebox; instead, we believe most improvements 

@@ -9,24 +9,24 @@
         \item Communication only with servers needed for the applications intended purpose, with preferably a limited number of entities contacted by the app overall.
     \end{itemize}
 
-\noindent\textbf{Survey of privacy violations in the wild.} In our dataset, we were surprised to find several examples of PII sent in the clear. Specifically, we searched for IMEI (device unique identifiers) and 
+\noindent\textbf{Survey of privacy violations in the wild.} In our dataset, we were surprised to find several examples of PII sent in the clear. Specifically, we identified IMEI (device unique identifiers) and 
 GPS coordinates in HTTP request strings. Offending apps include The New York Times, The Weather Channel, Fox News, ESPNCricInfo, FirstPost and 
 Angry Birds. For many of these apps, the privacy violations are due to included software for displaying ads. The key takeaway is that privacy 
 violations from tracking software is pervasive and often easy to detect. When using \meddle, users limit their exposure to eavesdroppers 
 because the connection to the \meddle server is encrypted. Further, in the next section we discuss how \meddle can strip this information. 
   
-\noindent\textbf{Controlled experiments} While the above examples indicate clear examples of undesirable app behavior, 
+\noindent\textbf{Controlled experiments.} While the above examples indicate clear examples of undesirable app behavior, 
 it is more difficult to determine which traffic is strictly necessary for app functionality and which can be removed through blocking 
 at a \meddle server. 
-    With this in mind, we used \meddle to perform a short app-by-app analysis of network usage behavior.
+    With this in mind, we used \meddle to perform a small app-by-app analysis of network usage behavior.
     
        We downloaded five of the most popular apps from the Android Market and installed them on an fresh install of Android 4.1.
-       The apps fall into the following categories: two popular games,a weather app, a settings 
+       The apps fall into the following categories: two popular games, a weather app, a settings 
         management app, and a risqu\'{e} app serving various images. We interacted with each app for between 7 and 15 minutes 
         to understand network behavior when the app is being used.
 
     \noindent{\bf Leaking PII.}
-    None of the apps we installed for these experiments leaked PII over HTTP. However, there was evidence that the weather app was making use of a tracking service, contacting an third-party service which markets itself as specializing in `device tracking and fraud prevention.'
+    None of the apps we installed for these experiments leaked PII over HTTP. However, there was evidence that the weather app was making use of a tracking service, contacting an third-party service which markets itself as specializing in ``device tracking and fraud prevention.''
     It is unclear why a weather app requires a service for fraud prevention.
 
     \noindent{\bf Third Party Contacts.} 
@@ -37,19 +37,19 @@ at a \meddle server.
 
    \noindent{\bf Resource Consumption.}
    Finally, we considered resource consumption towards both battery life and data caps.
-    The risqu\'{e} app by far made the most impact towards data cap consumption: on average, it consumed 23.37 Kb per second of use.
-    This is not entirely surprising, given that the app was serving images, but this figure is magnified by the fact that the app downloaded and installed several additional (unrequested) apps to the phone.
+    The risqu\'{e} app by far made the most impact towards data cap consumption: on average, it consumed 23.37 Kbps.
+    This is not entirely surprising, given that the app was serving images, but this figure is magnified by the fact that the app downloaded and installed several additional (unsolicited) apps to the phone.
     The weather app and settings app consumed 4.49 Kbps and 6.27 Kbps respectively; the games apps had much more limited bandwidth consumption with only 1.5 and 1.7 Kbps consumed each.
 
     To evaluate behavior towards battery life, we considered the fraction of 30-second intervals during which no traffic was sent by the phone, rather than the amount of traffic sent overall. 
-    We require this different metric because, \eg{} small amounts of traffic, sent frequently leave the radio on for an extended period of time, thus bandwidth is not the best indicator of radio use.
-    The games apps, which were the best performers in terms of bandwidth consumption, were some of the worst performers in terms of radio usage: 78\% and 66\% of 30-second intervals generated network traffic.
-    However, the worst performer overall was the settings app, which generated traffic during 85\% of 30-second intervals.
+    We require this different metric because frequent network access can cause the radio to stay in a high power state for an extended period of time.
+    The game apps, which were the best performers in terms of bandwidth consumption, were some of the worst performers in terms of radio usage: 78\% and 66\% of 30-second intervals generated network traffic.
+    The worst performer overall was the settings app, which generated traffic during 85\% of 30-second intervals.
     The weather app, and the risqu\'{e} app generated traffic during 23\% and 49\% of 30-second intervals respectively.
 
     \noindent{\bf Summary.}
     The risqu\'{e} app acted maliciously in installing unwanted apps; whether or not the weather app acted maliciously through its use of a third party tracking service is unclear.
-    However, all apps, even those that were decidedly non-malicious, had some network behavior worth some concern by contacting multiple third parties and making inefficient use of bandwidth and battery life.
+    However, all apps, even those that were decidedly non-malicious, had some questionable network behavior by contacting multiple third parties and making inefficient use of bandwidth and battery life.
     \meddle can help ameliorate some of these concerns: data consumption and third-party contacts can be restricted by blocking DNS lookups and connections to ad services. 
     In \S\ref{sec:filtering}, we discuss these filtering capabilities further.
 
