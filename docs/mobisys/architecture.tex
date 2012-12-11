@@ -71,15 +71,17 @@ to shape, modify or block network traffic.
 \end{packeditemize}
 
 \subsection{Design and Architecture}
-
-\subsubsection{Design}
-To meet the above goals, we propose building a system that redirects all mobile-device 
+To meet the above goals, we build a system that redirects all mobile-device 
 network traffic to a server outside the carrier's network, thus providing a point of control 
 where one can characterize, modify or block this traffic before sending it to the intended 
 destination. Importantly, we observe that we can do this today without any additional 
 support for devices or carriers: the key idea is to combine software middleboxes (e.g., 
 packet filters, proxies, etc.) with virtual private networks (VPNs). 
 
+
+
+
+\subsubsection{Design}
 We use VPNs to achieve our goals of portability, pervasiveness, deployability 
 and isolation. Specifically, major
  mobile OSes provide built-in VPN functionality for enterprise
