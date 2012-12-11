@@ -11,7 +11,7 @@ we can make using \meddle.
 %
 %- IRB based study from September 2012. 
 %- Full packet capture
-%- Currently serves 19 devices from 14 users, 8 Android, 11 iOS device,    
+%- Currently serves 20 devices from 14 users, 8 Android, 12 iOS device,    
 %  4 iPads, 7 iPhones, and 1 iPod Touch.
 %  15 service providers spread across US and France.
 %- 30.2 GB of Traffic Volume from November 1, 2012
@@ -229,7 +229,7 @@ experience shows this is not the case on an iPad 2.
 We now further investigate 
 the behavior of iOS push over time for three characteristic users. Figure~\ref{fig:pushHourly} 
 plots this in terms of the median number of push notifications received per 
-user per hour. During this period of two weeks from 15 November 2012, all three users were in the same time zone.
+user per hour. During the period, all users were in the same time zone.
 
 \begin{figure}
 \vspace{-2.5em}
@@ -241,9 +241,9 @@ user per hour. During this period of two weeks from 15 November 2012, all three 
   \vspace{\postfigspace}
 \end{figure}
 
-First, the figure shows that all three devices see significant numbers of push 
-notifications even when idle during overnight periods. The value of such traffic is unclear. 
-Second, we clearly see significant differences in the volume 
+First, the figure shows that all three users see significant numbers of push 
+notifications even in idle, overnight periods. It is unclear what the value of 
+such traffic is. Second, we clearly see significant differences in the volume 
 of traffic among users. User 1 has registered to receive push notifications 
 from multiple apps, while Users 2 and 3 have not. Last, we note that even 
 with iOS 6's ``do not disturb'' (DND) feature, push notifications continue to be 
@@ -286,13 +286,14 @@ available}.
 
 All the following experiments are performed on an \iphone 4 with iOS
 6.0.1.  At the beginning of each experiment we close all applications
-and restart the \iphone{}. The \iphone{} is then allowed to connect to our \wifi{}
-access point on which we use tcpdump to capture the \iphone{}'s \wifi{} traffic. 
-Each of our experiments lasts for around 1 hour. 
+and restart the \iphone{}. The \iphone{} is connected in \wifi{} to a
+controlled access point on which we perform a tcpdump on the \wifi{}
+interface and monitor the \wifi{} association between the access point
+and the \iphone{}. Each experiment lasts for around 1 hour. 
 
 \begin{figure}
 \centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_plug_novpn_interTs.pdf}
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_plug_novpn_interTs.eps}
   \caption{Distribution of the interarrival times of Ethernet frames
     for a one hour experiment with an idle \iphone{} plugged-in, with \wifi{} and cellular
     enabled, and no VPN enabled. For each bin of 1 second, we count
@@ -336,9 +337,9 @@ omitted for space reasons.)
   impact on network traffic pattern when the device is plugged in.}
 
 
-\begin{figure}[t]
+\begin{figure}[htb]
 \centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_plug_vpn_interTs.pdf}
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_plug_vpn_interTs.eps}
   \caption{Distribution of the interarrival times of Ethernet frames
     for a one hour experiment with an idle \iphone{} plugged-in, with \wifi{} and cellular
     enabled, and VPN enabled. For each bin of 1 second, we count
@@ -416,7 +417,7 @@ notifications, \eg, heavy users of SMS, twitter, facebook, games, \etc
 
 \begin{figure}
 \centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_novpn_ts.pdf}
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_novpn_ts.eps}
   \caption{Cumulative distribution of the Ethernet frames
           arrival with time for a one hour experiment with an idle
           \iphone{} unplugged, with \wifi{} and cellular enabled, and no VPN
@@ -434,7 +435,7 @@ consumption}.
 
 \begin{figure}
 \centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_unplug_novpn_ts.pdf}
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_unplug_novpn_ts.eps}
   \caption{Cumulative distribution of the Ethernet frames
           arrival with time for a one hour experiment with an idle
           \iphone{} unplugged, with \wifi{} enabled, and no VPN
@@ -491,7 +492,7 @@ Fig.~\ref{fig:push_wv_ts} and Fig.~\ref{fig:push_w3v_ts}.
 
 \begin{figure}
 \centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_unplug_vpn_ts.pdf}
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_unplug_vpn_ts.eps}
   \caption{Cumulative distribution of the Ethernet frames
           arrival with time for a one hour experiment with an idle
           \iphone{} unplugged, with \wifi{} enabled, and VPN
@@ -530,7 +531,7 @@ miss traffic in the circuit switched network when a cellular connection is enabl
 
 \begin{figure}
 \centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_vpn_ts.pdf}
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_vpn_ts.eps}
   \caption{Cumulative distribution of the Ethernet frames
           arrival with time for a one hour experiment with an idle
           \iphone{} unplugged, with \wifi{} and cellular enabled, and VPN
@@ -619,6 +620,10 @@ change has not been publicized.
 
 \subsection{Case Study: Traffic Optimization}
 \label{sec:case-study-compression}
+In this section, we use \meddle to investigate whether there 
+are opportunities for reducing data consumption using compression. 
+For example, companies such as Onavo charge a fee for subscribers 
+to use their compression proxies. 
 
 In our data set we observed that 42.45\% of the all the HTTP flows (1.06\% by volume) have 
 a mime-type of ``text.'' This implies that the content can be potentially compressed by the 
