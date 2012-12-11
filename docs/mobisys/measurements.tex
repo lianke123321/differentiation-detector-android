@@ -616,59 +616,7 @@ change has not been publicized.
 
 \subsection{Case Study: Misbehaving Apps}
 \label{sec:case-study-filtering}
-
-    Smartphone users are often faced with the decision whether or not to trust an app downloaded from the iPhone App Store or the Android Market.
-    The user can access some information \emph{a priori} regarding the app's behavior, \eg{} via reading reviews or inspecting the permissions requested, but this provides at best an incomplete and at worst and incorrect view.
-    Some undesirable app behavior is obvious -- \eg{} pushing advertisements to the notifications bar, installing unwanted third-party software, \etc{} -- the app's network behavior remains generally invisible to the user even after installation. \meddle allows users and researchers to see this behavior and draw conclusions about whether it is appropriate. 
-     To guide our analysis in the rest of this section, we define several key network-usage properties that describe a ``well behaved'' app:
-    \begin{packeditemize}
-        \item Protection of personally identifiable information (PII): transmitting PII only when required for application functionality, and if transmitting PII, doing so over HTTPS rather than HTTP.
-        \item Conservation of power and data quota by making only necessary use of network.
-        \item Communication only with servers needed for the applications intended purpose, with preferably a limited number of entities contacted by the app overall.
-    \end{packeditemize}
-
-\noindent\textbf{Survey of privacy violations in the wild.} In our dataset, we were surprised to find several examples of PII sent in the clear. Specifically, we searched for IMEI (device unique identifiers) and 
-GPS coordinates in HTTP request strings. Offending apps include The New York Times, The Weather Channel, Fox News, ESPNCricInfo, FirstPost and 
-Angry Birds. For many of these apps, the privacy violations are due to included software for displaying ads. The key takeaway is that privacy 
-violations from tracking software is pervasive and often easy to detect. When using \meddle, users limit their exposure to eavesdroppers 
-because the connection to the \meddle server is encrypted. Further, in the next section we discuss how \meddle can strip this information. 
-  
-\noindent\textbf{Controlled experiments} While the above examples indicate clear examples of undesirable app behavior, 
-it is more difficult to determine which traffic is strictly necessary for app functionality and which can be removed through blocking 
-at a \meddle server. 
-    With this in mind, we used \meddle to perform a short app-by-app analysis of network usage behavior.
-    
-       We then downloaded six of the most popular apps from the Android Market, installed them on an fresh install of Android \tbd{x.y.z}. 
-       The apps fall into the following categories: a popular game, an app for a widely used image sharing site, a weather app, a settings 
-        management app, an app for a popular movie, and a risqu\'{e} app serving various images. We interacted with each app for 30 minutes 
-        to understand network behavior when the app is being used.
-
-    The movie app, the settings app, and the game app easily fit our provider. \tbd{DRC: I don't get this. I think 'provider' is a syntax error (as Tom would say).}
-    
-    The movie app contacted Amazon, Google, and a single CDN provider; the median inter-packet transmission time was \tbd{x}.
-    The settings app contacted Amazon, Google, a hosting service, and two CDN services; the median inter-packet transmission time was \tbd{y}.
-    The game app contacted only Google and Amazon; while the median inter-packet transmision time was higher (\tbd{z}), we presume this was needed for updating the game scoreboard at the end of each game.\tbd{Amy, is this a reasonable estimate?}
-
-    The image-sharing and weather app we classified as likely non-malicious. They did not leak any PII in their traffic traces, however, they did violate our expectations of well-behaved apps. The risu\'{e} app we classified as malicious, however its network behavior only violated our expectations in one dimension. 
-    Time plots of network traffic for these three apps are shown in Figure~\ref{fig:amy}.
-
-    The image-sharing service violated our definition of a well-behaved app by contacting too many entities and generating too much traffic. 
-    The app phone contacted 10 CDNs, exposing the user's browsing behavior to a large number of organizations.
-    %The phone also contacted Google, StumbleUpon, Twitter, and Facebook all upon startup; we presume this was for linked login services.
-    Further, the inter-packet arrival time was a median of \tbd{alpha}, resulting in sustained network usage and potentially impacting battery life.
-
-    The weather app similarly contacted a large number of CDNs and organizations, for a total of 10 organizations contacted.
-    This network footprint raise concerns about exposure to numerous entities; further, one of the organizations contacted explicitly serves as a tracking service that appears to serve no purpose for the user.
-    Although they advertise this service for fraud prevention, it is hard to imagine what fraud prevention is necessary for a simple weather app.
-
-    Finally, the risqu\'{e} app we did classify as malicious; it pushed advertisements to the notification bar and installed unwanted extra apps.
-    However, its network profile was fairly benign.
-    We observed no leaked PII. However, it did contact 19 entities including 7 CDNs and 4 advertising networks.
-    This illustrates that, while monitoring network traffic is an important aspect of monitoring app behavior, it does not cover all malicious or undesirable app activity.
-
-    All three of our borderline apps contacted multiple ad networks, thus a potential application of \meddle, which we discuss in the following section, is to simply filter all traffic to ad networks.
-    To verify that blocking ad networks would not interfere with normal app behavior, we enabled filtering on the ad networks that the apps contacted, and manually tested each app's behavior...
-    \tbd{more tomorrow.}
+\input{amy_measurements}
 
 \subsection{Case Study: Traffic Optimization}
 \label{sec:case-study-compression}
