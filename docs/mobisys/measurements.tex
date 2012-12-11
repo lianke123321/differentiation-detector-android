@@ -46,7 +46,7 @@ as either HTTP or SSL are classified as other.
 \cline{3-6}
            &           &  \textbf{Flows}  &  \textbf{Bytes}  &  \textbf{Flows}  &  \textbf{Bytes}  \tabularnewline
 \hline
- TCP       &  HTTP     &  14.87  &  74.31  &  16.07  &  80.22  \tabularnewline
+ TCP       &  HTTP     &  14.87  &  74.31  &  16.07  &  82.01  \tabularnewline
 \hline
 TCP       &  SSL      &  37.19  &  24.35  &  37.64  &  17.31  \tabularnewline
 \hline
@@ -54,13 +54,14 @@ TCP       &  SSL      &  37.19  &  24.35  &  37.64  &  17.31  \tabularnewline
 \hline
  TCP       &  other    &   2.08  &   0.22  &   1.13  &   1.89  \tabularnewline
 \hline
- Other     &  -        &   5.34  &   0.14  &   2.82  &   0.09  \tabularnewline
+ Other     &  -        &   5.35  &   0.14  &   2.82  &   0.09  \tabularnewline
 \hline
 \multicolumn{2}{|c|}{\emph{total}} & 100.00 & 100.00 & 100.00 & 100.00 \tabularnewline
 \hline
 \end{tabular}
 \end{center}
-\caption{Percentage of flows and bytes from iOS and Android devices. \emph{SSL is responsible for the majority of
+\caption{Percentage of flows and bytes from iOS and Android devices. \tbd{Verify total 100
+    for final results} \emph{SSL is responsible for the majority of
     TCP flows from iOS and Android devices.}} 
 \label{tab:summaryIOSAndroidTraffic}
 \end{table}
@@ -107,13 +108,13 @@ traffic after only a few seconds of losing the foreground.
 \cline{3-6}
            &           &  \textbf{Flows}  &  \textbf{Bytes}  &  \textbf{Flows}  &  \textbf{Bytes}  \tabularnewline
 \hline
- TCP       &  HTTP     &  16.91  &  83.52  &  13.15  &  56.14  \tabularnewline
+ TCP       &  HTTP     &  16.91  &  83.52  &  13.03  &  56.14  \tabularnewline
 \hline
  TCP       &  SSL      &  38.18  &  15.83  &  36.14  &  41.42  \tabularnewline
 \hline
-UDP       &  -        &  41.41  &   0.48  &  41.56  &   1.67  \tabularnewline
+UDP       &  -        &  41.43  &   0.49  &  41.56  &   1.67  \tabularnewline
 \hline
-TCP       &  other    &   1.38 &   0.16  &   1.95  &   0.47  \tabularnewline
+TCP       &  other    &   1.38 &   0.16  &   1.95  &   0.4  \tabularnewline
 \hline
 Other     &  -        &   2.12  &  0.01  &   7.2  &   0.3  \tabularnewline
 \hline
@@ -121,7 +122,8 @@ Other     &  -        &   2.12  &  0.01  &   7.2  &   0.3  \tabularnewline
 \hline
 \end{tabular}
 \end{center}
-\caption{Percentage of flows and bytes using Wi-Fi and Cellular as access technology. \emph{The share of SSL traffic over Cellular
+\caption{Percentage of flows and bytes using Wi-Fi and Cellular as access technology. \tbd{Verify total 100
+    for final results} \emph{The share of SSL traffic over Cellular
     networks is larger than its share over Wi-Fi.}}  
 \label{tab:summaryWifiCellularTraffic}
 \end{table}
@@ -184,6 +186,7 @@ connections over cellular connections even if they are using 3G or older
 technologies. This highlights opportunities for proposals such as 3G onloading~\cite{vr:3gol}.
 
 \begin{figure}
+\vspace{-2.5em}
 \centering
         \includegraphics[width=\linewidth]{./plots/dataRate.pdf}
   \caption{Median and quartile peak transfer rates for users when on \wifi 
@@ -191,6 +194,7 @@ technologies. This highlights opportunities for proposals such as 3G onloading~\
   from \wifi; however, users with LTE often receive better performance over 
   cellular than \wifi.}
   \label{fig:datarates}
+  \vspace{\postfigspace}
 \end{figure}
 
 \subsection{Case Study: Device Specific Apps (iOS Push)}
@@ -228,11 +232,13 @@ plots this in terms of the median number of push notifications received per
 user per hour. During the period, all users were in the same time zone.
 
 \begin{figure}
+\vspace{-2.5em}
 \centering
         \includegraphics[width=\linewidth]{./plots/iosPushHourDistrib.pdf}
   \caption{Median number of push notifications seen per hour for three devices. 
   A significant number of updates occur at all hours, even during idle and ``do not disturb'' periods.}
   \label{fig:pushHourly}
+  \vspace{\postfigspace}
 \end{figure}
 
 First, the figure shows that all three users see significant numbers of push 
@@ -293,6 +299,7 @@ and the \iphone{}. Each experiment lasts for around 1 hour.
     enabled, and no VPN enabled. For each bin of 1 second, we count
     the number of interarrivals in that bin.}
   \label{fig:push_w3p_interTs}
+  \vspace{\postfigspace}
 \end{figure}
 
 %\begin{figure}
@@ -304,16 +311,6 @@ and the \iphone{}. Each experiment lasts for around 1 hour.
 %          enabled.}
 %  \label{fig:push_w3p_ts}
 %\end{figure}
-
-\begin{figure}
-\centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_plug_vpn_interTs.eps}
-  \caption{Distribution of the interarrival times of Ethernet frames
-    for a one hour experiment with an idle \iphone{} plugged-in, with \wifi{} and cellular
-    enabled, and VPN enabled. For each bin of 1 second, we count
-    the number of interarrivals in that bin.}
-  \label{fig:push_w3pv_interTs}
-\end{figure}
 
 %\begin{figure}
 %\centering
@@ -338,6 +335,19 @@ omitted for space reasons.)
 %no VPN (see Fig.~\ref{fig:push_w3p_ts}) scenarios. 
 \emph{Thus, it appears that the VPN connection has no noticeable
   impact on network traffic pattern when the device is plugged in.}
+
+
+\begin{figure}[htb]
+\centering
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_plug_vpn_interTs.eps}
+  \caption{Distribution of the interarrival times of Ethernet frames
+    for a one hour experiment with an idle \iphone{} plugged-in, with \wifi{} and cellular
+    enabled, and VPN enabled. For each bin of 1 second, we count
+    the number of interarrivals in that bin.}
+  \label{fig:push_w3pv_interTs}
+   \vspace{\postfigspace}
+\end{figure}
+
 
 %We don't claim this
 %traffic to be typical, in particular, our access point is a Windows 7
@@ -366,17 +376,6 @@ periods during which the \wifi interface of the \iphone{} is not
 associated to the access point for energy saving. 
 
 
-
-\begin{figure}
-\centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_novpn_ts.eps}
-  \caption{Cumulative distribution of the Ethernet frames
-          arrival with time for a one hour experiment with an idle
-          \iphone{} unplugged, with \wifi{} and cellular enabled, and no VPN
-          enabled.}
-  \label{fig:push_w3_ts}
-\end{figure}
-
 %\begin{figure}
 %\centering
 %        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_unplug_novpn_interTs.eps}
@@ -387,15 +386,6 @@ associated to the access point for energy saving.
 %  \label{fig:push_w_interTs}
 %\end{figure}
 
-\begin{figure}
-\centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_unplug_novpn_ts.eps}
-  \caption{Cumulative distribution of the Ethernet frames
-          arrival with time for a one hour experiment with an idle
-          \iphone{} unplugged, with \wifi{} enabled, and no VPN
-          enabled.}
-  \label{fig:push_w_ts}
-\end{figure}
 
 Surprisingly, even though the \iphone{} is idle, the traffic pattern
 is not regular (Fig.~\ref{fig:push_w3_ts}). To
@@ -407,6 +397,8 @@ is confirmed by Fig.~\ref{fig:push_w_ts} that shows a regular
 succession of short periods during which frames are exchanged and long
 periods during which the wifi interface is not associated to the
 access point.
+
+
 
 Therefore, there is an evidence that the cellular connection triggers
 the association of the \iphone{} \wifi interface with the access
@@ -421,11 +413,36 @@ don't know the exact reason for this behavior, but it may have an
 adverse impact of battery life for users with frequent push
 notifications, \eg, heavy users of SMS, twitter, facebook, games, \etc
 
+
+
+\begin{figure}
+\centering
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_novpn_ts.eps}
+  \caption{Cumulative distribution of the Ethernet frames
+          arrival with time for a one hour experiment with an idle
+          \iphone{} unplugged, with \wifi{} and cellular enabled, and no VPN
+          enabled.}
+  \label{fig:push_w3_ts}
+   \vspace{\postfigspace}
+\end{figure}
+
+
 In summary, APNS allows apps to interact with the user despite a strict energy-saving policy that 
 prevents apps running in the background; however, \emph{the systematic wake up of
 the wifi interface might lead to an unnecessary severe increase in power
 consumption}. 
 
+
+\begin{figure}
+\centering
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_unplug_novpn_ts.eps}
+  \caption{Cumulative distribution of the Ethernet frames
+          arrival with time for a one hour experiment with an idle
+          \iphone{} unplugged, with \wifi{} enabled, and no VPN
+          enabled.}
+  \label{fig:push_w_ts}
+   \vspace{\postfigspace}
+\end{figure}
 
 %We observed this same behavior on the tcpdump traces used to plot
 %Fig.~\ref{fig:push_w3_ts}. We observe that the \wifi{} interface is
@@ -472,6 +489,19 @@ too, which explains the very different interarrival times seen in
 Fig.~\ref{fig:push_w3_ts} and Fig.~\ref{fig:push_w_ts}, and in
 Fig.~\ref{fig:push_wv_ts} and Fig.~\ref{fig:push_w3v_ts}.
 
+
+\begin{figure}
+\centering
+        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_unplug_vpn_ts.eps}
+  \caption{Cumulative distribution of the Ethernet frames
+          arrival with time for a one hour experiment with an idle
+          \iphone{} unplugged, with \wifi{} enabled, and VPN
+          enabled.}
+  \label{fig:push_wv_ts}
+   \vspace{\postfigspace}
+\end{figure}
+
+
 The main question that remains is: what are these messages received on
 the cellular interface? In Fig.~\ref{fig:push_w3v_ts}, we observe a pattern
 with a periodicity of around 45 seconds. This pattern does not exist
@@ -501,26 +531,17 @@ miss traffic in the circuit switched network when a cellular connection is enabl
 
 \begin{figure}
 \centering
-        \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_unplug_vpn_ts.eps}
-  \caption{Cumulative distribution of the Ethernet frames
-          arrival with time for a one hour experiment with an idle
-          \iphone{} unplugged, with \wifi{} enabled, and VPN
-          enabled.}
-  \label{fig:push_wv_ts}
-\end{figure}
-
-\begin{figure}
-\centering
         \includegraphics[width=0.8\linewidth]{../../code/pushNotification/Fig/bw_iphone_wifi_3g_unplug_vpn_ts.eps}
   \caption{Cumulative distribution of the Ethernet frames
           arrival with time for a one hour experiment with an idle
           \iphone{} unplugged, with \wifi{} and cellular enabled, and VPN
           enabled.}
   \label{fig:push_w3v_ts}
+   \vspace{\postfigspace}
 \end{figure}
 
 
-\subsection{Case Study: Longitudinal Measurements - Google Search }
+\subsection{Case Study: Longitudinal Measurements }
 \label{sec:case-study-google}
 
 
@@ -600,11 +621,11 @@ change has not been publicized.
     The user can access some information \emph{a priori} regarding the app's behavior, \eg{} via reading reviews or inspecting the permissions requested, but this provides at best an incomplete and at worst and incorrect view.
     Some undesirable app behavior is obvious -- \eg{} pushing advertisements to the notifications bar, installing unwanted third-party software, \etc{} -- the app's network behavior remains generally invisible to the user even after installation. \meddle allows users and researchers to see this behavior and draw conclusions about whether it is appropriate. 
      To guide our analysis in the rest of this section, we define several key network-usage properties that describe a ``well behaved'' app:
-    \begin{itemize}
+    \begin{packeditemize}
         \item Protection of personally identifiable information (PII): transmitting PII only when required for application functionality, and if transmitting PII, doing so over HTTPS rather than HTTP.
         \item Conservation of power and data quota by making only necessary use of network.
         \item Communication only with servers needed for the applications intended purpose, with preferably a limited number of entities contacted by the app overall.
-    \end{itemize}
+    \end{packeditemize}
 
 \noindent\textbf{Survey of privacy violations in the wild.} In our dataset, we were surprised to find several examples of PII sent in the clear. Specifically, we searched for IMEI (device unique identifiers) and 
 GPS coordinates in HTTP request strings. Offending apps include The New York Times, The Weather Channel, Fox News, ESPNCricInfo, FirstPost and 
@@ -649,18 +670,23 @@ at a \meddle server.
     To verify that blocking ad networks would not interfere with normal app behavior, we enabled filtering on the ad networks that the apps contacted, and manually tested each app's behavior...
     \tbd{more tomorrow.}
 
-\subsection{Case Study: Traffic Optimization - Compression}
+\subsection{Case Study: Traffic Optimization}
 \label{sec:case-study-compression}
 
 In our data set we observed that 42.45\% of the all the HTTP flows (1.06\% by volume) have 
-a mime-type that contains \emph{text}. This implies that the content can be potentially compressed by the 
-remote server. We observe that 38\% of the flows (3.42\% by volume) that have a mime-type 
-containing \emph{text} are compressed. We also observe that compression is counter productive for 4\% of 
-the all the flows that have a mime-type containing \emph{text}. This is because the volume of data after 
-compression is larger than the volume before compression. In Table~\ref{tab:compression} we present the top 5 
-sources of traffic for which compression is counterproductive. What is surprising is that 
-compression of google search responses can be counter-productive for the user in terms 
-of power consumption. \tbd{Do you want to use the past tense for the last sentence?}
+a mime-type of ``text.'' This implies that the content can be potentially compressed by the 
+remote server. We observe that 38\% of such flows (3.42\% by volume) are, in fact, compressed. 
+Importantly, our analysis reveals that 23\% of HTTP flows are uncompressed, and these flows 
+contribute only 0.5\% of our users' total data. Thus, we believe there are few meaningful 
+opportunities for injecting compression at a meddlebox; instead, we believe most improvements 
+will come from transcoding media content to lower bitrates and resolution. 
+
+Interestingly, we also observe that compression is counter-productive for 4\% of 
+the all the flows that have a mime-type of "text" -- the volume of data after 
+compression is larger than the volume before compression. In Table~\ref{tab:compression} we present the top five  
+sources of traffic for which compression is counterproductive. As one example, we find 
+that despite good intentions, Google's use of compression for search responses generally 
+does more harm than good.
 
 \begin{table}
 \begin{center}
