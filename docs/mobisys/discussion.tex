@@ -3,7 +3,7 @@
 In this section, we discuss several key issues and limitations for an indirection-based 
 deployment such as \meddle.
  
-\noindent\textbf{Privacy and trust.} As discussed in Section~\ref{subsec:currdeploy}, we 
+\noindent\textbf{Privacy and trust.} As discussed in \S\ref{subsec:currdeploy}, we 
 collect traces from users as part of an IRB-approved study. We take great care in 
 protecting user privacy -- data is encrypted before being stored, the private key is 
 not stored on the server where data is recorded and any PII sent in the 
@@ -34,21 +34,21 @@ remove offending users without disrupting compliant users.
 
 \noindent\textbf{ISP objections.} Many mobile carriers deploy in-network middleboxes 
 for traffic engineering purposes. By tunneling \emph{all} traffic, these boxes lose the 
-ability to implement ISPs' policies, which can lead to suboptimal performance for 
-other users sharing the network. 
+ability to implement ISPs' policies, which could lead to suboptimal performance for 
+our users and for other users sharing the network. 
 
-We believe such concerns are either overblown or misguided. First, we do not 
+We believe that addressing such concerns is straightforward. First, we do not 
 expect \emph{every} device to run \meddle. If we were to attract even 1\% of 
 mobile users that would be a surprisingly huge success. Thus we do not expect 
 \meddle to significantly impact overall traffic in a mobile network. Second, if \meddle 
 traffic were to become a significant traffic engineering challenge, we argue that 
-such information, and the policies that address this issue, need to be 
-transparent to users. We believe that we can address most any such challenge 
-using either meddleboxes or pigeonholes that send traffic outside of the VPN 
+transparency can go a long way toward addressing the issue. Namely, 
+given sufficient information we can implement policies to address problematic traffic using either 
+meddleboxes or pigeonholes that send traffic outside of the VPN 
 tunnel. 
 
 \noindent\textbf{Scalability and reliability.} If successful, \meddle will 
-face scalability and reliability problems as the number of users increases. 
+face scalability and reliability challenges as the number of users increases. 
 We believe that, in return for valuable measurement and experimentation data, 
 we can justify funding to support some number of thousands of users. For a 
 larger deployment, we may have to consider a paid service or alternative 
