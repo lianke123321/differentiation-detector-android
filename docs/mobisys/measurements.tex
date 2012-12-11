@@ -46,7 +46,7 @@ as either HTTP or SSL are classified as other.
 \cline{3-6}
            &           &  \textbf{Flows}  &  \textbf{Bytes}  &  \textbf{Flows}  &  \textbf{Bytes}  \tabularnewline
 \hline
- TCP       &  HTTP     &  14.87  &  74.31  &  16.07  &  82.01  \tabularnewline
+ TCP       &  HTTP     &  14.87  &  74.31  &  16.07  &  80.22  \tabularnewline
 \hline
 TCP       &  SSL      &  37.19  &  24.35  &  37.64  &  17.31  \tabularnewline
 \hline
@@ -54,14 +54,13 @@ TCP       &  SSL      &  37.19  &  24.35  &  37.64  &  17.31  \tabularnewline
 \hline
  TCP       &  other    &   2.08  &   0.22  &   1.13  &   1.89  \tabularnewline
 \hline
- Other     &  -        &   5.35  &   0.14  &   2.82  &   0.09  \tabularnewline
+ Other     &  -        &   5.34  &   0.14  &   2.82  &   0.09  \tabularnewline
 \hline
 \multicolumn{2}{|c|}{\emph{total}} & 100.00 & 100.00 & 100.00 & 100.00 \tabularnewline
 \hline
 \end{tabular}
 \end{center}
-\caption{Percentage of flows and bytes from iOS and Android devices. \tbd{Verify total 100
-    for final results} \emph{SSL is responsible for the majority of
+\caption{Percentage of flows and bytes from iOS and Android devices. \emph{SSL is responsible for the majority of
     TCP flows from iOS and Android devices.}} 
 \label{tab:summaryIOSAndroidTraffic}
 \end{table}
@@ -108,13 +107,13 @@ traffic after only a few seconds of losing the foreground.
 \cline{3-6}
            &           &  \textbf{Flows}  &  \textbf{Bytes}  &  \textbf{Flows}  &  \textbf{Bytes}  \tabularnewline
 \hline
- TCP       &  HTTP     &  16.91  &  83.52  &  13.03  &  56.14  \tabularnewline
+ TCP       &  HTTP     &  16.91  &  83.52  &  13.15  &  56.14  \tabularnewline
 \hline
  TCP       &  SSL      &  38.18  &  15.83  &  36.14  &  41.42  \tabularnewline
 \hline
-UDP       &  -        &  41.43  &   0.49  &  41.56  &   1.67  \tabularnewline
+UDP       &  -        &  41.41  &   0.48  &  41.56  &   1.67  \tabularnewline
 \hline
-TCP       &  other    &   1.38 &   0.16  &   1.95  &   0.4  \tabularnewline
+TCP       &  other    &   1.38 &   0.16  &   1.95  &   0.47  \tabularnewline
 \hline
 Other     &  -        &   2.12  &  0.01  &   7.2  &   0.3  \tabularnewline
 \hline
@@ -122,8 +121,7 @@ Other     &  -        &   2.12  &  0.01  &   7.2  &   0.3  \tabularnewline
 \hline
 \end{tabular}
 \end{center}
-\caption{Percentage of flows and bytes using Wi-Fi and Cellular as access technology. \tbd{Verify total 100
-    for final results} \emph{The share of SSL traffic over Cellular
+\caption{Percentage of flows and bytes using Wi-Fi and Cellular as access technology. \emph{The share of SSL traffic over Cellular
     networks is larger than its share over Wi-Fi.}}  
 \label{tab:summaryWifiCellularTraffic}
 \end{table}
