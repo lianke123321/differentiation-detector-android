@@ -1,15 +1,15 @@
 \section{Related Work}
 \meddle builds upon two existing technologies: VPNs and middleboxes. 
 In our current implementation, we rely on an IPsec~\cite{rfc:ipsec} implementation 
-to tunnel traffics to \meddle servers. Sekar et al. investigated consolidating middleboxes 
+to tunnel traffic to \meddle servers. Sekar et al.~\cite{sekar:middleboxes} investigated consolidating middleboxes 
 to reduce costs and improve load balance. Sherry et al.~\cite{sherry:middleboxes} explore the opportunities 
 enabled by moving middleboxes to the cloud, which includes simplifying management 
 for enterprise network administrators. In contrast, our work focuses on the mobile capabilities 
-software middleboxes enable rather than a redirection architecture for enterprise networks. 
+that software middleboxes enable rather than a redirection architecture for enterprise networks. 
 
 \meddle provides researchers with a cross-platform, cross-carrier technique 
 for capturing network usage patterns from mobile devices. Previous work 
-used on-demand active measurements to characterize network measurements~\cite{wang:middleboxes,speedtest}; 
+used on-demand active measurements to characterize network performance~\cite{wang:middleboxes,speedtest}; 
 however, these measurements are restricted to the point at which users run 
 the tests. Gerber et al.~\cite{gerber:passivespeed} use passive measurements alone 
 to estimate transfer rates in a single carrier's network; \meddle 
