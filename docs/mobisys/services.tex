@@ -3,7 +3,7 @@
 In this section, we use two case studies to highlight some of the 
 advantages \meddle provides as a new point of control 
 for mobile networking traffic. We then discuss several new applications 
-we are currently building.
+that take advantage of \meddle's location outside of a mobile network.
 
 \subsection{Packet Filtering}
 \label{sec:filtering}
@@ -18,7 +18,7 @@ currently either unavailable or poorly implemented.
 typically use revenue from advertisements to cover their costs, enabling 
 ``free'' access for users. Given the additional costs in terms of data volume, 
 battery consumption and potentially reduced privacy from tracking, it is unclear 
-just how ``free'' these services truly are. Vallina-Rodriguez~\etal~\cite{Vallina-rodriguez:2012:AdCache} observe
+just how ``free'' these services truly are. For example, Vallina-Rodriguez~\etal~\cite{Vallina-rodriguez:2012:AdCache} observe
 that ads account for 5\% of daily traffic from more than 50\% of
 Android users in a large European ISP. 
 
@@ -80,7 +80,7 @@ In our current implementation, we use a DNS-based filter to
 block ads, analytics, and mediation sites.\footnote{The service is disabled by default, so users must 
 opt in to enable blocking.} A key feature of our solution is that it works 
 regardless of whether SSL is used because DNS requests occur out of band 
-from the secure connection. Further, the response for the DNS request is an IP address corresponding to {\tt localhost}, 
+from the secure connection. Further, our response for the DNS request is an IP address corresponding to {\tt localhost}, 
 meaning that devices will generate no external network traffic when failing 
 to resolve the ad servers. 
 
@@ -101,12 +101,11 @@ Many users do not turn off their devices at night, even while asleep. In our stu
 most (89\%) of the devices were active for at least one entire 24-hour period. Network 
 traffic occurring during those periods is generally not helpful for the user; worse, 
 such traffic may cause audible alerts that wake up the user. In part to address this, 
-iOS 6 introduced a ``Do not disturb'' feature that silences the phone and \emph{reduces} 
-network activity. We are unaware of such support on Android.
+iOS 6 introduced a ``Do not disturb'' feature that silences the phone. We are unaware of such support on Android.
 
 \meddle enables a cross-platform and cross-device ``Do not disturb'' for network 
 traffic. Users specify the hours when traffic should be blocked and the corresponding 
-meddlebox will drop all traffic. Further, users can specify hosts that should \emph{not} be 
+meddlebox will drop all traffic. Further, for critical notifications, users can specify hosts that should \emph{not} be 
 blocked. An interesting area of future work is to map apps to their network-traffic 
 signatures, enabling users to specify per-app policies via \meddle.
 
@@ -116,7 +115,7 @@ tend to focus on which apps a user cannot run. For example, a parent can block t
 To the best of our knowledge, there is no way to prevent a user from using a 
 Web browser to access the Facebook site, unless all Web browser activity is blocked. 
 
-In general, this would be too prohibitive. Using \meddle, we can blacklist traffic for 
+In general, blocking all browser activity is too prohibitive. Using \meddle, however, we can blacklist traffic only for 
 all IPs known to belong to a content or service provider. For example, to block 
 Facebook we would block IPs belonging to Facebook, as well as any traffic using Facebook 
 SSL certificates (\eg, for accessing content hosted by CDNs). 
@@ -165,8 +164,8 @@ versions of the Web page (tunneled and untunneled) to the \meddle server for ana
 through the VPN tunnel, where a meddlebox inserts a Web tripwire. The 
 tripwire causes the browser to reload the Web page using the address of a
 transparent proxy server that is accessed using an unencrypted connection. 
-After the proxied version of the page is loaded, a message is sent to the user if 
-the pages differ due to ISP interference. }
+After the proxied version of the page is loaded, the browser or a meddlebox 
+can compare the two pages to identify potential interference. }
   \label{fig:tripnet}
 \vspace{\postfigspace}
 \end{figure}
@@ -196,18 +195,17 @@ from our approach.
 
 \begin{packeditemize}
 \item \textbf{P2P offloading.} P2P services tend to benefit from multiple connections 
-and symmetric bandwidth contributions from participating hosts. Both of these are 
+and symmetric bandwidth contributions from participating hosts. Both are 
 costly in the mobile environment. \meddle can ease these costs by offloading the 
-logic for maintaining P2P connections to a meddlebox.
+maintenance of P2P connections to a meddlebox.
 \item \textbf{Privad.}  Instead of simply blocking ads, \meddle is an ideal location 
 to deploy anonymizing systems that support targeted advertising, as suggested by 
-Guha et al.~\cite{guha:privad}. This can alleviate concerns for user privacy and can 
-serve as a viable alternative to wholesale ad blocking.
+Guha et al.~\cite{guha:privad}. 
 \item \textbf{Tor.} \meddle improves privacy in mobile networking by encrypting the 
 connection from the mobile device to the \meddle server. We can further improve 
 privacy and anonymity by providing a Tor meddlebox that establishes and manages 
 onion-routed connections.
-\item \textbf{Privacy Preserving Photo Sharing.} Recently Ra et al~\cite{ra:p3} propose 
+\item \textbf{Privacy Preserving Photo Sharing.} Ra et al.~\cite{ra:p3} propose 
 using indirection to support privacy-preserving photo-sharing for mobile users. \meddle 
 provides an ideal vantage point from which to deploy this service without requiring 
 users to install additional apps. 
