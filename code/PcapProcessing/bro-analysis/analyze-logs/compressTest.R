@@ -126,10 +126,11 @@ sum(chunkRows$connLen)/sum(textRows$connLen)
 nrow(uncompRows)/nrow(textRows)
 sum(uncompRows$connLen)/sum(textRows$connLen)
 
+nrow(uncompRows)/nrow(httpData)
+sum(uncompRows$connLen)/sum(httpData$connLen)
+
 nrow(compressFail)/nrow(textRows)
 sum(compressFail$content_length)/sum(textRows$content_length)
-
-
 
 
 # displayTopFailSources <- function(compressFailRows) {
