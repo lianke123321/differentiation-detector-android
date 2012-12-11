@@ -653,14 +653,14 @@ at a \meddle server.
 \label{sec:case-study-compression}
 
 In our data set we observed that 42.45\% of the all the HTTP flows (1.06\% by volume) have 
-a mime-type of "text." This implies that the content can be potentially compressed by the 
+a mime-type that contains \emph{text}. This implies that the content can be potentially compressed by the 
 remote server. We observe that 38\% of the flows (3.42\% by volume) that have a mime-type 
-of "text" are compressed. We also observe that compression is counter productive for 4\% of 
-the all the flows that have a mime-type of "text". This is because the volume of data after 
+containing \emph{text} are compressed. We also observe that compression is counter productive for 4\% of 
+the all the flows that have a mime-type containing \emph{text}. This is because the volume of data after 
 compression is larger than the volume before compression. In Table~\ref{tab:compression} we present the top 5 
 sources of traffic for which compression is counterproductive. What is surprising is that 
 compression of google search responses can be counter-productive for the user in terms 
-of power consumption.
+of power consumption. \tbd{Do you want to use the past tense for the last sentence?}
 
 \begin{table}
 \begin{center}
