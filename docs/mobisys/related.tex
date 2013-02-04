@@ -1,0 +1,49 @@
+\section{Related Work}
+\label{sec:rw}
+\meddle builds upon two existing technologies: VPNs and middleboxes. 
+In our current implementation, we rely on an IPsec~\cite{rfc:ipsec} implementation 
+to tunnel traffic to \meddle servers. Sekar et al.~\cite{sekar:middleboxes} investigated consolidating middleboxes 
+to reduce costs and improve load balance. Sherry et al.~\cite{sherry:middleboxes} explore the opportunities 
+enabled by moving middleboxes to the cloud, which includes simplifying management 
+for enterprise network administrators. In contrast, our work focuses on the mobile capabilities 
+that software middleboxes enable rather than a redirection architecture for enterprise networks. 
+
+\meddle provides researchers with a cross-platform, cross-carrier technique 
+for capturing network usage patterns from mobile devices. Previous work 
+used on-demand active measurements to characterize performance~\cite{wang:middleboxes,speedtest}; 
+however, these measurements are restricted to the time and location at which users run 
+the tests. Gerber et al.~\cite{gerber:passivespeed} use passive measurements alone 
+to estimate transfer rates in a single carrier's network; \meddle 
+enables such analysis across multiple carriers and access technologies.
+
+We use \meddle to investigate security and privacy issues in the 
+traffic that mobile devices generate. By monitoring and controlling 
+information at lower layers in the software stack, previous work~\cite{enck:taintdroid,hornyack:appfence,wsj:apps-watching-you} has shown 
+that existing apps leak significant private information. In \meddle, we take 
+this downward mobility to an extreme, moving off the end-host entirely and 
+eliminating the restrictions of a lab setting. We demonstrated that  
+many identifiers are being leaked in the clear, which our approach can 
+block or modify without needing any additional support (\eg, taint tracking) 
+from the operating system. We are investigating 
+opportunities for detecting information leakage when apps use encrypted 
+channels and/or obfuscation.
+
+\meddle allows us to improve data and energy consumption by blocking 
+unsolicited content such as advertisements, and by blocking unwanted 
+traffic during idle periods. Vallina-Rodriguez et al.~\cite{vallina-rod:ads} demonstrated 
+that ads account for a significant portion of data consumption. Pathak et al.~\cite{pathak:eprof} 
+showed that ads can consume a significant fraction of an app's overall energy consumption. 
+Importantly, \meddle not only allows us to characterize unsolicited content, but 
+also allows us to block it without OS or app modification.
+
+The CloneCloud~\cite{chun:clonecloud} and MAUI~\cite{cuervo:maui} projects explored the space of moving functionality 
+from mobile devices into the cloud. By interposing on user traffic, \meddle will allow us to explore some of this 
+functionality without requiring OS modifications.
+
+
+%** User Behavior and Energy consumption
+%  - Falling Asleep Angry Birds -- Appsensor MobileHCI'12 
+%     - Meddle is passive
+%  - Who killed my battery - WWW'12 
+%** Web caching 
+%  - ATT papers - periodic nature stuff

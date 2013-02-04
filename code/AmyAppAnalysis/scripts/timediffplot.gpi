@@ -1,0 +1,22 @@
+set yrange [-1:*]
+#set ytics (.00001,.0001,.001,.01, .1, 1)
+#set log x
+#set log y
+set nokey
+set key off
+set xdata time
+set timefmt "%H:%M:%S"
+set pointsize 1 
+#set xlabel "Timestamps"
+#set ylabel "IP address" 
+set output "google.png"
+set terminal png
+
+binwidth=3600
+bin(x,width) = width*floor(x/width)
+
+set style fill solid border -1
+set boxwidth 0.4
+
+#plot 'googlehistogram.txt' u 2 w boxes t "boxes", "" u (column(0)):1 t "lines" w l 
+plot 'googlehistogram.txt' using (bin($1,binwidth)):(1.0)

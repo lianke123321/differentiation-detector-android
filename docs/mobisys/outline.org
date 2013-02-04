@@ -1,31 +1,76 @@
-Contains the outline for the Mobisys paper and the time line
-
-(Mobisys paper might end up being a paper with a lot of measurements)
-
+* Title
+  Meddle: Transparency and Control for Mobile Network Traffic.
+* Abstract
+ -
 * Introduction
- - Platform for characterization of mobile traffic
- - no modifications required to operating systems
- - control and transparency 
-    - users can take back control
-    - researchers can perform experiments
- - VPN based middlebox - all packets routed via our servers
-* Platform Descripton
+ - Include walled garden sentence 
+ - Things to highlight
+   - cross platform/provider/OS* 
+   - platform to implement new services and features and not just a measurement platform
+   - low barrier to entry
+* System Architecture
+** System Goals
+
+DRC: These are the things I think we need to emphasize as key features
+
+Portable (Cross platform, access technology, provider w/o needing app or rooting)
+Continuous/Pervasive (always on)
+Passive (low cost, real traffic)
+Control
+
+
+ - Increase transparency of the opaque mobile ecosystem
+   + Opaque because
+     - tied to OS, service provider
+     - limited knowledge of apps - measurement studies limited to small user set or data sets from cell providers
+     - no knowledge of what service providers are doing
+       - Trip wire 
+     - only way to address somes of these issues is to root the phone, but this cannot shed light on what carriers are doing
+   + Allow users to ensure they are getting what they pay for
+   + Prevent and/or monitor carrier interference
+   + Understand network footprint of apps and devices over time
+ - Expose control knobs to enable users to tune the traffic 
+   + Control knobs exists on home gateways and people use it (DRC: Not sure we can prove anything about this)
+      - Firewalls on home gateways but none for mobile - direct exposure to internet 
+	DRC: This isn't true. Mobile networks are in a sense a giant firewall.
+      - Control knobs to filtering traffic given by iOS but details not publicly available (DRC: Mainly, these knobs are coarse-grained and insufficiently expressive to meet the intended goals of parental controls.)
+ - Have a low barrier to entry
+   + Users do not want to violate terms of service (DRC: They want to, but are afraid to :-)
+   + Rooting/Jailbreaking issues - not easy, ROMs may not be available for device, opens device to huge security risks
+ - VPN based middleboxes to achieve each of these goals
+** System Descripton
  - VPN based middlebox
- - Strongswan on the server 
- - Native IPsec support on mobile devices exists
- - IKEv1 with Certificates for iOS - IKEv2 for Android 
- - DNS reidrection 
- - Openvswitch based middleboxes (Discuss with Justine on the timeline and splitting of tasks with her undergrad)
-* Overheads of VPN
- - Network overheads (1 day)
+    - Why VPNs and advantages of VPNs 
+      + comprehensive view -- cross access technology, service provider, device
+      + native IPsec support on smartphones and tablets
+      + low barrier to entry -- no need to jailbreak phone or install custom OS
+    - IPsec support on mobile devices 
+       + IKEv1 with Certificates for iOS and Android
+       + On demand on iOS fully supported
+       + Android 4.2 has always on but not on demand 
+           - short comings on IP and not host names
+           - no IKEv2 support - faster and less connection 
+       + Strongswan APP 
+           - support ICS, and Jellybean  
+           - added functionality to have always ON
+       + Strongswan on the server 
+           - Native IPSec support, 
+ - Servers in UW, berkeley, and INRIA. 
+ - Openvswitch based middleboxes ?? (Justines inputs needed here) 
+** System Feasibility
+ - VPNs by Smartphones
+   - IKEv1 and IKEv2 
+   - Short VPN Primer comes here 
+ - Network overheads (data and latency)
    - Signalling overheads - from Strongswan   
    - Headers in each packet - from IPsec standards 
    - Other overheads
-   - (Ideas for VPN issues and improvements of VPN for Mobile networks). (0.5 days)
- - Power overheads (Inputs from Aruna on the time required to perform these tests -- at 1 day)
+   - (Ideas for VPN issues and improvements of VPN for Mobile networks)
+ - Power overheads (Inputs from Aruna on the time required to perform these tests)
+   - Cannot do this for iOS but we can do a test with power up and down
    - Power meter setup
       - Devices used in the test            
-   - Test case description
+   - Test case description ( Do we have time for this??)
          - factory reset the device (stop all apps that have been installed by the user)
          - Perform the test with and without VPN
               - browse the web with and without VPN - Select websites domain from alexa top sites
@@ -33,8 +78,118 @@ Contains the outline for the Mobisys paper and the time line
               - Listen to Music, Pandora, TuneIn radio (1 hour per app -- about 10 songs to include ads)
               - See 5 videos from YouTube                  
    - Test results
-* Network Traffic Characteristics 
- - Time Evolution of Traffic (results based on Arnauds script and its extension, tstat) - (3 days to 7 days to build on the scripts to plot the data)
+ - User Concerns and Security Risks (do we need it here??)
+   - Privacy implications - IRB to ensure user privacy is not violated
+   - Server failures - VPN tunnel shall not be established but  
+   - EULA that allows us to block malicious user activity
+ - Summary
+    - We need strong statements here to indicate this is indeed feasible
+    - We can cancel the affects of these overheads by the value added services that we provide
+* Example Apps (highlight things we can do with meddle)
+ - Begin with a sentence/intro-para on using middleboxes to offloading activities and offer device wide services
+ - Middlebox based packet monitoring 
+      - cross * possible
+      - passive - real traffic 24x7 
+      - actual users
+      - Network traffic characterization
+         - Longitudinal study of network traffic
+         - undersbehavior of apps
+ - Device wide services - service like packet filtering that is not limited to an app 
+     - Ad blocking
+     - Platform for malware detection and blocking
+     - Parental controls 
+ - Deployment of new protocols and services 
+   - Users can opt in for specific service
+   - Mobile story for services like FreeDOM, CCNs, etc.
+   - service in a VM where users opt in for services
+ - Generic Proxy
+   - Privad
+   - Anti-censorship
+* Measurement Results on Network Traffic Characteristics
+** Dataset description
+ - IRB based study from September 2012
+   - full packet captured
+   - # of Android, iOS devices - type of device (phone/tablet)
+   - # of service providers
+   - Total volume of traffic
+** Initial results
+ - Aggregate data results
+   - Objective to show comprehensive coverage using meddle
+   - Breakup of Wi-fi vs Cellular traffic
+   - Breakup of Android vs iOS traffic 
+ - ( --- NOT TO BE INCLUDED -- WE CAN CITE MORLEYS PAPER FOR THIS )Classification of apps (which apps are causing this traffic)
+   - Certificates in case of SSL traffic
+   - User Agent and referrer field
+   - ip addresses (whois)
+   - Why is this useful?
+      + Understand what fraction of traffic is neccessary
+      + Periodic nature of apps - identify avenues to improve performance
+** Case Study - iPhone push notification
+  - Objective - most of research limited to Android - we can study iOS device without jailbreaking them
+  - How push notification works
+    - Signals over cellular network
+    - connection establishment over 3G/Wi-Fi - preference of 3G??
+    - how frequent are these interactions (180s to 600s) depending on the users
+    - time of the day analysis
+    - Use three users for case study on time evolution 
+** Case Study - Search and Social Networks
+  - Objective - platform can be used for longitudinal studies - highlight iOS vs Android comparison
+*** Google on iOS and Android 
+  - iOS5 and Android - http  
+  - iOS6 https
+  - compression issues on Android
+*** Facebook
+  - How frequently are facebook sites contacted
+  - Time duration of each interaction
+  - What happens during the night
+** Case Study - Analytics and Ads (Cost of a Free APP)
+  - Objective - show that we can identify unwanted traffic and block it. 
+  - Fraction of traffic due to ads and analytics
+  - Apps leaking information to ad server
+    - Weather APP (10 M to 50 M installs)
+      - leaks IMEI number to ads
+      - leaks location to ads 
+    - Yahoo Mail (10 M to 50 M installs)
+      - sends requests for ads in the clear
+      - yql queries in the clear 
+      - similar observations made on the weather app for iOS powered by yahoo
+    - ESPN Cricinfo (500k to 1 M installs)
+      - uses IMEI as identifier
+      - IMEI number used by Ads
+   - When are apps resulting in network flows
+   - Meddle allows users to block ads
+   - example of Dave phone, iPad, and Droid
+** Case Study - Compression 
+  - Objective - opportunities for meddling 
+  - Fraction of SSL traffic -  assuming they are compressed before encryption)
+  - Identifying HTTP traffic that can be compressed (text in mime/type and content-encoding)
+    - What fraction of total traffic is this traffic in terms of bytes and flows
+    - How much of this is actually compressed 
+    - What fraction of traffic was compression not useful
+        - Which apps dominate this behavior
+    - Simple patch to check if compression is required or not.
+** Case Study - Crazy Apps 
+  - All of Amy's work comes here
+** Case Study -  ISP Interference
+ - Daves stuff comes here
+* Related Work
+** Middleboxes in the cloud
+ - Sekar Hotnets'11, Sekar NSDI'12, Sherry Sigcomm'12
+** Security and Privacy of Apps
+  - Taintdroid, Appfence, Third party tracking NSDI'12, 
+  - We can act on it without the need to root the phone - computation is offloaded to the middlebox
+** Ads and Analytics for Mobile
+  - Valina-Rodriguez IMC'12, other mobile measurements papers from IMC'12
+  - Appfence
+  - We not only report activities but also provide an interface that users can use to filter ads and analytics
+** User Behavior and Energy consumption
+  - Falling Asleep Angry Birds -- Appsensor MobileHCI'12 
+     - Meddle is passive
+  - Who killed my battery - WWW'12 
+** Web caching 
+  - ATT papers - periodic nature stuff
+* Conclusion
+* MISC (old)
    - traffic when devices are asleep
       - apps that contribute the majority of traffic in off peak hours 
       - periodic nature from apps
@@ -52,21 +207,20 @@ Contains the outline for the Mobisys paper and the time line
           - privacy implications of the graph - data sent to the ads and analytics sites
  - Traffic Manipulation
    - blocking ads 
-       - DNS based ad blocker (2 days to 4 days)
-          - impact of app performance (2+ days)
+       - DNS based ad blocker 
+          - impact of app performance 
        - redirection of ad requests to our server
           - quantify the amount of ad traffic
        - Q) Why not a HTTP based ad blocker - to block traffic to these sites that may be over HTTPS
-   - modifying identifiers (2 days to 4 days)
+   - modifying identifiers 
       - user agent in the strings
       - Yahoo sending usernames and sql queries in HTTP requests! (Has someone reported this yet?) 
       - IMEI numbers in payloads (are they still being sent out after appfence paper released the names of these apps/domains)
-   - caching using a proxy (2 days to 4 days)
+   - caching using a proxy 
       - dynamic access control lists on squid for per user configs [ http://wiki.squid-cache.org/SquidFaq/SquidAcl ] 
       - explore privoxy chaining with squid 
       - setup depends on openvswitch 
-* Mobile Network 
+** Mobile Network 
  - Route traffic to a custom server with and without VPN to measure the role of mobile providers.
    - Assumption is VPN traffic is IPsec traffic therefore TCP, HTTP, and other layers are not visible to mobile provider 
  - Experiments using Mobiperf with and without VPN 
-* 
