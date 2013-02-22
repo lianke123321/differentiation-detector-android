@@ -1,13 +1,13 @@
 #!/bin/bash
 
-export basePath="/data/pcap-data/"
+export basePath="${MEDDLE_ROOT}/pcap-data/"
 export logFile="${basePath}/pkt-capt.log"
 export ipLookUpFile="${basePath}/ipLookUp.txt"
 export devCapture="tun0"
 export encPublicKeyID="Meddle"
 export TCPDUMP_BIN="/usr/sbin/tcpdump" 
 export GPG_BIN="/usr/bin/gpg"
-export GPG_HOME="/data/.gpg"
+export GPG_HOME="${MEDDLE_ROOT}/.gpg"
 export encPublicKeyRing="${GPG_HOME}/Meddle.key"
 
 function logState()
@@ -92,7 +92,7 @@ function startEncPacketCapture()
 {
     stopEncPacketCapture
     echo "starting Capture" >> ${logFile}
-    ( /data/usr/lib/ipsec/capture-wrapper.ksh > /dev/null 2>&1 & ) &
+    ( ${MEDDLE_IPSEC_LIB}/capture-wrapper.ksh > /dev/null 2>&1 & ) &
 }
 
 function updateIPLookUp()
@@ -122,7 +122,7 @@ function mainFunc()
 
 function sigHandler()
 {
-    echo "RECEIVED SIGNAL" >>  /data/pcap-data/sig.log
+    echo "RECEIVED SIGNAL" >>  ${basePath}/sig.log
 }
 
 trap 'sigHandler' SIGTERM SIGINT

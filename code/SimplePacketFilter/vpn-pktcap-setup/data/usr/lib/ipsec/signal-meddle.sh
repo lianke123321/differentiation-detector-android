@@ -1,8 +1,8 @@
 #!/bin/bash
 
-basePath="/data/pcap-data/"
+basePath="${MEDDLE_ROOT}/pcap-data/"
 logFile="${basePath}/pkt-capt.log"
-signalCMD="/data/usr/sbin/SignalUserUpDown"
+signalCMD="/${MEDDLE_ROOT}/usr/sbin/SignalUserUpDown"
 
 function logState()
 {
@@ -20,7 +20,8 @@ function genParams()
 function signalUP()
 {
     echo "Signalling ${signalCMD} ${clientID} ${clientIP} up" >> ${logFile}
-    ${signalCMD} ${clientID} ${clientIP} ${PLUTO_PEER} ${PLUTO_ME} up >> ${logFile} 2>&1
+    #TODO CHANGE THIS 
+    ${signalCMD} -f ${MEDDLE_CONFIG_FILE} -u ${clientID} -t ${clientIP} -r ${PLUTO_PEER} -s ${PLUTO_ME} -c up >> ${logFile} 2>&1
     retV=$?	    
     # TODO:: THE ERROR HANDLING NEEDS TO BE IMPROVED  
     if [ ${retV} -ne 0 ];
@@ -34,7 +35,8 @@ function signalUP()
 function signalDown()
 {
     echo "Signalling ${signalCMD} ${clientID} ${clientIP} down" >> ${logFile}
-    ${signalCMD} ${clientID} ${clientIP} ${PLUTO_PEER} ${PLUTO_ME} down >> ${logFile} 2>&1
+    #TODO:: CHANGE THIS	 
+    ${signalCMD} -f ${MEDDLE_CONFIG_FILE} -u ${clientID} ${clientIP} ${PLUTO_PEER} ${PLUTO_ME} down >> ${logFile} 2>&1
     retV=$?	    
     # TODO:: THE ERROR HANDLING NEEDS TO BE IMPROVED  
     if [ ${retV} -ne 0 ]
