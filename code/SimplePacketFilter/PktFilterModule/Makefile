@@ -1,5 +1,6 @@
 CXXFLAGS = -Wall -Werror
-LIBS= -lboost_thread-mt  -lboost_date_time -lmysqlclient -lpthread -lz -lm -lrt -ldl
+# -O has been removed because the optimization causes the checksum code to break! 
+LIBS= -lboost_thread-mt  -lboost_date_time -lboost_program_options -lmysqlclient -lpthread -lz -lm -lrt -ldl
 LIBDIR = -L/usr/lib/x86_64-linux-gnu -L/usr/lib64/mysql/ -L/usr/lib64/
 SRC = $(wildcard $(PWD)/*.cc)
 OBJS = $(SRC:.cc=.o)
@@ -24,7 +25,7 @@ SIGNALCONFIG = SignalConfigChange
 %.o : %.cc
 	$(CXX) $(LIBS) $(CXXFLAGS) -c $<
 
-all: $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG)
+all: clean $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG)
 
 distclean: clean
 	rm -f $(MAIN)	
@@ -33,7 +34,7 @@ clean:
 	rm -f $(OBJS) $(SIGNALUSER) $(MAIN) $(SIGNALCONFIG)
 
 $(MAIN): $(MAINOBJS)
-	$(CXX) $(LIBDIR) -o $(MAIN) $(MAINOBJS) $(LIBS) 
+	$(CXX) $(LIBDIR) -o $(MAIN) $(MAINOBJS) $(LIBS)
 
 $(SIGNALUSER) : $(SIGNALUSEROBJS)
 	$(CXX) $(LIBDIR) -o $(SIGNALUSER) $(SIGNALUSEROBJS) $(LIBS)
