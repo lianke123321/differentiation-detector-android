@@ -5,7 +5,8 @@ Binaries to be installed
 * tcpdump
 * iptables
 
-./configure --sysconfdir=/data/etc/ --prefix=/data/usr/ --libexecdir=/data/usr/lib --enable-openssl --enable-agent --enable-gcrypt --enable-integrity-test --enable-openssl --enable-eap-gtc --enable-eap-md5 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2 --enable-eap-identity --enable-md4 --enable-eap-radius --enable-socket-dynamic
+export MEDDLE_ROOT="path/to/meddle/root"
+./configure --sysconfdir=${MEDDLE_ROOT}/etc/ --prefix=${MEDDLE_ROOT}/usr/ --libexecdir=${MEDDLE_ROOT}/usr/lib --enable-openssl --enable-agent --enable-gcrypt --enable-integrity-test --enable-openssl --enable-eap-gtc --enable-eap-md5 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2 --enable-eap-identity --enable-md4 --enable-eap-radius --enable-socket-dynamic
 
 make 
 make install

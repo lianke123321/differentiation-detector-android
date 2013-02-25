@@ -1,3 +1,4 @@
+include meddle.config
 CXXFLAGS = -Wall -Werror
 # -O has been removed because the optimization causes the checksum code to break! 
 LIBS= -lboost_thread-mt  -lboost_date_time -lboost_program_options -lmysqlclient -lpthread -lz -lm -lrt -ldl
@@ -43,4 +44,8 @@ $(SIGNALCONFIG) : $(SIGNALCONFIGOBJS)
 	$(CXX) $(LIBDIR) -o $(SIGNALCONFIG) $(SIGNALCONFIGOBJS) $(LIBS)
 
 install: $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG)
-	sudo cp -vRf $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG) /data/usr/sbin/  
+	sudo cp -v meddle.config $(MEDDLE_ROOT)
+	sudo cp -v SetupPacketFilter.sh $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG) $(MEDDLE_ROOT)/usr/sbin/
+	ln -s $(MEDDLE_ROOT)/meddle.config $(MEDDLE_ROOT)/usr/sbin/
+	sudo cp -v meddle_root/* $(MEDDLE_ROOT)/
+	sed 's/MEDDLE_ROOT_PATH_FILLER/$(MEDDLE_ROOT)/g' $(MEDDLE_ROOT)/usr/lib/ipsec/_updown

@@ -131,7 +131,7 @@
 
 # define a minimum PATH environment in case it is not set
 PATH="/sbin:/bin:/usr/sbin:/usr/bin:/home/arao/usr/sbin"
-export MEDDLE_CONFIG_FILE=${MEDDLE_ETC}/meddle.config
+export MEDDLE_CONFIG_FILE=MEDDLE_ROOT_PATH_FILLER/meddle.config
 set -a # Required to export all variables! http://www.unix.com/shell-programming-scripting/56430-how-run-new-shell-copy-current-shell-declarations.html
 # Note set -a must be called before the source! I do not know why
 source ${MEDDLE_CONFIG_FILE}
