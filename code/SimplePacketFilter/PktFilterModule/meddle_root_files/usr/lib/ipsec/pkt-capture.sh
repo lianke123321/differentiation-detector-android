@@ -1,14 +1,14 @@
 #!/bin/bash
 
-export basePath="${MEDDLE_ROOT}/pcap-data/"
-export logFile="${basePath}/pkt-capt.log"
+export basePath="${pcapDataPath}"
+export logFile="${MEDDLE_LOG_PATH}/pkt-capt.log"
 export ipLookUpFile="${basePath}/ipLookUp.txt"
-export devCapture="tun0"
-export encPublicKeyID="Meddle"
-export TCPDUMP_BIN="/usr/sbin/tcpdump" 
-export GPG_BIN="/usr/bin/gpg"
-export GPG_HOME="${MEDDLE_ROOT}/.gpg"
-export encPublicKeyRing="${GPG_HOME}/Meddle.key"
+export devCapture=${tunDeviceName} # Capture on the tunnel device
+export encPublicKeyID=${gpgPublicKeyID}
+export TCPDUMP_BIN=${tcpdumpBinPath}
+export GPG_BIN=${gpgBinPath}
+export GPG_HOME=${gpgHome}
+export encPublicKeyRing="${gpgPublicKeyRing}"
 
 function logState()
 {

@@ -4,7 +4,7 @@ set -a
 source ${MEDDLE_CONFIG}
 
 logSuffix=`date  +%h-%d-%Y-%H-%M-%s`
-logPath="${MEDDLE_ROOT}/logs/"
+logPath="${MEDDLE_LOG_PATH}"
 mkdir -p ${logPath}
 filterLogName="${logPath}/SimplePacketFilter-${logSuffix}.log"
 webServerLogName="${logPath}/webServer-${logSuffix}.log"

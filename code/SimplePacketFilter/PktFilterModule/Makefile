@@ -2,7 +2,7 @@ include meddle.config
 CXXFLAGS = -Wall -Werror
 # -O has been removed because the optimization causes the checksum code to break! 
 LIBS= -lboost_thread-mt  -lboost_date_time -lboost_program_options -lmysqlclient -lpthread -lz -lm -lrt -ldl
-LIBDIR = -L/usr/lib/x86_64-linux-gnu -L/usr/lib64/mysql/ -L/usr/lib64/
+LIBDIR = -L/usr/lib/ -L/usr/lib/mysql/ -L/usr/lib/
 SRC = $(wildcard $(PWD)/*.cc)
 OBJS = $(SRC:.cc=.o)
 # mysql_config --libs
@@ -44,8 +44,9 @@ $(SIGNALCONFIG) : $(SIGNALCONFIGOBJS)
 	$(CXX) $(LIBDIR) -o $(SIGNALCONFIG) $(SIGNALCONFIGOBJS) $(LIBS)
 
 install: $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG)
-	sudo cp -v meddle.config $(MEDDLE_ROOT)
-	sudo cp -v SetupPacketFilter.sh $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG) $(MEDDLE_ROOT)/usr/sbin/
+	cp -v meddle.config $(MEDDLE_ROOT)
+	cp -v SetupPacketFilter.sh $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG) $(MEDDLE_ROOT)/usr/sbin/
 	ln -sf $(MEDDLE_ROOT)/meddle.config $(MEDDLE_ROOT)/usr/sbin/
-	sudo cp -v meddle_root/* $(MEDDLE_ROOT)/
-	sed 's/MEDDLE_ROOT_PATH_FILLER/$(MEDDLE_ROOT)/g' $(MEDDLE_ROOT)/usr/lib/ipsec/_updown
+	cp -vR meddle_root_files/* $(MEDDLE_ROOT)/
+	# Replace the quotes and escape the /s 
+	sed -i 's/MEDDLE_ROOT_PATH_FILLER/$(subst /,\/,$(subst ",,$(MEDDLE_ROOT)))/g' $(MEDDLE_ROOT)/usr/lib/ipsec/_updown

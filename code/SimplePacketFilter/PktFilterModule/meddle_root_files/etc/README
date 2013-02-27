@@ -1,3 +1,7 @@
+The description of each of the files is available in the following URLs
 ipsec.conf - http://wiki.strongswan.org/projects/strongswan/wiki/IpsecConf
 ipsec.secrets - http://wiki.strongswan.org/projects/strongswan/wiki/IpsecSecrets
 strongswan.conf - http://wiki.strongswan.org/projects/strongswan/wiki/StrongswanConf
+
+Modify the contents of each of these files based on the meddle.config 
+
