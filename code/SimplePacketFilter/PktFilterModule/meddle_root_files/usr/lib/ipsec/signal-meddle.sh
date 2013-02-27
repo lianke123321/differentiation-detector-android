@@ -1,7 +1,7 @@
 #!/bin/bash
 
 basePath="${MEDDLE_ROOT}/pcap-data/"
-logFile="${basePath}/pkt-capt.log"
+logFile="${MEDDLE_LOG_PATH}/pkt-capt.log"
 signalCMD="/${MEDDLE_ROOT}/usr/sbin/SignalUserUpDown"
 
 function logState()
@@ -36,7 +36,7 @@ function signalDown()
 {
     echo "Signalling ${signalCMD} ${clientID} ${clientIP} down" >> ${logFile}
     #TODO:: CHANGE THIS	 
-    ${signalCMD} -f ${MEDDLE_CONFIG_FILE} -u ${clientID} -t ${clientIP} -r ${PLUTO_PEER} -s ${PLUTO_ME} down >> ${logFile} 2>&1
+    ${signalCMD} -f ${MEDDLE_CONFIG_FILE} -u ${clientID} -t ${clientIP} -r ${PLUTO_PEER} -s ${PLUTO_ME} -c down >> ${logFile} 2>&1
     retV=$?	    
     # TODO:: THE ERROR HANDLING NEEDS TO BE IMPROVED  
     if [ ${retV} -ne 0 ]
