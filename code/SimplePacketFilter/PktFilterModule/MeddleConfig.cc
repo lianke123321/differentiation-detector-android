@@ -30,7 +30,8 @@ bool MeddleConfig::ReadConfigFile(std::string configName)
 	try {
 		po::variables_map vm;
 		BindVariables();
-		po::store(po::parse_config_file(configFile, desc), vm);
+		// the last parameter is to allow_unregistered options -- these options are the ones used in the shell scripts
+		po::store(po::parse_config_file(configFile, desc, true), vm);
 		po::notify( vm );
 	} catch(std::exception& e) {
 			logError("Error: " << e.what() << ". The valid options are as follows" << std::endl << desc);

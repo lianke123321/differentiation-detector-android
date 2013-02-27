@@ -46,6 +46,6 @@ $(SIGNALCONFIG) : $(SIGNALCONFIGOBJS)
 install: $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG)
 	sudo cp -v meddle.config $(MEDDLE_ROOT)
 	sudo cp -v SetupPacketFilter.sh $(MAIN) $(SIGNALUSER) $(SIGNALCONFIG) $(MEDDLE_ROOT)/usr/sbin/
-	ln -s $(MEDDLE_ROOT)/meddle.config $(MEDDLE_ROOT)/usr/sbin/
+	ln -sf $(MEDDLE_ROOT)/meddle.config $(MEDDLE_ROOT)/usr/sbin/
 	sudo cp -v meddle_root/* $(MEDDLE_ROOT)/
 	sed 's/MEDDLE_ROOT_PATH_FILLER/$(MEDDLE_ROOT)/g' $(MEDDLE_ROOT)/usr/lib/ipsec/_updown

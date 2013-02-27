@@ -1,19 +1,13 @@
 MEDDLE_ROOT=${PWD}
 MEDDLE_CONFIG=${MEDDLE_ROOT}/meddle.config
-
-eth="eth1"
-tunDeviceName="tun0"
-tunIpAddress="10.11.101.101"
-tunFwdPathNetSlash="10.11.0.0/16"
-tunRevPathNet="10.101.0.0/16"
-tunIpNetSlash="10.0.0.0/8"
-ethIpGateway="128.208.4.100"
-ethIpNetSlash="128.208.4.0/24"
+set -a
+source ${MEDDLE_CONFIG}
 
 logSuffix=`date  +%h-%d-%Y-%H-%M-%s`
-logPath="${MEDDLE_ROOT}/logs/
-filterLogName=${logPath}/SimplePacketFilter-"${logSuffix}".log"
-webServerLogName="${logPath}/webServer-"${logSuffix}".log"
+logPath="${MEDDLE_ROOT}/logs/"
+mkdir -p ${logPath}
+filterLogName="${logPath}/SimplePacketFilter-${logSuffix}.log"
+webServerLogName="${logPath}/webServer-${logSuffix}.log"
 basePath="${MEDDLE_ROOT}/usr/sbin/"
 webServerCommand="${MEDDLE_ROOT}/webServer/MainServer.py"
 
@@ -41,7 +35,7 @@ disableMySqlIpTables()
 
 startPacketFilter()
 {
-    ${basePath}/SimplePacketFilter > ${filterLogName} 2>&1 &
+    ${basePath}/SimplePacketFilter -c ${MEDDLE_CONFIG} > ${filterLogName} 2>&1 &
     echo "Sleeping for the device to come up"
     sleep 5 
 
