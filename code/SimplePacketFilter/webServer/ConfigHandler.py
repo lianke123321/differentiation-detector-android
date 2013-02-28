@@ -46,6 +46,7 @@ class ConfigHandler:
         shellVar = "MEDDLE_ROOT"
         value = self._configDict[key]
         value = value.replace("${"+shellVar+"}", self.getParam(shellVar))
+        value = value.replace('"', '');
         self._configDict[key] = value
         return
     
