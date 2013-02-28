@@ -56,10 +56,10 @@ class UserConfigs:
     def fetchConfigs(self, uid):
         global configParams
         query = "SELECT * FROM UserConfigs WHERE UserID = "+str(uid)+" ;"
-        dbCon = tornado.database.Connection(host=configParams.getParam("dbServer"), 
-                                            database=configParams.getParam("dbName"),
-                                            user=configParams.getParam("dbUserName"), 
-                                            password=configParams.getParam("dbPassword"))
+        dbCon = tornado.database.Connection(host=configParams.getParam(MCFG_DB_HOST), 
+                                            database=configParams.getParam(MCFG_DB_NAME),
+                                            user=configParams.getParam(MCFG_DB_USER), 
+                                            password=configParams.getParam(MCFG_DB_PASSWD))
         results = dbCon.query(query)
         if results is not None and len(results) == 1:
              self.__updateEntry(results[0])
@@ -78,10 +78,10 @@ class UserConfigs:
     def commitEntry(self):
          global configParams
          query = "UPDATE UserConfigs SET filterAdsAnalytics="+str(self.filterAdsAnalytics)+" WHERE userID="+str(self.userID)+ " ;"
-         dbCon = tornado.database.Connection(host=configParams.getParam("dbServer"), 
-                                            database=configParams.getParam("dbName"),
-                                            user=configParams.getParam("dbUserName"), 
-                                            password=configParams.getParam("dbPassword"))         
+         dbCon = tornado.database.Connection(host=configParams.getParam(MCFG_DB_HOST), 
+                                            database=configParams.getParam(MCFG_DB_NAME),
+                                            user=configParams.getParam(MCFG_DB_USER), 
+                                            password=configParams.getParam(MCFG_DB_PASSWD))         
          results = dbCon.execute(query)
          query = "INSERT INTO UserConfigChange VALUES("+str(self.userID)+", CURRENT_TIMESTAMP, \"filterAdsAnalytics\", "+str(self.filterAdsAnalytics)+");"
          results = dbCon.execute(query)

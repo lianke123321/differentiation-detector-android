@@ -52,7 +52,7 @@ class MeddleCommunicator:
     def __init__ (self):
         global configParams
         self.sock = -1;
-        self.sockAddr = (configParams.getParam("msgSockIpAddress"), int(configParams.getParam("msgSockPort")))
+        self.sockAddr = (configParams.getParam(MCFG_MSG_SRVIP), int(configParams.getParam(MCFG_MSG_SRVPORT)))
         logging.error("Connecting to "+str(self.sockAddr))
          
     def connectRemoteServer(self):
