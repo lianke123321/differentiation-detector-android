@@ -74,6 +74,7 @@ class ConfigHandler:
     def validateRequiredKeys(self):
         keyList = [MCFG_WEBSRV_PORT, 
                    MCFG_WEBPAGES_PATH,
+                   MCFG_WEBSRV_HOST,
                    MCFG_MSG_SRVPORT,
                    MCFG_MSG_SRVIP,
                    MCFG_MSG_SIGPATH,

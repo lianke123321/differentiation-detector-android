@@ -33,8 +33,11 @@ MCFG_MSG_SIGPATH = "msgConfigChangePath"
 MCFG_TUN_IPPREFIX = "tunClientIpNetPrefix"
 MCFG_WEBPAGES_PATH = "webPagesStaticPath"
 MCFG_WEBSRV_PORT = "webServerPort"
+MCFG_WEBSRV_HOST = "webServerHost"
 
-
+SERVER_HOST_FILLER = 'SERVER_HOST_FILLER'
+SERVER_PORT_FILLER = 'SERVER_PORT_FILLER'
+# TODO: Note I have not modified the strings SERVER_HOST/PORT_FILLER in TEMPLATES
 TEMPLATE_PAGE_HEADER = """<head>
   <meta charset="utf-8" />
 
@@ -93,9 +96,9 @@ TEMPLATE_PAGE_HEADER = """<head>
               Logged in as <a href="#" class="navbar-link">Username</a>
             </p> -->
             <ul class="nav">
-              <li class="active"><a href="index.html">Home</a></li>
-              <li><a href="about.html">About</a></li>
-              <li><a href="contact.html">Contact</a></li>
+              <li class="active"><a href="SERVER_HOST_FILLER:SERVER_PORT_FILLER/index.html">Home</a></li>
+              <li><a href="SERVER_HOST_FILLER:SERVER_PORT_FILLER/about.html">About</a></li>
+              <li><a href="SERVER_HOST_FILLER:SERVER_PORT_FILLER/contact.html">Contact</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>

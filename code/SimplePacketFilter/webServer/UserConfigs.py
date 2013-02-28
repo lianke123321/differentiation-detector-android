@@ -20,7 +20,7 @@ class UserConfigs:
         return
     
     def __header(self):        
-        hstr = TEMPLATE_PAGE_HEADER
+        hstr = TEMPLATE_PAGE_HEADER        
         return hstr
     
     def __footer(self):        
@@ -51,6 +51,8 @@ class UserConfigs:
         page += """<br/></form>"""
         #page += """<br/><input type="submit" id=\""""+str(CFG_SUBMIT_ID)+"""\" value=\""""+str(CFG_SUBMIT_STR)+"""\"></form>"""
         page += self.__footer()
+        page = page.replace(SERVER_HOST_FILLER, configParams.getParam(MCFG_WEBSRV_HOST))
+        page = page.replace(SERVER_PORT_FILLER, configParams.getParam(MCFG_WEBSRV_PORT))
         return page
     
     def fetchConfigs(self, uid):

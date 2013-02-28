@@ -54,6 +54,8 @@ class CommonHandler(tornado.web.RequestHandler):
         else:
             page += "Internal error on webserver. Please try again later."
         page += TEMPLATE_PAGE_FOOTER
+        page = page.replace(SERVER_HOST_FILLER, configParams.getParam(MCFG_WEBSRV_HOST))
+        page = page.replace(SERVER_PORT_FILLER, configParams.getParam(MCFG_WEBSRV_PORT))
         return page
      
     def __getIPInfo(self, remoteIP):
@@ -161,10 +163,13 @@ class DefaultHandler(CommonHandler):
             
 class SignUpHandler(CommonHandler):
     def __getThanksPage(self):
+        global configParams
         page = TEMPLATE_PAGE_HEADER
         page += "<p>Thank you for your interest.</p>"
-        page += "<p><a href=\"index.html\">Click here to return to home page</a></p> "
+        page += "<p><a href=\"http://"+configParams.getParam(MCFG_WEBSRV_HOST)+"/index.html\">Click here to return to home page</a></p> "
         page += TEMPLATE_PAGE_FOOTER
+        page = page.replace(SERVER_HOST_FILLER, configParams.getParam(MCFG_WEBSRV_HOST))
+        page = page.replace(SERVER_PORT_FILLER, configParams.getParam(MCFG_WEBSRV_PORT))
         return page
         
     def __verifyInput(self):
