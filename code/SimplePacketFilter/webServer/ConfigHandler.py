@@ -43,12 +43,12 @@ class ConfigHandler:
 
     def __expandShellVariables(self):
         # A simple replace of the relative paths with the absolute paths!
-        key = MCFG_WEBPAGES_PATH
-        shellVar = "MEDDLE_ROOT"
-        value = self._configDict[key]
-        value = value.replace("${"+shellVar+"}", self.getParam(shellVar))
-        value = value.replace('"', '');
-        self._configDict[key] = value
+        for key in [MCFG_WEBPAGES_PATH, MCFG_MSG_SIGPATH]:
+            shellVar = "MEDDLE_ROOT"
+            value = self._configDict[key]
+            value = value.replace("${"+shellVar+"}", self.getParam(shellVar))
+            value = value.replace('"', '');
+            self._configDict[key] = value
         return
     
     def getParam(self, key):

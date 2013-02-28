@@ -4,6 +4,7 @@ import struct
 import logging
 
 from ConfigHandler import configParams
+from StringConstants import *
 
 #TODO:: Add logging support
 
