@@ -1,5 +1,6 @@
 import tornado.database
 from StringConstants import *
+from ConfigHandler import configParams
 
 class UserConfigs:
     userName = None
@@ -53,8 +54,12 @@ class UserConfigs:
         return page
     
     def fetchConfigs(self, uid):
+        global configParams
         query = "SELECT * FROM UserConfigs WHERE UserID = "+str(uid)+" ;"
-        dbCon = tornado.database.Connection(host=DB_HOSTNAME, database=DB_DBNAME, user=DB_USER, password=DB_PASSWORD)
+        dbCon = tornado.database.Connection(host=configParams.getParam("dbServer"), 
+                                            database=configParams.getParam("dbName"),
+                                            user=configParams.getParam("dbUserName"), 
+                                            password=configParams.getParam("dbPassword"))
         results = dbCon.query(query)
         if results is not None and len(results) == 1:
              self.__updateEntry(results[0])
@@ -71,8 +76,12 @@ class UserConfigs:
          return
      
     def commitEntry(self):
-         query = "UPDATE UserConfigs SET filterAdsAnalytics="+str(self.filterAdsAnalytics)+" WHERE userID="+str(self.userID)+ " ;"         
-         dbCon = tornado.database.Connection(host=DB_HOSTNAME, database=DB_DBNAME, user=DB_USER, password=DB_PASSWORD)
+         global configParams
+         query = "UPDATE UserConfigs SET filterAdsAnalytics="+str(self.filterAdsAnalytics)+" WHERE userID="+str(self.userID)+ " ;"
+         dbCon = tornado.database.Connection(host=configParams.getParam("dbServer"), 
+                                            database=configParams.getParam("dbName"),
+                                            user=configParams.getParam("dbUserName"), 
+                                            password=configParams.getParam("dbPassword"))         
          results = dbCon.execute(query)
          query = "INSERT INTO UserConfigChange VALUES("+str(self.userID)+", CURRENT_TIMESTAMP, \"filterAdsAnalytics\", "+str(self.filterAdsAnalytics)+");"
          results = dbCon.execute(query)

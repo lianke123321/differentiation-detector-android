@@ -6,14 +6,20 @@ import logging
 import socket
 import tornado.netutil
 import subprocess
-
-import MeddleCommunicator
-import UserConfigs
-
-from StringConstants import *
 from recaptcha.client import captcha
 import urllib
 import httplib
+import sys
+
+# The python files to manage the meddle pages
+import MeddleCommunicator
+import UserConfigs
+import ConfigHandler
+
+# The variables and string constants
+from StringConstants import *
+from ConfigHandler import configParams
+
 #import smtplib
 # THE PROBLEM HERE IS THAT SOUNDER HAS AN OLDER VERSION OF DJANGO RUNNING 
 try:
@@ -27,6 +33,7 @@ ERR_OTHER=3
 ERR_FAILUPDATE = 4
 ERR_CAPTCHA = 5
 ERR_EMAIL = 6
+
 
 
 class CommonHandler(tornado.web.RequestHandler):
@@ -69,14 +76,15 @@ class CommonHandler(tornado.web.RequestHandler):
         return ipInfo
     
     def getIpInfo(self):
+        global configParams
         remoteIP = self.request.remote_ip
-        if remoteIP.find(PRIV_NETWORK) == -1:
+        if remoteIP.find(configParams.getParam("tunClientIpNetPrefix")) == -1:
             self.mainErr = ERR_NOUSER
             return None
         try:
             return self.__getIPInfo(remoteIP)
         except (socket.error, IOError), msg:
-            self.mainErr == ERR_OTHER
+            self.mainErr = ERR_OTHER
             logging.error("Received exception"+str(msg))
         return None
 
@@ -102,15 +110,15 @@ class ViewConfigsHandler(CommonHandler):
 
 
     def __sendReloadMessage(self, ipInfo):
-        # http://stackoverflow.com/questions/325463/launch-a-shell-command-with-in-a-python-script-wait-for-the-termination-and-ret
-        command = SIGNAL_CONFIG_COMMAND_PATH + " " + str(ipInfo.userID)
+        # http://stackoverflow.com/questions/325463/launch-a-shell-command-with-in-a-python-script-wait-for-the-termination-and-ret        
+        command = configParams["msgConfigChangePath"] + " -c " + configParams.getConfigPath() + " -u " + str(ipInfo.userID)
         logging.warning("Sending the command " +str(command))
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)        
         process.wait()
         logging.warning("The command returned with value"+str(process.returncode))
         if process.returncode == 0:
             return True
-        self.mainErr == ERR_FAILUPDATE
+        self.mainErr = ERR_FAILUPDATE
         return False
     
     
@@ -126,7 +134,7 @@ class ViewConfigsHandler(CommonHandler):
         uConfig = UserConfigs.UserConfigs()
         logging.debug(uConfig)
         if False == uConfig.fetchConfigs(ipInfo.userID):
-            self.mainErr == ERR_NOUSER
+            self.mainErr = ERR_NOUSER
             return self.getERRPage()
         uConfig.updateAdsConfig(cfg_ads)
         uConfig.commitEntry()
@@ -144,8 +152,9 @@ class ViewConfigsHandler(CommonHandler):
         
 class DefaultHandler(CommonHandler):
     def get(self):
+        global configParams
         try:
-            self.render(STATICPATH+"/index.html")
+            self.render(str(configParams.getParam("webPagesStaticPath"))+"/index.html")
         except (socket.error, IOError), msg:
             self.write(self.getERRPage())
             
@@ -154,7 +163,7 @@ class SignUpHandler(CommonHandler):
     def __getThanksPage(self):
         page = TEMPLATE_PAGE_HEADER
         page += "<p>Thank you for your interest.</p>"
-        page += "<p><a href=\"http://meddle.cs.washington.edu\">Click here to return to home page</a></p> "
+        page += "<p><a href=\"index.html\">Click here to return to home page</a></p> "
         page += TEMPLATE_PAGE_FOOTER
         return page
         
@@ -182,10 +191,14 @@ class SignUpHandler(CommonHandler):
         return bool(email_re.match(emailAddr))
     
     def __serveNewInterest(self):
+        global configParams
         emailAddress = self.get_argument('interestEmail', 'None')
         query = "INSERT INTO InterestedUsers VALUES (0, CURRENT_TIMESTAMP, '"+str(emailAddress)+"', 0 );"
         logging.warning(query);
-        dbCon = tornado.database.Connection(host=DB_HOSTNAME, database=DB_DBNAME, user=DB_USER, password=DB_PASSWORD)
+        dbCon = tornado.database.Connection(host=configParams.getParam("dbServer"), 
+                                            database=configParams.getParam("dbName"),
+                                            user=configParams.getParam("dbUserName"), 
+                                            password=configParams.getParam("dbPassword"))        
         results = dbCon.execute(query)
         dbCon.close()
         
@@ -213,15 +226,25 @@ class SignUpHandler(CommonHandler):
          return
              
                 
-handlers = [(r"/",DefaultHandler),
-            (r""+str(PAGE_VIEWCONFIGS), ViewConfigsHandler),
-            (r"/dyn/signupCaptcha", SignUpHandler),
-            (r"/(.+\..+)", tornado.web.StaticFileHandler, {'path': str(STATICPATH)})]
-settings = {}
 #settings = {'debug': True, 
 #            'static_path': os.path.join(STATICPATH)}
 
+
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        logging.error("python "+sys.argv[0] +" <configFileName>")
+        sys.exit(-1)
+    #endif     
+    if False == configParams.readConfigs(sys.argv[1]):
+        logging.error("Error while reading the config file")
+        sys.exit(-1)
+        
+    
+    handlers = [(r"/",DefaultHandler),
+            (r""+str(PAGE_VIEWCONFIGS), ViewConfigsHandler),
+            (r"/dyn/signupCaptcha", SignUpHandler),
+            (r"/(.+\..+)", tornado.web.StaticFileHandler, {'path': str(configParams.getParam("webPagesStaticPath"))})]
+    settings = {}
     application = tornado.web.Application(handlers, **settings)
-    application.listen(80)
+    application.listen(configParams.getParam("webServerPort"))
     tornado.ioloop.IOLoop.instance().start()

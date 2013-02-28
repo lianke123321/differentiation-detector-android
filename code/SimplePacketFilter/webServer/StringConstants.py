@@ -1,25 +1,15 @@
 
 STATICPATH="/data/webPages"
 PAGE_DYNPATH="/dyn/"
-PAGE_SERVER_URL = "http://10.11.101.101"
 PAGE_UPDATECONFIGS=PAGE_DYNPATH+"updateConfigs"
 PAGE_VIEWCONFIGS=PAGE_DYNPATH+"viewConfigs"
 PAGE_STATIC_EXPR="^(dyn.*)"
-SIGNAL_CONFIG_COMMAND_PATH = "/data/usr/sbin/SignalConfigChange"
 STR_TITLE="Meddle"
 STR_CAPTCHA_PRIV_KEY = "6LdcvNgSAAAAACIFHFCDgz0wk91qd7o01vWzS1pj"
 CFG_ADS_GRP= "cfg_ads"
 CFG_ADS_GRP_ENABLE_STR = "enable"
 CFG_ADS_GRP_DISABLE_STR = "disable"
-PRIV_NETWORK = "10.11."
-
 CFG_SUBMIT_ID="submitID"
-
-DB_HOSTNAME = "sounder.cs.washington.edu"
-DB_USER = "meddle"
-DB_PASSWORD = "q@847#$6&4@RfbvD"
-DB_DBNAME = "MeddleDB"
-
 CFG_SUBMIT_STR = "Save Settings"
 
 #TEMPLATE_INTEREST_EMAIL_SUBMITTER = "STR_INTEREST_EMAIL"
@@ -92,16 +82,16 @@ TEMPLATE_PAGE_HEADER = """<head>
               Logged in as <a href="#" class="navbar-link">Username</a>
             </p> -->
             <ul class="nav">
-              <li class="active"><a href="http://meddle.cs.washington.edu/">Home</a></li>
-              <li><a href="http://meddle.cs.washington.edu/about.html">About</a></li>
-              <li><a href="http://meddle.cs.washington.edu/contact.html">Contact</a></li>
+              <li class="active"><a href="index.html">Home</a></li>
+              <li><a href="about.html">About</a></li>
+              <li><a href="contact.html">Contact</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
       </div>
     </div>
 """
-#TEMPLATE_PAGE_FOOTER="""<br/><a href="http://meddle.cs.washington.edu/"> Click here to go back to meddle</a> </body>"""
+
 TEMPLATE_PAGE_FOOTER="""<footer>
      <p>&copy; Copyright 2012 by David Choffnes, University of Washington.</p>
     </footer>

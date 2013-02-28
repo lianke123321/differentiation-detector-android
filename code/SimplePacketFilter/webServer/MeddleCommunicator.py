@@ -3,11 +3,9 @@ import sys
 import struct
 import logging
 
-#TODO:: Add logging support
+from ConfigHandler import configParams
 
-#define COMMAND_SOCKET_PATH "/data/.meddleCmdSocket"
-MESSAGE_SOCKET_ADDR = "127.0.0.1"
-MESSAGE_SOCKET_PORT = 12321 
+#TODO:: Add logging support
 
 #define MSG_CREATETUNNEL 1
 #define MSG_CLOSETUNNEL 2
@@ -52,9 +50,9 @@ class MeddleCommunicator:
     sockAddr = None 
         
     def __init__ (self):
-        global MESSAGE_SOCKET_ADDR, MESSAGE_SOCKET_PORT
+        global configParams
         self.sock = -1;
-        self.sockAddr = (MESSAGE_SOCKET_ADDR, MESSAGE_SOCKET_PORT)
+        self.sockAddr = (configParams.getParam("msgSockIpAddress"), configParams.getParam("msgSockPort"))
         logging.error("Connecting to "+str(self.sockAddr))
          
     def connectRemoteServer(self):
