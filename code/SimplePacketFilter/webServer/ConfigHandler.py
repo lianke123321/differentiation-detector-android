@@ -1,5 +1,6 @@
 #import ConfigVariables
 import logging
+from StringConstants import *
 
 class ConfigHandler:
     _path = None
@@ -42,7 +43,7 @@ class ConfigHandler:
 
     def __expandShellVariables(self):
         # A simple replace of the relative paths with the absolute paths!
-        key = "webPagesStaticPath"
+        key = MCFG_WEBPAGES_PATH
         shellVar = "MEDDLE_ROOT"
         value = self._configDict[key]
         value = value.replace("${"+shellVar+"}", self.getParam(shellVar))
@@ -70,16 +71,16 @@ class ConfigHandler:
         return self._path
     # TODO:: Add to this list when you add a param that needs to be read from the config file
     def validateRequiredKeys(self):
-        keyList = ["webServerPort", 
-                   "webPagesStaticPath",
-                   "msgSockPort",
-                   "msgSockIpAddress",
-                   "msgConfigChangePath",
-                   "tunClientIpNetPrefix",
-                   "dbServer",
-                   "dbUserName",
-                   "dbPassword",
-                   "dbName"]
+        keyList = [MCFG_WEBSRV_PORT, 
+                   MCFG_WEBPAGES_PATH,
+                   MCFG_MSG_SRVPORT,
+                   MCFG_MSG_SRVIP,
+                   MCFG_MSG_SIGPATH,
+                   MCFG_TUN_IPPREFIX,
+                   MCFG_DB_HOST,
+                   MCFG_DB_USER,
+                   MCFG_DB_PASSWD,
+                   MCFG_DB_NAME]
         if self.keysPresent(keyList) is False:
             logging.error("Error while reading the config file at "+str(self._path))            
             return False

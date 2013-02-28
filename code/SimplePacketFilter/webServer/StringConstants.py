@@ -22,6 +22,17 @@ CFG_SUBMIT_STR = "Save Settings"
 #Please respond to this interest.
 #"""
 
+# They keys in the meddle.config file
+MCFG_DB_PASSWD = "dbPassword"
+MCFG_DB_NAME = "dbName"
+MCFG_DB_USER = "dbUserName"
+MCFG_DB_HOST = "dbServer"
+MCFG_MSG_SRVIP = "msgSockIpAddress"
+MCFG_MSG_SRVPORT = "msgSockPort"
+MCFG_MSG_SIGPATH = "msgConfigChangePath"
+MCFG_TUN_IPPREFIX = "tunClientIpNetPrefix"
+MCFG_WEBPAGES_PATH = "webPagesStaticPath"
+MCFG_WEBSRV_PORT = "webServerPort"
 
 
 TEMPLATE_PAGE_HEADER = """<head>

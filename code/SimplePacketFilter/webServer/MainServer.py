@@ -78,7 +78,7 @@ class CommonHandler(tornado.web.RequestHandler):
     def getIpInfo(self):
         global configParams
         remoteIP = self.request.remote_ip
-        if remoteIP.find(configParams.getParam("tunClientIpNetPrefix")) == -1:
+        if remoteIP.find(configParams.getParam(MCFG_TUN_IPPREFIX)) == -1:
             self.mainErr = ERR_NOUSER
             return None
         try:
@@ -111,7 +111,7 @@ class ViewConfigsHandler(CommonHandler):
 
     def __sendReloadMessage(self, ipInfo):
         # http://stackoverflow.com/questions/325463/launch-a-shell-command-with-in-a-python-script-wait-for-the-termination-and-ret        
-        command = configParams["msgConfigChangePath"] + " -c " + configParams.getConfigPath() + " -u " + str(ipInfo.userID)
+        command = configParams.getParam(MCFG_MSG_SIGPATH) + " -c " + configParams.getConfigPath() + " -u " + str(ipInfo.userID)
         logging.warning("Sending the command " +str(command))
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)        
         process.wait()
@@ -154,7 +154,7 @@ class DefaultHandler(CommonHandler):
     def get(self):
         global configParams
         try:
-            self.render(str(configParams.getParam("webPagesStaticPath"))+"/index.html")
+            self.render(str(configParams.getParam(MCFG_WEBPAGES_PATH))+"/index.html")
         except (socket.error, IOError), msg:
             self.write(self.getERRPage())
             
@@ -195,10 +195,10 @@ class SignUpHandler(CommonHandler):
         emailAddress = self.get_argument('interestEmail', 'None')
         query = "INSERT INTO InterestedUsers VALUES (0, CURRENT_TIMESTAMP, '"+str(emailAddress)+"', 0 );"
         logging.warning(query);
-        dbCon = tornado.database.Connection(host=configParams.getParam("dbServer"), 
-                                            database=configParams.getParam("dbName"),
-                                            user=configParams.getParam("dbUserName"), 
-                                            password=configParams.getParam("dbPassword"))        
+        dbCon = tornado.database.Connection(host=configParams.getParam(MCFG_DB_HOST), 
+                                            database=configParams.getParam(MCFG_DB_NAME),
+                                            user=configParams.getParam(MCFG_DB_USER), 
+                                            password=configParams.getParam(MCFG_DB_PASSWD))        
         results = dbCon.execute(query)
         dbCon.close()
         
@@ -243,8 +243,8 @@ if __name__ == "__main__":
     handlers = [(r"/",DefaultHandler),
             (r""+str(PAGE_VIEWCONFIGS), ViewConfigsHandler),
             (r"/dyn/signupCaptcha", SignUpHandler),
-            (r"/(.+\..+)", tornado.web.StaticFileHandler, {'path': str(configParams.getParam("webPagesStaticPath"))})]
+            (r"/(.+\..+)", tornado.web.StaticFileHandler, {'path': str(configParams.getParam(MCFG_WEBPAGES_PATH))})]
     settings = {}
     application = tornado.web.Application(handlers, **settings)
-    application.listen(configParams.getParam("webServerPort"))
+    application.listen(configParams.getParam(MCFG_WEBSRV_PORT))
     tornado.ioloop.IOLoop.instance().start()
