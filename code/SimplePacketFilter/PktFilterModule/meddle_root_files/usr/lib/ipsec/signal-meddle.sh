@@ -1,8 +1,8 @@
 #!/bin/bash
 
-basePath="${MEDDLE_ROOT}/pcap-data/"
+basePath="${pcapDataPath}"
 logFile="${MEDDLE_LOG_PATH}/pkt-capt.log"
-signalCMD="/${MEDDLE_ROOT}/usr/sbin/SignalUserUpDown"
+signalCMD="${msgSignalUserUpDownPath}"
 
 function logState()
 {
