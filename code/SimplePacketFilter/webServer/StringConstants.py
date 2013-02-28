@@ -96,9 +96,9 @@ TEMPLATE_PAGE_HEADER = """<head>
               Logged in as <a href="#" class="navbar-link">Username</a>
             </p> -->
             <ul class="nav">
-              <li class="active"><a href="SERVER_HOST_FILLER:SERVER_PORT_FILLER/index.html">Home</a></li>
-              <li><a href="SERVER_HOST_FILLER:SERVER_PORT_FILLER/about.html">About</a></li>
-              <li><a href="SERVER_HOST_FILLER:SERVER_PORT_FILLER/contact.html">Contact</a></li>
+              <li class="active"><a href="http://SERVER_HOST_FILLER:SERVER_PORT_FILLER/index.html">Home</a></li>
+              <li><a href="http://SERVER_HOST_FILLER:SERVER_PORT_FILLER/about.html">About</a></li>
+              <li><a href="http://SERVER_HOST_FILLER:SERVER_PORT_FILLER/contact.html">Contact</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
