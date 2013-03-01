@@ -34,11 +34,13 @@ def dumpConfXML(xmlPath, p12Path, clientName, clientPassword, serverHostName, ca
                          caCertName=caCertName, base64caCert=base64caCert, caName=caName)
         dumpStr = templateString.safe_substitute(substDict)
         fpxml.write(dumpStr)
+        print "Created" + xmlPath
         return 0
     return 1
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 9:
+        print "Argument invalid:"+str(sys.argv)
         print "sys.argv[0] <clientName> <password> <orgName> <connDisplayName> <caName> <serverHostName> <caCertPath> <clientCertPath>"
         exit(-1)
         
@@ -54,7 +56,7 @@ if __name__ == "__main__":
     orgName = sys.argv[3]
     connDisplayName = sys.argv[4]
     caName = sys.argv[5]
-    serverHostname = sys.argv[6]
+    serverHostName = sys.argv[6]
     caCertPath = sys.argv[7]
     clientCertPath = sys.argv[8]
     

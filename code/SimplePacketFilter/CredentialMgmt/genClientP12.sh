@@ -38,6 +38,7 @@ fi
 
 ################################################################################
 # 4. Create the private key and check if it is a valid key
+echo "Creating the Key: ${keyFile}"
 ${ipsecBin} pki --gen --outform pem > ${keyFile}
 # echo "${keyFile} created using ${IPSEC_BIN}"
 # cat ${keyFile}
@@ -51,6 +52,7 @@ fi
 ################################################################################
 # 4. Use the key and send (pipe) it to the CA. The CA then signs the signature
 # using its private key. Check if the certificate signed by the CA is valid.
+echo "Creating the Certificate: ${certFile}"
 cmd=""${ipsecBin}" pki --pub --in "${keyFile}" | "${ipsecBin}" pki --issue --cacert "${caCert}" --cakey "${caKey}" --dn \""${DNstr}"\" --outform pem > ${certFile}"
 eval ${cmd}
 # Stupid bash bug made me use eval to get the quotes for DN working :(.
@@ -70,9 +72,11 @@ fi
 
 # Note I am using shell variables because it is considered to be a secure way
 # to send passwords to programs :p !
+echo "Generating the .p12 file:${p12File}"
 "${OPENSSL}" pkcs12 -export -inkey "${keyFile}" -in "${certFile}" -name "${clientName}" -passout pass:"${clientPassword}" -certfile "${caCert}" -caname \""${caName}"\" -out "${p12File}"
 # The android file is useful for testing different accounts on the same android device
-cp ${certFile} ${androidFile}
+#cp ${certFile} ${androidFile}
+echo "Done! Created ${keyFile} ${certFile} ${p12File} for user ${clientName} with password ${clientPassword}"
 
 #python genIOSConfigXML.py ${clientName} ${clientPassword}
 #echo "Created ${clientName} ${clientPassword}"
