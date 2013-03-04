@@ -1,5 +1,5 @@
 The following steps need to be followed to install Meddle in a folder specified by MEDDLE_ROOT. All the files required by Meddle are installed in MEDDLE_ROOT. The meddle.config file assumes MEDDLE_ROOT to be /opt/meddle/. 
-* Edit meddle.config
+* Edit MeddleSystem/meddle.config
   This file contains the configuration parameters for the Meddle system. The following fields must be edited before you begin the installation
   MEDDLE_ROOT - The location where all the meddle related files are to be placed. 
   dbPassword - The password to access the database.
