@@ -1,5 +1,5 @@
-MEDDLE_ROOT=${PWD}
-MEDDLE_CONFIG=${MEDDLE_ROOT}/meddle.config
+# Please makes sure that the path to meddle.config is correct after installation
+MEDDLE_CONFIG=MEDDLE_ROOT_FILLER/meddle.config
 set -a
 source ${MEDDLE_CONFIG}
 
@@ -9,7 +9,6 @@ mkdir -p ${logPath}
 filterLogName="${logPath}/SimplePacketFilter-${logSuffix}.log"
 webServerLogName="${logPath}/webServer-${logSuffix}.log"
 basePath="${MEDDLE_ROOT}/usr/sbin/"
-webServerCommand="${MEDDLE_ROOT}/webServer/MainServer.py"
 
 enableMySqlIpTables()
 {
@@ -143,7 +142,7 @@ stopIPSec()
 
 startWebServer()
 {
-    echo "Manually Start the webserver if not running with the command ${webServerCommand} > ${webServerLogName} 2>&1" 
+    echo "Manually Start the webserver if not running with a log name ${webServerLogName} 2>&1" 
 }
 
 stopWebServer()
@@ -169,9 +168,9 @@ stopMeddle()
 
 if [ $# -ne "1" ];
 then
-    echo $0 "<1 for setup> <2 for undo>"
+    echo $0 "<start to start Meddle> <stop to stop Meddle>"
 else
-    if [ $1 == "1" ];
+    if [ $1 == "start" ];
     then
 	startMeddle
     else
