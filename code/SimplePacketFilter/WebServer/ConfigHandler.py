@@ -28,6 +28,7 @@ class ConfigHandler:
         for line in self._fh:
             confs = line.split('#')[0]
             confs = confs.strip()
+            confs = confs.replace('"', '')
             if len(confs) > 0:
                 confLst = confs.split('=')
                 if len(confLst) > 0 and len(confLst[0]) > 0:
