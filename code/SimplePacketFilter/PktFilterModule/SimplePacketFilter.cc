@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 		logError("Error reading the config file");
 		return -1;
 	}
-	if (false == meddleConfig.ReadConfigFile(configName)) {
+	if (false == meddleConfig.readConfigFile(configName)) {
 		logError("Error reading the config file " << configName);
 		return -1;
 	}

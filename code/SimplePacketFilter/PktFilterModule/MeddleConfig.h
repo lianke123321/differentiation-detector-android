@@ -47,9 +47,11 @@ public:
 	std::string dbName;
 private:
 	po::options_description desc;
-	bool BindVariables();
+	bool bindVariables();
+	bool handleQuotes();
+	void removeQuote(std::string &quotedString);
 public:
-	bool ReadConfigFile(std::string configName);
+	bool readConfigFile(std::string configName);
 	MeddleConfig();
 	MeddleConfig(std::string configName);
 	~MeddleConfig();

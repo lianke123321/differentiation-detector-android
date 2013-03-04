@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 		logError("Error parsing command line arguments");
 		return 1;
 	}
-	if (false == meddleConfig.ReadConfigFile(configName)) {
+	if (false == meddleConfig.readConfigFile(configName)) {
 		logError("Error reading the configurations for meddle");
 		return 1;
 	}

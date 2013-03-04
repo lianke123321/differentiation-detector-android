@@ -55,7 +55,7 @@ bool sendCommand(const std::string & configName, const uint32_t &userID)
 	bool ret;
 	MeddleConfig config;
 
-	if (false == config.ReadConfigFile(configName)) {
+	if (false == config.readConfigFile(configName)) {
 		logError("Error reading the config file");
 		return false;
 	}

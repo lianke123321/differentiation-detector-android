@@ -5,6 +5,8 @@
 
 #include "MeddleConfig.h"
 #include "Logging.h"
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/erase.hpp>
 
 namespace po = boost::program_options;
 
@@ -15,11 +17,34 @@ MeddleConfig::MeddleConfig()
 
 MeddleConfig::MeddleConfig(std::string configName)
 {
-	validConfig = ReadConfigFile(configName);
+	validConfig = readConfigFile(configName);
 	return;
 }
 
-bool MeddleConfig::ReadConfigFile(std::string configName)
+inline void MeddleConfig::removeQuote(std::string &quotedString)
+{
+	// remove trailing whitespaces
+	boost::trim(quotedString);
+	// remove the quotes
+	quotedString.erase(std::remove(quotedString.begin(), quotedString.end(), '\"'), quotedString.end());
+	return;
+}
+
+bool MeddleConfig::handleQuotes()
+{
+	removeQuote(tunDeviceName); removeQuote(tunFwdPathNet);
+	removeQuote(tunRevPathNet); removeQuote(tunIpNetmask);
+	removeQuote(tunRouteNetmask); removeQuote(tunIpAddress);
+
+	removeQuote(msgSockPort); removeQuote(msgSockIpAddress);
+
+	removeQuote(fltrDefaultDNS); removeQuote(fltrAdBlockDNS);
+
+	removeQuote(dbServer); removeQuote(dbUserName);
+	removeQuote(dbPassword); removeQuote(dbName);
+	return true;
+}
+bool MeddleConfig::readConfigFile(std::string configName)
 {
 	std::ifstream configFile;
 	configFile.open(configName.c_str());
@@ -29,10 +54,11 @@ bool MeddleConfig::ReadConfigFile(std::string configName)
 	}
 	try {
 		po::variables_map vm;
-		BindVariables();
+		bindVariables();
 		// the last parameter is to allow_unregistered options -- these options are the ones used in the shell scripts
 		po::store(po::parse_config_file(configFile, desc, true), vm);
-		po::notify( vm );
+		po::notify(vm);
+		handleQuotes();
 	} catch(std::exception& e) {
 			logError("Error: " << e.what() << ". The valid options are as follows" << std::endl << desc);
 			configFile.close();
@@ -46,7 +72,7 @@ bool MeddleConfig::ReadConfigFile(std::string configName)
 	return true;
 }
 
-bool MeddleConfig::BindVariables()
+bool MeddleConfig::bindVariables()
 {
 	logDebug("Binding variables");
 	// Tunnel options
