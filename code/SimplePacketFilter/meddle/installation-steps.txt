@@ -1,0 +1,66 @@
+The following steps need to be followed to install Meddle in a folder specified by MEDDLE_ROOT. All the files required by Meddle are installed in MEDDLE_ROOT. The meddle.config file assumes MEDDLE_ROOT to be /opt/meddle/. 
+* Edit meddle.config
+  This file contains the configuration parameters for the Meddle system. The following fields must be edited before you begin the installation
+  MEDDLE_ROOT - The location where all the meddle related files are to be placed. 
+  dbPassword - The password to access the database.
+  ethDeviceName - The interface used by this machine to access the Internet.
+  ethIpNetSlash - The network in the / format. 
+  ethIpGateway - The IP address of the gateway.
+  fltrDefaultDNS - The IP address of the DNS server.
+  fltrAdBlockDNS - The IP address where the DNS server running the rules for adblocking is present. 
+  webServerHost - The hostname of this machine. 
+  
+* Install VPN server
+  The installation instructions for this step are present in VPNSetup/strongswan-config-steps.txt. 
+ 
+* Install the database schema.
+  The installation instructions are present in DatabaseSetup/setup.txt. 
+ 
+* Install the Meddle system.
+  cd MeddleSystem; make; sudo make install
+
+* Install the web server
+  Enter WebServer folder and execute ./install.sh
+
+* Place the web pages in the appropriate folder  
+  Enter WebPages and execute ./install.sh
+  If the Webserver is listening on a port other than port 80 then edit MEDDLE_ROOT/WebPages/index.html. Replace 10.11.101.101 with the values of tunIpAddress:webServerPort in meddle.config file. 
+
+* Create and the certificates for CA and the server.
+  Change directory to MEDDLE_ROOT/credential-mgmt/
+  Execute ./gen-CA-Certs.sh
+  Execute ./gen-Server-Certs.sh
+  This step ensures that the certificates are installed in the appropriate location.
+
+* Install the DNS setting for ad blocking on the DNS server for AD blocking.
+  The installation steps are present in DNSAdblock/installation-steps.txt
+
+* Start Meddle
+  Change to MEDDLE_ROOT/usr/sbin/
+  ./SetupMeddle.sh start to start meddle and ./SetupMeddle.sh to stop meddle
+  The suggested logname for the webserver is printed in the last message of this script.
+
+* Start the web server
+  The webserver needs to be started manually. This was done to ensure that the webpages will be served even if Meddle is not running or is undergoing an upgrade.
+  Change to MEDDLE_ROOT/WebServer
+  python MainServer.sh > suggested_log_name 2>&1 &
+  
+* Start the DNS server
+  For Ubuntu/Debian service bind restart and for Fedora service bind9 restart
+
+* Create users
+
+* Email credentials to the users. 
+  Copy the credentials that have been created and email them to the users. The email template is as follows. The URLs can be used as is because there will always be a copy of these instructions available at these URLs. 
+---
+The attachment contains the certificates required by Meddle.
+
+The installation password for the certificates is <password>
+
+The installation instructions are available at
+http://meddle.cs.washington.edu/android.html
+http://meddle.cs.washington.edu/iOS.html
+
+The VPN app (mentioned in Step 3) for Android devices is available at
+http://sounder.cs.washington.edu/apk/MeddleVPN.apk
+---
