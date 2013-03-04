@@ -2,47 +2,59 @@
 # Lines that begin with $>  indicate bash prompt
 # Line that begin with mysql> indicate mysql prompt
 
+# Start the mysql service if it is not running. 
+$> service mysqld start
+
+# If this is the first time mysql is being used then perform the secure installation to ensure that root password is set. 
 $> mysql_secure_installation
 
 # Set the root password and disable remote root login
-# Steps taken from http://dev.mysql.com/doc/refman/5.1/en/adding-users.html
-
+# The following steps have been taken from http://dev.mysql.com/doc/refman/5.1/en/adding-users.html
 $> mysql --user=root -p 
-pass: <root password> 
-# I have used root for the time being
+pass: <enter_root_password_here> 
 
-mysql> CREATE USER 'meddle'@'localhost' IDENTIFIED BY 'meddle';
+# Now we create an account with a username meddle and a password specified by meddle_password_for_this_server. Please remember the meddle_password_for_this_server. This password should be the one present in the dbPassword field in meddle.config file.
+mysql> CREATE USER 'meddle'@'localhost' IDENTIFIED BY 'meddle_password_for_this_server';
 
+# Create the Database with the name MeddleDB
 mysql> CREATE DATABASE MeddleDB;
 
-
+# Ensure that the user meddle can access the MeddleDB database
 mysql> GRANT ALL ON MeddleDB.* TO 'meddle'@'localhost' WITH GRANT OPTION;
 
-# FOR EACH meddle server. Avoid using meddle@*
-mysql> GRANT ALL ON MeddleDB.* to meddle@sounder.cs.washington.edu IDENTIFIED BY <meddle password>
-mysql> GRANT ALL ON MeddleDB.* to meddle@snowmane.cs.washington.edu IDENTIFIED BY <meddle password>
+# This step can be ignored if only one server is used to serve the mobile clients. 
+# When more than one server is used to serve the domain then for each meddle server 
+# Avoid using meddle@*.
+mysql> GRANT ALL ON MeddleDB.* to meddle@myserverhostname1 IDENTIFIED BY <meddle_password_for_this_server>
+mysql> GRANT ALL ON MeddleDB.* to meddle@myserverhostname2 IDENTIFIED BY <meddle_password_for_this_server>
 
+# Now login as meddle to check if the credentials work
 $> mysql -u meddle -p MeddleDB
-Enter password: <meddle password>
+Enter password: <meddle_password_for_this_server>
 
-#http://stackoverflow.com/questions/1420839/cant-connect-to-mysql-server-error-111
-Edit /etc/mysql/my.cnf or the corresponding my.cnf for your mysql installation
+# If you are not able to connect then edit the my.cnf based on the suggestions available at 
+# http://stackoverflow.com/questions/1420839/cant-connect-to-mysql-server-error-111
+# Edit /etc/mysql/my.cnf or the corresponding my.cnf for your mysql installation
 
-Add iptables rules to ensure no one 
+# Add iptables rules to ensure that mysql is not accessed by anyone else.
 $> iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
 $> iptables -A INPUT -p tcp --dport 3306 -j REJECT
   
-
+# CREATE THE Tables required by Meddle
+# Table where the user configurations are present
 mysql> CREATE TABLE UserConfigs (userID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, userName VARCHAR(512), filterAdsAnalytics INT NOT NULL DEFAULT 0, UNIQUE(userName)) ENGINE="InnoDB";
 
+# Table where the tunnel information is kept. This is used for book keeping and is currently not used. 
 mysql> CREATE TABLE UserTunnelInfo (rowID SERIAL PRIMARY KEY, userID INT NOT NULL, clientTunnelIpAddress VARCHAR(64) NOT NULL, clientRemoteIpAddress VARCHAR(64) NOT NULL, serverIpAddress VARCHAR(64) NOT NULL, timestamp TIMESTAMP NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, startStopFlag BOOLEAN NOT NULL DEFAULT 0) ENGINE="InnoDB"; 
 #mysql> ALTER TABLE UserTunnelInfo ADD INDEX (timestamp);
 
-# For each user add this entry to he table while creating users
-mysql> INSERT INTO UserConfigs VALUES (0, 'arao-ipod', 0);
+# For each user add this entry to he table while creating users. This step shall be performed by the scripts to manage users. 
+# mysql> INSERT INTO UserConfigs VALUES (0, 'arao-ipod', 0);
 
-
+# Table that logs the change in configuration parameters.
 mysql> CREATE TABLE UserConfigChange(userID INT NOT NULL,  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, configVariable VARCHAR (512), newValue VARCHAR (512)) ENGINE="InnoDB";
 
+# Table keeping the list of Interested Users
 mysql> CREATE TABLE InterestedUsers(rowID SERIAL PRIMARY KEY, timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, emailAddress VARCHAR (512), responded BOOLEAN NOT NULL DEFAULT 0) ENGINE="InnoDB";  
 
+# Hurray! Database is setup
