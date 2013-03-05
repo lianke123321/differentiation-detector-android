@@ -2,6 +2,12 @@
 # Lines that begin with $>  indicate bash prompt
 # Line that begin with mysql> indicate mysql prompt
 
+# Install mysql and its connector
+# For Fedora
+$> sudo yum install mysql-server mysql-client mysql-devel mysql-connector-python MySQL-python
+# For Ubuntu/debian 
+$> sudo apt-get install mysql-server mysql-client mysql-common python-mysqldb-dbg python-mysql libmysqlclient-dev
+
 # Start the mysql service if it is not running. 
 $> sudo service mysqld start
 

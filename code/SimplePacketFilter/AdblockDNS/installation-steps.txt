@@ -1,21 +1,29 @@
-# Install bind. 
+################### STEPS FOR FEDORA ##########################################
 # For Fedora 
 sudo yum install bind bind-utils
+
+export NAMED_PATH=/etc/
+# For fedora it is /etc/
+# Add the following line to the named.conf in ${NAMED_PATH}
+# Do not forget the quotes and to end the line with a semicolon
+# Also replace NAMED_PATH with the absolute path
+include "<NAMED_PATH>/named.conf.adblock";
+# Copy the null.zone.file and named.conf.adblock to ${NAMED_PATH}
+sudo cp named.conf.adblock ${NAMED_PATH}
+sudp cp null.zone.file /var/named/
+# NOTE:: I faced issues with the DNS installation on Fedora and I was not
+# able to figure out how it got fixed. However, on Debian/Ubuntu the 
+# following steps should ensure correct installation of the DNS server
+
+############## STEPS FOR UBUNTU ###############################################
 # For ubuntu
 sudo apt-get install bind9
 
-# Now copy the config files in the appropriate location
-export NAMED_PATH=<PATH_TO_NAMED_FILES>
-# For ubuntu/debian based systems /etc/bind/
-# For fedora it is /etc/
+export NAMED_PATH=/etc/bind/
 
 # Add the following line to the named.conf in ${NAMED_PATH}
-include "<PATH_TO_NAMED_FILES>/named.conf.adblock";
-# Copy the null.zone.file and named.conf.adblock to ${NAMED_PATH}
-sudo cp  null.zone.file named.conf.adblock ${NAMED_PATH}
-
-# NOTE:: I faced issues with the DNS installation on Fedora and I was not
-# able to figure out how it got fixed. However, on Debian/Ubuntu these steps 
-# should ensure correct installation of the DNS server
-
+# Do not forget the quotes and to end the line with a semicolon
+# Also replace NAMED_PATH with the absolute path
+include "<NAMED_PATH>/named.conf.adblock";
+cp null.zone.file named.conf.adblock ${NAMED_PATH}
 

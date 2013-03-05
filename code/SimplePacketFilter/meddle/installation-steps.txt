@@ -159,8 +159,6 @@ net.ipv4.ip_forward=1
   - Note that a suggested logname for the webserver is printed in the
     last message of this script. This can be used in the following
     step if required.
-  - This step creates a tunnel device. To test if the tunnel device is created properly try to ping some external machine using this tunnel device
-       ping -I tun0 www.inria.fr or ping -I tun0 192.168.1.61
 
 13 Start the web server
   - The Webserver internally uses the mysql bindings for python. These
@@ -181,7 +179,7 @@ net.ipv4.ip_forward=1
 
 14 Start the DNS server
   - The DNS server which is required for ad blocking can be started by
-     sudo service bind restart
+     sudo service named restart
      or
      sudo service bind9 restart
 

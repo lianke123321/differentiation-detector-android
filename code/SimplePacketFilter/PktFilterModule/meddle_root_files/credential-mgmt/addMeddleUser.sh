@@ -16,7 +16,10 @@ mysql -u ${dbUserName} --password=${dbPassword} -D ${dbName} -e "${query}"
 query="select userID, userName, filterAdsAnalytics from UserConfigs where userName='${clientName}';"
 echo ${query}
 mysql -u ${dbUserName} --password=${dbPassword} -D ${dbName} -e "${query}"
-echo "${clientName} : XAUTH ${clientPassword}" >> ${MEDDLE_ETC}/ipsec.secrets
+echo "${clientName} : XAUTH \"${clientPassword}\"" >> ${MEDDLE_ETC}/ipsec.secrets
+
+echo "Making strongswan load the new credentials"
+${MEDDLE_ROOT}/usr/sbin/ipsec rereadall 
 
 echo "The certificates have been installed in the ${clientCertsPath}"
 echo "For an android device the certificate is ${clientCertsPath}${clientName}.p12"
