@@ -1,8 +1,8 @@
 # Install bind. 
 # For Fedora 
-yum install bind bind-utils
+sudo yum install bind bind-utils
 # For ubuntu
-apt-get install bind9
+sudo apt-get install bind9
 
 # Now copy the config files in the appropriate location
 export NAMED_PATH=<PATH_TO_NAMED_FILES>
@@ -12,6 +12,6 @@ export NAMED_PATH=<PATH_TO_NAMED_FILES>
 # Add the following line to the named.conf in ${NAMED_PATH}
 include "<PATH_TO_NAMED_FILES>/named.conf.adblock";
 # Copy the null.zone.file and named.conf.adblock to ${NAMED_PATH}
-cp null.zone.file named.conf.adblock ${NAMED_PATH}
+sudo cp  null.zone.file named.conf.adblock ${NAMED_PATH}
 
 

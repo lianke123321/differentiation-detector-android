@@ -1,3 +1,5 @@
 set -a
-source ../meddle.config
+source ../MeddleSystem/meddle.config
+mkdir -p ${webPagesStaticPath}
 cp -vRf * ${webPagesStaticPath}/
+rm ${webPagesStaticPath}/install.sh

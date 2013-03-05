@@ -1,5 +1,5 @@
 set -a
-source certificate.config
+source ./certificate.config
 tmpID=`date +%s | sha1sum | cut -b -10`
 tmpPass=`echo ${tmpID} | cut -b -5`
 clientName="$tmpID"

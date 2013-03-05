@@ -1,7 +1,7 @@
 # Untar the tarball and change to the directory containing strongswan
 # This step has not be automated to be executed from a shell script because I observed issues
 # with respect to the dependencies depending on the Ubuntu/Fedora/Debian versions
-tar -xjzvf strongswan-5.0.1.tar.bz2
+tar -xjvf strongswan-5.0.1.tar.bz2
 cd strongswan-5.0.1 
 # MEDDLE_ROOT is the base directory where all Meddle specific files will be installed
 export MEDDLE_ROOT="/opt/meddle/" # Please change this location if you decide to install meddle in another folder. 
