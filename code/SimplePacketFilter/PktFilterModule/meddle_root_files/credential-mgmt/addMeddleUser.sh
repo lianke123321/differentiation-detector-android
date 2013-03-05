@@ -11,11 +11,11 @@ mkdir -p ${clientCertsPath}
 python genIOSConfigXML.py "${clientName}" "${clientPassword}" "${mobileConfigOrgName}" "${mobileConfigConDisplayName}" "${caName}" "${mobileConfigServerHostname}" "${signingCertsPath}${caCertName}" "${clientCertsPath}" 
 
 query="INSERT INTO UserConfigs VALUES (0, '${clientName}', 0);"
-echo ${query}
-mysql -u ${dbUserName} --password=${dbPassword} -D ${dbName} -e "${query}"
+echo "${query}"
+mysql -u "${dbUserName}" --password="${dbPassword}" -D "${dbName}" -e "${query}"
 query="select userID, userName, filterAdsAnalytics from UserConfigs where userName='${clientName}';"
-echo ${query}
-mysql -u ${dbUserName} --password=${dbPassword} -D ${dbName} -e "${query}"
+echo "${query}"
+mysql -u "${dbUserName}" --password="${dbPassword}" -D "${dbName}" -e "${query}"
 echo "${clientName} : XAUTH \"${clientPassword}\"" >> ${MEDDLE_ETC}/ipsec.secrets
 
 echo "Making strongswan load the new credentials"

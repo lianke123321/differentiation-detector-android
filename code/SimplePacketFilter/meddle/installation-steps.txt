@@ -21,7 +21,9 @@ guide you in installing Meddle in the MEDDLE_ROOT folder .
               password is meddle. There is no private information
               saved in the database so a weak password like meddle may
               not create issues. Step 3 shall guide you on installing
-              the database schema.
+              the database schema. Make sure that the dbPassword 
+              DOES NOT contain a # because a # is considerd to be start
+              of a comment. 
       ethDeviceName - The interface used by this machine to access the
               Internet. Typically it is "eth0"
       ethIpGateway - The IP address of the gateway. This can be
