@@ -28,6 +28,8 @@ guide you in installing Meddle in the MEDDLE_ROOT folder .
               obtained by looking the default gateway provided by the
               command
                  route -n
+              NOTE: The gateway is important because if this field is 
+              incorrect the machine shall end up as unreachable! 
       ethIpNetSlash - The network in the / format. You can obtain this
               value with the help of the route and ifconfig commands.
       fltrDefaultDNS - The IP address of the DNS server. This can be
@@ -89,6 +91,7 @@ guide you in installing Meddle in the MEDDLE_ROOT folder .
     this location change to the location specified by pcapDataPath and
     execute
       sudo tcpdump -i lo -w abc.
+      Press Ctrl-C after some time and test if abc was created. 
   - If tcpdump is not install then install tcpdump
   - If tcpdump is present and is unable to write in the given
     directory then execute the following commands.
@@ -98,12 +101,16 @@ guide you in installing Meddle in the MEDDLE_ROOT folder .
       sudo aa-complain /usr/sbin/tcpdump
 
 9 Test gpg
+  - Install gpg if gpg command fails. (I do not remember the name of the 
+    gpg package because gpg was present on the machine in which I installed
+    Meddle).
   - All the pcap files are encrypted using gpg to protect the privacy
     of the users using Meddle in case the server is compromised.
   - To test if gpg works execute
       sudo gpg --homedir=${MEDDLE_ROOT}/gpg
       (Make sure that MEDDLE_ROOT is defined).
-  - If not install gpg (the names of packages vary a lot with the distributions).
+      Press Ctrl-C after seeing
+      "gpg: Go ahead and type your message ..."
 
 10 Create and install the certificates for CA and the server.
   - Change directory to ${MEDDLE_ROOT}/credential-mgmt/
@@ -128,8 +135,7 @@ guide you in installing Meddle in the MEDDLE_ROOT folder .
 # Meddle changes begin here.
 net.ipv4.ip_forward=1
 # Meddle modifications end here.
-
-12 Assign names to the routing tables internally used by Meddle
+ 
   - Meddle internally loops the packets through the tunnel
     device. This is made possible by adding the following five lines
     to /etc/iproute2/rt_tables.
@@ -139,19 +145,24 @@ net.ipv4.ip_forward=1
 7 depart
 # Meddle modifications end here
 
-13 Start Meddle
+12 Start Meddle
   - First check if mysql is running by executing
-      sudo service mysqld status.
-  - Change to ${MEDDLE_ROOT}/usr/sbin/ and beome root user by executing
+      sudo service mysqld status
+    If it is not running then start mysql
+      sudo service mysqld start
+  - Change to ${MEDDLE_ROOT}/usr/sbin/ and become root user by executing
       sudo su
   - Start meddle by the following command
       ./SetupMeddle.sh start
-    Meddle can be stopped if required by executing ./SetupMeddle.sh stop
+    Ignore messages related to checksum (csum) and offloading (offload setting)
+    Meddle can be stopped if required by executing ./SetupMeddle.sh stop   
   - Note that a suggested logname for the webserver is printed in the
     last message of this script. This can be used in the following
     step if required.
+  - This step creates a tunnel device. To test if the tunnel device is created properly try to ping some external machine using this tunnel device
+       ping -I tun0 www.inria.fr or ping -I tun0 192.168.1.61
 
-14 Start the web server
+13 Start the web server
   - The Webserver internally uses the mysql bindings for python. These
     bindings are available if the MySQL-python and
     mysql-connector-python packages are installed in Fedora.
@@ -168,14 +179,14 @@ net.ipv4.ip_forward=1
   - If the simple test passes then start the webserver as a background process.
     python MainServer.sh ${MEDDLE_ROOT}/meddle.config >> ${MEDDLE_ROOT}/logs/webServer.log 2>&1 &
 
-15 Start the DNS server
+14 Start the DNS server
   - The DNS server which is required for ad blocking can be started by
      sudo service bind restart
      or
      sudo service bind9 restart
 
-16 Create user accounts
-  - Step 16 and Step 17 should be performed each time a new user
+15 Create user accounts
+  - Step 15 and Step 16 should be performed each time a new user
     account needs to be created.
   - A user account with a random user name and password can be created
     by the addMeddleUser.sh script in ${MEDDLE_ROOT}/credential-mgmt
@@ -194,11 +205,11 @@ net.ipv4.ip_forward=1
   - It would be nice to maintain a log file or spread sheet of device
     type assosciated with each account.
 
-17 Email credentials to the users.
+16 Email credentials to the users.
   - Note down the username and password and copy the .p12 file or the
     .mobileconfig file that has been created and attach it to an email
     with the following message. Do not forget to replace <password> with
-    the password displayed in Step 17
+    the password displayed in Step 15
 ---
 The attachment contains the certificates required by Meddle.
 
@@ -212,7 +223,7 @@ The VPN app (mentioned in Step 3) for Android devices is available at
 http://sounder.cs.washington.edu/apk/MeddleVPN.apk
 ---
 
-18 Test VPN connection
+17 Test VPN connection
   - Install the credentials using the VPN server following instructions
     available at http://meddle.cs.washington.edu.
   - For sanity check if a folder for the user is created in

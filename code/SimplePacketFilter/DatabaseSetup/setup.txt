@@ -3,10 +3,10 @@
 # Line that begin with mysql> indicate mysql prompt
 
 # Start the mysql service if it is not running. 
-$> service mysqld start
+$> sudo service mysqld start
 
 # If this is the first time mysql is being used then perform the secure installation to ensure that root password is set. 
-$> mysql_secure_installation
+$> sudo mysql_secure_installation
 
 # Set the root password and disable remote root login
 # The following steps have been taken from http://dev.mysql.com/doc/refman/5.1/en/adding-users.html
@@ -36,7 +36,7 @@ Enter password: <meddle_password_for_this_server>
 # http://stackoverflow.com/questions/1420839/cant-connect-to-mysql-server-error-111
 # Edit /etc/mysql/my.cnf or the corresponding my.cnf for your mysql installation
 
-# Add iptables rules to ensure that mysql is not accessed by anyone else.
+# Add iptables rules to ensure that mysql is not accessed by anyone else. This step can be ignored.
 $> iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
 $> iptables -A INPUT -p tcp --dport 3306 -j REJECT
   

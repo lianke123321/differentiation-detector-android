@@ -14,4 +14,8 @@ include "<PATH_TO_NAMED_FILES>/named.conf.adblock";
 # Copy the null.zone.file and named.conf.adblock to ${NAMED_PATH}
 sudo cp  null.zone.file named.conf.adblock ${NAMED_PATH}
 
+# NOTE:: I faced issues with the DNS installation on Fedora and I was not
+# able to figure out how it got fixed. However, on Debian/Ubuntu these steps 
+# should ensure correct installation of the DNS server
+
 
