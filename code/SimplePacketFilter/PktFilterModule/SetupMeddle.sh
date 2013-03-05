@@ -66,11 +66,11 @@ startPacketFilter()
     # The forward path 
     ip rule add from ${tunFwdPathNetSlash} to all lookup fwdpath prio 1000
     # Depart 
-    ip rule add from ${tunRevPathNet} to all lookup depart prio 1001
+    ip rule add from ${tunRevPathNetSlash} to all lookup depart prio 1001
     # Reverse path
-    ip rule add from all to ${tunRevPathNet} lookup revpath prio 1002
+    ip rule add from all to ${tunRevPathNetSlash} lookup revpath prio 1002
     # Special rule for reverse path
-    ip rule add from ${ethIpNetSlash} to ${tunRevPathNet} lookup revpath prio 1003 # Specific to DN # Specific to DNS
+    ip rule add from ${ethIpNetSlash} to ${tunRevPathNetSlash} lookup revpath prio 1003 # Specific to DN # Specific to DNS
     # When to leave from the network
     ip rule add from all to ${tunFwdPathNetSlash} lookup depart prio 1004
     ip rule add from ${ethIpNetSlash} to all lookup depart prio 1005
@@ -85,27 +85,27 @@ startPacketFilter()
 
     # The routing entries for the reverse path packets
     ip route add default via ${tunIpAddress} dev ${tunDeviceName} table revpath
-    ip route add ${tunRevPathNet} dev ${tunDeviceName} table revpath
+    ip route add ${tunRevPathNetSlash} dev ${tunDeviceName} table revpath
 
     # Enable forwarding between the tun+ devices and the ${eth} device
     iptables -A FORWARD -i tun+ -o ${ethDeviceName} -j ACCEPT
     iptables -A FORWARD -i ${ethDeviceName} -o tun+ -j ACCEPT
 
     # Enable the NAT
-    iptables -t nat -A POSTROUTING -s ${tunRevPathNet} -o ${ethDeviceName} -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s ${tunRevPathNetSlash} -o ${ethDeviceName} -j MASQUERADE
 }
 
 stopPacketFilter()
 {
-    iptables -t nat -D POSTROUTING -s ${tunRevPathNet} -o ${ethDeviceName} -j MASQUERADE
+    iptables -t nat -D POSTROUTING -s ${tunRevPathNetSlash} -o ${ethDeviceName} -j MASQUERADE
 
     iptables -D FORWARD -i tun+ -o ${ethDeviceName} -j ACCEPT
     iptables -D FORWARD -i ${ethDeviceName} -o tun+ -j ACCEPT
     
     ip rule del from ${tunFwdPathNetSlash} to all lookup fwdpath prio 1000
-    ip rule del from ${tunRevPathNet} to all lookup depart prio 1001
-    ip rule del from all to ${tunRevPathNet} lookup revpath prio 1002
-    ip rule del from ${ethIpNetSlash} to ${tunRevPathNet} lookup revpath prio 1003 # Specific to DN # Specific to DNSS
+    ip rule del from ${tunRevPathNetSlash} to all lookup depart prio 1001
+    ip rule del from all to ${tunRevPathNetSlash} lookup revpath prio 1002
+    ip rule del from ${ethIpNetSlash} to ${tunRevPathNetSlash} lookup revpath prio 1003 # Specific to DN # Specific to DNSS
     ip rule del from all to ${tunFwdPathNetSlash} lookup depart prio 1004
     ip rule del from ${ethIpNetSlash} to all lookup depart prio 1005
 
@@ -116,7 +116,7 @@ stopPacketFilter()
     ip route del ${ethIpNetSlash} dev ${ethDeviceName} table depart
 
     ip route del default via ${tunIpAddress} dev ${tunDeviceName} table revpath
-    ip route del ${tunRevPathNet} dev ${tunDeviceName} table revpath
+    ip route del ${tunRevPathNetSlash} dev ${tunDeviceName} table revpath
 
     echo "1" > /proc/sys/net/ipv4/conf/${tunDeviceName}/rp_filter
     echo "1" > /proc/sys/net/ipv4/conf/all/rp_filter
