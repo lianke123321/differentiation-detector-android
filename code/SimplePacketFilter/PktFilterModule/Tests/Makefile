@@ -3,6 +3,7 @@ SRC = $(wildcard $(PWD)/*.cc)
 OBJS = $(SRC:.cc=.o)
 MAINSRC = $(filter-out $(PWD)/../SimplePacketFilter.cc, $(wildcard $(PWD)/../*.cc))
 MAINOBJS = $(MAINSRC:.cc=.o)
+TMP=$(shell date +%s)
 
 all:clean $(OBJS)
 
@@ -10,4 +11,5 @@ all:clean $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $< $(MAINOBJS)
 	
 clean:
+	echo $(TMP)
 	rm -f $(OBJS)
