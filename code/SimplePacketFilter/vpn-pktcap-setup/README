@@ -1,5 +1,0 @@
-data - the directories that need to be copied in the /data folder
-etc - contains the sysctl.conf and other config files that need to be copied in the /etc/ folder
-config-steps - the steps to be followed to setup the system
-certificate-steps - steps of create certificates
-strongswan*.bz2 - the strongswan version we are using

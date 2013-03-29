@@ -9,37 +9,45 @@
 #include <unistd.h>
 #include "Logging.h"
 #include <exception>
+#include <boost/lexical_cast.hpp>
 
 MessageSender::MessageSender()
 {
-	std::string serverIP = "127.0.0.1";
-	connectToServer(serverIP);
+	sockFD = -1;
 }
 
-inline void MessageSender::connectToServer(std::string serverIP)
+bool MessageSender::connectToServer(std::string serverIP, std::string sockPort)
 {
+	uint16_t sockP = -1;
 	if ((sockFD = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		sockFD = -1;
 		logError("socket error");
-		return;
+		return false;
 	}
 	logDebug("Created the socket FD = " << sockFD);
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(MEDDLE_MESSAGE_SOCKET_PORT);
-	inet_pton(AF_INET, "127.0.0.1", &(addr.sin_addr));
+	inet_pton(AF_INET, serverIP.c_str(), &(addr.sin_addr));
+	try {
+		sockP = boost::lexical_cast<uint16_t>(sockPort);
+	} catch (...) {
+		logError("Error in getting the socket port" << sockPort);
+		sockFD = -1;
+		return false;
+	}
+	addr.sin_port = htons(sockP); // TODO:: Modify this when reading from config file
 	if (connect(sockFD, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
 		logError("Connect error");
 		sockFD = -1;
-		return;
+		return false;
 	}
 	logDebug("Successfully connected to socket");
-	return;
+	return true;
 }
 
-MessageSender::MessageSender(std::string serverIP)
+MessageSender::MessageSender(std::string serverIP, std::string sockPort)
 {
-	connectToServer(serverIP);
+	connectToServer(serverIP, sockPort);
 }
 
 MessageSender::~MessageSender()
