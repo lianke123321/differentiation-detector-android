@@ -1,0 +1,55 @@
+\section{Motivation}
+\label{sec:motivation}
+
+The current mobile ecosystem is very opaque and it offers researchers  a
+limited view into how mobile devices and the installed apps generate
+network traffic. This lack of transparency is currently being addressed by
+either instrumenting the mobile operating system (OS), instrumenting the
+binaries, static analysis of app binaries, or relying on ISP traces. In
+this section, we discuss each of these techniques and use their 
+shortcomings to motivate the need for a new platform for mobile
+measurements.      
+
+% Why it is done. Papers doing it. Short comings. 
+Instrumenting a mobile OS system provides researchers a fine grained view
+of the apps and OS in action. Taintdroid~\cite{enck:taintdroid}, one of the
+seminal works of instrumenting the Android OS, and its extensions have
+therefore been widely used to study Android apps in action. For example,
+Hornyack~\etal~cite{hornyack:appfence} rely on Taintdroid to detail the
+internals of the 1100 most popular Android apps. The major shortcoming of
+instrumenting OSes is that the measurement results are limited to a 
+specific OS version and apps written for that OS version. This implies that
+instrumenting OSes cannot be used for longitudinal studies that need to
+consider changes in not only the app code but also the OS code. 
+Furthermore, because the app code is tightly coupled to the API provided by
+the underlying OS, the results obtained by instrumenting  one mobile OS
+cannot be extrapolated to other mobile OSes. Instrumenting an OS also
+results in a high barrier to entry for studies that require participation
+of end users  who may be unwilling to modify the underlying OS. 
+
+Instrumenting app binaries at predefined code points can be used to detail the behavior of a specific set of apps. One of the biggest advantages of  instrumenting apps is its low barrier to entry because it does not require an OS modifications. This low barrier to entry was one the key motivations for the development of AppInsight~\cite{ravindranath:appinsight}. Indeed AppInsight can provide developers improve the app quality, however, its scope is limited to the apps that have been instrumented, the marketplaces from where the apps are downloaded, and the OS version for which the instrumented app was written. Furthermore, each new version of the app needs to be instrumented.
+
+Static analysis of the app code can be used to address closed operating systems and marketplaces where the underlying OS and the app binaries cannot be modified. 
+
+
+
+{Identifying Diverse Usage Behaviors of Smartphone Apps} {IMC 2012} 
+        Gather traces from ISP measurements: IMC 2012 paper on Ads.
+Requires
+support from ISPs which includes contracts limiting the quality and
+quantity of
+data. Data is non-comprehensive because users can use different service
+providers for Wi-F and Cellular.
+    In summary these techniques have a high barrier to entry and despite
+this
+high barrier they come with serious limitations. 
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End: 
+
+
+
+
+
