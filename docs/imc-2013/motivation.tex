@@ -27,9 +27,23 @@ cannot be extrapolated to other mobile OSes. Instrumenting an OS also
 results in a high barrier to entry for studies that require participation
 of end users  who may be unwilling to modify the underlying OS. 
 
-Instrumenting app binaries at predefined code points can be used to detail the behavior of a specific set of apps. One of the biggest advantages of  instrumenting apps is its low barrier to entry because it does not require an OS modifications. This low barrier to entry was one the key motivations for the development of AppInsight~\cite{ravindranath:appinsight}. Indeed AppInsight can provide developers improve the app quality, however, its scope is limited to the apps that have been instrumented, the marketplaces from where the apps are downloaded, and the OS version for which the instrumented app was written. Furthermore, each new version of the app needs to be instrumented.
+Instrumenting app binaries at predefined code points can be used to detail
+the behavior of a specific set of apps. One of the biggest advantages of 
+instrumenting apps is its low barrier to entry because it does not require
+an OS modifications. This low barrier to entry was one the key motivations
+for the development of AppInsight~\cite{ravindranath:appinsight}. Indeed
+AppInsight can provide developers improve the app quality, however, its
+scope is limited to the apps that have been instrumented, the marketplaces
+from where the apps are downloaded, and the OS version for which the
+instrumented app was written. Furthermore, each new version of the app
+needs to be instrumented.
 
-Static analysis of the app code can be used to address closed operating systems and marketplaces where the underlying OS and the app binaries cannot be modified. 
+Static analysis of the app code is used to study apps when the apps and the
+underlying OS are secured to avoid being tampered. For example,
+Egele~\etal~\cite{egele:pios}, perform static analysis of 1400 IOS apps by
+static analysis. The authors observe that more than half of the apps they
+analyzed leak the unique ID of the device. 
+
 
 
 
