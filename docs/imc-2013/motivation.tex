@@ -40,23 +40,30 @@ needs to be instrumented.
 
 Static analysis of the app code is used to study apps when the apps and the
 underlying OS are secured to avoid being tampered. For example,
-Egele~\etal~\cite{egele:pios}, perform static analysis of 1400 IOS apps by
-static analysis. The authors observe that more than half of the apps they
-analyzed leak the unique ID of the device. 
+PiOS~\cite{egele:pios} was used to perform static analysis of 1400 IOS apps
+by static analysis. The authors of PiOS observe that the unique ID of the
+device is leaked by more than half of the apps they analyzed. A shortcoming
+of this study is that the PiOS can access the app binaries only after the
+iOS device is jail-broken, thus voiding the warranty of the device.
+Furthermore, like AppInsight~\cite{ravindranath:appinsight}, the results of
+PiOS are limited to the iOS operating system. \tbd{Text for SPARTA project
+at UW.}
 
+ISP traces are useful to study mobile devices in the wild.
+Viallina-Rodriguez~\etal~\cite{vallina-rod:ads} use an ISP trace of 3
+million subscribers to detail the impact of ads and analytics on the mobile
+data and energy consumption. Similarly, Maeir~\etal~\cite{maier:mobtraffic}
+study the mobile traffic by looking at the DSL traces from a popular
+European ISP. However, these studies cannot provide a comprehensive view of
+the mobile devices included in the study because end users are free to
+choose different ISPs for the different access technologies present on
+their mobile device. For example, the home wi-fi and office wi-fi may be
+served from an ISP which is different from the ISP used for cellular data
+traffic. 
 
-
-
-{Identifying Diverse Usage Behaviors of Smartphone Apps} {IMC 2012} 
-        Gather traces from ISP measurements: IMC 2012 paper on Ads.
-Requires
-support from ISPs which includes contracts limiting the quality and
-quantity of
-data. Data is non-comprehensive because users can use different service
-providers for Wi-F and Cellular.
-    In summary these techniques have a high barrier to entry and despite
-this
-high barrier they come with serious limitations. 
+In summary, \tbd{portability, pervasiveness, ubiquitous, and deployable}
+missing in existing platforms. In the next section we show that a VPN based
+platform can address these issues. 
 
 %%% Local Variables: 
 %%% mode: latex

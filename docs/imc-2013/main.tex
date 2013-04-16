@@ -21,8 +21,8 @@
 \newcommand{\chk}{$\checkmark$}
 \newcommand{\dsh}{{\bf --}}
 \newcommand{\til}{{\bf\large \textasciitilde}}
-%\newcommand{\tbd}[1]{[{\color{red}{\bf{TBD: #1}}}]}
-\newcommand{\tbd}[1]{}
+\newcommand{\tbd}[1]{[{\color{red}{\bf{TBD: #1}}}]}
+%\newcommand{\tbd}[1]{}
 \newcommand{\etal}{\emph{et~al.}}
 \newcommand{\meddle}{{\emph{Meddle}}\xspace}
 \newcommand{\meddleT}{{Meddle}\xspace}
@@ -56,6 +56,16 @@ Justine Sherry\\
 \affaddr{UC Berkeley}
 \and
 \alignauthor
+Adrian Sham\\
+\affaddr{University of Washington}
+\alignauthor
+Sam Wilson\\
+\affaddr{University of Washington}
+\alignauthor
+Shen Wang\\
+\affaddr{University of Washington}
+\and
+\alignauthor
 Arnaud Legout\\
 \affaddr{INRIA}
 \alignauthor
@@ -69,7 +79,8 @@ Arvind Krishnamurthy\\
 David Choffnes\\
 \affaddr{University of Washington}
 }
-
+% Remove additional authors section
+\def\addauthorsection{}
 \date{}
 \begin{document}	
 \maketitle
@@ -79,6 +90,12 @@ David Choffnes\\
 \input{introduction}
 
 \input{motivation}
+
+\input{platform}
+
+\input{related}
+
+\input{conclusion}
 
 \bibliographystyle{abbrv}
 \bibliography{biblio}
