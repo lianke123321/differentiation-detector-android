@@ -1,0 +1,79 @@
+\section{Measurement Results}
+\label{sec:measurements}
+
+\subsection{Descriptive Statistics}
+\tbd{Rewrite this text based on new insights and values}
+
+Comparison of Devices
+
+Comparision of access technology
+
+
+\tbd{New values to come here}
+\begin{table}
+\begin{center}
+\begin{small}
+\begin{tabular}{|l|l|r|r|r|r|}
+\hline
+\multirow{2}{*}{\bf Protocol} & \multirow{2}{*}{\bf Service} & \multicolumn{2}{|c|}{\bf Android} & \multicolumn{2}{|c|}{\bf iOS} \tabularnewline
+\cline{3-6}
+           &           &  \textbf{Flows}  &  \textbf{Bytes}  &  \textbf{Flows}  &  \textbf{Bytes}  \tabularnewline
+\hline
+ TCP       &  HTTP     &  14.87  &  74.31  &  16.07  &  82.01  \tabularnewline
+\hline
+TCP       &  SSL      &  37.19  &  24.35  &  37.64  &  17.31  \tabularnewline
+\hline
+ UDP       &  -        &  40.52  &   0.98  &  42.34  &   0.49  \tabularnewline
+\hline
+ TCP       &  other    &   2.08  &   0.22  &   1.13  &   1.89  \tabularnewline
+\hline
+ Other     &  -        &   5.35  &   0.14  &   2.82  &   0.09  \tabularnewline
+\hline
+\multicolumn{2}{|c|}{\emph{total}} & 100.00 & 100.00 & 100.00 & 100.00 \tabularnewline
+\hline
+\end{tabular}
+\end{small}
+\end{center}
+\caption{Percentage of flows and bytes from iOS and Android devices. \tbd{Verify total 100
+    for final results} \emph{SSL is responsible for the majority of
+    TCP flows from iOS and Android devices.}}
+\label{tab:summaryIOSAndroidTraffic}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{small}
+\begin{tabular}{|l|l|r|r|r|r|}
+\hline
+\multirow{2}{*}{\bf Protocol} & \multirow{2}{*}{\bf Service} & \multicolumn{2}{|c|}{\bf Wi-Fi} & \multicolumn{2}{|c|}{\bf Cellular} \tabularnewline
+\cline{3-6}
+           &           &  \textbf{Flows}  &  \textbf{Bytes}  &  \textbf{Flows}  &  \textbf{Bytes}  \tabularnewline
+\hline
+ TCP       &  HTTP     &  16.91  &  83.52  &  13.03  &  56.14  \tabularnewline
+\hline
+ TCP       &  SSL      &  38.18  &  15.83  &  36.14  &  41.42  \tabularnewline
+\hline
+UDP       &  -        &  41.43  &   0.49  &  41.56  &   1.67  \tabularnewline
+\hline
+TCP       &  other    &   1.38 &   0.16  &   1.95  &   0.4  \tabularnewline
+\hline
+Other     &  -        &   2.12  &  0.01  &   7.2  &   0.3  \tabularnewline
+\hline
+\multicolumn{2}{|c|}{\emph{total}} & 100.00 & 100.00 & 100.00 & 100.00 \tabularnewline
+\hline
+\end{tabular}
+\end{small}
+\end{center}
+\caption{Percentage of flows and bytes using Wi-Fi and Cellular as access technology. \tbd{Verify total 100
+    for final results} \emph{The share of SSL traffic over Cellular
+    networks is larger than its share over Wi-Fi.}}
+\label{tab:summaryWifiCellularTraffic}
+\end{table}
+
+\subsection{Case Studies}
+
+\subsection{Controlled Experiments}
+
+\subsection{Discussion}
+
+
