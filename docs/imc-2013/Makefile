@@ -20,5 +20,5 @@ all:
 
 clean:
 	rm -f *aux *bbl *blg *log *.tex~ *.dvi *.fdb_lat* *.fls 
-	rm -f ${MAINDOC}.pdf
+#	rm -f ${MAINDOC}.pdf
 	rm -Rf auto/ 
