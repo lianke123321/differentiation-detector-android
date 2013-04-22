@@ -1,10 +1,27 @@
 \section{Dataset Description}
 \label{sec:dataset}
 
-In this section, we describe the three datasets: \moball, \mobcomp, and \mobexpt. We use these datasets in our studies that we present in the subsequent sections.
+In this section, we describe the three datasets: \moball, \mobcomp, and \mobexpt. 
+We use these datasets in our studies that we present in the subsequent sections.
 
-The \moball dataset consists of mobile data traffic traces from \tbd{number} devices that belong to \tbd{number} users who are volunteers of an IRB approved study. This dataset consists of \tbd{number} of iPhone, \tbd{number} iPads, \tbd{number} of iPodTouch, \tbd{number} of Android phones, and \tbd{number} of Android tablets. The Android devices include with the Nexus, Sony, Samsung, and Gsmart brands. The users of these devices are spread across France and USA. Across all users the dataset consists of \tbd{number} days of data and for each device the number days of data varies from \tbd{number} to \tbd{number}. On our VPN server, we observe connections from \tbd{number} different ISPs. For \tbd{number} of devices we were able to see the data traffic for at least one 24-hour cycle. 
+\tbd{Run genDataSetDescription.R to get these numbers} 
+The \moball dataset consists of mobile data traffic traces from \tbdv{23} devices that belong to \tbdv{18} users who are volunteers of an IRB approved study. 
+This dataset consists of \tbdv{8} iPhones, \tbdv{3} iPads, \tbdv{1} iPodTouch, \tbdv{10} of Android phones, and \tbdv{1} of Android tablet.
+We consider an Android device that accesses the Internet by using only \wifi to be a tablet. 
+The Android devices used to generate this dataset include the Nexus, Sony, Samsung, and Gsmart brands. 
+The users of these devices are spread across France and USA. We observed connections from \tbdv{52} different ISPs.
+This dataset consists of \tbdv{171} days of data that was captured on our servers and for each device the number days varies from \tbdv{5} to \tbdv{171} with a median of \tbdv{34} days.  
 
-The \mobcomp dataset consists of data from two users who had three and two devices respectively. The three devices that belong to one of the two users consists of a two smart phones and a tablet, while one smartphone and a tablet belong to the second user. We use this dataset to compare the behavior of popular apps and to detail the behavior of devices when the device is kept idle. The data set consists of \tbd{number} of days of data from each device and \tbd{number} of days for which data traffic was seen for all the 24 hours. 
+The \mobcomp dataset consists of data from two users who had three and two devices respectively. 
+The three devices that belong to one of the two users consists of a two smart phones and a tablet, while one smartphone and a tablet belong to the second user. 
+We use this dataset to compare the behavior of popular apps and to detail the behavior of devices when the device is kept idle. 
+The data set consists of \tbdv{number} of days of data from each device and \tbd{number} of days for which data traffic was seen for all the 24 hours. 
 
-The \mobexpt dataset contains the traffic traces from an Android device and an iOS device that were used to perform a controlled experiment on popular application. We tested \tbd{number} of Android applications and \tbd{number} of iOS application for this study. \tbd{How we decided this list}. \tbd{How we performed the test} \tbd{other attributes of this dataset}.
+The \mobexpt dataset contains the traffic traces from an Android device and an iOS device that were used to perform a controlled experiment on popular application. 
+We tested \tbdv{number} of Android applications and \tbdv{number} of iOS application for this study. 
+\tbd{How we decided this list}. \tbd{How we performed the test} \tbd{other attributes of this dataset}.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End: 
