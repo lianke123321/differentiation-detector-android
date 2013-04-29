@@ -19,6 +19,8 @@ package org.strongswan.android.ui;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.strongswan.android.R;
 import org.strongswan.android.data.VpnProfile;
@@ -48,6 +50,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnVpnProfileSelectedListener
 {
@@ -162,6 +165,16 @@ public class MainActivity extends Activity implements OnVpnProfileSelectedListen
 					Intent intent = new Intent(this, CharonVpnService.class);
 					intent.putExtras(mProfileInfo);
 					this.startService(intent);
+				} else {
+					// do something in here if user click cancel for the trust issue
+					Toast.makeText(getApplicationContext(), "Meddle is closing", Toast.LENGTH_SHORT).show();
+					
+					new Timer().schedule(new TimerTask() {
+						@Override
+						public void run() {
+							System.exit(0);
+						}
+					}, 3000);
 				}
 				break;
 			default:
