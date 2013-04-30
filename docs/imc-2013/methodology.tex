@@ -1,0 +1,62 @@
+\section{Methodology and Dataset}
+\label{sec:Methodology}
+
+In this section, we detail the data collection methodology of \platname and describe the datasets we collected.
+Our objective for monitoring mobile Internet traffic was to understand the Internet usage of  mobile devices and the ISP interference of mobile Internet traffic. 
+To achieve this objective we performed controlled experiments and also allowed real users to redirect their traffic through our VPN servers.  
+
+\subsection{Controlled Experiments}
+
+We performed controlled experiments to detail mobile Internet traffic is affected by mobile operating systems, background processes running on mobile devices, applications installed on the mobile devices, and interference of mobile ISPs.
+
+The applications running on iOS devices receive notifications from Web services using \emph{iOS push notification}.  
+The iOS push notifications have received little research attention due to the closed-source nature of iOS.
+We ran controlled experiments using an iPhone to detail the behavior of \emph{push notificaton} and to the best of our knowledge we are the first to characterize iOS push notification.
+
+\tbd{Ashwin: Paragraph on Android comes here}. 
+This text is a placeholder text for this paragraph. Please replace this text. 
+
+\tbd{Justine: I need your help to rewrite the text here. I have put some crappy text as placeholder.}
+Mobile applications have received attention for leaking personally identifiable information (PII) to ads and analytics sites~\cite{hornyack:appfence,egele:pios}\tbd{papers}
+We performed controlled experiments using an Android device that contained dummy user credentials for popular social networking sites and dummy contact information.
+We then used \tbd{Monkey} to automatically test \tbd{number} applications. 
+We selected these applications because \tbd{}.
+
+\tbd{Dave/Ashwin: Complete the text here for iOS -- subset of apps}. 
+Dummy text for the paragraph.
+
+
+\tbd{Dave: Text Here}
+
+\subsection{In The Wild}
+
+Along with controlled experiments we also conducted a measurement study to characterize the mobile Internet in the wild.
+To serve real users we deployed two servers in USA and one server in France. 
+These servers tunnel Internet traffic using VPNs from 25 of devices that belong to 19 users who are volunteers for an IRB approved study.
+To protect the identity of the users and their data, on each server we use public key cryptography to encrypt the files that log the data traffic that flow through the server. 
+We call this dataset the \moball dataset. 
+
+The 25 devices that contribute to the \moball dataset consists of 9 iPhones, 4 iPads, 1 iPodTouch, 10 Android phones, and 1 of Android tablet.
+Though \emph{tablets} can access the Internet via a cellular data connections, for the \moball we consider tablets to be devices that only use \wifi to access the Internet.
+The Android devices in this dataset include the Nexus, Sony, Samsung, and Gsmart brands.
+This dataset consists of 190 days of data that flowed through our VPN servers; the number days for each user varies from 5 to 176 with a median of 33 days.
+
+We estimate the access technology used by the mobile device by performing a \emph{WHOIS} lookup on the IP address used by the mobile client for creation of the VPN tunnel. 
+We use the WHOIS databases available at \emph{whois.cmyru.com} and \emph{utrace.de} to get the ISP details.
+We observe that ISPs that provide Internet access over cellular connections use dedicated ASes for cellular traffic. 
+We use the information provided by the \emph{WHOIS} databases to manually classify the ASes used by the mobile devices to be either cellular or \wifi.
+This classification gives incorrect results when mobile clients are served by a \wifi access point that internally uses a cellular connection to connect the Internet.
+In this case, though the device uses \wifi to connect to the Internet, our servers will log the connection to be from a cellular ISP. 
+
+\tbd{we need some wording and consitency for the usage of ISP -- for example ATT can provide cellular and DSL. Also mobile data cannot be used and we need some word for cellular data and wifi data and this must be defined in the dataset description.}
+
+Based on the above classification of access technology and ISPs, our dataset consists of data traffic from 54 distinct ISPs, of which 10 provided cellular services.
+Of the 19 devices that used cellular data, we observed that 16 devices restricted their cellular data traffic to one ISP each; the other three users used the services of four, two, and two ISPs respectively.
+We observed that the devices in our dataset used a higher number of \wifi ISPs.
+We observed a median of 4 \wifi ISPs per device with a maximum of 24 \wifi ISPs that were used by one device.
+%The device that used \tbdv{24} distinct ISPs was used by a user who traveled across 6 different countries during the data collection process. 
+This observation confirms our intuition that studies based traces from a single ISP~\cite{maier:mobtraffic, vallina-rod:ads}, shall not be able to analyze how specific users use mobile devices. 
+
+\subsection{Discussion}
+
+\tbd{In summary, ... }
