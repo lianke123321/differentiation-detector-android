@@ -1,0 +1,84 @@
+%Note one sentence in one text line.
+\section{Motivation}
+\label{sec:motivation}
+
+\eat{List of questions to answer. 
+\begin{enumerate}
+\item Why are the devices communicating?
+\item How does the communication change with operating system and access technology?
+\item Are there any benefits of selecting a particular access technology? Wifi over Cell etc.
+\item How do apps affect the network usage of mobile devices?
+\item What information do these applications exchange? 
+\end{enumerate}
+Right way to do stuff and this technique is not absurd.}
+
+Despite the increasing popularity of mobile devices, the current mobile ecosystem offers researchers a limited view into the mobile Internet traffic.
+Intuitively, the factors that affect mobile Internet traffic include mobile OS and application design decisions, the access technologies used to connect to the Internet, and the ISP policies. 
+This diversity in factors implies that characterizing mobile Internet traffic requires end user participation in measurement studies and controlled experiments.
+%We have limited knowledge of Internet usage by mobile devices and on the ISP policies mobile Internet traffic.
+%Therefore, characterizing mobile Internet traffic requires end user participation in measurement studies and controlled experiments.
+Current techniques to characterize mobile Internet traffic include instrumenting the mobile operating system (OS), instrumenting application binaries, static analysis of application binaries, and relying on ISP traces. 
+We now show that these techniques are not practical for end user participation.
+%This perspective should also provide researchers to ability to zoom into the impact of the underlying operating system, installed apps, access technology, and service provider. 
+
+Instrumenting a mobile OS system using tools such as Taintdroid~\cite{enck:taintdroid} and AppFence~\cite{hornyack:appfence} provides researchers a fine grained view of the apps and OS in action. 
+However, this fine grained view comes at a high cost of jail-breaking and warranty voiding of the devices.
+Most end users shall not be willing to pay this cost. 
+Instrumenting an mobile OS is therefore not practical for measurement studies and experiments that require end user participation. 
+Furthermore, longitudinal studies that detail the impact of OS code changes and application code changes cannot be performed by instrumenting OSes.
+
+Instrumenting app binaries using tools such as AppInsight~\cite{ravindranath:appinsight} can be used to characterize the network traffic from mobile applications. 
+Indeed, AppInsight provides a detail analysis of mobile applications.
+However, in terms of the network footprint of the app, the scope of AppInsight is limited to the instrumented apps, the marketplaces from where the apps are downloaded, and the OS version for which the app was instrumented.
+Furthermore, each new version of the app needs to be instrumented to characterize the impact of the changes.
+
+Static analysis of the app code can be used to study mobile application whose code cannot be instrumented. 
+For example, PiOS~\cite{egele:pios} was used to perform static analysis of 1400 IOS apps. 
+A shortcoming of PiOS is that access to the app binary is possible only if the device is jail-broken, thus voiding the warranty of the device.
+Furthermore, like AppInsight~\cite{ravindranath:appinsight}, the results of PiOS are limited to the iOS operating system. \tbd{Dave Text for SPARTA project at UW.}
+
+ISP traces are useful to study mobile devices in the wild. 
+Vallina-Rodriguez~\etal~\cite{vallina-rod:ads} use an ISP trace of 3 million subscribers to detail the impact of ads and analytics on mobile Internet traffic and energy consumption. 
+Similarly, Maier~\etal~\cite{maier:mobtraffic} study the mobile traffic by looking at the DSL traces from a popular European ISP. 
+However, the data used in these studies is limited to the ISP that provided these traces.
+Mobile devices can use different ISPs depending on their location and the access technology used to connect to the Internet. 
+For example, the home \wifi and office \wifi may be served from ISPs that are different from the ISP used for cellular data traffic.
+Therefore, traces from a single ISP are expected to have a limited view on the traffic from the mobile devices.
+
+ISPs can interfere with the Internet traffic to inject javascript code for advertisements and analytics.
+This problem of ISP interference was highlighted by Reis~\etal~\cite{reis:tripwires}. 
+The authors demonstrated that inflight changes made by ISPs tend to introduce vulnerabilities such as overflows and cross-site scripting (XSS) attacks. 
+They proposed and deployed \emph{Web Tripwires}, a Javascript code that detects in-flight page changes. 
+The main limitation of \emph{Web Tripwires} is that Web sites are required to modify their content to include a tripwire that can detect ISP interference. 
+\emph{Web Tripwires} are therefore not practical because they require support from the Web site maintainers.
+
+In summary, existing solutions to measure the network characteristics of mobile Internet traffic fall short of being either portable, pervasive, or ISP agnostic. 
+Furthermore, the need for practical monitoring on mobile Internet traffic becomes more critical with the possible arrival of new mobile operating systems from the Ubuntu and Firefox communities.
+In the next section we show how traffic redirection can be to monitor mobile Internet traffic. 
+
+
+%\eat{ COMMENTED TEXT
+%In this section, we discuss each of these techniques and use their  shortcomings to motivate the need for \platname, a VPN based platform to monitor mobile Internet traffic.
+%Instrumenting a mobile OS system using tools such as Taintdroid~\cite{enck:taintdroid} and AppFence~\cite{hornyack:appfence} provides researchers a fine grained view of the apps and OS in action. 
+%For example, Hornyack~\etal~\cite{hornyack:appfence} use AppFence to detail the internals of the 1100 most popular Android apps. 
+%The major shortcomings of instrumenting OSes is that it can result in warranty voiding of the device and that the measurement results are limited to a specific OS version and apps written for that OS version.
+%Longitudinal studies that detail the impact of OS code changes and app code changes cannot be performed by instrumenting OSes.
+%Furthermore, because the app code is tightly coupled to the API provided by the underlying OS, the results obtained by instrumenting  one mobile OS cannot be extrapolated to other mobile OSes. 
+%Instrumenting an OS also results in a high barrier to entry for practical studies that require participation of end users  who may be unwilling to modify the underlying OS and void the warranty of their devices. 
+%\tbd{The tone should move towards network monitoring and that OS instrumentation is an overkill for network measurements.}
+%Instrumenting app binaries at predefined code points can be used to detail the behavior of a specific set of apps. 
+%One of the biggest advantages of  instrumenting apps is its low barrier to entry because it does not require an OS modifications. 
+%This low barrier to entry was one the key motivations for the development of AppInsight~\cite{ravindranath:appinsight}.
+%Indeed AppInsight can provide a detail analysis of apps, however, in terms of the network footprint of the app, the scope of AppInsight is limited to the instrumented apps, the marketplaces from where the apps are downloaded, and the OS version for which the app was instrumented.
+%Furthermore, each new version of the app needs to be instrumented.
+%Static analysis of the app code is used to study apps when the apps and the underlying OS are secured to avoid being tampered. 
+%For example, PiOS~\cite{egele:pios} was used to perform static analysis of 1400 IOS apps by static analysis. 
+%The authors of PiOS observe that the unique ID of the device is leaked by more than half of the apps they analyzed. 
+%A shortcoming of this study is that the PiOS can access the app binaries only after the iOS device is jail-broken, thus voiding the warranty of the device.
+%Furthermore, like AppInsight~\cite{ravindranath:appinsight}, the results of PiOS are limited to the iOS operating system. \tbd{Dave:Text for SPARTA project at UW.}
+%ISP traces are useful to study mobile devices in the wild. 
+%Viallina-Rodriguez~\etal~\cite{vallina-rod:ads} use an ISP trace of 3 million subscribers to detail the impact of ads and analytics on the mobile data and energy consumption. 
+%Similarly, Maier~\etal~\cite{maier:mobtraffic} study the mobile traffic by looking at the DSL traces from a popular European ISP. 
+%However, these studies cannot provide a comprehensive view of the traffic from mobile devices because users can access the Internet using different ISPs depending on their location and the access technology used to connect to the Internet. 
+%For example, the home \wifi and office \wifi may be served from ISPs that are different from the ISP used for cellular data traffic.}
+%
