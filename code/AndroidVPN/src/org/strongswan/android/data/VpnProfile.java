@@ -139,4 +139,10 @@ public class VpnProfile implements Cloneable
 	public void setAutoReconnect(Boolean mAutoReconnect) {
 		this.mAutoReconnect = mAutoReconnect.toString();
 	}
+	
+	public boolean isAutoReconnectClicked(){
+		if (mAutoReconnect != null)
+		return mAutoReconnect.equals("true");
+		return false;
+	}
 }

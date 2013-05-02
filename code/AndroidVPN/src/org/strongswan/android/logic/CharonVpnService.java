@@ -58,6 +58,7 @@ public class CharonVpnService extends VpnService implements Runnable
 	private static final String TAG = CharonVpnService.class.getSimpleName();
 	public static final String LOG_FILE = "charon.log";
 
+	private Timer timer;
 	private String mLogFile;
 	private VpnProfileDataSource mDataSource;
 	private Thread mConnectionHandler;
@@ -206,7 +207,7 @@ public class CharonVpnService extends VpnService implements Runnable
 	{
 		syncObject = this;
 		final Thread thisThread = Thread.currentThread();
-		Timer timer = new Timer();
+		timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask(){
 
 			@Override
@@ -328,6 +329,12 @@ public class CharonVpnService extends VpnService implements Runnable
 				mIsDisconnecting = true;
 				deinitializeCharon();
 				Log.i(TAG, "charon stopped");
+				boolean isAutoRec = mCurrentProfile.isAutoReconnectClicked();
+				Log.e("CHARONVPNSERVICE", "autoconnect " + isAutoRec);
+				if (!isAutoRec){
+					// user don't want the auto reconnect
+					timer.cancel();
+				}
 				mCurrentProfile = null;
 			}
 		}

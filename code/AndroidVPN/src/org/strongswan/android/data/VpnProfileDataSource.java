@@ -261,7 +261,8 @@ public class VpnProfileDataSource
 		profile.setVpnType(VpnType.fromIdentifier(cursor.getString(cursor.getColumnIndex(KEY_VPN_TYPE))));
 		profile.setUsername(cursor.getString(cursor.getColumnIndex(KEY_USERNAME)));
 		profile.setPassword(cursor.getString(cursor.getColumnIndex(KEY_PASSWORD)));
-		profile.setAutoReconnect(cursor.getString(cursor.getColumnIndex(KEY_RECONNECT))=="true");
+		// ******* bug? use .equal rather than ==? *************
+		profile.setAutoReconnect(cursor.getString(cursor.getColumnIndex(KEY_RECONNECT)).equals("true"));
 		profile.setCertificateAlias(cursor.getString(cursor.getColumnIndex(KEY_CERTIFICATE)));
 		profile.setUserCertificateAlias(cursor.getString(cursor.getColumnIndex(KEY_USER_CERTIFICATE)));
 		return profile;

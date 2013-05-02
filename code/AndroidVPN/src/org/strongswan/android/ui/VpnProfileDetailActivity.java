@@ -100,6 +100,10 @@ public class VpnProfileDetailActivity extends Activity
 		mSelectUserCert = (TwoLineListItem)findViewById(R.id.select_user_certificate);
 
 		mAutoReconnect = (CheckBox)findViewById(R.id.reconnect_auto);
+		
+		
+//		Log.e("VPN AUTO RECONNECT", "mAuto " + mAutoReconnect.isChecked());
+//		mAutoReconnect.setChecked(true);
 		mCheckAuto = (CheckBox)findViewById(R.id.ca_auto);
 		mSelectCert = (TwoLineListItem)findViewById(R.id.select_certificate);
 
@@ -133,6 +137,9 @@ public class VpnProfileDetailActivity extends Activity
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{
+				//*****************************************************************
+				// need to check if user is uncheck this
+				//*****************************************************************
 				updateCertificateSelector();
 			}
 		});
@@ -386,6 +393,7 @@ public class VpnProfileDetailActivity extends Activity
 		}
 		String certAlias = mCheckAuto.isChecked() ? null : mCertEntry.getAlias();
 		mProfile.setCertificateAlias(certAlias);
+		Log.e("VPNDetailActivity", "inside updateProfileData mAutoReconnect check: " + mAutoReconnect.isChecked());
 		mProfile.setAutoReconnect(mAutoReconnect.isChecked());
 	}
 
