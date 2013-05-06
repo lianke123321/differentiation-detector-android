@@ -95,6 +95,19 @@ googleadservices.com  & 17 & 8 &  9 \tabularnewline
   \tbd{Shen...}
 
 \subsection{Personally Identifiable Information}
+  \begin{table*}
+    \begin{tabular}{l|l|l|l|l|l|l|l|l|l}
+       Dataset&Platform&\# Apps&Email&Location&Username&Password&Android ID&Contacts&IMEI\\
+       \hline
+       Google Play&Android&100&?&10 (10\%)&7 (7\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
+       \hline
+       Third Party&Android&908&?&32 (3.5\%)&?&0 (0\%)&95 (10.4\%)&4 (0.4\%)&48 (5.3\%)\\
+       \hline
+       App Store&iPhone&100&?&?&?&?&?&?&?\\
+    \end{tabular}
+    \caption{Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone apps.}
+  \end{table*}
+  
   Finally, we turn to information leaked by individual applications. We do not report on data leaked for our real users here, but only the data leaked by our controlled apps in isolation.
   We consider data to be `leaked' when any personally identifiable information -- email address, phone number, IMEI number -- is sent across the network under HTTP or HTTPS.
   Naturally, some of this information may be relevant to the app -- most apps legitimately require email access. 
