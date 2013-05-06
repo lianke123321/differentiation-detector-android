@@ -33,7 +33,8 @@
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/main_activity_name"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,15 +42,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.VpnProfileDetailActivity" >
+            android:name=".ui.VpnProfileDetailActivity"
+            android:screenOrientation="portrait"  >
         </activity>
         <activity
             android:name=".ui.TrustedCertificatesActivity"
-            android:label="@string/trusted_certs_title" >
+            android:label="@string/trusted_certs_title" 
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ui.LogActivity"
-            android:label="@string/log_title" >
+            android:label="@string/log_title"
+            android:screenOrientation="portrait"  >
         </activity>
 
         <service
