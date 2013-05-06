@@ -16,13 +16,21 @@
     \end{itemize}
 
   {\bf Android Apps.}
-    To dig in to the root cause of these usage patterns, we also 
+    To dig in to the root cause of these usage patterns, we also did an `app-by-app` analysis of network usage to see if most bandwidth consumption/radio time was the result of a few heavy applications, with most applications relatively idle, or whether usage was divided amongst all applications equally.
+    In Figure~\ref{fig:app-by-app-usage}, we plot the CDF of total bytes transferred by each app in our study, one line for the top-100 Google Play apps we tested manually, and another for the top 2000 apps, tested automatically, from a third-party market.
+    We see that...\tbd{Amy...}
+    Regarding radio usage,...\tbd{Do we even have time to do this? I don't remember the exact metrics we used for the MobiSys submission.}
 
   {\bf iPhone Apps.}
 
-\subsection{Third Party Servers: Ads and Analytic Traffic}
+\subsection{Third Party Servers}
+  Many free applications support themselves financially by serving ads or providing resources for third parties to track user behavior.
+  We now explore how many servers are contacted by a given app (\ie{} how many providers are tracking a user with this app) -- most of these typically for ads, tracking, or analytics -- as well as how much data is transferred to and from these servers (\ie{} how much does this traffic impact the user's data cap?).
 
   {\bf In the Wild.}
+  We first consider the overall impact of these ads, analytic, and tracking services on typical user behavior in our IRB study...
+  \tbd{Ashwin...}
+
 \begin{figure}
 \includegraphics[width=\columnwidth]{plots/ad_share_bytes.pdf}
 \caption{Fraction of traffic volume because of Ads and Analytics. \emph{\tbd{Check for id1 and id25}}}
@@ -77,22 +85,34 @@ googleadservices.com  & 17 & 8 &  9 \tabularnewline
 
 
   {\bf Android Apps.}
+  When we inspect the data from our controlled study, we see that some apps contact a large number of external servers while others contact significantly fewer.
+  In Figure~\ref{fig:android-cdns}, we show both the total number of servers contacted (solid lines) as well as the number of organizations contacted (dotted lines) for both the top-100 Google Play dataset and the top-2000 third-party dataset.
+  To quantify ``organizations contacted'', we performed whois lookups on all servers contacted and mapped them to an organization name, allowing us to tighten our upper bound on the number of companies/entities able to track the user through a single app.
+  Returning to the figure, we see...~\ref{fig:android-cdns}...\tbd{Amy...}
+
 
   {\bf iPhone Apps.}
-
+  \tbd{Shen...}
 
 \subsection{Personally Identifiable Information}
+  Finally, we turn to information leaked by individual applications. We do not report on data leaked for our real users here, but only the data leaked by our controlled apps in isolation.
+  We consider data to be `leaked' when any personally identifiable information -- email address, phone number, IMEI number -- is sent across the network under HTTP or HTTPS.
+  Naturally, some of this information may be relevant to the app -- most apps legitimately require email access. 
+  However, none of this information should ever travel across the network in plaintext (HTTP), which we unfortunately see violated in serveral cases.
+
+  To generate this data, we created fake user accounts on the test phones for a fake user named ``Tess Droid'', with fake contact information and fake Twitter and Facebook accounts. We were then able to check that none of this data ever was released over the network in plaintext.
 
   {\bf Android Apps.}
+  Table 1 shows...
 
   {\bf iPhone Apps.}
 
-\subsection{Characterize Facebook Applications}
+%\subsection{Characterize Facebook Applications}
 
-Why Facebook was chosen?
+%Why Facebook was chosen?
 
-What do we observe ?
+%What do we observe ?
 
-What do we see in the User Agent Fields. 
+%What do we see in the User Agent Fields. 
 
 
