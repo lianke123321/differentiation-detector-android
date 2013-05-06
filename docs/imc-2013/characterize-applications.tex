@@ -1,22 +1,28 @@
-\section{Characterize Applications}
+\section{Application Characterization}
 \label{sec:characterize-app}
 
-\begin{packedenumerate}
-\item How does an application behavior change with operating system and access technology?
-\item How intrusive are popular applications?
-\end{packedenumerate}
+  We now turn to measurements of specific popular iOS and Android applications. 
+  When users install apps, they grant them Internet access without detailed knowledge of how that access will be used, including {\it how much} data is sent or accessed, {\it what} data is sent,  or {\it with whom} the app communications.
+  ``How much'' is important to conserve both bandwidth caps and battery capacity: an app which consumes or produces too much data will waste bandwidth resources, while an app which consumes or produces data too frequently will prevent the device radio from going idle to save power.
+  ``With whom'' is important to protect users from excessive tracking -- the more organization's servers an app connects to, the more organizations which are able to track user behavior, location, or other private data.
+  Finally, ``what data'' is important because apps may unnecessarily leak personally identifiable information (PII) such as user email address, IMEI, contact information, or other stored data either to the app provider or worse, to any eavesdropper on a public WiFi connection.
+  We now report on our findings in all three of these dimensions for the iPhone and Android apps in our study.
 
-\subsection{Characterize Facebook Applications}
+\subsection{Bandwidth and Radio Usage}
 
-Why Facebook was chosen?
+  {\bf In the Wild.}
+    \begin{itemize}
+      \item Stats on how much bandwidth each user used; time of day; how frequent...
+    \end{itemize}
 
-What do we observe ?
+  {\bf Android Apps.}
+    To dig in to the root cause of these usage patterns, we also 
 
-What do we see in the User Agent Fields. 
+  {\bf iPhone Apps.}
 
+\subsection{Third Party Servers: Ads and Analytic Traffic}
 
-\subsection{Characterize Ads and Analytic Traffic}
-
+  {\bf In the Wild.}
 \begin{figure}
 %\includegraphics[width=\columnwidth]{plots/ad_share_bytes.pdf}
 \caption{Fraction of traffic volume because of Ads and Analytics. \emph{\tbd{Check for id1 and id25}}}
@@ -64,26 +70,23 @@ googleadservices.com  & 17 & 8 &  9 \tabularnewline
 \label{tab:top_trackers}
 \end{table}
 
+  {\bf Android Apps.}
+
+  {\bf iPhone Apps.}
 
 
-How do we characterize ads and Analytics.
+\subsection{Personally Identifiable Information}
 
-What fraction of traffic is due to ads and analytics.
+  {\bf Android Apps.}
 
-Breakup over Cell and Wifi and Android and iOS.
+  {\bf iPhone Apps.}
 
-What more do we observer.
+\subsection{Characterize Facebook Applications}
 
-Now motivate for the next section saying we observe PII leaks. 
+Why Facebook was chosen?
 
-\subsection{Identify Instrusive Applications}
+What do we observe ?
 
-Why did we do this test?
+What do we see in the User Agent Fields. 
 
-How did we perform our experiments?
 
-What did we observe?
-
-What is different from previous observations?
-
-What insights do we gain from our results?
