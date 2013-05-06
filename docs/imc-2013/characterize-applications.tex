@@ -6,7 +6,7 @@
   ``How much'' is important to conserve both bandwidth caps and battery capacity: an app which consumes or produces too much data will waste bandwidth resources, while an app which consumes or produces data too frequently will prevent the device radio from going idle to save power.
   ``With whom'' is important to protect users from excessive tracking -- the more organization's servers an app connects to, the more organizations which are able to track user behavior, location, or other private data.
   Finally, ``what data'' is important because apps may unnecessarily leak personally identifiable information (PII) such as user email address, IMEI, contact information, or other stored data either to the app provider or worse, to any eavesdropper on a public WiFi connection.
-  We now report on our findings in all three of these dimensions for the iPhone and Android apps in our study.
+  We  report on our findings in all three of these dimensions for the iPhone and Android apps in our study.
 
 \subsection{Bandwidth and Radio Usage}
 
@@ -24,13 +24,13 @@
 
   {\bf In the Wild.}
 \begin{figure}
-%\includegraphics[width=\columnwidth]{plots/ad_share_bytes.pdf}
+\includegraphics[width=\columnwidth]{plots/ad_share_bytes.pdf}
 \caption{Fraction of traffic volume because of Ads and Analytics. \emph{\tbd{Check for id1 and id25}}}
 \label{fig:description}
 \end{figure}
 
 \begin{figure}
-%\includegraphics[width=\columnwidth]{plots/distrib_ad_uploads.pdf}
+\includegraphics[width=\columnwidth]{plots/distrib_ad_uploads.pdf}
 \caption{Distribution of bytes uploaded by ads and analytics sites. \emph{The distribution of bytes uploaded by all ads and analytics sites and the top four ads sites based on traffic volume across all users}.}
 \label{fig:description}
 \end{figure}
@@ -69,6 +69,12 @@ googleadservices.com  & 17 & 8 &  9 \tabularnewline
 \emph{Two trackers, \emph{doubleclick.net} and\emph{google-analytics.com}, were tracking all the 25 devices in our dataset.}}
 \label{tab:top_trackers}
 \end{table}
+\begin{figure}
+\includegraphics[width=\columnwidth]{plots/num_uploading_trackers.pdf}
+\caption{Distribution of bytes uploaded by ads and analytics sites. \emph{The distribution of bytes uploaded by all ads and analytics sites and the top four ads sites based on traffic volume across all users}.}
+\label{fig:description}
+\end{figure}
+
 
   {\bf Android Apps.}
 

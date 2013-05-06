@@ -53,11 +53,11 @@ These servers tunnel Internet traffic using VPNs from 25 devices, belonging to 1
 To protect the identity of the users and their data, on each server we use public key cryptography to encrypt the files that log the data traffic that flow through the server. 
 We call this dataset the \moball dataset. 
 
-The 25 devices that contribute to the \moball dataset consists of 9 iPhones, 4 iPads, 1 iPodTouch, 10 Android phones, and 1 Android tablet.
+The 25 devices that contribute to the \moball dataset consists of 10 iPhones, 4 iPads, 1 iPodTouch, 9 Android phones, and 1 Android tablet.
 Though \emph{tablets} can access the Internet via a cellular data connections, for the \moball we included tablets that only use \wifi to access the Internet.
 The Android devices in this dataset include the Nexus, Sony, Samsung, and Gsmart brands.
 
-This dataset consists of 190 days of data that flowed through our VPN servers; the number days for each user varies from 5 to 176 with a median of 33 days.
+This dataset consists of 202 days of data that flowed through our VPN servers; the number days for each user varies from 5 to 198 with a median of 35 days.
 
 We estimate the access technology used by the mobile device by performing a \emph{WHOIS} lookup on the IP address used by the mobile client for creation of the VPN tunnel. 
 We use the WHOIS databases available at \emph{whois.cmyru.com} and \emph{utrace.de} to get the ISP details.
@@ -68,10 +68,10 @@ In this case, though the device uses \wifi to connect to the Internet, our serve
 
 \tbd{we need some wording and consitency for the usage of ISP -- for example ATT can provide cellular and DSL. Also mobile data cannot be used and we need some word for cellular data and wifi data and this must be defined in the dataset description.}
 
-Based on the above classification of access technology and ISPs, our dataset consists of data traffic from 54 distinct ISPs, of which 10 provided cellular services.
-Of the 19 devices that used cellular data, we observed that 16 devices restricted their cellular data traffic to one ISP each; the other three users used the services of four, two, and two ISPs respectively.
+Based on the above classification of access technology and ISPs, our dataset consists of data traffic from 52 distinct ISPs, of which 10 provided cellular services.
+Of the 18 devices that used cellular data, we observed that 15 devices restricted their cellular data traffic to one ISP each; we observed that the other three devices accessed the Internet using the services of two different ISPs.
 We observed that the devices in our dataset used a higher number of \wifi ISPs.
-We observed a median of 4 \wifi ISPs per device with a maximum of 24 \wifi ISPs that were used by one device.
+We observed a median of 4 \wifi ISPs per device with a maximum of 25 \wifi ISPs that were used by one device.
 %The device that used \tbdv{24} distinct ISPs was used by a user who traveled across 6 different countries during the data collection process. 
 This observation confirms our intuition that studies based traces from a single ISP~\cite{maier:mobtraffic, vallina-rod:ads}, shall not be able to analyze how specific users use mobile devices. 
 
