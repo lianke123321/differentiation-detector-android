@@ -87,14 +87,16 @@ googleadservices.com  & 17 & 8 &  9 \tabularnewline
 
 
 \begin{table*}[t]
-    \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l}
-       Dataset&Platform&Proto&\# Apps&Email&Location&Username&Password&Android ID&Contacts&IMEI\\
+    \centering
+    \begin{tabular}{l|l|l|l|l|l|l|l|l|l}
+       Dataset&Platform&\# Apps&Email&Location&Name&Password&Android ID&Contacts&IMEI\\
        \hline
-       Google Play&Android&HTTP&100&?&10 (10\%)&7 (7\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
        \hline
-       Third Party&Android&HTTP&908&?&32 (3.5\%)&?&0 (0\%)&95 (10.4\%)&4 (0.4\%)&48 (5.3\%)\\
+       Google Play&Android&100&3 (3\%)&10 (10\%)&2 (2\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
        \hline
-       App Store&iPhone&HTTP&100&?&?&?&?&?&?&?\\
+       Third Party&Android&908&1 (0.1\%)&32 (3.5\%)&2 (0.2\%)&0 (0\%)&95 (10.4\%)&4 (0.4\%)&48 (5.3\%)\\
+       \hline
+       App Store&iPhone&100&?&?&?&?&?&?&?\\
     \end{tabular}
     \caption{\label{tbl:pii}Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone apps.}
   \end{table*}
