@@ -31,19 +31,20 @@
   We first consider the overall impact of these ads, analytic, and tracking services on typical user behavior in our IRB study...
   \tbd{Ashwin...}
 
-\begin{figure}
+\begin{figure}[t]
 \includegraphics[width=\columnwidth]{plots/ad_share_bytes.pdf}
 \caption{Fraction of traffic volume because of Ads and Analytics. \emph{\tbd{Check for id1 and id25}}}
 \label{fig:description}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[t]
 \includegraphics[width=\columnwidth]{plots/distrib_ad_uploads.pdf}
 \caption{Distribution of bytes uploaded by ads and analytics sites. \emph{The distribution of bytes uploaded by all ads and analytics sites and the top four ads sites based on traffic volume across all users}.}
 \label{fig:description}
 \end{figure}
 
-\begin{table}
+\begin{table}[t]
+\centering
 \begin{small}
 \begin{tabular}{|p{0.35\columnwidth}|p{0.1\columnwidth}|p{0.15\columnwidth}|p{0.1\columnwidth}|}
 \hline
@@ -77,12 +78,25 @@ googleadservices.com  & 17 & 8 &  9 \tabularnewline
 \emph{Two trackers, \emph{doubleclick.net} and\emph{google-analytics.com}, were tracking all the 25 devices in our dataset.}}
 \label{tab:top_trackers}
 \end{table}
-\begin{figure}
+\begin{figure}[t]
 \includegraphics[width=\columnwidth]{plots/num_uploading_trackers.pdf}
 \caption{Distribution of bytes uploaded by ads and analytics sites. \emph{The distribution of bytes uploaded by all ads and analytics sites and the top four ads sites based on traffic volume across all users}.}
 \label{fig:description}
 \end{figure}
 
+\begin{table*}[t]
+    \begin{tabular}{l|l|l|l|l|l|l|l|l|l|l}
+       Dataset&Platform&Proto&\# Apps&Email&Location&Username&Password&Android ID&Contacts&IMEI\\
+       \hline
+       Google Play&Android&HTTP&100&?&10 (10\%)&7 (7\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
+       \hline
+       Third Party&Android&HTTP&908&?&32 (3.5\%)&?&0 (0\%)&95 (10.4\%)&4 (0.4\%)&48 (5.3\%)\\
+       \hline
+       App Store&iPhone&HTTP&100&?&?&?&?&?&?&?\\
+    \end{tabular}
+    \caption{\label{tbl:pii}Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone apps.}
+  \end{table*}
+  
 
   {\bf Android Apps.}
   When we inspect the data from our controlled study, we see that some apps contact a large number of external servers while others contact significantly fewer.
@@ -95,31 +109,25 @@ googleadservices.com  & 17 & 8 &  9 \tabularnewline
   \tbd{Shen...}
 
 \subsection{Personally Identifiable Information}
-  \begin{table*}
-    \begin{tabular}{l|l|l|l|l|l|l|l|l|l}
-       Dataset&Platform&\# Apps&Email&Location&Username&Password&Android ID&Contacts&IMEI\\
-       \hline
-       Google Play&Android&100&?&10 (10\%)&7 (7\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
-       \hline
-       Third Party&Android&908&?&32 (3.5\%)&?&0 (0\%)&95 (10.4\%)&4 (0.4\%)&48 (5.3\%)\\
-       \hline
-       App Store&iPhone&100&?&?&?&?&?&?&?\\
-    \end{tabular}
-    \caption{Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone apps.}
-  \end{table*}
-  
+ 
   Finally, we turn to information leaked by individual applications. We do not report on data leaked for our real users here, but only the data leaked by our controlled apps in isolation.
+  We created fake user accounts on the test phones for a fake user named ``Tess Droid'', with fake contact information and fake Twitter and Facebook accounts. 
+  We were then able to check that none of this data ever was released over the network, either in plaintext (HTTP) or encrypted (HTTPS, see \S\ref{sec:bumping}).
+  
   We consider data to be `leaked' when any personally identifiable information -- email address, phone number, IMEI number -- is sent across the network under HTTP or HTTPS.
-  Naturally, some of this information may be relevant to the app -- most apps legitimately require email access. 
-  However, none of this information should ever travel across the network in plaintext (HTTP), which we unfortunately see violated in serveral cases.
+  Some of this information may be relevant to the app -- \eg{}, many apps legitimately require email access. 
+  However, none of this information should ever travel across the network in plaintext (HTTP), which we see violated in serveral cases.
 
-  To generate this data, we created fake user accounts on the test phones for a fake user named ``Tess Droid'', with fake contact information and fake Twitter and Facebook accounts. We were then able to check that none of this data ever was released over the network in plaintext.
+  In Table~\ref{tbl:pii}, we see the type of PII leaked for both Android and iPhone apps.
+  For Android apps, IMEI and Android ID are the most commonly leaked forms of PII in both the Google Play and third-party dataset.
+  Although not popularly thought of as ``private'' data, each of these identifiers are globally unique: IMEI is a unique identifier tied to a phone, and an Android ID is an identifier tied to a user's Google Account, used across many services on the Internet. 
+  Consequently, either of these datapoints can be used to track or correlate a user's behavior across all sites the user visits that sell or collaborate with tracking data: a user's behavior on one site can easily be linked to their behavior on any other site they visit.
+  With Android ID being tracked by between 10 and 20\% of apps in our study, and IMEI being tracked by between 5\% and 13\% of apps in our study, this suggests that global user tracking across collaborating services can be easily achieved today just by using this identifier.
+  \tbd{...}
 
-  {\bf Android Apps.}
-  Table 1 shows...
+  Other informaiton like contacts, email, and passwords were rarely leaked in the clear, but all were leaked on occaision, suggesting that stricter monitoring of Android app behavior is needed -- contrastingly, no iPhone apps (which are manually given clearance by Apple before hitting the iPhone store) leaked passwords in plaintext~\tbd{is this true.}
 
-  {\bf iPhone Apps.}
-
+  Moving to iPhone apps, \tbd{...}
 %\subsection{Characterize Facebook Applications}
 
 %Why Facebook was chosen?
