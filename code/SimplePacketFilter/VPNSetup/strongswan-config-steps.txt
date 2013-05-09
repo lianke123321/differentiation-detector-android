@@ -1,0 +1,40 @@
+# Untar the tarball and change to the directory containing strongswan
+# This step has not be automated to be executed from a shell script because I observed issues
+# with respect to the dependencies depending on the Ubuntu/Fedora/Debian versions
+
+# Remove any existing installations of strongswan and openswan
+# For Fedora
+yum remove openswan strongswan
+# For debian/ubuntu
+apt-get remove openswan strongswan
+# Please make sure there is no ipsec in /usr/sbin folder
+
+
+tar -xjvf strongswan-5.0.1.tar.bz2
+cd strongswan-5.0.1 
+# MEDDLE_ROOT is the base directory where all Meddle specific files will be installed
+export MEDDLE_ROOT="/opt/meddle/" # Please change this location if you decide to install meddle in another folder. 
+
+# Then configure strongswan with the following plugins 
+./configure --sysconfdir=${MEDDLE_ROOT}/etc/ --prefix=${MEDDLE_ROOT}/usr/ --libexecdir=${MEDDLE_ROOT}/usr/lib --enable-openssl --enable-agent --enable-gcrypt --enable-integrity-test --enable-openssl --enable-eap-gtc --enable-eap-md5 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2 --enable-eap-identity --enable-md4 --enable-eap-radius --enable-socket-dynamic
+# Compile Strongswan
+make 
+# NOTE:: make install without sudo might end with an error because the install script
+# shall try to install some init scripts which we do not need. 
+# However for sake of completeness please try with sudo
+sudo make install
+# These steps should install strongswan in MEDDLE_ROOT
+#
+
+The following steps can be used to address the errors encountered while running ./configure.  
+Error - configure: error: GNU Multi Precision library gmp not found
+Remedy - sudo yum install gmp gmp-devel
+       - apt-get install libgmp3-dev libgmp3c2
+
+Error - configure: error: OpenSSL crypto library not found
+Remedy - yum install openssl-devel
+
+Error - configure: error: gcrypt library not found
+Remedy - yum install libgcrypt-devel
+       - apt-get install  libgcrypt11-dev
+

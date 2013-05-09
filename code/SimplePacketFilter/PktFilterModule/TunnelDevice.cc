@@ -6,6 +6,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <string.h>
+#include <unistd.h>
 #include <linux/if.h>
 #include <linux/if_tun.h>
 #include <arpa/inet.h>
@@ -15,7 +16,8 @@
 
 TunnelDevice::TunnelDevice()
 {
-	tunFD = 0;
+	tunFD = wFD = 0;
+	ipAddress = netMask = 0;
 }
 TunnelDevice::~TunnelDevice()
 {

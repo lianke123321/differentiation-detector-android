@@ -14,6 +14,7 @@ class TunnelDevice {
 public:
 	uint32_t tunFD;
 	uint32_t wFD;
+	// wFD duplicate of the tunFD used for writing; we change this when we decide to write on another descriptor
 	uint8_t readBuffer[1<<16];
 private:
 	std::string deviceName;

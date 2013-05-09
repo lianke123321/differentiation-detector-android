@@ -6,13 +6,11 @@
 
 DatabaseManager::DatabaseManager()
 {
-	// TODO Auto-generated constructor stub
 	mysql = mysql_init(NULL);
 }
 
 DatabaseManager::~DatabaseManager()
 {
-	// TODO Auto-generated destructor stub
 	delete mysql;
 }
 
@@ -26,10 +24,11 @@ bool DatabaseManager::connectDB(std::string hostname, std::string user, std::str
 	// mysql_real_connect(connect,SERVER,USER,PASSWORD,DATABASE,0,NULL,0);
 	return true;
 }
-bool DatabaseManager::connectDB()
-{
-	return connectDB(DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME);
-}
+
+//bool DatabaseManager::connectDB()
+//{
+//	return connectDB(DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME);
+//}
 bool DatabaseManager::closeDB()
 {
 	// TODO:: code to close the DB comes here
