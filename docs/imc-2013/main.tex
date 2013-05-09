@@ -1,0 +1,115 @@
+\documentclass{sig-alternate-10pt}
+\usepackage{amsfonts,xspace}
+\usepackage{url}
+%\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{ifpdf}
+\usepackage{epstopdf}
+\usepackage[usenames,dvipsnames]{color}
+\newcommand{\ie}{{\it i.e.}}
+\newcommand{\eg}{{\it e.g.}}
+\newcommand{\etc}{{\it etc.}}
+\newcommand{\eat}[1]{}
+\usepackage[english,plain]{fancyref}
+\usepackage{times}
+\usepackage{rotating}
+\usepackage[labelformat=simple]{subfig}
+\usepackage{multirow}
+
+\newcommand{\mypara}[1]{\medskip\noindent{\bf {#1}:}~}
+\newcommand{\chk}{$\checkmark$}
+\newcommand{\dsh}{{\bf --}}
+\newcommand{\til}{{\bf\large \textasciitilde}}
+\newcommand{\tbd}[1]{[{\color{red}{\bf{TBD: #1}}}]}
+\newcommand{\drc}[1]{[{\color{blue}{Dave: #1}}]}
+%\newcommand{\tbd}[1]{}
+\newcommand{\tbdv}[1]{{\color{blue}{!\bf{#1}$_{verify}$}!}}
+\newcommand{\etal}{\emph{et~al.}}
+\newcommand{\platname}{{\emph{MobiScope}}\xspace}
+\newcommand{\platnameT}{{MobiScope}\xspace}
+\newcommand{\dsum}{\displaystyle\sum}
+\newcounter{packednmbr}
+\newcommand{\iphone}{iPhone\xspace}
+\newcommand{\wifi}{Wi-Fi\xspace}
+\newcommand{\postfigspace}{-1em}
+\newcommand{\figcapspace}{0em}
+\newcommand{\moball}{{\emph{mobAll}}\xspace}
+\newcommand{\mobcomp}{{\emph{mobCompare}}\xspace}
+\newcommand{\mobexpt}{{\emph{mobileExpt}}\xspace}
+
+\newenvironment{packedenumerate}{\begin{list}{\thepackednmbr.}{\usecounter{packednmbr}\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+\newenvironment{packeditemize}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+\newenvironment{packedtrivlist}{\begin{list}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+
+\renewcommand{\fref}{\Fref}
+\renewcommand\thesubfigure{~(\alph{subfigure})}
+
+\title{MobiScope: Pervasive Mobile Internet Traffic Monitoring Made Practical}
+
+\numberofauthors{7}
+\author{
+\alignauthor
+Ashwin Rao\\
+\affaddr{INRIA}
+\alignauthor
+Amy Tang\\
+\affaddr{UC Berkeley}
+\alignauthor        
+Adrian Sham\\
+\affaddr{University of Washington}
+\and
+\alignauthor
+Sam Wilson\\
+\affaddr{University of Washington}
+\alignauthor
+Shen Wang\\
+\affaddr{University of Washington}
+\alignauthor
+Justine Sherry\\
+\affaddr{UC Berkeley}
+\and
+\alignauthor
+Arnaud Legout\\
+\affaddr{INRIA}
+\alignauthor
+Walid Dabbous\\
+\affaddr{INRIA}
+\alignauthor 
+Arvind Krishnamurthy\\
+\affaddr{University of Washington}
+\and
+\alignauthor
+David Choffnes\\
+\affaddr{University of Washington}
+}
+% Remove additional authors section
+\def\addauthorsection{}
+\date{}
+\begin{document}	
+\maketitle
+
+\input{abstract}
+
+\input{introduction}
+
+\input{motivation}
+
+\input{platform}
+
+\input{methodology}
+
+\input{measurements}
+
+\input{related}
+
+\input{conclusion}
+
+%\input{placeholder-tex/placeholder}
+
+\bibliographystyle{abbrv}
+\bibliography{biblio}
+
+\end{document}
+
+

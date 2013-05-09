@@ -1,0 +1,6 @@
+KEY: actualHTML
+VALUE: %3Chtml%3E%3Cbody%3E%3Cimg%20src%3D'http%3A%2F%2Facookie.tanx.com%2Fcms.gif%3Fid%3D29628860%26extendata%3Dtid%253D15%2526mvck%253DVZMB402u79CLS9ScIH3y7U'%2F%3E%3Cimg%20src%3D'http%3A%2F%2Fcm.allyes.com%2Fpixel%3Fallyes_dspid%3D122%26allyes_cm%26tid%3D17%26mvck%3DBlRvDxWUfFaH7d3u6Wl2JG'%2F%3E%3Cimg%20src%3D'http%3A%2F%2Fcm.l.qq.com%2F%3Fdspid%3D10013%26gettuid%3D1%26dspuid%3DOj5DMQ3rhJlqHyE7lTTlzG'%2F%3E%3C%2Fbody%3E%3C%2Fhtml%3E
+KEY: requestHeader
+VALUE: ckmap.mediav.com/b?type=10
+KEY: expectedHTML
+VALUE: %3Chtml%3E%3Cbody%3E%3Cimg%20src%3D'http%3A%2F%2Fcm.g.doubleclick.net%2Fpixel%3Fgoogle_nid%3DMEV%26google_sc%26google_cm%26tid%3D3%26mvck%3DXInL6A5BUNkoIkNYsA6HbU%26google_ula%3D2121606'%2F%3E%3C%2Fbody%3E%3C%2Fhtml%3E
