@@ -52,9 +52,6 @@ egrep -io "[^a-zA-Z]?phone[^a-zA-Z]?([:=])+(\"?)........." httpdata.txt | sort |
 #echo " Looking for emails "
 #egrep -io '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}' httpdata.txt | grep -v 'png' | grep -v 'jpg' | grep -v 'jpeg' | grep -v 'gif' | sort | uniq -c
 
-
-<<<<<<< HEAD
-=======
 echo "\nLooking for lat=, latitude=\n"
 grep -io "lat=.[0-9]\{0,5\}.[0-9]\{0,5\}" httpdata.txt
 grep -io "latitude=.[0-9]\{0,5\}.[0-9]\{0,5\}" httpdata.txt
@@ -84,7 +81,6 @@ grep -o '......\(([0-9]\{3\})\|[0-9]\{3\}\)[ -]\?[0-9]\{3\}[ -]\?[0-9]\{4\}' htt
 grep -io "number=.........." httpdata.txt
 grep -io "phone=........." httpdata.txt
 #grep -i -e -o "lat=\d+\}" httpdata.txt
->>>>>>> d1c81d14cdf31110f885f0e592bd5184702a6e2d
 
 echo "\nLooking for credit card numbers"
 
