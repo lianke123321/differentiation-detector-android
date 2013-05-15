@@ -17,117 +17,94 @@
 
 package org.strongswan.android.data;
 
-public class VpnProfile implements Cloneable
-{
-	private String mName, mGateway, mUsername, mPassword, mCertificate, mUserCertificate, mAutoReconnect;
+public class VpnProfile implements Cloneable {
+	private String mName, mGateway, mUsername, mPassword, mCertificate,
+			mUserCertificate, mAutoReconnect;
 	private VpnType mVpnType;
 	private long mId = -1;
 
-	public long getId()
-	{
+	public long getId() {
 		return mId;
 	}
 
-	public void setId(long id)
-	{
+	public void setId(long id) {
 		this.mId = id;
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return mName;
 	}
 
-	public void setName(String name)
-	{
+	public void setName(String name) {
 		this.mName = name;
 	}
 
-	public String getGateway()
-	{
+	public String getGateway() {
 		return mGateway;
 	}
 
-	public void setGateway(String gateway)
-	{
+	public void setGateway(String gateway) {
 		this.mGateway = gateway;
 	}
 
-	public VpnType getVpnType()
-	{
+	public VpnType getVpnType() {
 		return mVpnType;
 	}
 
-	public void setVpnType(VpnType type)
-	{
+	public void setVpnType(VpnType type) {
 		this.mVpnType = type;
 	}
 
-	public String getUsername()
-	{
+	public String getUsername() {
 		return mUsername;
 	}
 
-	public void setUsername(String username)
-	{
+	public void setUsername(String username) {
 		this.mUsername = username;
 	}
 
-	public String getPassword()
-	{
+	public String getPassword() {
 		return mPassword;
 	}
 
-	public void setPassword(String password)
-	{
+	public void setPassword(String password) {
 		this.mPassword = password;
 	}
 
-	public String getCertificateAlias()
-	{
+	public String getCertificateAlias() {
 		return mCertificate;
 	}
 
-	public void setCertificateAlias(String alias)
-	{
+	public void setCertificateAlias(String alias) {
 		this.mCertificate = alias;
 	}
 
-	public String getUserCertificateAlias()
-	{
+	public String getUserCertificateAlias() {
 		return mUserCertificate;
 	}
 
-	public void setUserCertificateAlias(String alias)
-	{
+	public void setUserCertificateAlias(String alias) {
 		this.mUserCertificate = alias;
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return mName;
 	}
 
 	@Override
-	public boolean equals(Object o)
-	{
-		if (o != null && o instanceof VpnProfile)
-		{
-			return this.mId == ((VpnProfile)o).getId();
+	public boolean equals(Object o) {
+		if (o != null && o instanceof VpnProfile) {
+			return this.mId == ((VpnProfile) o).getId();
 		}
 		return false;
 	}
 
 	@Override
-	public VpnProfile clone()
-	{
-		try
-		{
-			return (VpnProfile)super.clone();
-		}
-		catch (CloneNotSupportedException e)
-		{
+	public VpnProfile clone() {
+		try {
+			return (VpnProfile) super.clone();
+		} catch (CloneNotSupportedException e) {
 			throw new AssertionError();
 		}
 	}
@@ -139,10 +116,17 @@ public class VpnProfile implements Cloneable
 	public void setAutoReconnect(Boolean mAutoReconnect) {
 		this.mAutoReconnect = mAutoReconnect.toString();
 	}
-	
-	public boolean isAutoReconnectClicked(){
-		if (mAutoReconnect != null)
-		return mAutoReconnect.equals("true");
-		return false;
+
+	/**
+	 * 
+	 * mAutoReconnect needed to be access by CharonVpnService in order to enable
+	 * or disable auto reconnection timer
+	 * 
+	 * @author Sam Wilson
+	 * @return true if auto reconnect button is clicked
+	 */
+	public boolean isAutoReconnectClicked() {
+		// defensive programming, make sure mAutoReconnect != null
+		return mAutoReconnect != null && mAutoReconnect.equals("true");
 	}
 }

@@ -57,7 +57,12 @@ public class CharonVpnService extends VpnService implements Runnable
 {
 	private static final String TAG = CharonVpnService.class.getSimpleName();
 	public static final String LOG_FILE = "charon.log";
-
+	/* baidu is chinese's google */
+	private static final String CHINESE_URL = "www.baidu.com";
+	private static final String US_URL = "www.google.com";
+	/* set one minute for the timer time*/
+	private static final int TIMER_TIME  = 60 * 1000;
+	/* the timer to keep check the current network connection */
 	private Timer timer;
 	private String mLogFile;
 	private VpnProfileDataSource mDataSource;
@@ -206,60 +211,9 @@ public class CharonVpnService extends VpnService implements Runnable
 	public void run()
 	{
 		syncObject = this;
-		final Thread thisThread = Thread.currentThread();
-		timer = new Timer();
-		timer.scheduleAtFixedRate(new TimerTask(){
-
-			@Override
-			public void run() {
-//				if (mCurrentProfile != null && !mCurrentProfile.isAutoReconnect()) return;
-				synchronized (syncObject)
-				{
-					if (mService==null) return;
-					Log.i(TAG, "periodic restart check");
-					if (mService.getState() != State.CONNECTED && 
-							mService.getState() != State.CONNECTING)
-						connectToDefaultProfile();
-					
-
-
-					
-//					if ((mConnectStartTime != -1 && 
-//							mConnectStartTime < System.currentTimeMillis()-30*1000) || 
-//							mLastError != ErrorState.NO_ERROR || mService.getState()!=State.CONNECTED){
-//						Log.i(TAG, "restarting connection due to 30 seconds of no connection");
-//						//					TrustedCertificateManager.getInstance().reload();
-//						//					if (getLocalIPv4Address()!=null)
-//						//						deinitializeCharon();
-//						restartConnection();
-//						thisThread.interrupt();
-//					}
-				}
-
-			}}, 5000, 60*1000);
-		timer.scheduleAtFixedRate(new TimerTask(){
-
-			@Override
-			public void run() {
-		try{
-		    SocketAddress sockaddr = new InetSocketAddress("www.google.com", 80);
-
-            // Create an unbound socket
-            Socket sock = new Socket();
-
-            // This method will block no more than timeoutMs.
-            // If the timeout occurs, SocketTimeoutException is thrown.
-            int timeoutMs = 5000;   // 5 seconds
-            sock.connect(sockaddr, timeoutMs);
-            Log.i(TAG, "Google is reachable");
-            sock.close();
-            
-		}             
-		catch(Exception e){
-			Log.i(TAG, "Google not reachable! Restarting...");
-			connectToDefaultProfile();
-		}
-			}}, 5000, 15*60*1000);
+		
+		// start the timer
+		runTimer();
 		
 		while (true)
 		{
@@ -275,7 +229,7 @@ public class CharonVpnService extends VpnService implements Runnable
 					mProfileUpdated = false;
 					stopCurrentConnection();
 					if (mNextProfile == null)
-					{
+ 					{
 						setProfile(null);
 						setState(State.DISABLED);
 						if (mTerminate)
@@ -317,6 +271,66 @@ public class CharonVpnService extends VpnService implements Runnable
 	}
 
 	/**
+	 * The timer to double check the current network connection
+	 */
+	private void runTimer() {
+//		final Thread thisThread = Thread.currentThread();
+		timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask(){
+
+			@Override
+			public void run() {
+				synchronized (syncObject)
+				{
+					if (mService==null) return;
+					Log.i(TAG, "periodic restart check");
+					if (mService.getState() != State.CONNECTED && 
+							mService.getState() != State.CONNECTING)
+						connectToDefaultProfile();
+					
+
+
+					
+//					if ((mConnectStartTime != -1 && 
+//							mConnectStartTime < System.currentTimeMillis()-30*1000) || 
+//							mLastError != ErrorState.NO_ERROR || mService.getState()!=State.CONNECTED){
+//						Log.i(TAG, "restarting connection due to 30 seconds of no connection");
+//						//					TrustedCertificateManager.getInstance().reload();
+//						//					if (getLocalIPv4Address()!=null)
+//						//						deinitializeCharon();
+//						restartConnection();
+//						thisThread.interrupt();
+//					}
+				}
+				// delay and timer rate are all one minute
+			}}, TIMER_TIME, TIMER_TIME); 
+		timer.scheduleAtFixedRate(new TimerTask(){
+
+			@Override
+			public void run() {
+		try{
+			
+		    SocketAddress sockaddr = new InetSocketAddress(CHINESE_URL, 80);
+
+            // Create an unbound socket
+            Socket sock = new Socket();
+
+            // This method will block no more than timeoutMs.
+            // If the timeout occurs, SocketTimeoutException is thrown.
+            int timeoutMs = 5000;   // 5 seconds
+            sock.connect(sockaddr, timeoutMs);
+            Log.i(TAG, CHINESE_URL + " is reachable");
+            sock.close();
+            
+		}             
+		catch(Exception e){
+			Log.i(TAG, CHINESE_URL + " not reachable! Restarting...");
+			connectToDefaultProfile();
+		}
+			}}, TIMER_TIME, 15*TIMER_TIME);
+	}
+
+	/**
 	 * Stop any existing connection by deinitializing charon.
 	 */
 	private void stopCurrentConnection()
@@ -325,15 +339,20 @@ public class CharonVpnService extends VpnService implements Runnable
 		{
 			if (mCurrentProfile != null)
 			{
+				// check is the auto reconnect button clicked or not
+				boolean isAutoRec = mCurrentProfile.isAutoReconnectClicked();
+				if (mNextProfile != null){
+					isAutoRec = mNextProfile.isAutoReconnectClicked();
+				}
+				// cancel the timer and restart it later if user click auto reconnect
+				timer.cancel();
 				setState(State.DISCONNECTING);
 				mIsDisconnecting = true;
 				deinitializeCharon();
 				Log.i(TAG, "charon stopped");
-				boolean isAutoRec = mCurrentProfile.isAutoReconnectClicked();
-				Log.e("CHARONVPNSERVICE", "autoconnect " + isAutoRec);
-				if (!isAutoRec){
-					// user don't want the auto reconnect
-					timer.cancel();
+				if (isAutoRec){
+					// restart timer
+					runTimer();
 				}
 				mCurrentProfile = null;
 			}

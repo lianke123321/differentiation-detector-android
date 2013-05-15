@@ -101,9 +101,6 @@ public class VpnProfileDetailActivity extends Activity
 
 		mAutoReconnect = (CheckBox)findViewById(R.id.reconnect_auto);
 		
-		
-//		Log.e("VPN AUTO RECONNECT", "mAuto " + mAutoReconnect.isChecked());
-//		mAutoReconnect.setChecked(true);
 		mCheckAuto = (CheckBox)findViewById(R.id.ca_auto);
 		mSelectCert = (TwoLineListItem)findViewById(R.id.select_certificate);
 
@@ -374,6 +371,7 @@ public class VpnProfileDetailActivity extends Activity
 	 */
 	private void updateProfileData()
 	{
+		mProfile.setAutoReconnect(mAutoReconnect.isChecked());
 		/* the name is optional, we default to the gateway if none is given */
 		String name = mName.getText().toString().trim();
 		String gateway = mGateway.getText().toString().trim();
@@ -391,10 +389,11 @@ public class VpnProfileDetailActivity extends Activity
 		{
 			mProfile.setUserCertificateAlias(mUserCertEntry.getAlias());
 		}
+		
 		String certAlias = mCheckAuto.isChecked() ? null : mCertEntry.getAlias();
 		mProfile.setCertificateAlias(certAlias);
-		Log.e("VPNDetailActivity", "inside updateProfileData mAutoReconnect check: " + mAutoReconnect.isChecked());
-		mProfile.setAutoReconnect(mAutoReconnect.isChecked());
+		
+		
 	}
 
 	/**
