@@ -1,22 +1,28 @@
 #!/bin/bash
 
+# Note this key is useless without the Meddle.secret file. This key is used to access the private key present in the Meddle.secret file.
+# The Meddle.secret file is not present in the git tree! DO NOT ADD IT TO THE GIT TREE!
 meddleKey="S@#dvnjkurEqr6uhdfSxVh12d"
-baseDir="/Users/ashwin/proj-work/meddle/meddle-data"
-currDir=${baseDir}
-decryptDir="${currDir}/pcap-decrypted"
+baseDir="/user/arao/home/meddle_data/"
+decryptDir="${baseDir}/pcap-decrypted/"
+encryptDir="${baseDir}/pcap-encrypted/"
+newPcapTimeStamp="1365199064" #Apr-05-2013-23-57-1365199064
+if [ $# -ne 1 ];
+then
+  echo "$0 inria/snowmane/sounder/" 
+  exit -1
+fi 
+locName=$1
+echo ${locName}
 mkdir -p ${decryptDir}
 decrypt()
 {
-    for bName in snowmane sounder
+    for bName in ${locName}
     do
-	for uName in `ls ${currDir}/${bName}`
+	for uName in `ls ${encryptDir}/${bName}`
 	do
             echo ${bName} ${uName} 
-#            if [ "${uName}" == "arao-droid" ]  || [ "${uName}" == "dave-droid" ] || [ "${uName}" == "arao-ipod" ] || [ "${uName}" == "dave-iphone" ] || [ "${uName}" == "dave-ipad" ] ||   [ "${uName}" == "1bb03d7910" ] || [ "${uName}" == "parikshan-droid" ] ;
-#            then
-#                 continue
-#            fi	
-	    uDir=${currDir}/${bName}/${uName}
+	    uDir=${encryptDir}/${bName}/${uName}
 	    if [ -d "${uDir}" ];
 	    then
 		echo "Dir" ${uDir}		
@@ -25,16 +31,23 @@ decrypt()
 	    mkdir -p ${uDecDir}
 	    for encFile in ${uDir}/*.pcap*;
 	    do
-		tmpName=`basename ${encFile}`
-		decName=${uDecDir}/${tmpName}.clr
-#		echo ${decName}
-		gpg --homedir=${currDir}/gpg --no-default-keyring --secret-keyring Meddle.secret --keyring Meddle.key -o ${decName} --passphrase ${meddleKey} --decrypt ${encFile}  # >> /dev/null 2>&1
+                newFile=`python isPcapFileNew.py ${encFile} ${newPcapTimeStamp}`
+                if [ "${newFile}" == "1" ];
+                then    
+		    tmpName=`basename ${encFile}`
+		    decName=${uDecDir}/${tmpName}.clr
+		    echo ${decName}
+		    gpg --batch --yes --homedir=${baseDir}/gpg --no-default-keyring --secret-keyring Meddle.secret --keyring Meddle.key -o ${decName} --passphrase "${meddleKey}" --decrypt ${encFile}  # >> /dev/null 2>&1
+                #else
+                #   echo "Timestamp of ${encFile} < ${newPcapTimeStamp}"
+                fi       
 	    done
-            #rename .pcap.enc.clr .pcap ${uDecDir}/*	
+            echo "renaming not performed for sync issues"
+            echo "Use this template rename .pcap.enc.clr .pcap ${uDecDir}/*.pcap.enc.clr"
 	done
     done
     echo "Now run this find . -size 0 | grep "\.pcap" | xargs rm"
-    find ${decryptDir} -size 24c | grep "\.pcap.clr" | xargs rm -f
+    find ${decryptDir} -size 24c | grep "\.pcap" | xargs rm -f
 }   
 
 decrypt

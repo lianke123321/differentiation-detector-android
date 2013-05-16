@@ -1,0 +1,7 @@
+cd inria/ 
+rsync -avz arao@meddle-srv1.inria.fr:/opt/meddle/pcap-data/ .
+cd ..
+cd snowmane
+rsync -avz arao@snowmane.cs.washington.edu:/data/pcap-data/ .
+cd sounder
+rsync -avz arao@sounder.cs.washington.edu:/data/pcap-data/ .

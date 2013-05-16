@@ -1,13 +1,13 @@
 # This script is used to assign the signature and the label we can identify based on the user agent field. 
 # This file only annotates the http.log.* file with the signature that we identify based on the user agent. 
 
-baseDir<-"/user/arao/home/proj-work/meddle/"
-scriptsDir<-"/home/arao/proj-work/meddle/arao-meddle/meddle/code/PcapProcessing/bro-analysis/gen-analysis-logs/"
+baseDir<-"/user/arao/home/meddle_data/"
+scriptsDir<-paste(baseDir, "/parsing-scripts/", sep="")
 setwd(scriptsDir);
 #broLogsDir<-paste(baseDir, "bro-results/", sep="");
-broLogsDir<-"/user/arao/home/proj-work/meddle/projects/app-identification/bro-results/"
+broLogsDir<-paste(baseDir, "/bro-aggregate-data/", sep="")
 
-unknownAppLabel="unknown"
+unknownAppLabel="-"
 
 #library(RecordLinkage); # for string comparison this was required for edit distance (levensteinSim)
 
@@ -184,7 +184,7 @@ assignLabelsToSignatures <- function(uniqueSigs, simMatrix, threshold, defaultLa
 #userAgentElems <- getUserAgentElems(uniqueUserAgents)
 
 assignHttpSignature <- function(httpLogName) {
-  global unknownAppLabel 
+  #global unknownAppLabel 
 
   httpData <- readHttpData(fName)
   unique_user_agent = unique(httpData$user_agent)
@@ -208,7 +208,7 @@ assignHttpSignature <- function(httpLogName) {
   httpDataLabeled <- merge(x=httpData, y=userAgentSignatureLabels, by="user_agent")
 }
 
-fName <- paste(broLogsDir, "http.log.info", sep="");
+fName <- paste(broLogsDir, "http.log.info.ads", sep="");
 httpData <- assignHttpSignature(httpData)
 fName <- paste(fName, ".app", sep="")
 print(fName)
@@ -218,13 +218,13 @@ rm(httpData) # Free the memory for connData
 
 ### TODO:: All the code for other logs such as ssl and conn comes here. For the time being we just add stuff for conn.log
 ### for some tests.
-fName <- paste(broLogsDir, "conn.log.info", sep="");
-connData <- readConnData(fName)
-connData <- merge(x=connData, y=httpSigs, by="uid", all.x=TRUE)
-connData[is.na(connData$app_label),]$app_label=unknownAppLabel
-fName <- paste(fName, ".app", sep="")
-print(fName)
-write.table(connData, fName, sep="\t", quote=F, col.names=c(colnames(connData)), row.names=FALSE, stringsAsFactors=FALSE)
+#fName <- paste(broLogsDir, "conn.log.info.ads", sep="");
+#connData <- readConnData(fName)
+#connData <- merge(x=connData, y=httpSigs, by="uid", all.x=TRUE)
+#connData[is.na(connData$app_label),]$app_label=unknownAppLabel
+#fName <- paste(fName, ".app", sep="")
+#print(fName)
+#write.table(connData, fName, sep="\t", quote=F, col.names=c(colnames(connData)), row.names=FALSE)
 
 
  
