@@ -1,0 +1,143 @@
+\section{Application Characterization}
+\label{sec:characterize-app}
+
+  We now turn to measurements of specific popular iOS and Android applications. 
+  When users install apps, they grant them Internet access without detailed knowledge of how that access will be used, including {\it how much} data is sent or accessed, {\it what} data is sent,  or {\it with whom} the app communications.
+  ``How much'' is important to conserve both bandwidth caps and battery capacity: an app which consumes or produces too much data will waste bandwidth resources, while an app which consumes or produces data too frequently will prevent the device radio from going idle to save power.
+  ``With whom'' is important to protect users from excessive tracking -- the more organization's servers an app connects to, the more organizations which are able to track user behavior, location, or other private data.
+  Finally, ``what data'' is important because apps may unnecessarily leak personally identifiable information (PII) such as user email address, IMEI, contact information, or other stored data either to the app provider or worse, to any eavesdropper on a public WiFi connection.
+  We  report on our findings in all three of these dimensions for the iPhone and Android apps in our study.
+
+\subsection{Bandwidth and Radio Usage}
+
+  {\bf In the Wild.}
+    \begin{itemize}
+      \item Stats on how much bandwidth each user used; time of day; how frequent...
+    \end{itemize}
+
+  {\bf Android Apps.}
+    To dig in to the root cause of these usage patterns, we also did an `app-by-app` analysis of network usage to see if most bandwidth consumption/radio time was the result of a few heavy applications, with most applications relatively idle, or whether usage was divided amongst all applications equally.
+    In Figure~\ref{fig:app-by-app-usage}, we plot the CDF of total bytes transferred by each app in our study, one line for the top-100 Google Play apps we tested manually, and another for the top 2000 apps, tested automatically, from a third-party market.
+    We see that...\tbd{Amy...}
+    Regarding radio usage,...\tbd{Do we even have time to do this? I don't remember the exact metrics we used for the MobiSys submission.}
+
+  {\bf iPhone Apps.}
+
+\subsection{Third Party Servers}
+  Many free applications support themselves financially by serving ads or providing resources for third parties to track user behavior.
+  We now explore how many servers are contacted by a given app (\ie{} how many providers are tracking a user with this app) -- most of these typically for ads, tracking, or analytics -- as well as how much data is transferred to and from these servers (\ie{} how much does this traffic impact the user's data cap?).
+
+  {\bf In the Wild.}
+  We first consider the overall impact of these ads, analytic, and tracking services on typical user behavior in our IRB study...
+  \tbd{Ashwin...}
+
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{plots/ad_share_bytes.pdf}
+\caption{Fraction of traffic volume because of Ads and Analytics. \emph{\tbd{Check for id1 and id25}}}
+\label{fig:description}
+\end{figure}
+
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{plots/distrib_ad_uploads.pdf}
+\caption{Distribution of bytes uploaded by ads and analytics sites. \emph{The distribution of bytes uploaded by all ads and analytics sites and the top four ads sites based on traffic volume across all users}.}
+\label{fig:description}
+\end{figure}
+
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{plots/distrib_ad_downloads.pdf}
+\caption{Distribution of bytes downloaded by ads and analytics sites. \emph{The distribution of bytes uploaded by all ads and analytics sites and the top four ads sites based on traffic volume across all users}.}
+\label{fig:description}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\begin{small}
+\begin{tabular}{|p{0.35\columnwidth}|p{0.1\columnwidth}|p{0.15\columnwidth}|p{0.1\columnwidth}|}
+\hline
+\multirow{2}{*}{\bf Tracker} & \multicolumn{3}{c|}{\bf Number of devices tracked}\tabularnewline
+\cline{2-4}
+   &  {\bf Total} & {\bf Android} & {\bf iOS} \tabularnewline
+\hline
+doubleclick.net & 25 & 11 & 14 \tabularnewline
+\hline
+google-analytics.com   & 25 & 11 & 14 \tabularnewline
+\hline
+googlesyndication.com  & 22 & 10 & 12 \tabularnewline
+\hline
+admob.com  & 21 & 10 & 11 \tabularnewline
+\hline
+scorecardresearch.com &  21 & 10 & 11 \tabularnewline
+\hline
+2mdn.net  &  20 & 9 &  11 \tabularnewline
+\hline
+atdmt.com  & 18 & 9 &  9 \tabularnewline
+\hline
+imrworldwide.com & 18 &  9 &  9 \tabularnewline
+\hline
+flurry.com & 17 & 7 &  10 \tabularnewline
+\hline
+googleadservices.com  & 17 & 8 &  9 \tabularnewline
+\hline
+\end{tabular}
+\end{small}
+\caption{The top 10 ads and analytics sites that tracked the devices in our dataset.
+\emph{Two trackers, \emph{doubleclick.net} and\emph{google-analytics.com}, were tracking all the 25 devices in our dataset.}}
+\label{tab:top_trackers}
+\end{table}
+
+
+\begin{table*}[t]
+    \centering
+    \begin{tabular}{l|l|l|l|l|l|l|l|l|l}
+       Dataset&Platform&\# Apps&Email&Location&Name&Password&Android ID&Contacts&IMEI\\
+       \hline
+       \hline
+       Google Play&Android&100&3 (3\%)&10 (10\%)&2 (2\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
+       \hline
+       Third Party&Android&908&1 (0.1\%)&32 (3.5\%)&2 (0.2\%)&0 (0\%)&95 (10.4\%)&4 (0.4\%)&48 (5.3\%)\\
+       \hline
+       App Store&iPhone&100&?&?&?&?&?&?&?\\
+    \end{tabular}
+    \caption{\label{tbl:pii}Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone apps.}
+  \end{table*}
+  
+
+  {\bf Android Apps.}
+  When we inspect the data from our controlled study, we see that some apps contact a large number of external servers while others contact significantly fewer.
+  In Figure~\ref{fig:android-cdns}, we show both the total number of servers contacted (solid lines) as well as the number of organizations contacted (dotted lines) for both the top-100 Google Play dataset and the top-2000 third-party dataset.
+  To quantify ``organizations contacted'', we performed whois lookups on all servers contacted and mapped them to an organization name, allowing us to tighten our upper bound on the number of companies/entities able to track the user through a single app.
+  Returning to the figure, we see...~\ref{fig:android-cdns}...\tbd{Amy...}
+
+
+  {\bf iPhone Apps.}
+  \tbd{Shen...}
+
+\subsection{Personally Identifiable Information}
+ 
+  Finally, we turn to information leaked by individual applications. We do not report on data leaked for our real users here, but only the data leaked by our controlled apps in isolation.
+  We created fake user accounts on the test phones for a fake user named ``Tess Droid'', with fake contact information and fake Twitter and Facebook accounts. 
+  We were then able to check that none of this data ever was released over the network, either in plaintext (HTTP) or encrypted (HTTPS, see \S\ref{sec:bumping}).
+  
+  We consider data to be `leaked' when any personally identifiable information -- email address, phone number, IMEI number -- is sent across the network under HTTP or HTTPS.
+  Some of this information may be relevant to the app -- \eg{}, many apps legitimately require email access. 
+  However, none of this information should ever travel across the network in plaintext (HTTP), which we see violated in serveral cases.
+
+  In Table~\ref{tbl:pii}, we see the type of PII leaked for both Android and iPhone apps.
+  For Android apps, IMEI and Android ID are the most commonly leaked forms of PII in both the Google Play and third-party dataset.
+  Although not popularly thought of as ``private'' data, each of these identifiers are globally unique: IMEI is a unique identifier tied to a phone, and an Android ID is an identifier tied to a user's Google Account, used across many services on the Internet. 
+  Consequently, either of these datapoints can be used to track or correlate a user's behavior across all sites the user visits that sell or collaborate with tracking data: a user's behavior on one site can easily be linked to their behavior on any other site they visit.
+  With Android ID being tracked by between 10 and 20\% of apps in our study, and IMEI being tracked by between 5\% and 13\% of apps in our study, this suggests that global user tracking across collaborating services can be easily achieved today just by using this identifier.
+  \tbd{...}
+
+  Other informaiton like contacts, email, and passwords were rarely leaked in the clear, but all were leaked on occaision, suggesting that stricter monitoring of Android app behavior is needed -- contrastingly, no iPhone apps (which are manually given clearance by Apple before hitting the iPhone store) leaked passwords in plaintext~\tbd{is this true.}
+
+  Moving to iPhone apps, \tbd{...}
+%\subsection{Characterize Facebook Applications}
+
+%Why Facebook was chosen?
+
+%What do we observe ?
+
+%What do we see in the User Agent Fields. 
+
+
