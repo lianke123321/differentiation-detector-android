@@ -308,9 +308,13 @@ public class CharonVpnService extends VpnService implements Runnable
 
 			@Override
 			public void run() {
+//				String url = null;
 		try{
-			
-		    SocketAddress sockaddr = new InetSocketAddress(CHINESE_URL, 80);
+			// wait for the data base completion
+//			System.err.println("Current profile " + (mCurrentProfile.getURLAddress()) );
+			 
+			// url = mCurrentProfile.getURLAddress();
+		    SocketAddress sockaddr = new InetSocketAddress(US_URL, 80);
 
             // Create an unbound socket
             Socket sock = new Socket();
@@ -319,12 +323,12 @@ public class CharonVpnService extends VpnService implements Runnable
             // If the timeout occurs, SocketTimeoutException is thrown.
             int timeoutMs = 5000;   // 5 seconds
             sock.connect(sockaddr, timeoutMs);
-            Log.i(TAG, CHINESE_URL + " is reachable");
+            Log.i(TAG, US_URL + " is reachable");
             sock.close();
             
 		}             
 		catch(Exception e){
-			Log.i(TAG, CHINESE_URL + " not reachable! Restarting...");
+			Log.i(TAG, US_URL + " not reachable! Restarting...");
 			connectToDefaultProfile();
 		}
 			}}, TIMER_TIME, 15*TIMER_TIME);

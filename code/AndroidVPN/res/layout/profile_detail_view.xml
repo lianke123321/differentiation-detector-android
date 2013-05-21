@@ -155,7 +155,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:spinnerMode="dropdown"
-            android:entries="@array/url_locations" />
+            android:entries="@array/url_locations" 
+            android:prompt="@string/profile_url_prompt"/>
 
         <include
             android:id="@+id/select_certificate"

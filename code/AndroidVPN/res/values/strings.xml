@@ -64,6 +64,7 @@
     <string name="profile_ca_select_certificate_label">Select CA certificate</string>
     <string name="profile_ca_select_certificate">Select a specific CA certificate</string>
     <string name="profile_url_location">Location</string>
+    <string name="profile_url_prompt">Select Location</string>
     <!-- Warnings/Notifications in the details view -->
     <string name="alert_text_no_input_gateway">Please enter the gateway address here</string>
     <string name="alert_text_no_input_username">Please enter your username here</string>

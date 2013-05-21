@@ -160,7 +160,7 @@ public class VpnProfileDetailActivity extends Activity
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO Auto-generated method stub
-				parent.getItemAtPosition(position).toString();
+				// wait for the data base completion
 			}
 
 			@Override
@@ -399,15 +399,7 @@ public class VpnProfileDetailActivity extends Activity
 		mProfile.setName(name.isEmpty() ? gateway : name);
 		mProfile.setGateway(gateway);
 		mProfile.setVpnType(mVpnType);
-		
-		
-		
-		System.out.println("UPDATE PROFILE DATA " + mSelectLoc.getSelectedItem().toString());
-		
-		
-		
-		
-		mProfile.setURLAddress(mSelectLoc.getSelectedItem().toString());
+		mProfile.setURLAddressPosition(mSelectLoc.getSelectedItemPosition());
 		if (mVpnType.getRequiresUsernamePassword())
 		{
 			mProfile.setUsername(mUsername.getText().toString().trim());
@@ -447,9 +439,11 @@ public class VpnProfileDetailActivity extends Activity
 				mUsername.setText(mProfile.getUsername());
 				mPassword.setText(mProfile.getPassword());
 				
-				int pos = (mProfile.getURLAddress().equals("United States")) ? 0 : 1;
-				System.out.println("SET POSITION " + pos);
-				mSelectLoc.setSelection(pos);
+//				wait for the data base completion
+//				int pos = mProfile.getURLAddressPosition();
+//				System.err.println("SET POSITION " + pos);
+				mSelectLoc.setSelection(0);
+				
 				
 				
 				mAutoReconnect.setChecked(mProfile.getAutoReconnect().equals("true"));
