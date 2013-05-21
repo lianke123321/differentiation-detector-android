@@ -18,8 +18,15 @@
 package org.strongswan.android.data;
 
 public class VpnProfile implements Cloneable {
+	
+	private static final String GOOGLE = "www.google.com";
+	private static final String BAIDU = "www.baidu.com";
+	
+	private static final String US = "United States";
+	private static final String CHA = "China";
+	
 	private String mName, mGateway, mUsername, mPassword, mCertificate,
-			mUserCertificate, mAutoReconnect;
+			mUserCertificate, mAutoReconnect, mURLAddress;
 	private VpnType mVpnType;
 	private long mId = -1;
 
@@ -115,6 +122,26 @@ public class VpnProfile implements Cloneable {
 
 	public void setAutoReconnect(Boolean mAutoReconnect) {
 		this.mAutoReconnect = mAutoReconnect.toString();
+	}
+	
+	public void setURLAddress(String url){
+		String urlAddress = null;
+		if (url.equals(US)){
+			urlAddress = GOOGLE;
+		} else if (url.equals(CHA)){
+			urlAddress = BAIDU;
+		}
+		
+		this.mURLAddress = urlAddress;
+	}
+	
+	public String getURLAddress(){
+		if (mURLAddress.equals(GOOGLE)){
+			return US;
+		} else if (mURLAddress.equals(BAIDU)){
+			return CHA;
+		}
+		return mURLAddress;
 	}
 
 	/**

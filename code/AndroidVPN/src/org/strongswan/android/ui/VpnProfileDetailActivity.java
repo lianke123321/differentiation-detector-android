@@ -66,6 +66,7 @@ public class VpnProfileDetailActivity extends Activity
 	private EditText mName;
 	private EditText mGateway;
 	private Spinner mSelectVpnType;
+	private Spinner mSelectLoc;
 	private ViewGroup mUsernamePassword;
 	private EditText mUsername;
 	private EditText mPassword;
@@ -103,6 +104,9 @@ public class VpnProfileDetailActivity extends Activity
 		
 		mCheckAuto = (CheckBox)findViewById(R.id.ca_auto);
 		mSelectCert = (TwoLineListItem)findViewById(R.id.select_certificate);
+		
+		mSelectLoc = (Spinner)findViewById(R.id.url_loc);
+		
 
 		mSelectVpnType.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
@@ -150,12 +154,29 @@ public class VpnProfileDetailActivity extends Activity
 			}
 		});
 
+		mSelectLoc.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO Auto-generated method stub
+				parent.getItemAtPosition(position).toString();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				// nothing to do
+			}
+		});
+		
 		mId = savedInstanceState == null ? null : savedInstanceState.getLong(VpnProfileDataSource.KEY_ID);
 		if (mId == null)
 		{
 			Bundle extras = getIntent().getExtras();
 			mId = extras == null ? null : extras.getLong(VpnProfileDataSource.KEY_ID);
 		}
+		
+		
 
 		loadProfileData(savedInstanceState);
 
@@ -378,6 +399,15 @@ public class VpnProfileDetailActivity extends Activity
 		mProfile.setName(name.isEmpty() ? gateway : name);
 		mProfile.setGateway(gateway);
 		mProfile.setVpnType(mVpnType);
+		
+		
+		
+		System.out.println("UPDATE PROFILE DATA " + mSelectLoc.getSelectedItem().toString());
+		
+		
+		
+		
+		mProfile.setURLAddress(mSelectLoc.getSelectedItem().toString());
 		if (mVpnType.getRequiresUsernamePassword())
 		{
 			mProfile.setUsername(mUsername.getText().toString().trim());
@@ -416,7 +446,13 @@ public class VpnProfileDetailActivity extends Activity
 				mVpnType = mProfile.getVpnType();
 				mUsername.setText(mProfile.getUsername());
 				mPassword.setText(mProfile.getPassword());
-				mAutoReconnect.setChecked(mProfile.getAutoReconnect()=="true");
+				
+				int pos = (mProfile.getURLAddress().equals("United States")) ? 0 : 1;
+				System.out.println("SET POSITION " + pos);
+				mSelectLoc.setSelection(pos);
+				
+				
+				mAutoReconnect.setChecked(mProfile.getAutoReconnect().equals("true"));
 				useralias = mProfile.getUserCertificateAlias();
 				alias = mProfile.getCertificateAlias();
 				getActionBar().setTitle(mProfile.getName());
