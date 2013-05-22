@@ -19,6 +19,13 @@
     To dig in to the root cause of these usage patterns, we also did an `app-by-app` analysis of network usage to see if most bandwidth consumption/radio time was the result of a few heavy applications, with most applications relatively idle, or whether usage was divided amongst all applications equally.
     In Figure~\ref{fig:app-by-app-usage}, we plot the CDF of total bytes transferred by each app in our study, one line for the top-100 Google Play apps we tested manually, and another for the top 2000 apps, tested automatically, from a third-party market.
     We see that...\tbd{Amy...}
+    We see that in general, more bytes are received than sent (289711536 vs 3040151). This is probably due to advertising, where the size of the requests is much smaller than the advertisements received. Indeed, most of the applications contacted Google, through AdMob. A few third-party advertising servers were also contacted. 
+    
+Applications in general fit their expected bandwidth usage(Spotify, predictably sent the most bytes (sent 318980 received 12108538) and a notepad application used the least (sent 414 received 262). However, some games used a surprisingly large amount of bandwidth (The Simpsons(TM): Tapped Out 149291 88932890 and Jurassic Park(TM) Builder
+ 312912 127163147 (These two received the most bytes)). Ludia games in particular used an unusually large amount of bandwidth. Ludia's Jurassic Park(TM) Builder ran for 13 minutes, and Ludia's Family Feud and Friends Free ran for 7 minutes. Ludia's Jurassic Park(TM) Builder was 38.1 MB  and Ludia's Family Feud and Friends Free was 27.6 MB. This may be because of game updates (for example, a lot of these games may have released more in-game content for Easter, new textures, new models, etc.) These applications were tested before Google updated its Play Developer Program Policies on May 1, 2013 to say, "an app downloaded from Google Play may not modify, replace or update its own APK binary code using any method other than Google Play's update mechanism." However, companies may still subvert this new policy by pushing textures and other in-app purchases aren't necessarily modifying the apk binary code, but still use excessive bandwidth. 
+ 
+In terms of categories, games had the most variable amount of usage. Music/video applications were consistently the biggest users of bandwidth. Productivity/tool apps tended to use the least.
+
     Regarding radio usage,...\tbd{Do we even have time to do this? I don't remember the exact metrics we used for the MobiSys submission.}
 
   {\bf iPhone Apps.}
@@ -107,7 +114,66 @@ googleadservices.com  & 17 & 8 &  9 \tabularnewline
   In Figure~\ref{fig:android-cdns}, we show both the total number of servers contacted (solid lines) as well as the number of organizations contacted (dotted lines) for both the top-100 Google Play dataset and the top-2000 third-party dataset.
   To quantify ``organizations contacted'', we performed whois lookups on all servers contacted and mapped them to an organization name, allowing us to tighten our upper bound on the number of companies/entities able to track the user through a single app.
   Returning to the figure, we see...~\ref{fig:android-cdns}...\tbd{Amy...}
+After doing whois lookups on all contacted servers, we categorized by hand each server.
+For all of the hundred apps, we broke down the 51 servers that each visited into these categories:
+\begin{itemize}
+   \item 3 Advertising
+   \item 1 Analytics
+   \item 6 CDN
+  \item 10 Hosting
+  \item  1 IANA
+  \item  1 ISP
+   \item 3 Network
+  \item 23 PrivateCompany
+   \item 3 RegionalInternetRegistry
+\end{itemize}
+   For all of the third party apps, we broke down the 96 servers that each visited into these categories:
+\begin{itemize}
+\item      4 Advertising
+ \item   1 Analytics
+ \item   8 CDN
+ \item  31 Hosting
+ \item   1 IANA
+ \item   2 ISP
+\item    8 Network
+\item   37 PrivateCompany
+ \item   4 RegionalInternetRegistry
+ \end{itemize}
+   
+   Words with Friends contacted an astounding 21 servers:
+\begin{itemize}
+\item    1 Advertising
+\item    3 CDN
+\item    7 Hosting
+\item    1 IANA
+\item    1 Network
+\item    5 PrivateCompany
+\item    1 RegionalInternetRegistry
+\end{itemize}
+ooVoo Video Call also contacted 21 servers, and interestingly, contacted Fastly, an analytics company. 
+\begin{itemize}
+\item    2 Advertising
+\item    1 Analytics
+\item    5 CDN
+\item    1 Hosting
+  \item  1 IANA
+\item    1 ISP
+ \item   1 Network
+\item    8 PrivateCompany
+  \item  1 RegionalInternetRegistry
+\end{itemize}
 
+Small practical apps such as PhotoGrid - Collage Maker and ColorNote Notepad Notes generally did not contact many servers at all.
+\begin{itemize} 
+\item com.socialnmobile.dictapps.notepad.color.note
+\item 10.11.4.21	Internet Assigned Numbers Authority
+\item 128.208.4.1	University of Washington
+\item 74.217.75.7	Internap "
+\item com.roidapp.photogrid
+\item 10.11.4.22	Internet Assigned Numbers Authority
+\item 128.208.4.1	University of Washington
+\item 173.194.33.45	Google Inc."
+\end{itemize}
 
   {\bf iPhone Apps.}
   \tbd{Shen...}
