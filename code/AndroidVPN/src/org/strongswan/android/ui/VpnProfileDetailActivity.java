@@ -438,14 +438,7 @@ public class VpnProfileDetailActivity extends Activity
 				mVpnType = mProfile.getVpnType();
 				mUsername.setText(mProfile.getUsername());
 				mPassword.setText(mProfile.getPassword());
-				
-//				wait for the data base completion
-//				int pos = mProfile.getURLAddressPosition();
-//				System.err.println("SET POSITION " + pos);
-				mSelectLoc.setSelection(0);
-				
-				
-				
+				mSelectLoc.setSelection(mProfile.getURLAddressPosition());
 				mAutoReconnect.setChecked(mProfile.getAutoReconnect().equals("true"));
 				useralias = mProfile.getUserCertificateAlias();
 				alias = mProfile.getCertificateAlias();

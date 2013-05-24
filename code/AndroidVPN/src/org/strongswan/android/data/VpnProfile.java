@@ -22,9 +22,6 @@ public class VpnProfile implements Cloneable {
 	private static final String GOOGLE = "www.google.com";
 	private static final String BAIDU = "www.baidu.com";
 	
-//	private static final String US = "United States";
-//	private static final String CHA = "China";
-	
 	private String mName, mGateway, mUsername, mPassword, mCertificate,
 			mUserCertificate, mAutoReconnect, mURLAddress;
 	private VpnType mVpnType;
@@ -124,6 +121,10 @@ public class VpnProfile implements Cloneable {
 		this.mAutoReconnect = mAutoReconnect.toString();
 	}
 	
+	public void setURLAddress(String url){
+		this.mURLAddress = url;
+	}
+	
 	public void setURLAddressPosition(int position){
 		String urlAddress = GOOGLE;
 		if (position == 1){
@@ -133,9 +134,12 @@ public class VpnProfile implements Cloneable {
 	}
 	
 	public int getURLAddressPosition(){
-		if (mURLAddress.equals(BAIDU)){
+		if (mURLAddress.equals(GOOGLE)){
+			return 0;
+		} else if (mURLAddress.equals(BAIDU)){
 			return 1;
 		}
+		// default is google
 		return 0;
 	}
 	

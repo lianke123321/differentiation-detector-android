@@ -19,4 +19,8 @@
         <item>IKEv2 EAP (Benutzername/Passwort)</item>
         <item>IKEv2 Zertifikat</item>
     </string-array>
+    <string-array name="url_locations">
+        <item>United States</item>
+        <item>China</item>
+    </string-array>
 </resources>
