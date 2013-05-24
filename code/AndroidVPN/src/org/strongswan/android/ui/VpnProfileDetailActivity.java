@@ -24,6 +24,7 @@ import org.strongswan.android.data.TrustedCertificateEntry;
 import org.strongswan.android.data.VpnProfile;
 import org.strongswan.android.data.VpnProfileDataSource;
 import org.strongswan.android.data.VpnType;
+import org.strongswan.android.logic.CharonVpnService;
 import org.strongswan.android.logic.TrustedCertificateManager;
 
 import android.app.Activity;
@@ -159,8 +160,7 @@ public class VpnProfileDetailActivity extends Activity
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int position, long id) {
-				// TODO Auto-generated method stub
-				// wait for the data base completion
+				mProfile.setURLAddressPosition(position);
 			}
 
 			@Override
@@ -350,6 +350,11 @@ public class VpnProfileDetailActivity extends Activity
 				mDataSource.insertProfile(mProfile);
 			}
 			setResult(RESULT_OK, new Intent().putExtra(VpnProfileDataSource.KEY_ID, mProfile.getId()));
+			if (CharonVpnService.isConnected()){
+				CharonVpnService cv = new CharonVpnService();
+				cv.stopCurrentConnection();
+				cv.setNextProfile(mProfile);
+			}
 			finish();
 		}
 	}
