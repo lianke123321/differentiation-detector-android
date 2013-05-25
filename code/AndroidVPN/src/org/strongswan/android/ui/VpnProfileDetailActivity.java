@@ -24,7 +24,6 @@ import org.strongswan.android.data.TrustedCertificateEntry;
 import org.strongswan.android.data.VpnProfile;
 import org.strongswan.android.data.VpnProfileDataSource;
 import org.strongswan.android.data.VpnType;
-import org.strongswan.android.logic.CharonVpnService;
 import org.strongswan.android.logic.TrustedCertificateManager;
 
 import android.app.Activity;
@@ -155,19 +154,19 @@ public class VpnProfileDetailActivity extends Activity
 			}
 		});
 
-		mSelectLoc.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int position, long id) {
-				mProfile.setURLAddressPosition(position);
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				// nothing to do
-			}
-		});
+//		mSelectLoc.setOnItemSelectedListener(new OnItemSelectedListener() {
+//
+//			@Override
+//			public void onItemSelected(AdapterView<?> parent, View view,
+//					int position, long id) {
+//				mProfile.setURLAddressPosition(position);
+//			}
+//
+//			@Override
+//			public void onNothingSelected(AdapterView<?> arg0) {
+//				// nothing to do
+//			}
+//		});
 		
 		mId = savedInstanceState == null ? null : savedInstanceState.getLong(VpnProfileDataSource.KEY_ID);
 		if (mId == null)
@@ -350,11 +349,11 @@ public class VpnProfileDetailActivity extends Activity
 				mDataSource.insertProfile(mProfile);
 			}
 			setResult(RESULT_OK, new Intent().putExtra(VpnProfileDataSource.KEY_ID, mProfile.getId()));
-			if (CharonVpnService.isConnected()){
-				CharonVpnService cv = new CharonVpnService();
-				cv.stopCurrentConnection();
-				cv.setNextProfile(mProfile);
-			}
+//			if (CharonVpnService.isConnected()){
+//				CharonVpnService cv = new CharonVpnService();
+//				cv.stopCurrentConnection();
+//				cv.setNextProfile(mProfile);
+//			}
 			finish();
 		}
 	}
