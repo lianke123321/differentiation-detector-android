@@ -18,6 +18,7 @@
 package org.strongswan.android.logic;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -61,9 +62,7 @@ public class CharonVpnService extends VpnService implements Runnable
 	private static final String CHINESE_URL = "www.baidu.com";
 	private static final String US_URL = "www.google.com";
 	/* set one minute for the timer time*/
-	private static final int TIMER_TIME  = 60 * 1000;
-	/* the timer to keep check the current network connection */
-	private Timer timer;
+	private static final int ONE_MINUTE  = 60 * 1000;
 	private String mLogFile;
 	private VpnProfileDataSource mDataSource;
 	private Thread mConnectionHandler;
@@ -76,6 +75,11 @@ public class CharonVpnService extends VpnService implements Runnable
 	private volatile boolean mIsDisconnecting;
 	private VpnStateService mService;
 	private final Object mServiceLock = new Object();
+	/* pass this object to other activities */
+	private static CharonVpnService thisStaticObject;
+	/* keep track the auto reconnect status */
+	private boolean isAutoReconnect;
+	
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceDisconnected(ComponentName name)
@@ -162,6 +166,8 @@ public class CharonVpnService extends VpnService implements Runnable
 		/* check if we need to start a connection after being offline */
 		registerReceiver(mConnReceiver, 
 	            new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+		// initialize this object in order to obtain all the fields
+		thisStaticObject = this;
 	}
 
 	@Override
@@ -196,7 +202,7 @@ public class CharonVpnService extends VpnService implements Runnable
 	 *
 	 * @param profile the profile to initiate
 	 */
-	private void setNextProfile(VpnProfile profile)
+	public void setNextProfile(VpnProfile profile)
 	{
 		if (syncObject==null) return;
 		synchronized (syncObject)
@@ -259,6 +265,8 @@ public class CharonVpnService extends VpnService implements Runnable
 						initiate(mCurrentProfile.getVpnType().getIdentifier(),
 								 mCurrentProfile.getGateway(), mCurrentProfile.getUsername(),
 								 mCurrentProfile.getPassword());
+						
+						isAutoReconnect = mCurrentProfile.isAutoReconnectClicked();
 					}
 				}
 				catch (InterruptedException ex)
@@ -275,22 +283,16 @@ public class CharonVpnService extends VpnService implements Runnable
 	 */
 	private void runTimer() {
 //		final Thread thisThread = Thread.currentThread();
-		timer = new Timer();
+		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask(){
 
 			@Override
 			public void run() {
 				synchronized (syncObject)
 				{
-					if (mService==null) return;
 					Log.i(TAG, "periodic restart check");
-					if (mService.getState() != State.CONNECTED && 
-							mService.getState() != State.CONNECTING)
-						connectToDefaultProfile();
-					
-
-
-					
+					if (checkState()) return;
+					connectToDefaultProfile();
 //					if ((mConnectStartTime != -1 && 
 //							mConnectStartTime < System.currentTimeMillis()-30*1000) || 
 //							mLastError != ErrorState.NO_ERROR || mService.getState()!=State.CONNECTED){
@@ -303,32 +305,67 @@ public class CharonVpnService extends VpnService implements Runnable
 //					}
 				}
 				// delay and timer rate are all one minute
-			}}, TIMER_TIME, TIMER_TIME); 
-		timer.scheduleAtFixedRate(new TimerTask(){
+			}}, ONE_MINUTE, ONE_MINUTE); 
+		
+		timer.scheduleAtFixedRate(new TimerTask() {
 
 			@Override
 			public void run() {
+				// don't run this if current state is not connected.
+				if (mService == null) return;
+				if (mService.getState() != State.CONNECTED && 
+						mService.getState() != State.CONNECTING) return;
 				String url = null;
-		try{
-			url = mCurrentProfile.getURLAddress();
-		    SocketAddress sockaddr = new InetSocketAddress(url, 80);
+				Socket sock = null;
+				try {
+					url = mCurrentProfile.getURLAddress();
+					SocketAddress sockaddr = new InetSocketAddress(url, 80);
 
-            // Create an unbound socket
-            Socket sock = new Socket();
+					// Create an unbound socket
+					sock = new Socket();
 
-            // This method will block no more than timeoutMs.
-            // If the timeout occurs, SocketTimeoutException is thrown.
-            int timeoutMs = 5000;   // 5 seconds
-            sock.connect(sockaddr, timeoutMs);
-            Log.i(TAG, url + " is reachable");
-            sock.close();
-            
-		}             
-		catch(Exception e){
-			Log.i(TAG, url + " not reachable! Restarting...");
-			connectToDefaultProfile();
-		}
-			}}, TIMER_TIME, 15*TIMER_TIME);
+					// This method will block no more than timeoutMs.
+					// If the timeout occurs, SocketTimeoutException is thrown.
+					int timeoutMs = 5000; // 5 seconds
+					sock.connect(sockaddr, timeoutMs);
+					Log.i(TAG, url + " is reachable");
+				} catch (NullPointerException ne){
+					// display message and close the socket.
+					Log.i(TAG, "Cannot obtain the url address, current profile is null");
+				} catch (Exception e) {
+					Log.i(TAG, url + " not reachable! Restarting...");
+					connectToDefaultProfile();
+				} finally {
+					// close socket
+						try {
+							if (sock != null)
+							sock.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+				}
+			}
+			// start at one minute delay and run 15 minutes apart  
+		}, ONE_MINUTE, 15 * ONE_MINUTE);
+	}
+
+	/*
+	 * return true if unknown current state or it's connected or is not auto
+	 * reconnected.
+	 */
+	private boolean checkState() {
+		return mService == null || isConnect() || !isAutoReconnect;
+	}
+	
+	/**
+	 * @return true if currently is connected.
+	 */
+	public boolean isConnect() {
+		// defensive programming since this method will be called from other
+		// activities
+		return mService != null
+				&& (mService.getState() == State.CONNECTED || mService
+						.getState() == State.CONNECTING);
 	}
 
 	/**
@@ -340,21 +377,10 @@ public class CharonVpnService extends VpnService implements Runnable
 		{
 			if (mCurrentProfile != null)
 			{
-				// check is the auto reconnect button clicked or not
-				boolean isAutoRec = mCurrentProfile.isAutoReconnectClicked();
-				if (mNextProfile != null){
-					isAutoRec = mNextProfile.isAutoReconnectClicked();
-				}
-				// cancel the timer and restart it later if user click auto reconnect
-				timer.cancel();
 				setState(State.DISCONNECTING);
 				mIsDisconnecting = true;
 				deinitializeCharon();
 				Log.i(TAG, "charon stopped");
-				if (isAutoRec){
-					// restart timer
-					runTimer();
-				}
 				mCurrentProfile = null;
 			}
 		}
@@ -736,7 +762,17 @@ public class CharonVpnService extends VpnService implements Runnable
 		}
 	}
 
+	/**
+	 * Singleton object in order to be called from other activities.
+	 * 
+	 * @return the static object of this
+	 */
+	public static CharonVpnService getInstance() {
+		return thisStaticObject;
+	}
 
+	
+	
 	/*
 	 * The libraries are extracted to /data/data/org.strongswan.android/...
 	 * during installation.
