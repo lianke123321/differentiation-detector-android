@@ -1,0 +1,6 @@
+Android ID
+Device ID
+Username
+Password
+Contact
+Location

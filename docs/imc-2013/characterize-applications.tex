@@ -22,9 +22,15 @@
     We see that in general, more bytes are received than sent (289711536 vs 3040151). This is probably due to advertising, where the size of the requests is much smaller than the advertisements received. Indeed, most of the applications contacted Google, through AdMob. A few third-party advertising servers were also contacted. 
     
 Applications in general fit their expected bandwidth usage(Spotify, predictably sent the most bytes (sent 318980 received 12108538) and a notepad application used the least (sent 414 received 262). However, some games used a surprisingly large amount of bandwidth (The Simpsons(TM): Tapped Out 149291 88932890 and Jurassic Park(TM) Builder
- 312912 127163147 (These two received the most bytes)). Ludia games in particular used an unusually large amount of bandwidth. Ludia's Jurassic Park(TM) Builder ran for 13 minutes, and Ludia's Family Feud and Friends Free ran for 7 minutes. Ludia's Jurassic Park(TM) Builder was 38.1 MB  and Ludia's Family Feud and Friends Free was 27.6 MB. This may be because of game updates (for example, a lot of these games may have released more in-game content for Easter, new textures, new models, etc.) These applications were tested before Google updated its Play Developer Program Policies on May 1, 2013 to say, "an app downloaded from Google Play may not modify, replace or update its own APK binary code using any method other than Google Play's update mechanism." However, companies may still subvert this new policy by pushing textures and other in-app purchases aren't necessarily modifying the apk binary code, but still use excessive bandwidth. 
+ 312912 127163147 (These two received the most bytes)). Ludia games in particular used an unusually large amount of bandwidth. Ludia's Jurassic Park(TM) Builder ran for 13 minutes, and Ludia's Family Feud and Friends Free ran for 7 minutes. Ludia's Jurassic Park(TM) Builder was 38.1 MB  and Ludia's Family Feud and Friends Free was 27.6 MB. This may be because of game updates (for example, a lot of these games may have released more in-game content for Easter, new textures, new models, etc.) This is confirmed by the fact that most of the data transmitted is near the beginning. These applications were tested before Google updated its Play Developer Program Policies on May 1, 2013 to say, "an app downloaded from Google Play may not modify, replace or update its own APK binary code using any method other than Google Play's update mechanism." However, companies may still subvert this new policy by pushing textures and other in-app purchases aren't necessarily modifying the apk binary code, but still use excessive bandwidth. 
  
-In terms of categories, games had the most variable amount of usage. Music/video applications were consistently the biggest users of bandwidth. Productivity/tool apps tended to use the least.
+In terms of categories, games had the most variable amount of usage. For example, The aforementioned Jurassic Park sent  (com.ludia.jurassicpark 312912 127163147), but Angry Birds StarWars only had (com.rovio.angrybirdsstarwars.ads.iap 5463 9416)  Fruit Ninja only had (com.halfbrick.fruitninjafree 4326 28639). Music/video applications were consistently the biggest users of bandwidth (com.spotify.mobile.android.ui 318980 12108538
+), (com.pandora.android 87753 7744094), (com.oovoo 148905 1402490). ooVoo is a video chat and I'm application.  Pinterest, through sheer number of pictures, also sent and received a lot. (com.pinterest 156963 3309776) Productivity/tool apps tended to use the least (com.socialnmobile.dictapps.notepad.color.note 414 262),(com.sirma.mobile.bible.android 2255 6523) .
+
+Methodology: Each pcap file is associated with an application. Simply look through all packets sent/received and find their lengths. Sum to get bytes sent and received. Script to do this is in totalBytes.sh. 
+To get size of packets over time, simply remove the summing part. This script is in bytesSentOverTime.sh
+Unfortunately, due to the usage of many computers with differing timestamps while working with the hundred pcaps, these need to be manually transcribed from pcap to app name. file_to_appname.txt has a rough approximation. Use map_file_to_name.rb file_to_appname.txt $<$file$>$.
+For the third party apps though, these were all conducted on a single computer, so just simply use the map_results_to_app.rb script. (If conducting these experiments in the future, would recommend synchronizing the time of the computer(s) running the experiment and the time of the thing handling the pcap-captures)
 
     Regarding radio usage,...\tbd{Do we even have time to do this? I don't remember the exact metrics we used for the MobiSys submission.}
 
@@ -174,6 +180,8 @@ Small practical apps such as PhotoGrid - Collage Maker and ColorNote Notepad Not
 \item 128.208.4.1	University of Washington
 \item 173.194.33.45	Google Inc."
 \end{itemize}
+
+Comments: wasn't entirely sure how to differentiate between 1.  server requested and getting CDNs back and 2. server requested, getting actual server back.
 
   {\bf iPhone Apps.}
   \tbd{Shen...}
