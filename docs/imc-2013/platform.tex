@@ -60,43 +60,60 @@ with the following constraints.
 % \subsubsection{VPN Proxying}
 % \label{sec:platform-vpn}
 
-VPN tunnels over Wi-Fi and the cellular interface are supported by
-Android, BlackBerry, Bada, and iOS.  Mobile OSes support VPNs
+In order to monitor all Internet traffic from and to mobile devices
+with the constraints we described, we designed the \platname{} plaform
+on a VPN infrastructure. By instrumenting the VPN server that
+mobile devices are using, we can monitor all the Internet traffic going
+through the VPN tunnels. But, using a VPN infrastructure raises three
+important questions. i) How ubiquitous is the VPN technology on mobile
+devices?  ii) How to monitor traffic on \platname{}? iii) How to
+modify traffic on \platname. We explore in the following these three key questions.
+
+\subsubsection{VPN Technology on Mobile Devices}
+\label{sec:vpn-tech-mobile-device}
+The VPN technology is widely supported on the most popular mobile
+OSes. Indeed, Android, BlackBerry, Bada, and iOS all support VPNs,
 primarily to satisfy their enterprise clients that use VPNs to
-securely connect to their enterprise networks.  We use VPNs to proxy
-Internet traffic and monitor the mobile Internet traffic that flows
-through our VPN proxy.
+securely connect to their enterprise networks. Also, the VPN
+technology on mobile devices encapsulates all the data traffic---both
+Wi-Fi and cellular. Consequently, it is possible to reach our three
+first design goals: OS, ISP, and access technology agnostic.
 
-All our goals can be achieved if we ensure that mobile devices use our
-VPN proxy to their Internet traffic.  The use of VPNs by enterprise
-clients meets our goals of portability, passiveness, and
-deployability.  To meet our goal of pervasiveness we must ensure that
-all the Internet traffic is tunneled through our VPN proxy.
-Currently, all iOS devices (version 3.0 and above) support a feature
-called ``VPN On-Demand''.  \emph{VPN On-Demand} forces the iOS device
-to use VPN tunnels when connecting to a specified set of domains.
-Using trial-and-error, we discovered that VPN On-Demand uses suffix
-matching to determine which domains require a VPN connection.  We use
-this knowledge to configure \emph{VPN On-Demand} such that iOS devices
-use a VPN tunnel to access the Internet.  Android version 4.2 and
-above support ``Always On'' VPN connections that are established
-regardless of the destination for network traffic.  Furthermore,
-Android version 4.0 and above provide an API that allows applications
-to manage VPN tunnels.  These APIs are used by open source android
-applications and we extend one such application to support ``Always
-On'' VPN connections. We are therefore able to ensure pervasive
-monitoring of iOS and Android devices.
+However, to capture all Internet traffic from and to a mobile device,
+a VPN must always be enabled. Currently, all iOS devices (version 3.0
+and above) support a feature called \textit{VPN On-Demand}.  VPN
+On-Demand forces the iOS device to use VPN tunnels when connecting to
+a specified set of domains, and we configured it to be enabled for all
+Internet domains. Android version 4.2 and above support an
+\textit{Always On VPN} connection that is always enabled for all data
+traffic, and Android version 4.0 and above provide an API that allows
+applications to manage VPN tunnels. We implemented an application that
+uses this API in order to provide the always on functionality for
+Android 4.0 and 4.1.
 
-The use IPsec by mobile devices for pervasive VPN tunnels limited our
-choice of VPN daemons to manage VPN tunnels on our proxying server.
-Though VPN daemons manage tunnels created using protocols such as PPTP
-and L2TP, the ``VPN On-Demand'' feature of iOS is available only for
-VPN tunnels that use IPsec.  To the best of our knowledge, the only
-publicly available VPN daemon that uses IPsec in Linux \emph{without
-  any kernel modifications} is Strongswan~\cite{strongswan}.
-Strongswan also supports the faster IKEv2~\cite{rfc5996} based
-authentication which is supported by Android devices.
 
+% The use IPsec by mobile devices for pervasive VPN tunnels limited our
+% choice of VPN daemons to manage VPN tunnels on our proxying server.
+% Though VPN daemons manage tunnels created using protocols such as PPTP
+% and L2TP, the ``VPN On-Demand'' feature of iOS is available only for
+% VPN tunnels that use IPsec.  To the best of our knowledge, the only
+% publicly available VPN daemon that uses IPsec in Linux \emph{without
+%   any kernel modifications} is Strongswan~\cite{strongswan}.
+% Strongswan also supports the faster IKEv2~\cite{rfc5996} based
+% authentication which is supported by Android devices.
+
+% \subsubsection{Advantages and Drawbacks of VPNs}
+% \label{sec:advant-drawback-vpn}
+
+
+
+\subsubsection{Monitoring Traffic on MobiScope}
+\label{sec:monit-traff-mobiscope}
+
+
+
+
+%start the discussion of the technical details. TO REWRITE
 The IPsec implementation in the Linux kernel is not suitable to
 traffic monitoring when the server running the VPN daemon is used to
 proxy Internet traffic.  A VPN Proxy, apart from serving VPN tunnels,
@@ -160,6 +177,15 @@ v' & IP address of the mobile device while looping through tun device. \tabularn
 \end{figure}
 
 
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.8\columnwidth]{figures/packet-monitoring-plugin.pdf}
+\end{center}
+\caption{Plugin Infrastructure on \platname.}
+\label{fig:packet-monitoring-solution}
+\end{figure}
+
+
 An association between the mobile device and a packet is possible only
 if the packet encapsulated within an IPsec packets is monitored in the
 clear.  However, the current implementation of NAT and IPsec makes
@@ -186,6 +212,11 @@ This implies without any modifications, any off the shelf packet
 monitor shall fail to associate the packets destined for mobile
 devices with the corresponding mobile device.
 
+\subsubsection{Modifying Traffic on MobiScope}
+\label{sec:modif-traffic-mobiscope}
+
+
+
 % \begin{figure}
 % \begin{center}
 % \includegraphics[width=0.8\columnwidth]{figures/tun-device.pdf}
@@ -198,14 +229,25 @@ devices with the corresponding mobile device.
 % route the packets through a tun-tap device before encryption and after
 % decryption.  As shown in \fref{fig:packet-monitoring-solution},
 
-\subsubsection{Transparent Proxy}
-\label{sec:platform-transparent-proxy}
+% \subsubsection{Transparent Proxy}
+% \label{sec:platform-transparent-proxy}
 
 
 \subsection{Feasibility}
 
 
-\subsection{Caveats}
+\subsection{Limitation}
+\platname {} has reached all the design goals, making this platform an
+excellent choice to monitor traffic for mobile devices. However,
+\platname{} has one limitation: because all the traffic between mobile
+devices and \platname{} is encrypted, we cannot observe any traffic
+modification made by ISPs. Indeed, ISPs that modify traffic (e.g., to insert
+advertisements \tbd{AR: give a reference}) must perform deep packet
+inspection, which is not possible when the traffic is encrypted.  In
+this section, we assess to which extent this issue is a practical
+limitation for \platname.
+
+
 \tbd{AL: put tripwire experiments here to show that ISP traffic
   modification does not impact much Mobiscope. }
 
