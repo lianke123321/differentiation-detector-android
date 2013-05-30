@@ -29,8 +29,8 @@ In terms of categories, games had the most variable amount of usage. For example
 
 Methodology: Each pcap file is associated with an application. Simply look through all packets sent/received and find their lengths. Sum to get bytes sent and received. Script to do this is in totalBytes.sh. 
 To get size of packets over time, simply remove the summing part. This script is in bytesSentOverTime.sh
-Unfortunately, due to the usage of many computers with differing timestamps while working with the hundred pcaps, these need to be manually transcribed from pcap to app name. file_to_appname.txt has a rough approximation. Use map_file_to_name.rb file_to_appname.txt $<$file$>$.
-For the third party apps though, these were all conducted on a single computer, so just simply use the map_results_to_app.rb script. (If conducting these experiments in the future, would recommend synchronizing the time of the computer(s) running the experiment and the time of the thing handling the pcap-captures)
+Unfortunately, due to the usage of many computers with differing timestamps while working with the hundred pcaps, these need to be manually transcribed from pcap to app name. file\_to\_appname.txt has a rough approximation. Use map\_file\_to\_name.rb file\_to\_appname.txt $<$file$>$.
+For the third party apps though, these were all conducted on a single computer, so just simply use the map\_results\_to\_app.rb script. (If conducting these experiments in the future, would recommend synchronizing the time of the computer(s) running the experiment and the time of the thing handling the pcap-captures)
 
     Regarding radio usage,...\tbd{Do we even have time to do this? I don't remember the exact metrics we used for the MobiSys submission.}
 

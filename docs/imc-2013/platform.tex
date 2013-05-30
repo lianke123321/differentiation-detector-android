@@ -42,11 +42,16 @@ with the following constraints.
   CDMA, UMTS, LTE, etc.)
 \item \emph{Encryption agnostic.} We want to monitor traffic both in
   clear and encrypted.
-\item \emph{Easy to install and setup.} We want a plateform easy to
-  install, typically on a single regular desktop, and easy to setup,
-  that is with no complex configuration.
-\end{packedenumerate}    
+\item \emph{Flow modification.} We want to not only monitor, but
+  also possibly modify data packets in order to experiment. This makes
+  \platname{} both a passive monitoring and an experimental
+  platform. 
+\item \emph{Single machine.} We want \platname{} to fit on a
+  single machine to facilitate its installation and deployment. 
+ \end{packedenumerate}    
 
+At the time of the camera ready version, we will make the \platname{}
+software publicly available. 
 
 
 \subsection{MobiScope Design}
@@ -67,7 +72,7 @@ mobile devices are using, we can monitor all the Internet traffic going
 through the VPN tunnels. But, using a VPN infrastructure raises three
 important questions. i) How ubiquitous is the VPN technology on mobile
 devices?  ii) How to monitor traffic on \platname{}? iii) How to
-modify traffic on \platname. We explore in the following these three key questions.
+modify traffic on \platname? We explore in the following these three key questions.
 
 \subsubsection{VPN Technology on Mobile Devices}
 \label{sec:vpn-tech-mobile-device}
@@ -91,6 +96,15 @@ applications to manage VPN tunnels. We implemented an application that
 uses this API in order to provide the always on functionality for
 Android 4.0 and 4.1.
 
+In summary, the VPN technology is available out-of-the-box for the
+latest versions of the most popular mobile OSes. From the server side,
+that is on the \platname{} platform, we use
+\textit{Strongswan}~\cite{strongswan}, an open source software used to
+manage VPN tunnels. Strongswan supports the required protocols and
+encryption algorithms required by iOS and Android, in particullar
+IPsec for the encryption of IP datagrams and IKEv1 and
+IKEv2~\cite{rfc5996} for authentication and key negotiation.
+
 
 % The use IPsec by mobile devices for pervasive VPN tunnels limited our
 % choice of VPN daemons to manage VPN tunnels on our proxying server.
@@ -110,31 +124,14 @@ Android 4.0 and 4.1.
 \subsubsection{Monitoring Traffic on MobiScope}
 \label{sec:monit-traff-mobiscope}
 
+Surprisingly, monitoring traffic on \platname{} is particularly
+involved. When we monitor traffic on \platname, we need to dump
+all traffic between the mobile device and the Internet, and we need to
+associate the dumped traffic to the right source and destination. The
+former is easy using a \textit{tcpdump} process, but the later is more
+complex. To explain this complexity, we first need to explain how
+packets are processed on \platname. 
 
-
-
-%start the discussion of the technical details. TO REWRITE
-The IPsec implementation in the Linux kernel is not suitable to
-traffic monitoring when the server running the VPN daemon is used to
-proxy Internet traffic.  A VPN Proxy, apart from serving VPN tunnels,
-relies on NAT to proxy Internet traffic.  When a mobile device
-establishes a VPN tunnel, the VPN server assigns it assigned a private
-IP address.  The mobile device therefore has two IP addresses, a
-private address assigned by the VPN server, and a public IP address
-assigned by the service provider.  The public IP address is used only
-to communicate with the VPN server while all other communication uses
-the private IP address.  Therefore all the traffic that would have
-used the public IP address when the VPN tunnel was not present, now
-uses the private IP address.  These packets that use the private IP
-are encapsulated and encrypted using IPsec and sent to the VPN server.
-The VPN server decapsulates these packets before forwarding them.
-Before forwarding the packet, the VPN server must perform NAT because
-these private IP address cannot used in the Internet.  The use of NAT
-and IPsec implies that the forwarding each packet by the server is
-governed by two rules: one rule to enforce IPsec encryption and
-decryption of packets that contain the public IP of the mobile device,
-and the other that enforces NAT for packets with the private IP
-address.
 
 \begin{figure}
 \begin{center}
@@ -176,6 +173,84 @@ v' & IP address of the mobile device while looping through tun device. \tabularn
 \label{fig:packet-monitoring}
 \end{figure}
 
+Figure~\ref{fig:packet-monitor-a} shows the processing on \platname{}
+of packets sent from a mobile device to the Internet. At step (1),
+(2), and (3) the encrypted datagram (in gray) goes up the layers, this
+datagram is encapsulated in a regular IP datagram sent from the device
+(address \emph{d}) to the \platname{} box (address \emph{m}). The
+IPsec layer decrypts at step (3) the datagram whose source IP address
+is the private address of the mobile device in the VPN tunnel (address
+\emph{v}) and the destination is the IP address of the destination
+Webservice (address \emph{w}). In order to send this datagram in the
+Internet, the NAT must convert in step (5) the private IP address
+\emph{v} to the public IP address of the \platname{} box (address
+\emph{m}). Then this packet is sent in the Internet. As the tcpdump
+process runs just above the Ethernet layer, it dumps packets at step
+(2), (4), and (7). In addition, we also dump the NAT translation
+table. Therefore, to associate packets to a device and a Webservice,
+we only need the packet captured at step (4) that associates the
+packet to the private address of the device in the VPN tunnel (address
+\emph{v}) and the Webservice (address \emph{w}), and the NAT
+translation table that gives the mapping between the device in the VPN
+tunnel (address \emph{v}) and the public IP address of the mobile
+device (address \emph{d}).
+
+
+
+
+
+
+% %start the discussion of the technical details. TO REWRITE
+% The IPsec implementation in the Linux kernel is not suitable to
+% traffic monitoring when the server running the VPN daemon is used to
+% proxy Internet traffic.  A VPN Proxy, apart from serving VPN tunnels,
+% relies on NAT to proxy Internet traffic.  When a mobile device
+% establishes a VPN tunnel, the VPN server assigns it assigned a private
+% IP address.  The mobile device therefore has two IP addresses, a
+% private address assigned by the VPN server, and a public IP address
+% assigned by the service provider.  The public IP address is used only
+% to communicate with the VPN server while all other communication uses
+% the private IP address.  Therefore all the traffic that would have
+% used the public IP address when the VPN tunnel was not present, now
+% uses the private IP address.  These packets that use the private IP
+% are encapsulated and encrypted using IPsec and sent to the VPN server.
+% The VPN server decapsulates these packets before forwarding them.
+% Before forwarding the packet, the VPN server must perform NAT because
+% these private IP address cannot used in the Internet.  The use of NAT
+% and IPsec implies that the forwarding each packet by the server is
+% governed by two rules: one rule to enforce IPsec encryption and
+% decryption of packets that contain the public IP of the mobile device,
+% and the other that enforces NAT for packets with the private IP
+% address.
+
+% An association between the mobile device and a packet is possible only
+% if the packet encapsulated within an IPsec packets is monitored in the
+% clear.  However, the current implementation of NAT and IPsec makes
+% this association of packets with the mobile devices non-trival.  A
+% packet from the mobile device, encrypted using IPsec, needs to be
+% decrypted before undergoing NAT.  As shown in
+% \fref{fig:packet-monitoring-problem}, because the IPsec computations
+% take place after the NAT computations, the kernel loops the packet
+% back to the IP layer after decryption.  This looping allows the packet
+% monitor to observe the IPsec packet before and after
+% decryption\footnote{A similar operation takes place if the mobile
+%   devices communicate with each other over P2P however we do not
+%   discuss this scenario due to lack of space.}.  When multiple flows
+% pass through the VPN server, the packet monitor can use the private IP
+% address to associate the packets with the mobile device.  Once the NAT
+% operation is performed the packet is forwarded via the network card.
+% When the network card receives a packet intended for the mobile
+% device, as shown in \fref{fig:packet-monitoring-problem}, the packet
+% first undergoes NAT followed by IPsec encryption.  The encrypted
+% packet is then sent to the mobile device.  Because the packet is not
+% looped through the packet monitor before encryption, the packet
+% monitor is not able to see the packet after NAT and before encrpytion.
+% This implies without any modifications, any off the shelf packet
+% monitor shall fail to associate the packets destined for mobile
+% devices with the corresponding mobile device.
+
+\subsubsection{Modifying Traffic on MobiScope}
+\label{sec:modif-traffic-mobiscope}
 
 \begin{figure}
 \begin{center}
@@ -184,36 +259,6 @@ v' & IP address of the mobile device while looping through tun device. \tabularn
 \caption{Plugin Infrastructure on \platname.}
 \label{fig:packet-monitoring-solution}
 \end{figure}
-
-
-An association between the mobile device and a packet is possible only
-if the packet encapsulated within an IPsec packets is monitored in the
-clear.  However, the current implementation of NAT and IPsec makes
-this association of packets with the mobile devices non-trival.  A
-packet from the mobile device, encrypted using IPsec, needs to be
-decrypted before undergoing NAT.  As shown in
-\fref{fig:packet-monitoring-problem}, because the IPsec computations
-take place after the NAT computations, the kernel loops the packet
-back to the IP layer after decryption.  This looping allows the packet
-monitor to observe the IPsec packet before and after
-decryption\footnote{A similar operation takes place if the mobile
-  devices communicate with each other over P2P however we do not
-  discuss this scenario due to lack of space.}.  When multiple flows
-pass through the VPN server, the packet monitor can use the private IP
-address to associate the packets with the mobile device.  Once the NAT
-operation is performed the packet is forwarded via the network card.
-When the network card receives a packet intended for the mobile
-device, as shown in \fref{fig:packet-monitoring-problem}, the packet
-first undergoes NAT followed by IPsec encryption.  The encrypted
-packet is then sent to the mobile device.  Because the packet is not
-looped through the packet monitor before encryption, the packet
-monitor is not able to see the packet after NAT and before encrpytion.
-This implies without any modifications, any off the shelf packet
-monitor shall fail to associate the packets destined for mobile
-devices with the corresponding mobile device.
-
-\subsubsection{Modifying Traffic on MobiScope}
-\label{sec:modif-traffic-mobiscope}
 
 
 
