@@ -96,6 +96,12 @@ applications to manage VPN tunnels. We implemented an application that
 uses this API in order to provide the always on functionality for
 Android 4.0 and 4.1.
 
+In addition, to facilitate the creation of certificates to configure
+the VPN tunnels between the mobile devices and the \platname{}
+platform, we created our own \platname{} root certificate that is used
+to sign all subsequent certificates issues to mobile devices that want
+to use the \platname{} platform. 
+
 In summary, the VPN technology is available out-of-the-box for the
 latest versions of the most popular mobile OSes. From the server side,
 that is on the \platname{} platform, we use
@@ -126,8 +132,8 @@ IKEv2~\cite{rfc5996} for authentication and key negotiation.
 
 Surprisingly, monitoring traffic on \platname{} is particularly
 involved. When we monitor traffic on \platname, we need to dump
-all traffic between the mobile device and the Internet, and we need to
-associate the dumped traffic to the right source and destination. The
+all traffic between the mobile devices and the Internet, and we need to
+associate the dumped traffic to the right mobile device and Webservice. The
 former is easy using a \textit{tcpdump} process, but the later is more
 complex. To explain this complexity, we first need to explain how
 packets are processed on \platname. 
@@ -163,13 +169,14 @@ w & IP address of the server providing the Webservice. \tabularnewline
 (i) & The i-th step of packet processing. \tabularnewline
 \fbox{a $\rightarrow$ b} & Packet with source IP \emph{a} and destination IP \emph{b}. \tabularnewline
 v & IP address of the mobile device in the VPN tunnel. \tabularnewline
-v' & IP address of the mobile device while looping through tun device. \tabularnewline
+v' & Temporary IP address of the mobile device used to send the packet
+to the TUN device. \tabularnewline
 
 \hline
 \end{tabular}
 \end{small}
 \end{center}
-\caption{Packet monitoring in the VPN proxy.}
+\caption{Packet monitoring in the \platname{} box.}
 \label{fig:packet-monitoring}
 \end{figure}
 
@@ -183,20 +190,60 @@ is the private address of the mobile device in the VPN tunnel (address
 \emph{v}) and the destination is the IP address of the destination
 Webservice (address \emph{w}). In order to send this datagram in the
 Internet, the NAT must convert in step (5) the private IP address
-\emph{v} to the public IP address of the \platname{} box (address
-\emph{m}). Then this packet is sent in the Internet. As the tcpdump
-process runs just above the Ethernet layer, it dumps packets at step
-(2), (4), and (7). In addition, we also dump the NAT translation
-table. Therefore, to associate packets to a device and a Webservice,
+\emph{v} to the public IP address \emph{m} of the \platname{}
+box. Then this packet is sent in the Internet. As the tcpdump process
+runs just above the Ethernet layer, it dumps packets at step (2), (4),
+and (7). In addition, we also dump the NAT translation
+table. To associate packets to a device and a Webservice,
 we only need the packet captured at step (4) that associates the
-packet to the private address of the device in the VPN tunnel (address
-\emph{v}) and the Webservice (address \emph{w}), and the NAT
-translation table that gives the mapping between the device in the VPN
-tunnel (address \emph{v}) and the public IP address of the mobile
-device (address \emph{d}).
+packet to the private address \emph{v} of the device in the VPN tunnel
+and the Webservice (address \emph{w}), and the NAT translation table
+that gives the mapping between the device in the VPN tunnel (address
+\emph{v}) and the public IP address \emph{d} of the mobile device.
 
+However, in the reverse direction, when packets flows from the
+Internet to the mobile device, it is no more possible to associate a
+mobile device to the packets, see
+Figure~\ref{fig:packet-monitor-b}. Indeed, from the dumped packets at
+step (2) and (7), we know that a packet in sent by the Webservice to
+the \platname{} box (step (2)), but then this packet is encapsulated
+at the IPsec layer, and the address resolution is performed by the NAT
+without any dump. So, when we see the datagram at step(7), we have no
+way to know which encrypted packet is encapsulated. We need to dump
+the packet at step (4), but we have no access to it. One way would be
+to run the NAT on a separate box, and to dump traffic from that box,
+but it would require two different boxes. Instead, we propose a
+solution that allows to dump the packet from \emph{w} to \emph{v} from
+a single box, which we describe in the following. 
 
+Our solution is to force the packets from \emph{w} to \emph{v} to make
+a loop on a TUN device, and to dump these packets at the TUN device,
+see Figure~\ref{fig:packet-monitor-d}. Indeed, when a packet is
+received from the Internet is goes up the layers up to the NAT at step
+(3). At that point, the NAT resolve the public address of the
+\platname{} box \emph{m} to the address of the device in the VPN
+tunnel \emph{v}. In the NAT all addresses in the VPN tunnel are class
+A private addresses using only 23 bits out of 24. The 24th bit has a
+specific role. By default it is set to 0, but we modified the NAT so
+that when it receives a packet that resolve to \emph{v}, it changes it
+to \emph{v'} that only differ from \emph{v} by the 24th bit that is
+set to 1. The only one reason to make this conversation is to send all
+packets whose destination is \emph{v} to the TUN device, by creating a
+specific forwarding rule that forwards all packet with a \emph{v'}
+destination address (a class A private address with the 24th bit set
+to 1) to the TUN device, step (5). Then, we implement a process at the
+TUN device whose only one goal is to change the destination address
+from \emph{v'} to \emph{v}, and to sends back the packet to the IP
+layer, step (6). Then the packet follows the path of a regular packet
+in a VPN tunnel. 
 
+When a packet is received from the mobile device, we perform a similar
+process that is described in Figure~\ref{fig:packet-monitor-c}. 
+
+In summary, exploiting the notion of TUN device, we are now able to
+dump all Internet traffic from and to a mobile device connected to the
+\platname{} platform from a single machine, and to associate this
+traffic to corresponding mobile devices and Web services. 
 
 
 
@@ -260,7 +307,50 @@ device (address \emph{d}).
 \label{fig:packet-monitoring-solution}
 \end{figure}
 
+We described in section~\ref{sec:monit-traff-mobiscope}, how we can
+monitor all Internet traffic on the \platname{} platform, using the
+notion of TUN device. In that section, we explain here how we can use
+this same notion of TUN device to build a powerful plugin
+infrastructure enabling any traffic modification.
 
+Figure~\ref{fig:packet-monitoring-solution} shows the plugin
+infrastructure of \platname. When a packet is received at the TUN
+device, it is sent to an open vSwitch~\cite{Openvswitch} process whose
+goal is to define in which order each plugin will receive
+packets. This order is configured by the policy manager. So packets
+flow through each plugin, being processed at each plugin. 
+
+Plugins can be used for many different purposes such as replaying
+traffic, testing reliability to data corruption or delays, or
+decrypting SSH traffic. In the following, we describe how easy it is
+to perform SSH traffic decryption using the \platname{} plugin
+infrastructure.
+
+In order to perform SSH traffic decryption, we use a 
+feature of the Squid proxy called SSL bumping\tbd{AR: give a
+  reference}. This feature consists in performing a man-in-the-middle
+attack. When the mobile device connects to a Web service, the squid
+proxy impersonates the Web service using a forged certificate signed
+with the root certificate of the \platname{} platform (see
+Section~\ref{sec:vpn-tech-mobile-device}). Then the squid proxy
+negotiate with the Web service a SSL session, impersonating a mobile
+device. Using the traffic dumped by the tcpdump process as shown in
+Figures~\ref{fig:packet-monitor-c} and \ref{fig:packet-monitor-d}, and
+using the private key generated by the squid proxy to communicate with
+the mobile device, we can decrypt all SSL traffic. We notice that when
+traffic is not encrypted using SSL, the squid proxy simply acts as a
+transparent proxy. 
+
+Impersonating a Web service using a root certificate that is not
+issued by a well known root authority might fail if the application on
+the mobile device only allows certificate issued by well known
+authorities. Surprisingly, this is rarely the case. Whereas the
+Twitter application and the Firefox browser prevent SSL bumping by
+validating the root certificate, Google Chrome, Safari, the Facebook
+application, the Google+ application, the default mail clients, and
+advertisement services do not check the validity of the root
+certificate, thus the SSL bumping attack is possible. We will discuss
+further this issue in Section~\ref{sec:classification}. 
 
 % \begin{figure}
 % \begin{center}
