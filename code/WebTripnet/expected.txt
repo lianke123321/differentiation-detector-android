@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html class="en-us no-js" lang="en" dir="ltr" xmlns:bi="urn:schemas-microsoft-com:mscom:bi"> 
+<head><meta http-equiv="X-UA-Compatible" content="IE=10" /><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="shortcut icon" href="//www.microsoft.com/favicon.ico?v2" /><title>
+	Microsoft Home Page | Devices and Services
+</title><link rel="stylesheet" type="text/css" href="http://i.s-microsoft.com/en-us/home/style.cssx?k=~/shared/templates/Styles/Base/viewport-css.aspx;~/shared/templates/Styles/Reset/reset-css.aspx;~/shared/templates/Styles/Views/cols-css.aspx;~/shared/templates/Styles/Base/webfont-nonlocal-css.aspx;~/shared/templates/Styles/Base/type-css.aspx;~/shared/templates/Styles/Base/layout-css.aspx;~/shared/templates/Styles/Views/header-css.aspx;~/shared/templates/Styles/Views/search-css.aspx;~/shared/templates/Styles/Views/list-css.aspx;~/shared/templates/Styles/Views/menu-css.aspx;~/shared/templates/Styles/Views/hero-css.aspx;~/shared/templates/Styles/Views/highlights-css.aspx;~/shared/templates/Styles/Views/footer-css.aspx;~/shared/templates/Styles/animations-css.aspx&amp;sc=/en-us/home/site.config&amp;pc=&amp;v=-1951683918"></link>
+    <!--Third party scripts and code linked to or referenced from this website are licensed to you by the parties that own such code, not by Microsoft. See ASP.NET Ajax CDN Terms of Use – http://www.asp.net/ajaxlibrary/CDN.ashx.-->
+    <script type="text/javascript" src="http://i.s-microsoft.com/en-us/home/shared/templates/Scripts/Lib/modernizr.js?v1"></script><script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">var ua,fontfix;/(Windows Phone)|(XBLWP)|(ZuneWP)/.test(navigator.userAgent)&&$("html").removeClass("fontface"),$("html").hasClass("fontface")||$("html").addClass("nofontface"),ua=navigator.userAgent.toLowerCase(),ua.indexOf("android")>-1&&ua.indexOf("android 4")===-1&&$("html").removeClass("cssanimations"),ua=navigator.userAgent.toLowerCase(),(ua.indexOf("android")>-1||ua.indexOf("silk/")>-1)&&(fontfix=document.createElement("style"),fontfix.setAttribute("type","text/css"),fontfix.innerHTML="",document.head.appendChild(fontfix))</script>
+<script src="//nexus.ensighten.com/msft/mscom/Bootstrap.js" type="text/javascript"></script>
+<script type="text/javascript" src="/en-us/home/shared/core/2/js/js.ashx?&"></script><link rel="stylesheet" type="text/css" href="/en-us/home/shared/core/2/css/css.ashx?sc=/en-us/home/site.config&amp;pt=hpHomepage" /><script type="text/javascript" src="http://i3.microsoft.com/library/svy/broker.js"> </script><meta name="SearchTitle" content="Microsoft.com" scheme="" /><meta name="Description" content="At Microsoft our mission and values are to help people and businesses throughout the world realize their full potential." scheme="" /><meta name="Title" content="Microsoft Home Page | Devices and Services" scheme="" /><meta name="SearchDescription" content="Microsoft.com Homepage" scheme="" /><meta name="application-name" content="Microsoft.com" scheme="" /><meta name="msapplication-task" content="name=Search;action-uri=http://www.bing.com/;icon-uri=http://www.bing.com/fd/s/a/bing.ico" scheme="" /><meta name="msapplication-task" content="name=Shop;action-uri=http://store.microsoft.com/;icon-uri=http://img3.store.microsoft.com/prod/clusterb/v2/framework/pages/global/msstore_icon.ico" scheme="" /><meta name="msapplication-task" content="name=Download;action-uri=http://www.microsoft.com/downloads/;icon-uri=http://www.microsoft.com/favicon.ico" scheme="" /><meta name="msapplication-task" content="name=Support;action-uri=http://support.microsoft.com/;icon-uri=http://www.microsoft.com/favicon.ico" scheme="" /><meta name="msapplication-task" content="name=Secure;action-uri=http://www.microsoft.com/security/;icon-uri=http://www.microsoft.com/favicon.ico" scheme="" /><meta name="msapplication-TileColor" content="#00188f" scheme="" /><meta name="msapplication-TileImage" content="/global/ImageStore/PublishingImages/logos/144x144/microsoft_symbol_clr_144x144.png" scheme="" /></head>
+<body class="home">
+    <script type="text/javascript" src="http://i.s-microsoft.com/en-us/home/script.jsx?k=~/shared/templates/Scripts/Lib/picturefill.js&amp;v=340844947"></script>
+    <form name="aspnetForm" method="post" action="default.aspx" id="aspnetForm" class="home-form">
+<div>
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUBMGRkrG4ZZMLmcMpgi9GdziiXK/43OIY=" />
+</div>
+
+<div>
+
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEWAgKy+5CjCQK1qaLSCizpUEQtEC/vjxl9SJ+9Vp8uKxhh" />
+</div>
+        <div class="top-bar account-center">
+    <div class="grid-container">
+
+<span class="top-bar-storelink " >
+    
+         <span class="store-editorial" 
+         
+           >  <a href="http://content.microsoftstore.com/home.aspx?WT.mc_id=MSCOM_EN_US_HP_NAV_STORELOC_132M2ENUS35042">Find a Microsoft Store near you</a>
+         </span>
+         
+
+</span>
+
+
+    </div>
+</div>
+<header id="mscom-header" class="site-header" bi:type="header" role="banner">
+    <div class="grid-container">
+        <h1> 
+            <div data-picture data-alt="Microsoft" class="mscom-logo">
+                <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hp/logo-lg-1x.png"></div>
+                <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hp/logo-lg-2x.png" data-media="(min-device-pixel-ratio: 2.0)"></div>
+                <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hp/logo-sm-1x.png" data-media="(max-width: 539px)"></div>
+                <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hp/logo-sm-2x.png" data-media="(max-width: 539px) and (min-device-pixel-ratio: 2.0)"></div>
+                <noscript><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hp/logo-lg-1x.png" alt="Microsoft" /></noscript>
+            </div>
+            <script type="text/javascript">window.picturePolyfill.resolveLast();</script>
+        </h1>
+        <div class="site-header-togglers" bi:track="false">
+            <a href="#mscom-navigation" id="toggle-menu" class="toggle toggle-menu" title="Toggle Navigation" bi:type="menu"><span class="icon-menu" aria-role="hidden"></span> <span class="screen-reader-text">Menu</span></a>
+            <a href="#mscom-actions" id="toggle-search" class="toggle toggle-search" title="Toggle Search" bi:type="search"><span class="icon-search" aria-role="hidden"></span> <span class="screen-reader-text">Search</span></a>
+        </div>
+        <div id="mscom-actions" class="site-actions global-navigation">
+            
+<div id="ctl00_ctl16_ctl00_ctl00_mscom-search" data-id="#mscom-search" class="mscom-search" bi:type="Search">
+    <div role="search" class="search-form">
+        <input type="hidden" name="form" value="smc" />
+        <input type="hidden" name="setlang" value="en-us" />
+        <input type="hidden" class="search-source" name="source" value="0" />
+        <div class="input-wrapper">
+            <label for="ctl00_ctl16_ctl00_ctl00_q" class="screen-reader-text">Search Microsoft.com</label>
+            <input name="q" id="ctl00_ctl16_ctl00_ctl00_q" class="search-box" type="search" autocomplete="off" />
+        </div>
+        <button type="submit" name="ctl00$ctl16$ctl00$ctl00$searchButton" value="" id="ctl00_ctl16_ctl00_ctl00_searchButton" type="submit" class="search-submit" value="Search"><img src="http://i.s-microsoft.com/global/imagestore/PublishingImages/sprites/search-button-blue.png" alt="Submit" height="16" width="16" /></button>
+    </div>
+    <div class="search-results-box">
+        <div bi:track="false" class="search-results">
+            <ul>
+            </ul>
+        </div>
+        <div class="search-scope">
+            <ul>
+                <li><a class="checked">Search Microsoft.com</a></li>
+                <li><a>Search the Web</a></li>
+            </ul>
+        </div>
+    </div>
+    <script type="text/javascript">
+        jQuery(document).ready(function ($) {
+            var search = new Ms.Search(
+                'ctl00_ctl16_ctl00_ctl00_mscom-search',
+                {"scope":[{"watermarkText":["Search Microsoft.com"],"searchUrlFormat":["http://search.microsoft.com/results.aspx?form=MSHOME&amp;mkt={1}&amp;setlang={1}&amp;q={0}"],"bi":[{"parameter":[{"name":["linkid"],"value":["searchmscomclick"]},{"name":["cpid"],"value":["MSCOMSearch"]},{"name":["searchtype"],"value":["MSCOM"]}]}],"autoSuggest":[{"serviceUrlFormat":["http://search.microsoft.com/shared/templates/master/smcPage/AutoSuggestHandler.ashx?q={0}&amp;site=smc&amp;locale={1}"],"jsonpCallbackName":["cb"],"resultType":["smcUnmarkedArray"],"minChars":["1"]}]},{"watermarkText":["Search the Web"],"searchUrlFormat":["http://www.bing.com/search?form=MSHPLS&amp;q={0}&amp;mkt={1}"],"bi":[{"parameter":[{"name":["cpid"],"value":["BingSearch"]},{"name":["searchtype"],"value":["Bing"]}]}],"autoSuggest":[{"serviceUrlFormat":["http://api.bing.com/qsonhs.aspx?FORM=MSHPLS&amp;mkt={1}&amp;type=cb&amp;q={0}&amp;o=s+p+a+l+h"],"jsonpCallbackName":["cb"],"resultType":["bingJSON"],"minChars":["1"]}]}]});
+        });
+    </script>
+</div>
+        </div>
+    </div>
+    
+<nav id="mscom-navigation" role="navigation" bi:type="menu" class="menu-component">
+    <div class="grid-container">
+        <span class="menulevel-storelink"></span>
+        <ul role="menubar" class="top-level-menubar">
+            <li role="menuitem" class="top-level-menuitem"><a class="top-level-link" bi:index="0" bi:track="false" bi:titleflag="t1" bi:title="t1" href="">Products</a>
+                <div class="dropdown-menu" bi:parenttitle="t1">
+                    <div class="grid-container">
+                        <div class="grid-row row-4"><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">Windows</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-us/windows/products">All Windows products</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-US/windows-8/meet">Windows 8</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">Internet Explorer</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://www.microsoftstore.com/store/msstore/cat/categoryID.61721000?WT.mc_id=MSCOM_HP_nav_BuyWSoftware">Buy Windows 8</a></li>
+                                    </ul>
+                                <h5 class="heading" bi:titleflag="t2" bi:title="t2">Office</h5>
+                                <ul role="menu" bi:parenttitle="t2">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://office.microsoft.com/en-US">All Office products</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://office.microsoft.com/en-us/buy-microsoft-office-and-microsoft-office-365-online-FX102886268.aspx">Office for home</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://office.microsoft.com/en-us/business/">Office for business</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://www.microsoftstore.com/store/msstore/cat/categoryID.61301000?WT.mc_id=MSCOM_HP_US_Nav_BuyOSoftware">Buy Office software</a></li>
+                                    </ul>
+                                <h5 class="heading" bi:titleflag="t3" bi:title="t3"></h5>
+                                <ul role="menu" bi:parenttitle="t3">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://www.microsoft.com/en-us/sitemap.aspx">See all products</a></li>
+                                    </ul>
+                            </div><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">Devices</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://www.microsoft.com/surface/en-US">Surface</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://www.microsoft.com/hardware/en-US">Microsoft Hardware</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://www.xbox.com/en-us/">Xbox</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://www.windowsphone.com/en-US">Windows Phone</a></li>
+                                    </ul>
+                                <h5 class="heading" bi:titleflag="t2" bi:title="t2">Services</h5>
+                                <ul role="menu" bi:parenttitle="t2">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://www.microsoft.com/en-us/outlook-com">Outlook.com</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-us/skydrive/download">SkyDrive cloud storage</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://www.skype.com/go/skype/?cm_mmc=MSFT|TRAF_B1-_-mscom-hero-us">Skype</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://msn.com/">MSN</a></li>
+                                    <li role="menuitem"><a bi:index="4" bi:cpid="hpMenu" href="http://www.bing.com/">Bing</a></li>
+                                    </ul>
+                            </div><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">Server and Tools</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://www.microsoft.com/servers/en/us/default.aspx">All server &amp; tools products</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://www.microsoft.com/en-us/server-cloud/ws2012/default.aspx">Windows Server</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://www.microsoft.com/en-us/sqlserver/default.aspx">SQL Server</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://office.microsoft.com/en-us/exchange/">Exchange Server</a></li>
+                                    <li role="menuitem"><a bi:index="4" bi:cpid="hpMenu" href="http://www.microsoft.com/visualstudio/">Visual Studio</a></li>
+                                    <li role="menuitem"><a bi:index="5" bi:cpid="hpMenu" href="http://www.windowsazure.com">Windows Azure</a></li>
+                                    <li role="menuitem"><a bi:index="6" bi:cpid="hpMenu" href="http://www.microsoft.com/windows/windowsintune/">Windows Intune</a></li>
+                                    </ul>
+                                <h5 class="heading" bi:titleflag="t2" bi:title="t2">Developers &amp; IT Pros</h5>
+                                <ul role="menu" bi:parenttitle="t2">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://www.microsoft.com/learning/en/us/default.aspx">Training &amp; certification</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://msdn.microsoft.com/en-us/default.aspx">MSDN (Microsoft Developer Network)</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://technet.microsoft.com/en-us/">TechNet for IT professionals</a></li>
+                                    </ul>
+                            </div><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">Business and enterprise</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://www.microsoft.com/en-us/dynamics/default.aspx">Microsoft Dynamics</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://www.microsoftbusinesshub.com/">Small and midsize business</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://www.microsoft.com/enterprise">Enterprise and industry solutions</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://pinpoint.microsoft.com/en-US/home?WT.mc_id=MSCOM_HP_US_NAV_PC_Solutions">Find an IT Expert (Pinpoint)</a></li>
+                                    <li role="menuitem"><a bi:index="4" bi:cpid="hpMenu" href="https://partner.microsoft.com/US/30000104">Resources for Microsoft Partners</a></li>
+                                    </ul>
+                            </div>
+                    </div>
+                    </div>
+                </div>
+            </li>
+            <li role="menuitem" class="top-level-menuitem"><a class="top-level-link" bi:index="1" bi:track="false" bi:titleflag="t1" bi:title="t1" href="">Downloads</a>
+                <div class="dropdown-menu" bi:parenttitle="t1">
+                    <div class="grid-container">
+                        <div class="grid-row row-2"><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">Windows</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-US/windows/downloads">All Windows downloads</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://www.microsoftstore.com/store/msstore/cat/categoryID.61721000?WT.mc_id=MSCOM_HP_nav_BuyWSoftware">Download Windows 8</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-us/windows/downloads">Free downloads</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">Internet Explorer</a></li>
+                                    </ul>
+                                <h5 class="heading" bi:titleflag="t2" bi:title="t2">Office</h5>
+                                <ul role="menu" bi:parenttitle="t2">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://office.microsoft.com/downloads">All Office downloads</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://www.microsoftstore.com/store/msstore/cat/categoryID.61301000?WT.mc_id=MSCOM_HP_US_Nav_BuyOSoftware">Download Office</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://office.microsoft.com/try">Free trials</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://office.microsoft.com/templates/">Templates</a></li>
+                                    </ul>
+                            </div><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">More Downloads</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://www.microsoft.com/en-us/download/default.aspx?WT.mc_id=MSCOM_HP_us_Nav_Downloads">Download Center</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-us/windows/products/security-essentials">Microsoft Security Essentials</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://www.update.microsoft.com">Microsoft Update: Service packs &amp; fixes</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-us/windows/hardware-drivers-help">Drivers (sound, printer, USB, others)</a></li>
+                                    <li role="menuitem"><a bi:index="4" bi:cpid="hpMenu" href="http://www.microsoft.com/hardware/en-us/downloads">Microsoft Hardware drivers</a></li>
+                                    </ul>
+                            </div>
+                    </div>
+                    </div>
+                </div>
+            </li>
+            <li role="menuitem" class="top-level-menuitem"><a class="top-level-link" bi:index="2" bi:track="false" bi:titleflag="t1" bi:title="t1" href="">Support</a>
+                <div class="dropdown-menu" bi:parenttitle="t1">
+                    <div class="grid-container">
+                        <div class="grid-row row-3"><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">By Resource</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://support.microsoft.com/">Microsoft Support home</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://answers.microsoft.com/en-US">Ask the experts</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://support.microsoft.com/contactus/?ws=support&amp;SegNo=2">Chat or call</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://search.microsoft.com/en-us/SupportResults.aspx?q=windows%208">Search knowledge base</a></li>
+                                    </ul>
+                                <h5 class="heading" bi:titleflag="t2" bi:title="t2">By Product</h5>
+                                <ul role="menu" bi:parenttitle="t2">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-us/windows/support">Windows 8</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://support.microsoft.com/find-solutions/more?Family=Windows">Other Windows products</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://office.microsoft.com/en-us/support/">Office (Outlook, Excel, and others)</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://www.microsoft.com/Surface/en-us/support/home">Surface</a></li>
+                                    </ul>
+                            </div><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">By Topic</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://support.microsoft.com/search/">Error messages</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://www.update.microsoft.com">Microsoft Update: Service packs &amp; fixes</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-us/windows/install-upgrade-activate-help">Install, upgrade, &amp; activate (Windows)</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://support.microsoft.com/kb/811224">Product keys (locate or replace)</a></li>
+                                    <li role="menuitem"><a bi:index="4" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-us/windows/hardware-drivers-help">Drivers (sound, printer, USB, others)</a></li>
+                                    <li role="menuitem"><a bi:index="5" bi:cpid="hpMenu" href="http://www.microsoft.com/hardware/en-us/downloads">Microsoft Hardware drivers</a></li>
+                                    </ul>
+                            </div><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">By Audience</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://support.microsoft.com/">For home users</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://smallbusiness.support.microsoft.com/">For small business</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://technet.microsoft.com/en-us/ms772425">For IT professionals</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://msdn.microsoft.com/en-us/hh361695">For developers</a></li>
+                                    </ul>
+                            </div>
+                    </div>
+                    </div>
+                </div>
+            </li>
+            <li role="menuitem" class="top-level-menuitem"><a class="top-level-link" bi:index="3" bi:track="false" bi:titleflag="t1" bi:title="t1" href="">Security</a>
+                <div class="dropdown-menu" bi:parenttitle="t1">
+                    <div class="grid-container">
+                        <div class="grid-row row-1"><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1"></h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://www.microsoft.com/security/default.aspx">Security Home</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://windows.microsoft.com/en-US/windows/products/security-essentials">Microsoft Security Essentials</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://www.update.microsoft.com">Microsoft Update: Service packs &amp; fixes</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://www.microsoft.com/security/family-safety/default.aspx">Family safety resources</a></li>
+                                    </ul>
+                            </div>
+                    </div>
+                    </div>
+                </div>
+            </li>
+            <li role="menuitem" class="top-level-menuitem"><a class="top-level-link" bi:index="4" bi:track="false" bi:titleflag="t1" bi:title="t1" href="">Shop</a>
+                <div class="dropdown-menu" bi:parenttitle="t1">
+                    <div class="grid-container">
+                        <div class="grid-row row-2"><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">For home</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://www.microsoftstore.com/store/msstore/home?WT.mc_id=MSCOM_HP_nav&amp;WT.mc_id=MSCOM_US_HP_Nav_Buy_Store">Microsoft Store</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://surface.microsoftstore.com/store/msstore/Content/pbpage.Surface_Category?WT.mc_id=MSCOM_US_HP_Nav_Buy_Surface">Surface</a></li>
+                                    <li role="menuitem"><a bi:index="2" bi:cpid="hpMenu" href="http://www.microsoftstore.com/store/msstore/cat/categoryID.61301000?WT.mc_id=MSCOM_HP_US_Nav_BuyOSoftware">Office</a></li>
+                                    <li role="menuitem"><a bi:index="3" bi:cpid="hpMenu" href="http://www.microsoftstore.com/store/msstore/cat/categoryID.61721000?WT.mc_id=MSCOM_HP_nav_BuyWSoftware">Windows</a></li>
+                                    <li role="menuitem"><a bi:index="4" bi:cpid="hpMenu" href="http://www.microsoftstore.com/store/msstore/cat/categoryID.50606600?WT.mc_id=MSCOM_HP_US_Nav_BuyXbox">Xbox</a></li>
+                                    </ul>
+                            </div><div class="grid-unit list-of-links list-of-links-sm">
+                                <h5 class="heading" bi:titleflag="t1" bi:title="t1">For business</h5>
+                                <ul role="menu" bi:parenttitle="t1">
+                                    <li role="menuitem"><a bi:index="0" bi:cpid="hpMenu" href="http://www.microsoft.com/licensing/default.aspx">Volume Licensing</a></li>
+                                    <li role="menuitem"><a bi:index="1" bi:cpid="hpMenu" href="http://pinpoint.microsoft.com/en-US/home?WT.mc_id=MSCOM_HP_US_NAV_PC_Solutions">Find an IT Expert (Pinpoint)</a></li>
+                                    </ul>
+                            </div>
+                    </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+</header>
+<main class="site-main" role="main"><div bi:type="slideshow" class="slideshow slideshow-hero hero">
+    <ul class="slides">
+        <li id="slide-1" bi:index="0" selectBi="">
+<div class="heroitem  light-foreground" bi:type="heroitem">
+    <div class="media" bi:parenttitle="t1"> 
+        <a href="http://clk.atdmt.com/MRT/go/419368227/direct/01/"  bi:track="false" bi:index="0" bi:titleflag="t1"  bi:linkid="S1A-GEN-132F1ENUS31193" bi:cpid="hpFeature">
+<div data-picture data-alt="Learn more about Surface RT." data-disable-swap-below >
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Surface_BG_1210_1600x540_EN_US.jpg"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Surface_BG_1210_1024x346_EN_US.jpg" data-media="(max-device-pixel-width:1024px)"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Surface_BG_1210_600x203_EN_US.jpg" data-media="(max-device-pixel-width:600px)"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Surface_BG_1210_480x162_EN_US.jpg" data-media="(max-device-pixel-width:480px)"></div>
+    
+    <noscript><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Surface_BG_1210_1600x540_EN_US.jpg" alt="Learn more about Surface RT." /></noscript>
+</div>
+<script type="text/javascript">window.picturePolyfill.resolveLast();</script>
+        </a>
+    </div>
+    <div class="text" bi:type="cta">
+<div class="text-container">
+    <div class="box" style="background: #EA005A; color: #FFFFFF;">
+        <img class="box-img" src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hpfeature/hirez/SurfaceRT_2x_500x60.png" alt="Surface" bi:type="img" bi:parenttitle="t1" />
+        <h3 class="box-title" bi:type="title" bi:title="t1" style="color: #FFFFFF;">Powerfully beautiful. Starting at $499.</h3>
+        <ul class="box-actions box-description">
+            <li><a bi:index="1" style="color:#FFFFFF;" bi:linkid="S1A-GEN-132F1ENUS31193" bi:cpid="hpFeature" href="http://clk.atdmt.com/MRT/go/419368227/direct/01/">Learn more</a></li>
+        </ul>
+    </div>
+</div></div>
+</div></li><li id="slide-2" bi:index="1" selectBi="" style="display:none;">
+<div class="heroitem  light-foreground" bi:type="heroitem">
+    <div class="media" bi:parenttitle="t1"> 
+        <a href="http://clk.atdmt.com/MRT/go/415868871/direct/01/"  bi:track="false" bi:index="0" bi:titleflag="t1"  bi:linkid="S2A-GEN-132W1ENUS27760" bi:cpid="hpFeature">
+<div data-picture data-alt="Work easy, play hard on any device with Windows 8." data-disable-swap-below  data-defer>
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Win8Meet_BG_0415_1600x540_EN_US.jpg"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Win8Meet_BG_0415_1024x346_EN_US.jpg" data-media="(max-device-pixel-width:1024px)"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Win8Meet_BG_0415_600x203_EN_US.jpg" data-media="(max-device-pixel-width:600px)"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Win8Meet_BG_0415_480x162_EN_US.jpg" data-media="(max-device-pixel-width:480px)"></div>
+    
+    <noscript><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Win8Meet_BG_0415_1600x540_EN_US.jpg" alt="Work easy, play hard on any device with Windows 8." /></noscript>
+</div>
+        </a>
+    </div>
+    <div class="text" bi:type="cta">
+<div class="text-container">
+    <div class="box" style="background: #1570A6; color: #FFFFFF;">
+        <img class="box-img" src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hpfeature/hirez/Win8_RetLogo__1127_500x60_EN_US.png" alt="Work easy, play hard on any device with Windows 8." bi:type="img" bi:parenttitle="t1" />
+        <h3 class="box-title" bi:type="title" bi:title="t1" style="color: #FFFFFF;">Work easy, play hard</h3>
+        <ul class="box-actions box-description">
+            <li><a bi:index="1" style="color:#FFFFFF;" bi:linkid="S2A-GEN-132W1ENUS27760" bi:cpid="hpFeature" href="http://clk.atdmt.com/MRT/go/415868871/direct/01/">Learn more</a></li>
+        </ul>
+    </div>
+</div></div>
+</div></li><li id="slide-3" bi:index="2" selectBi="" style="display:none;">
+<div class="heroitem  light-foreground" bi:type="heroitem">
+    <div class="media" bi:parenttitle="t1"> 
+        <a href="http://clk.atdmt.com/MRT/go/439174656/direct/01/"  bi:track="false" bi:index="0" bi:titleflag="t1"  bi:linkid="S3A-GEN-133O1ENUS35961" bi:cpid="hpFeature">
+<div data-picture data-alt="Try Office 365 today." data-disable-swap-below  data-defer>
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Ofc365HP_EpsilonBG_0128_1600x540_EN_US.jpg"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Ofc365HP_EpsilonBG_0128_1024x346_EN_US.jpg" data-media="(max-device-pixel-width:1024px)"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Ofc365HP_EpsilonBG_0128_600x203_EN_US.jpg" data-media="(max-device-pixel-width:600px)"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Ofc365HP_EpsilonBG_0128_480x162_EN_US.jpg" data-media="(max-device-pixel-width:480px)"></div>
+    
+    <noscript><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/Ofc365HP_EpsilonBG_0128_1600x540_EN_US.jpg" alt="Try Office 365 today." /></noscript>
+</div>
+        </a>
+    </div>
+    <div class="text" bi:type="cta">
+<div class="text-container">
+    <div class="box" style="background: #E23300; color: #FFFFFF;">
+        <img class="box-img" src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hpfeature/hirez/Ofc365_RetLogo_500x60.png" alt="Try Office 365 today." bi:type="img" bi:parenttitle="t1" />
+        <h3 class="box-title" bi:type="title" bi:title="t1" style="color: #FFFFFF;">Your complete office in the cloud</h3>
+        <ul class="box-actions box-description">
+            <li><a bi:index="1" style="color:#FFFFFF;" bi:linkid="S3A-GEN-133O1ENUS35961" bi:cpid="hpFeature" href="http://clk.atdmt.com/MRT/go/439174656/direct/01/">Try Office 365 Home Premium</a></li>
+        </ul>
+    </div>
+</div></div>
+</div></li><li id="slide-4" bi:index="3" selectBi="" style="display:none;">
+<div class="heroitem  light-foreground" bi:type="heroitem">
+    <div class="media" bi:parenttitle="t1"> 
+        <a href="http://clk.atdmt.com/MRT/go/438978199/direct/01/"  bi:track="false" bi:index="0" bi:titleflag="t1"  bi:linkid="S4A-GEN-134V1ENUS41845" bi:cpid="hpFeature" bi:Product Priority="Skype">
+<div data-picture data-alt="Sign up for Team Foundation Service for free." data-disable-swap-below >
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/VSTS_BG_0401_1600x540_EN_US.png"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/VSTS_BG_0401_1024x346_EN_US.png" data-media="(max-device-pixel-width:1024px)"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/VSTS_BG_0401_600x203_EN_US.png" data-media="(max-device-pixel-width:600px)"></div>
+    
+    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/VSTS_BG_0401_480x162_EN_US.png" data-media="(max-device-pixel-width:480px)"></div>
+    
+    <noscript><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/FY13/Asset/features/VSTS_BG_0401_1600x540_EN_US.png" alt="Sign up for Team Foundation Service for free." /></noscript>
+</div>
+<script type="text/javascript">window.picturePolyfill.resolveLast();</script>
+        </a>
+    </div>
+    <div class="text" bi:type="cta">
+<div class="text-container">
+    <div class="box" style="background: #442359; color: #FFFFFF;">
+        <img class="box-img" src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hpfeature/hirez/VSTS_2xLogo_500x60.png" alt="Sign up for Team Foundation Service for free." bi:type="img" bi:parenttitle="t1" />
+        <h3 class="box-title" bi:type="title" bi:title="t1" style="color: #FFFFFF;">Code and manage software projects from anywhere</h3>
+        <ul class="box-actions box-description">
+            <li><a bi:index="1" style="color:#FFFFFF;" bi:linkid="S4A-GEN-134V1ENUS41845" bi:cpid="hpFeature" bi:Product Priority="Skype" href="http://clk.atdmt.com/MRT/go/438978199/direct/01/">Sign up for free</a></li>
+        </ul>
+    </div>
+</div></div>
+</div></li>
+    </ul>
+    <div class="navigation international" bi:track="false">
+        <div class="grid-container" data-title-text="Go To Slide {{idx}}"></div>
+    </div>
+    <div class="prev-next" bi:track="false">
+        <button class="prev"><span class="icon-left" aria-hidden="true"></span><span class="screen-reader-text">Previous</span></button>
+        <button class="next"><span class="icon-right" aria-hidden="true"></span><span class="screen-reader-text">Next</span></button>
+    </div>
+</div>
+<section class="row-padded"><div class="grid-container"><div class="grid-row row-4 "><div class="grid-unit">
+
+<div bi:type="list" class="list-of-links list-of-links-xlg list-array">
+    <h2 bi:titleflag="t1" bi:title="t1" class="heading">Discover</h2>
+    <ul bi:parenttitle="t1">
+        <li><a bi:index="0" bi:linkid="BNV-00-000000" bi:cpid="hpDiscover" href="http://windows.microsoft.com/">Windows</a>
+        </li>
+        <li><a bi:index="1" bi:linkid="BNV-00-000000" bi:cpid="hpDiscover" href="http://office.microsoft.com/">Office</a>
+        </li>
+        <li><a bi:index="2" bi:linkid="BNV-00-000000" bi:cpid="hpDiscover" href="http://www.microsoft.com/surface/en-US">Surface</a>
+        </li>
+        <li><a bi:index="3" bi:linkid="BNV-00-000000" bi:cpid="hpDiscover" href="http://www.windowsphone.com/">Windows Phone</a>
+        </li>
+        <li><a bi:index="4" bi:linkid="BNV-00-000000" bi:cpid="hpDiscover" href="http://www.xbox.com/">Xbox</a>
+        </li>
+        <li><a bi:index="5" bi:linkid="BNV-00-000000" bi:cpid="hpDiscover" href="http://www.skype.com/go/skype/?cm_mmc=MSFT|TRAF_B1-_-mscom-hero-us">Skype</a>
+        </li>
+        <li><a bi:index="6" bi:linkid="BNV-00-000000" bi:cpid="hpDiscover" href="http://www.bing.com">Bing</a>
+        </li>
+    </ul>
+</div></div></div></div></section><section class="row-blue row-padded"><div class="grid-container"><div class="grid-row row-4 "><div class="grid-unit col-3 col-flow-opposite"><div bi:type="slideshow" class="slideshow slideshow-news highlight--tile">
+    <ul class="slides">
+        <li id="slide-1" bi:index="0" selectBi="">
+<div bi:type="highlight" class="hpHighlight ">
+    <a href="http://blogs.technet.com/b/microsoftupblog/archive/2013/05/01/have-an-idea-to-improve-your-community-campus-or-the-world-enter-youthspark-challenge-for-change.aspx" bi:linkid="MNC-GEN-000001" bi:cpid="hpNews"><div class="highlight-content">
+        <div class="highlight-img">
+        <img  bi:parenttitle="t1" src="http://i.s-microsoft.com/global/en-us/news/publishingimages/homepage/highlights/theme_youthsparkchallenge_hl.jpg" alt="Want to win a trip to Kenya? Share your idea for change '" bi:mimiclink="true" bi:type="img" />
+         </div>
+        <div class="highlight-text">       
+        
+       
+        <h3 class="title" bi:mimiclink="true" bi:title="t1" bi:titleflag="t1" bi:type="title">Want to win a trip to Kenya? Share your idea for change </h3>
+        <p  bi:parenttitle="t1" bi:mimiclink="true" bi:type="desc"><time pubdate class="pubdate">May 1, 2013 -</time> Microsoft launches contest for U.S. residents aged 18 to 25 who have ideas for sparking change in their communities or around the world. Prizes include a volunteer trip to Kenya.</p>
+        </div></div></a>
+</div></li><li id="slide-2" bi:index="1" selectBi="" style="display:none;">
+<div bi:type="highlight" class="hpHighlight ">
+    <a href="http://blogs.skype.com/2013/04/29/type-less-talk-more-make-skype-calls-directly-from-your-outlook-com-inbox/" bi:linkid="MNC-GEN-000002" bi:cpid="hpNews"><div class="highlight-content">
+        <div class="highlight-img">
+        <img  bi:parenttitle="t1" src="http://i.s-microsoft.com/global/en-us/news/publishingimages/homepage/highlights/theme_skypeOutlook_hl.jpg" alt="Type less, talk more with Skype for Outlook.com'" bi:mimiclink="true" bi:type="img" />
+         </div>
+        <div class="highlight-text">       
+        
+       
+        <h3 class="title" bi:mimiclink="true" bi:title="t1" bi:titleflag="t1" bi:type="title">Type less, talk more with Skype for Outlook.com</h3>
+        <p  bi:parenttitle="t1" bi:mimiclink="true" bi:type="desc"><time pubdate class="pubdate">April 29, 2013 -</time> Rollout of preview begins today in the United Kingdom.</p>
+        </div></div></a>
+</div></li><li id="slide-3" bi:index="2" selectBi="" style="display:none;">
+<div bi:type="highlight" class="hpHighlight ">
+    <a href="http://blogs.technet.com/b/microsoft_in_education/archive/2013/04/30/the-state-of-maine-switches-to-windows-pcs-for-statewide-1-1-learning.aspx" bi:linkid="MNC-GEN-000003" bi:cpid="hpNews"><div class="highlight-content">
+        <div class="highlight-img">
+        <img  bi:parenttitle="t1" src="http://i.s-microsoft.com/global/en-us/news/publishingimages/homepage/highlights/theme_Win8HP_hl.jpg" alt="Maine switches to Windows PCs for statewide learning'" bi:mimiclink="true" bi:type="img" />
+         </div>
+        <div class="highlight-text">       
+        
+       
+        <h3 class="title" bi:mimiclink="true" bi:title="t1" bi:titleflag="t1" bi:type="title">Maine switches to Windows PCs for statewide learning</h3>
+        <p  bi:parenttitle="t1" bi:mimiclink="true" bi:type="desc"><time pubdate class="pubdate">April 30, 2013 -</time> State of Maine has selected the HP ProBook 4440 running Windows 8 as the learning device of choice for all 7th and 8th grade students.</p>
+        </div></div></a>
+</div></li>
+    </ul>
+    <div class="navigation international" bi:track="false">
+        <div class="grid-container" data-title-text="Go To Slide {{idx}}"></div>
+    </div>
+    <div class="prev-next" bi:track="false">
+        <button class="prev"><span class="icon-left" aria-hidden="true"></span><span class="screen-reader-text">Previous</span></button>
+        <button class="next"><span class="icon-right" aria-hidden="true"></span><span class="screen-reader-text">Next</span></button>
+    </div>
+</div>
+</div><div class="grid-unit col-1">
+
+<div bi:type="list" class="list-of-links list-of-links-lg list-array">
+    <h2 bi:titleflag="t1" bi:title="t1" class="heading">Follow us</h2>
+    <ul bi:parenttitle="t1">
+        <li><a bi:index="0" bi:linkid="SOC-00-000000" bi:cpid="hpSocial" href="http://www.facebook.com/microsoft">Facebook</a>
+        </li>
+        <li><a bi:index="1" bi:linkid="SOC-00-000000" bi:cpid="hpSocial" href="http://www.twitter.com/microsoft">Twitter</a>
+        </li>
+        <li><a bi:index="2" bi:linkid="SOC-00-000000" bi:cpid="hpSocial" href="http://www.microsoft.com/news">News Center</a>
+        </li>
+    </ul>
+</div></div></div></div></section><section class="row-grey row-padded-top"><div class="grid-container"><div class="grid-row row-4 "><div class="grid-unit">
+
+<div bi:type="list" class="list-of-links list-of-links-sm footer-products-list">
+    <h2 bi:titleflag="t1" bi:title="t1" class="heading">Other Microsoft sites</h2>
+    <ul bi:parenttitle="t1">
+        <li><a bi:index="0" bi:linkid="PTN-00-000000" bi:cpid="hpFatFooter" href="http://windows.microsoft.com"><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/52x52/windows_symbol_clr_52x52.png" alt=""/>Windows</a>
+        </li>
+        <li><a bi:index="1" bi:linkid="PTN-00-000000" bi:cpid="hpFatFooter" href="http://office.microsoft.com/"><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/52x52/office_symbol_clr_52x52.png" alt=""/>Office</a>
+        </li>
+        <li><a bi:index="2" bi:linkid="PTN-00-132F1ENUS32267" bi:cpid="hpFatFooter" href="http://clk.atdmt.com/MRT/go/420109147/direct/01/"><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/52x52/fallpromo_bug_black.png" alt=""/>Surface</a>
+        </li>
+        <li><a bi:index="3" bi:linkid="PTN-00-000000" bi:cpid="hpFatFooter" href="http://www.windowsphone.com/"><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/52x52/windowsphone_symbol_clr_52x52.png" alt=""/>Windows Phone</a>
+        </li>
+        <li><a bi:index="4" bi:linkid="PTN-00-000000" bi:cpid="hpFatFooter" href="http://www.xbox.com/"><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/52x52/xbox_symbol_clr_52x52.png" alt=""/>Xbox</a>
+        </li>
+        <li><a bi:index="5" bi:linkid="PTN-00-000000" bi:cpid="hpFatFooter" href="http://www.skype.com/go/skype/?cm_mmc=MSFT|TRAF_B1-_-mscom-hero-us"><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/52x52/skype_symbol_clr_52x52.png" alt=""/>Skype</a>
+        </li>
+        <li><a bi:index="6" bi:linkid="PTN-00-000000" bi:cpid="hpFatFooter" href="http://www.bing.com/"><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/52x52/bing_symbol_clr_52x52.png" alt=""/>Bing</a>
+        </li>
+        <li><a bi:index="7" bi:linkid="PTN-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoftstore.com/store/msstore/home?WT.mc_id=MSCOM_HP_footer"><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/52x52/store_symbol_clr_52x52.png" alt=""/>Microsoft Store</a>
+        </li>
+    </ul>
+</div></div><div class="grid-unit">
+
+<div bi:type="list" class="list-of-links list-of-links-sm">
+    <h3 bi:titleflag="t1" bi:title="t1" class="heading">Downloads</h3>
+    <ul bi:parenttitle="t1">
+        <li><a bi:index="0" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoft.com/en-us/download/default.aspx">Download Center</a>
+        </li>
+        <li><a bi:index="1" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://windows.microsoft.com/en-US/windows/downloads">Windows downloads</a>
+        </li>
+        <li><a bi:index="2" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://office.microsoft.com/downloads">Office downloads</a>
+        </li>
+    </ul>
+</div>
+
+<div bi:type="list" class="list-of-links list-of-links-sm">
+    <h3 bi:titleflag="t1" bi:title="t1" class="heading">Support</h3>
+    <ul bi:parenttitle="t1">
+        <li><a bi:index="0" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://support.microsoft.com/">Support home</a>
+        </li>
+        <li><a bi:index="1" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://support.microsoft.com/search">Knowledge base</a>
+        </li>
+    </ul>
+</div></div><div class="grid-unit">
+
+<div bi:type="list" class="list-of-links list-of-links-sm">
+    <h3 bi:titleflag="t1" bi:title="t1" class="heading">Security</h3>
+    <ul bi:parenttitle="t1">
+        <li><a bi:index="0" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoft.com/security/default.aspx">Security home</a>
+        </li>
+        <li><a bi:index="1" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://windows.microsoft.com/en-US/windows/products/security-essentials">Microsoft Security Essentials</a>
+        </li>
+    </ul>
+</div>
+
+<div bi:type="list" class="list-of-links list-of-links-sm">
+    <h3 bi:titleflag="t1" bi:title="t1" class="heading">About</h3>
+    <ul bi:parenttitle="t1">
+        <li><a bi:index="0" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoft.com/about/en/us/default.aspx">Microsoft</a>
+        </li>
+        <li><a bi:index="1" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoft.com/careers">Careers</a>
+        </li>
+        <li><a bi:index="2" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoft.com/en-us/news/">Company News</a>
+        </li>
+        <li><a bi:index="3" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoft.com/investor">Investor relations</a>
+        </li>
+        <li><a bi:index="4" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoft.com/en-us/sitemap.aspx">Site map</a>
+        </li>
+    </ul>
+</div></div><div class="grid-unit">
+
+<div bi:type="list" class="list-of-links list-of-links-sm">
+    <h3 bi:titleflag="t1" bi:title="t1" class="heading">Popular resources</h3>
+    <ul bi:parenttitle="t1">
+        <li><a bi:index="0" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://windows.microsoft.com/en-US/windows/rt-welcome">Windows RT</a>
+        </li>
+        <li><a bi:index="1" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://windows.microsoft.com/en-US/windows/all-pcs">PC and Laptops</a>
+        </li>
+        <li><a bi:index="2" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://windows.microsoft.com/en-US/windows/tablets-computers">Tablet and Computers</a>
+        </li>
+        <li><a bi:index="3" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.windowsphone.com/en-us">Windows Phone smartphones</a>
+        </li>
+        <li><a bi:index="4" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.windowsphone.com/en-us/store">Windows Phone apps and games</a>
+        </li>
+        <li><a bi:index="5" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoft.com/security/default.aspx">Microsoft computer security</a>
+        </li>
+        <li><a bi:index="6" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoft.com/security/pc-security/malware-removal.aspx">Malware removal tool</a>
+        </li>
+        <li><a bi:index="7" bi:linkid="FFR-00-000000" bi:cpid="hpFatFooter" href="http://www.microsoft.com/en-us/dynamics/crm.aspx">Microsoft Dynamics CRM</a>
+        </li>
+    </ul>
+</div></div></div></div></section><footer class="site-footer" role="contentinfo" bi:type="footer">
+    <div class="legal grid-container">
+        <div class="grid-row row-4">
+            <div class="grid-unit col-1" bi:type="locale">
+                <span class="icon-globe"></span><a href="/en-us/locale.aspx">United States - English</a>
+            </div>
+            <div class="grid-unit col-3 inline-list" bi:type="legal">
+                <div data-picture data-alt="Microsoft" class="footer-logo">
+                    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hp/logo-type-1x.png"></div>
+                    <div data-src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hp/logo-type-2x.png" data-media="(min-device-pixel-ratio: 2.0)"></div>
+                    <noscript><img src="http://i.s-microsoft.com/global/ImageStore/PublishingImages/logos/hp/logo-type-1x.png" alt="Microsoft" /></noscript>
+                </div>
+                <script type="text/javascript">window.picturePolyfill.resolveLast();</script>
+                <ul>
+                    <li><a bi:index="0" bi:linkid="FTR-00-000000" bi:cpid="hpFooter" href="http://go.microsoft.com/?linkid=2028325">Contact us</a>
+                    </li>
+                    <li><a bi:index="1" bi:linkid="FTR-00-000000" bi:cpid="hpFooter" href="http://go.microsoft.com/fwlink/?LinkId=248681">Privacy &amp; Cookies</a>
+                    </li>
+                    <li><a bi:index="2" bi:linkid="FTR-00-000000" bi:cpid="hpFooter" href="http://go.microsoft.com/?linkid=4412892">Terms of use</a>
+                    </li>
+                    <li><a bi:index="3" bi:linkid="FTR-00-000000" bi:cpid="hpFooter" href="http://www.microsoft.com/library/toolbar/3.0/trademarks/en-us.mspx">Trademarks</a>
+                    </li>
+                    <li id="mscom-legal-copyright">
+                        © 2013 Microsoft
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+    </form>
+    <script type="text/javascript" src="http://i.s-microsoft.com/en-us/home/script.jsx?k=~/shared/templates/Scripts/Views/header.js;~/shared/templates/Scripts/Views/jquery.responsiveslideshow.js;~/shared/templates/Scripts/Lib/mscomhelper.js;~/shared/templates/Scripts/Views/search.js;~/shared/templates/Scripts/mscom-homepage.js;~/shared/templates/Scripts/Views/store-loc.js;~/shared/templates/Scripts/Views/menu.js;~/shared/templates/Scripts/Views/hero.js&amp;v=-1633251380"></script>
+    <script type="text/javascript">var varSegmentation=1;var varClickTracking=0;var varCustomerTracking=1;var varAutoFirePV=0;</script>
+    <noscript><img alt="" width="1" height="1" src="http://c.microsoft.com/trans_pixel.aspx"/></noscript><script type="text/javascript" src="http://i.s-microsoft.com/en-us/home/script.jsx?k=~/shared/templates/Scripts/BI/jquery.bi.js;~/shared/templates/Scripts/BI/jquery.bi.dataretrievers.attr.js;~/shared/templates/Scripts/BI/jquery.bi.dataretrievers.structure.js;~/shared/templates/Scripts/BI/jquery.bi.dataretrievers.resp.js;~/shared/templates/Scripts/BI/wedcs.js;~/shared/templates/Scripts/BI/jquery.bi.dataconsumers.wedcs.js;~/shared/templates/Scripts/BI/webtrends.js;~/shared/templates/Scripts/BI/jquery.bi.dataconsumers.webtrends.js&amp;v=1342920276"></script>
+    
+
+
+<script src="http://i.s-microsoft.com/en-us/home/bimapping.js?gv=BiMapping&amp;k=/en-us/home/Components/Config/BiMapping.xml&amp;v=1111998060" type="text/javascript"></script>
+<script type="text/javascript">
+    if (typeof $ != "undefined" && typeof $.bi != "undefined") {
+        $.bi.baseData({ lang: 'en' });
+        $.bi.baseData({ loc: 'us' });
+        $.bi.baseData({ ctrl: '44A6' });
+        $.bi.ignoreTextClass('bi-hidetext');
+        $.bi.init(window.BiMapping);
+        if (typeof window.requestId != "undefined") {
+            $.bi.baseData({ requestId: window.requestId });
+        }
+        
+        if (typeof $.bi.dataConsumers != "undefined" && typeof $.bi.dataConsumers.webtrends != "undefined" && typeof $.bi.dataConsumers.webtrends.WebTrends != "undefined") {
+            $.bi.dataConsumers.webtrends.WebTrends.dcsid = "dcso6p7z7100004j151amwxpo_5q2j";
+            $.bi.dataConsumers.webtrends.WebTrends.dcsGetId();
+        }
+        
+    }
+    if (typeof QosRecord != "undefined") {
+        $(function () { QosRecord('domready'); });
+    }
+</script>
+<script type="text/javascript">window.requestId='83c71771-890d-4bd5-8f88-2ec3b7b8543a';</script>
+</body>
+</html>

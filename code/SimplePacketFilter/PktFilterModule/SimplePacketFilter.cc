@@ -3,10 +3,13 @@
 #include <signal.h>
 #include <iostream>
 #include <execinfo.h>
+#include <arpa/inet.h>
 #include "Logging.h"
 #include "SimplePacketFilter.h"
 #include <boost/thread.hpp>
+#include <boost/lexical_cast.hpp>
 #include "MessageHandler.h"
+#include "MeddleConfig.h"
 #include "boost/date_time/local_time/local_time.hpp"
 
 /* The main file
@@ -44,27 +47,33 @@ void sigInit()
 }
 
 
-int mainInit(MeddleDaemon &meddle, MessageHandler &cmd)
+int mainInit(MeddleConfig &meddleConfig, MeddleDaemon &meddle, MessageHandler &cmd)
 {
 	in_addr_t serverAddr;
+	uint16_t sockPort;
+
 	sigInit();
-	logDebug("Creating a tunnel device" << TUN_DEVICE  <<
-			 " assigning it an IP " << IP_ADDRESS << " with mask " << ROUTE_NETMASK
-			 " to NAT packets from " << FWD_PATH_NET <<
-			 " to network " << REV_PATH_NET);
-	if (false == meddle.setupTunnel(TUN_DEVICE, IP_ADDRESS, DEV_NETMASK, ROUTE_NETMASK, FWD_PATH_NET, REV_PATH_NET)) {
+	logDebug("Creating a tunnel device" << meddleConfig.tunDeviceName
+			<<" assigning it an IP " << meddleConfig.tunIpAddress
+			<<" with mask " << meddleConfig.tunIpNetmask
+			<<" to NAT packets from " << meddleConfig.tunFwdPathNet
+			<<" to network " << meddleConfig.tunRevPathNet);
+	if (false == meddle.setupTunnel(meddleConfig.tunDeviceName,
+			meddleConfig.tunIpAddress, meddleConfig.tunIpNetmask,
+			meddleConfig.tunRouteNetmask, meddleConfig.tunFwdPathNet,
+			meddleConfig.tunRevPathNet)) {
 		logError("Unable to setup the tunnel");
 		return -1;
 	}
 	logDebug("Setting up the DNS server to filter traffic");
 
-	if (false == meddle.setupDNS(DEFAULT_DNS_SERVER, FILTER_DNS_SERVER)) {
+	if (false == meddle.setupDNS(meddleConfig.fltrDefaultDNS, meddleConfig.fltrAdBlockDNS)) {
 		logError("Error in setting up the DNS");
 		return -1;
 	}
 	logDebug("Connecting to the Database");
 
-	if (false == mainPktFilter.connectToDB(DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME)) {
+	if (false == mainPktFilter.connectToDB(meddleConfig.dbServer, meddleConfig.dbUserName, meddleConfig.dbPassword, meddleConfig.dbName)) {
 		logError("Error in connecting to the database");
 		return -1;
 	}
@@ -76,25 +85,68 @@ int mainInit(MeddleDaemon &meddle, MessageHandler &cmd)
 	logDebug("Config Table is " << mainPktFilter.getAllUserConfigs());
 	logDebug("We have done the initialization now time to meddle");
 
-	inet_pton(AF_INET, MEDDLE_MESSAGE_SOCKET_ADDR, &serverAddr);
-	logDebug("Listening on "<< MEDDLE_MESSAGE_SOCKET_PORT << " for commands from other processes");
-	if (false == cmd.setupMessageHandler(MEDDLE_MESSAGE_SOCKET_PORT, serverAddr)) {
+	inet_pton(AF_INET, meddleConfig.msgSockIpAddress.c_str(), &serverAddr);
+	logDebug("Listening on "<< meddleConfig.msgSockPort << " for commands from other processes");
+	sockPort = boost::lexical_cast<uint16_t>(meddleConfig.msgSockPort);
+	if (false == cmd.setupMessageHandler(sockPort, serverAddr)) {
 		logError("Unable to setup the socket for receiving commands");
 		return -1;
 	}
 	return 0;
 }
 
+bool ParseCommandLineForConfigFile(std::string &configName, int argc, char *argv[])
+{
+	po::options_description desc("Allowed options");
+	try {
+		desc.add_options()
+			("help,h", "produce help message")
+			("configFile,c", po::value<std::string>(&configName)->required(), "the name of the config file");
+		po::variables_map vm;
+		po::store(po::parse_command_line(argc, argv, desc), vm);
+		if (vm.count("help")) {
+			logError(desc);
+			return false;
+		}
+		po::notify(vm);
+	} catch(std::exception& e) {
+		logError("Error: " << e.what());
+		logError(desc);
+		return false;
+	} catch(...) {
+		logError("Unknown error!");
+		return false;
+	}
+	logInfo("You have provided '" << configName);
+	return true;
+}
+
 /* mainPktFilter is the global object that is shared by all the threads */
 PacketFilterData mainPktFilter;
 
-int main()
+int main(int argc, char *argv[])
 {
 	MeddleDaemon meddle;
 	MessageHandler cmdHandler;
+	MeddleConfig meddleConfig;
+	std::string configName;
 
-	if (mainInit(meddle, cmdHandler) < 0) {
-		logError("Error in the setup");
+	if (false == ParseCommandLineForConfigFile(configName, argc, argv)) {
+		logError("Error reading the config file");
+		return -1;
+	}
+	if (false == meddleConfig.readConfigFile(configName)) {
+		logError("Error reading the config file " << configName);
+		return -1;
+	}
+	logInfo(meddleConfig);
+	try {
+		if (mainInit(meddleConfig, meddle, cmdHandler) < 0) {
+			logError("Error in the setup");
+			return -1;
+		}
+	} catch(...) {
+		logError("Exception during initialization!");
 		return -1;
 	}
 	logDebug("Create the worker threads");
