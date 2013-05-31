@@ -85,8 +85,10 @@ var svg = $('svg')[0];
 
 $(window).on("mouseup.svgpan", handleMouseUp)
 			.on("mousedown.svgpan", handleMouseDown)
-			.on("mousemove.svgpan", handleMouseMove)
-			.on("mousewheel.svgpan", handleMouseWheel);
+			.on("mousemove.svgpan", handleMouseMove);
+			//.on("mousewheel.svgpan", handleMouseWheel);
+
+$("#chart").mousewheel(handleMouseWheel);
 
 var view = $('#viewport')[0];
 
@@ -137,7 +139,12 @@ function handleMouseWheel(evt) {
 	// Compute new scale matrix in current mouse position
 	var k = svg.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
 
-  setCTM(view, view.getCTM().multiply(k));
+  	setCTM(view, view.getCTM().multiply(k));
+  	var lineScale = (.1 + .9/view.getCTM().a);
+  	$('.nozoom').attr("transform", "scale("+lineScale+")");
+  	$('.link').attr("style", "stroke-width: "+ lineScale+ " !important;");
+  	$('.clickable').attr("style", "stroke-width: "+(10*lineScale)+" !important;");
+
 
 	if(typeof(stateTf) == "undefined")
 		stateTf = view.getCTM().inverse();
@@ -151,7 +158,9 @@ function handleMouseWheel(evt) {
  * Handle mouse move event.
  */
 function handleMouseMove(evt) {
-	if(state == 'pan') {
+	var panning = state == 'pan'
+	d3.select('body').classed("noselect", panning)
+	if(panning) {
 		var p = getEventPoint(evt).matrixTransform(stateTf);
 		setCTM(view, stateTf.inverse().translate(p.x - stateOrigin.x, p.y - stateOrigin.y));
 	}
