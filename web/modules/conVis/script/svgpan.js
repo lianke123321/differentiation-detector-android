@@ -140,7 +140,9 @@ function handleMouseWheel(evt) {
 	var k = svg.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
 
   	setCTM(view, view.getCTM().multiply(k));
-  	var lineScale = (.1 + .9/view.getCTM().a);
+
+  	var scalar = view.getCTM().a;
+  	var lineScale = scalar > 1.5 ? (.1 + .9/(scalar)) : 1/(scalar-3) + 1.37;
   	$('.nozoom').attr("transform", "scale("+lineScale+")");
   	$('.link').attr("style", "stroke-width: "+ lineScale+ " !important;");
   	$('.clickable').attr("style", "stroke-width: "+(10*lineScale)+" !important;");

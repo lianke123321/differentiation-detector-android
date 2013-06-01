@@ -37,6 +37,8 @@ ini_set('display_errors', '1');
 		<div id="chooserButton" style="position:fixed; top:0; right:10px;">
 		<button type="button" onclick="showChooser()">Pick Data Set</button>
 		</div>
+		<div id="linkInfo" class="hidden">
+		</div>
 		<div id="chart"><!-- The d3 layout graph will go inside this div -->
 			<svg height="1000px" width="100%" style="opacity: 1;">
 				<g id="viewport">
@@ -62,7 +64,7 @@ ini_set('display_errors', '1');
 	<script src="script/jquery-ui-1.10.3.custom.js"></script>
 	<script src="script/jquery.mousewheel.js"></script>
 	<script src="script/jQDateRangeSlider-withRuler-min.js"></script>
-	<script src="script/graphrunner2.js"></script>
+	<script src="script/graphrunner.js"></script>
 	<script src="script/svgpan.js"></script>
 	<script src="script/sorttable.js"></script>
 	<script id="chooserModel" type="text/plain">

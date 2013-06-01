@@ -217,7 +217,8 @@ var ConVis = (function(jQuery, d3) {
 
 		function drawLinks(links) {
 			var enter = vis.select("g.links").selectAll("g.link")
-					.data(links).enter().append("svg:g");
+					.data(links).enter().append("svg:g")
+					.attr("class", function(d){ return 'from-'+ d.source.index +' to-'+ d.target.index; });
 
 					enter.append("svg:line").attr("class", function(d){ return 'link from-'+ d.source.index +' to-'+ d.target.index; })
 						.attr("x1", function(d){ return d.source.x; })
@@ -225,28 +226,44 @@ var ConVis = (function(jQuery, d3) {
 						.attr("x2", function(d){ return d.target.x; })
 						.attr("x2", function(d){ return d.target.y; })
 						//Figure this one out
-						.classed("banned", function(d){ return d.target.banned ? d.target.banned[getNodeId(d.source)] : false });
+						.classed("banned", function(d){ return d.source.banned ? d.source.banned[d.target.name] : false });
 					enter.append("svg:line").attr("class", "clickable no-stroke")
 						.attr("x1", function(d){ return d.source.x; })
 						.attr("y1", function(d){ return d.source.y; })
 						.attr("x2", function(d){ return d.target.x; })
 						.attr("x2", function(d){ return d.target.y; })
 						.on("click", destroyLink)
+						.on("mouseover", highlight)
+						.on("mouseout", unhighlight);/*
 						.attr("onmouseover", "$(this).attr(\"class\", \"clickable\")")
-						.attr("onmouseout", "$(this).attr(\"class\", \"clickable no-stroke\")");
+						.attr("onmouseout", "$(this).attr(\"class\", \"clickable no-stroke\")");*/
+		}
+
+		function highlight(d, i){
+			console.log(".from-" + d.source.index + ".to-" + d.target.index+" .clickable");
+			$(".from-" + d.source.index + ".to-" + d.target.index+" .clickable").attr("class", "clickable");
+			$('#linkInfo').attr("class", "").html("Link from <b>"+d.source.name+"</b> to <b>"+d.target.name+"</b>.");
+		}
+
+		function unhighlight(d, i){
+			$(".from-" + d.source.index + ".to-" + d.target.index+" .clickable").attr("class", "clickable no-stroke");
+			$('#linkInfo').attr("class", "hidden").html("");
 		}
 
 		function destroyLink(d, i){
 			req = new XMLHttpRequest();
-			req.open("POST", "action.php", true);
+			req.open("POST", "action.php?action=banLink", true);
 			req.onreadystatechange=function(){
 					if (req.readyState==4){
 						if (req.status==200){
-						  if(req.responseText != "success"){
-								d3.select('.from-'+ d.source.index +'.to-' + d.target.index)
-								.classed("banned", function(){ return req.responseText == "banned"; });
+							console.log(req.responseText);
+							obj = jQuery.parseJSON(req.responseText);
+							if(!obj.fail){
+								d3.select('.link.from-'+ d.source.index +'.to-' + d.target.index)
+								.classed("banned", function(){ return obj.success == "banned"; });
 							} else {
 								alert("Could not add to block list. Please try again later.");
+								console.log(obj);
 							}
 						}else{
 							alert("Could not contact server. Please try again later.");
