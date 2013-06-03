@@ -1,7 +1,40 @@
-\section{Traffic Classification}
+\section{Analysis of Applications}
 \label{sec:classification}
 
-This is a raw dump of the results. I have to work on putting this in the context of iOS vs Android. 
+
+
+
+
+\subsection{Traffic Classification Methodology}
+
+Why do we need to classify traffic?
+Why is it traffic classification important?
+How is it useful?
+How have previous work used traffic classification?
+
+Use well known port numbers to broadly categorize tcp and udp traffic. 
+TCP traffic is classified as either HTTP, SSL, or other while UDP is classified as either DNS or other. 
+SSL: 443/tcp, 563/tcp, 585/tcp, 614/tcp, 636/tcp, 989/tcp, 990/tcp, 992/tcp, 993/tcp, 995/tcp, 5223/tcp.
+HTTP:  80/tcp, 81/tcp, 631/tcp, 1080/tcp, 3138/tcp, 8000/tcp, 8080/tcp, 8888/tcp.
+Traffic such as ICMP which is neither TCP or UDP is classified as other. 
+In \fref{tab:summaryIOSAndroidTraffic} we observe that based on this simple classification we observe that more than 90\% of the traffic is either HTTP or SSL.
+We observe that the traffic share of SSL over cellular is more than twice the traffic share observed over \wifi  
+
+\subsubsection{Classification of HTTP Traffic}
+
+Why IP and DNS is not sufficient?
+User-Agent field 
+Limitation of User-Agent field 
+
+
+\subsubsection{Classification of SSL Traffic}
+
+\subsection{Traffic Characteristics of iOS and Android Applications}
+
+
+\subsection{Controlled Experiments on }
+
+
 
 \begin{enumerate}
 \item Traffic classification: Is it possible to identify the source of the traffic by just looking at the traffic? What heuristics can be used? What fraction of the traffic can be classified to specific webservices?
@@ -84,16 +117,16 @@ This difference is because of the techniques used by Android and iOS application
 \begin{table}
 \begin{tabular}{|l|l|}
 \hline
-User-Agent & OS \tabularnewline
+User-Agent Prefix& OS \tabularnewline
 \hline
-AppleCoreMedia/1.0* & iOS \tabularnewline
-stagefright/1.2* & Android \tabularnewline
-Dalvik/1.6* & Android \tabularnewline
+AppleCoreMedia/1.0 & iOS \tabularnewline
+stagefright/1.2 & Android \tabularnewline
+Dalvik/1.6 & Android \tabularnewline
 Linux; Android & Android \tabularnewline
-com.google.android.youtube* & Android \tabularnewline
+com.google.android.youtube & Android \tabularnewline
 \hline
 \end{tabular}
-\caption{User agents while streaming youtube videos. \emph{We use * for the characters not shown due to lack of space.}}
+\caption{Prefix of User-Agent string while streaming youtube videos. \emph{While iOS devices use AppleCoreMedia for more than 95\% of YouTube traffic, Android devices use a variety of User-Agent strings depending on the Android version, YouTube application version, and the version of various applications from which YouTube videos are viewed.}}
 \label{tab:top-user-agents}
 \end{table}
 
@@ -104,7 +137,6 @@ We observed that AppleCoreMedia was the primary application that fetched content
 Like iOS devices have AppleCoreMedia, Android provides Stagefright\cite{stagefright} as media library.
 However, only 41.91\% of YouTube content in our dataset was fetched using Stagefright in the User-Agent field. 
 In contrast, 56.52\% of YouTube content was downloaded by Android devices without any application signature in the User-Agent field.  
-
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{plots/appusage_someappservicesig_traffic.pdf}
@@ -131,6 +163,28 @@ Workaround:
 Use of DNS
 
 \cite{chen:wifi}
+
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{plots/sslanalysis_someservername_traffic.pdf}
+\caption{HTTP traffic classification using User-Agent or name of media service.}
+\label{fig:http-classification-app-service}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{plots/sslanalysis_samedns_traffic.pdf}
+\caption{HTTP traffic classification using User-Agent or name of media service.}
+\label{fig:http-classification-app-service}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{plots/sslanalysis_dns_timediff_distrib.pdf}
+\caption{HTTP traffic classification using User-Agent or name of media service.}
+\label{fig:http-classification-app-service}
+\end{figure}
+
 
 
 \subsection{Misc}
