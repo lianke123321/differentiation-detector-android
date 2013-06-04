@@ -1,22 +1,24 @@
 \section{Methodology and Dataset}
 \label{sec:Methodology}
 
-Our objective of building \platname was to characterize mobile Internet traffic, analyze mobile application behavior, and detail the impact of access technology and operating systems on application behavior. 
-For our analysis we used \platname to perform controlled experiments to analyze Android and iOS applications.
-To analyze the application behavior in the wild, we used \platname for an IRB approved study to collect data traffic from mobile users during a 7-month interval.
+We used \platname to characterize mobile Internet traffic, and detail the impact of access technology and operating systems on application behavior. 
+
+Our analysis methodology included controlled experiments to detail the behavior of specific applications and OS services, and a 7-month long IRB approved measurement study to characterize mobile Internet traffic in the \emph{in the wild} . 
 
 \subsection{Controlled Experiments}
 
-For our controlled experiments, we used \emph{factory reseted} Android and iOS devices that ran the latest versions of their operating systems (Android 4.0, Android 4.2, and iOS 6). 
-We first let these devices run idle to test behavior of OS services and the default applications when using \wifi and cellular networks.
-We then test applications by first installing the application on a \emph{clean slate} device, interacting with the application for a few minutes, and finally uninstalling the  application. 
+For our controlled experiments, we ran the latest versions of Android (Ice Cream Sandwich 4.0, and Jelly-bean 4.2) and iOS 6 respectively on our Android and iOS devices. 
+We analyze the behavior of OS services and the default applications by first performing a factory reset on these devices, and installing the \platname credentials on this device.
+We then test Android and iOS applications by installing the application, interacting with the application for a few minutes, and finally uninstalling the  application. 
+During our controlled experiment we use SSL-Bumping to study the behavior of SSL traffic from these applications. 
 
-In our experiments, we manually test the top 100 most popular free Android apps from the \emph{Google Play} store and \tbd{} iOS applications from the iOS App store.
-For this test we first manually installed each application by hand, enter user credentials for accounts like Facebook and Twitter, and toy with the app for \tbd{} minutes. 
-In addition to this manual setup, we used an automatic test-click generator to further toy with the app for \tbd{} actions. 
+Our first experiment included manual testing of the top 100 most popular free Android apps from the \emph{Google Play} store and \tbd{} iOS applications from the iOS App store.
+For this experiment we first manually installed each application by hand, enter user credentials for accounts like Facebook and Twitter, and toy with the app for \tbd{} minutes. 
+In addition to this manual setup, we used an automatic test-click generator to further toy with the Android applications for \tbd{} actions. 
+We did not perform this automation step while testing the the iOS applications.
 We then uninstall the application and reset the device to test the next application. 
 
-We then performed fully-automated tests on 1003 Android applications from a free, third-party Android market.
+For our second experiment we performed fully-automated tests on 1003 Android applications from a free, third-party Android market.
 We perform this test because Android devices can install \emph{Third-party applications} that are not available on the \emph{Google Play} store.
 A consequence of this freedom is that numerous third-party app markets are available on the web whose applications have not received research attention.
 Our automation used the adb Android command shell to install each app, enable \platname, and start the app.
@@ -32,8 +34,9 @@ Along with controlled experiments we also conducted a measurement study to chara
 For this study, we deployed two \platname servers, one in USA and one in France, to proxy Internet traffic from 26 devices, 10 iPhones, 4 iPads, 1 iPodTouch, and 11 Android phones.
 The Android devices in this dataset include the Nexus, Sony, Samsung, and Gsmart brands while the iPhones include one iPhone~3gs, five iPhone~5, and five iPhone~4S.
 These devices belonged to 21 users, volunteers for our IRB approved study.
-To protect the identity of the users and their data, we use public key cryptography to encrypt the \emph{pcap} files that log the data traffic flowing through our \platname servers. 
-This dataset, called \mobWild, consists of 218 days of data that flowed through our VPN servers; the number days for each user varies from 5 to 215 with a median of 35 days.
+To protect the identity of the users and their data, we used public key cryptography to encrypt the \emph{pcap} files that log the data traffic flowing through our \platname servers. 
+This dataset, called \mobWild, consists of 218 days of data that flowed through our \platname servers; the number days for each user varies from 5 to 215 with a median of 35 days.
+We would like to point out that though we performed SSL-Bumping during our controlled experiments, we did not perform SSL-Bumping for the traffic in this dataset.
 
 \begin{table}
 \begin{small}
@@ -68,8 +71,8 @@ This dataset, called \mobWild, consists of 218 days of data that flowed through 
 \label{tab:summaryIOSAndroidTraffic}
 \end{table}
 
-A mobile devices can tunnel the traffic using either \wifi or cellular networks. 
-We estimate the access technology used by a device with the description of the AS through which the mobile client connects to our \platname server. 
+A mobile devices can tunnel the traffic through our \platname servers using either \wifi or cellular networks. 
+We estimate the access technology with the description of the AS through which the mobile client connects to our \platname server. 
 We get this AS description by performing a \emph{WHOIS} lookup on the IP address used by the mobile client to tunnel Internet traffic. 
 For our analysis, we use the WHOIS databases available at \emph{whois.cmyru.com} and \emph{utrace.de}.
 We use the information from these \emph{WHOIS} databases to manually classify the ASes to be either cellular or \wifi.
@@ -77,12 +80,12 @@ Our dataset consists of data traffic from 54 distinct ASes, of which we classify
 The devices connected to our system from at most two cellular ASes.
 In contrast, a median of 4 \wifi ASes were observed per device and for one device we observed traffic from 25 different \wifi ASes that are spread across 5 countries. 
 
-In \fref{tab:summaryIOSAndroidTraffic} we present a summary of our dataset based on the classification provided by Bro~\cite{bro}.
-Bro classifies IP flows protocol field in the IP header. 
+In \fref{tab:summaryIOSAndroidTraffic} we summarize \mobWild based on the classification performed using Bro~\cite{bro}.
+Bro classifies IP flows using the protocol field in the IP header.
 We use this classification to label flows as either TCP, UDP, or \emph{other}; flows that are neither TCP nor UDP are classified as \emph{other}. 
-Furthermore, Bro uses TCP port numbers to classify popular TCP services.
+Bro further uses the well defined port numbers to identify the services that use TCP.
 We use this classification to label flows as either HTTP, SSL (which includes HTTPS, IMAP, etc.) or \emph{other} flows; TCP flows that are not classified as either HTTP or SSL are classified as \emph{other}.
-we observe that more than 90\% of the traffic in our dataset is either HTTP or SSL. 
+In \fref{tab:summaryIOSAndroidTraffic}, we observe that more than 90\% of the traffic in our dataset is either HTTP or SSL. 
 We also observe that the share of HTTP volume over \wifi and cellular are significantly different. 
 As detailed in \fref{sec:.}, this difference is primarily due to the use of \wifi to transfer media content.
 We also observe the share of SSL traffic over cellular networks is considerably larger compared to \wifi networks.
