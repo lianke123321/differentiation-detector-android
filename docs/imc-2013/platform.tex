@@ -368,23 +368,221 @@ further this issue in Section~\ref{sec:classification}.
 % \label{sec:platform-transparent-proxy}
 
 
-\subsection{Feasibility}
+\subsection{Limitations}
+Using \platname{} to monitor traffic from mobile devices leads to
+limitations that we discuss in the following. We discuss first the
+overheads due to the VPN on the monitoring: VPN establishment delay,
+data consumption overhead due to the VPN encapsulation, power
+consumption overhead on the mobile device. Then we discuss the
+limitation such as the one due to the encryption of all the traffic
+between the mobile device and the \platname{} box, encryption
+preventing the access ISP to perform traffic modification and
+optimization. Finally, we discuss the scalability of a single
+\platname{} box.
+
+\subsubsection{VPN Establishment Delay}
+To establish a VPN tunnel, the mobile device and the \platname{} box
+must negotiate, which takes time. iOS devices use IKEv1 to establish VPN
+tunnels, whereas Android devices use the more recent and faster IKEv2.
+
+% The iOS devices use IKEv1 to manage the VPN tunnels while Android
+% devices support both IKEv1 and IKEv2.  To establish the VPN tunnel,
+% IKEv1 requires a total of 16 packets to be exchanged between the
+% mobile client and the VPN server while IKEv2 requires 4 packets.
+% \platname uses IKEv2 for Android devices while IKEv1 is used for iOS
+% devices.
+
+We made a simple set of 50 VPN establishments on both iOS (on an
+iPhone 5 running iOS 6.1) and Android (on a Galaxy Nexus running
+Android 4.2), and for both \wifi{} and cellular connections. For
+Android, we found maximum VPN establishment of 0.81 second on \wifi{}
+and of 1.59 second on cellular. For iOS that uses the older IKEv1, the
+VPN establishment takes longer: we observe a maximum of 2 seconds on
+\wifi{} and 2.18 seconds on cellular.  In summary, for most long term
+traffic monitoring experiments, the VPN establishment delay is
+negligible.
+
+% To measure the time required to establish a VPN tunnel, we performed
+% controlled tests using one Android device and an iPhone 5.  We
+% performed these tests from two different locations based in the same
+% city in which the server was deployed.  OUr tests involved
+% \tbdv{number} of VPN tunnel creation over a time period of \tbdv{}
+% hours.  When the Android device used \wifi to establish the VPN
+% tunnel, we observe a median connection establishment time of 0.62
+% seconds from both locations with a maximum of 0.81 seconds and 0.79
+% seconds respectively.  When the Android device used cellular networks
+% to establish the tunnel, the median connection establishment time was
+% 0.81 seconds from both locations with a maximum of 1.59 seconds.
+
+% Compared to the Android device, the iOS devices required a larger
+% amount of time to establish the connection because it relies on a an
+% older key authentication protocol.  From the two Wi-Fi networks, to
+% establish the VPN tunnel, the iOS device required 1.60 seconds and
+% 1.34 seconds with a maximum of 2.0 seconds and 1.48 seconds
+% respectively; in the case of cellular networks we observed a median of
+% 1.80 seconds and 1.65 seconds with a maximum of 2.18 seconds and 1.87
+% seconds respectively. \drc{This needs to go in a table, since it is
+%   impossibly dense.}
+
+% \tbd{In summary, we observe that because iOS devices use an older key
+%   exchange protocol they can take up to twice as much time as Android
+%   devices to establish the VPN tunnel.  Any more insights .. The
+%   tunnel establishment times in the order of 2 seconds implies that
+%   \platname can have a significant latency overhead if VPN tunnels are
+%   established periodically for short tests.}
+
+\subsubsection{Data Consumption Overhead}
+\platname{} uses IPsec for datagram encryption, thus there is
+encapsulation overhead for each packet exchanged between the mobile
+device and the \platname{} box. To evaluate this overhead, we logged
+for 30 days and 25 mobile devices the size of all IPsec packets and of
+the encapsulated packet. We observed a maximum increase in the packet
+size due to the IPsec encapsulation of 12.8\%. Within the scope of the
+traffic monitoring experiments performed with \platname{}, the impact
+of this overhead is negligible. However, in case of experiments with a
+limited cellular data plan, this overhead must be taken into account. 
 
 
-\subsection{Limitation}
-\platname {} has reached all the design goals, making this platform an
-excellent choice to monitor traffic for mobile devices. However,
-\platname{} has one limitation: because all the traffic between mobile
-devices and \platname{} is encrypted, we cannot observe any traffic
-modification made by ISPs. Indeed, ISPs that modify traffic (e.g., to insert
-advertisements \tbd{AR: give a reference}) must perform deep packet
-inspection, which is not possible when the traffic is encrypted.  In
-this section, we assess to which extent this issue is a practical
-limitation for \platname.
+% IPSec encapsulation slightly inflates packet sizes, in addition to
+% preventing carrier middleboxes from applying their own compression.
+% We measured the overhead of the tunnel in terms of data overhead from
+% IPsec headers and keep-alive messages, finding that it ranges from
+% 8--12.8\%.
+
+% To compute the increase in the amount of bytes transferred due to
+% encapsulation and the keep-alive messages, we log the packet lengths
+% of the encrypted packets (IPsec packets) exchanged by our \platname
+% servers and the mobile clients.  We performed this packet capture for
+% 30 days during which 25 devices tunneled their traffic via \platname.
+% During this time interval we also log the packet length of the packets
+% encapsulated within the IPsec packets.  During this 30 day period we
+% observe that the median of the increase to be 8.31\%, with a maximum
+% increase of 12.8\%.
+
+% \tbd{In summary, we observe a maximum overhead of 12.8\% increase in data consumption. We believe the costs of this overhead are minimal compared to the cost of warrant voiding the device.}
+
+\subsubsection{Power Consumption Overhead}
+To establish and maintain a VPN tunnel, the mobile devices need
+additional resources that translate into a larger battery drain during
+experiments. To evaluate this battery consumption due to the VPN, we
+used a power meter to measure the draw from a Galaxy Nexus running
+Android 4.2. We run 10 minutes experiments with and without the VPN
+enabled. For each experiment, we generated an intensive activity such
+as Web searches, map searches, Facebook interaction, e-mail and video
+streaming. We found that the VPN leads to a 10\% power overhead. 
+
+We used a power meter on an Android device only because power
+measurements require physical access to the battery for a device,
+which is not feasible for iOS devices. For iOS devices with made
+simpler experiment consisting in draining a fully charged battery with
+a video streaming with a without the VPN enabled. We found also around
+a 10\% power overhead. 
+
+In summary, the power overhead is low enough to run long experiments
+using mobile devices on \platname. 
+
+% \footnote{We use Android because power measurements
+%   require physical access to the battery for a device, which is not
+%   feasible for iOS devices. We found similar results when testing the
+%   time to discharge an iOS device while streaming video with and
+%   without a VPN connection.}
+
+% We found that VPN proxying imposes approximately 10\% power overhead
+% compared to direct traffic. To test the additional power consumption
+% from using a VPN proxy, we used a power meter to measure the draw from
+% a Galaxy Nexus running Android 4.2.\footnote{We use Android because
+%   power measurements require physical access to the battery for a
+%   device, which is not feasible for iOS devices. We found similar
+%   results when testing the time to discharge an iOS device while
+%   streaming video with and without a VPN connection.} While
+% instrumented, we conducted 10-minute experiments where we scripted
+% device usage with and without a VPN enabled. The activities included
+% Web searches, map searches, Facebook interaction, e-mail and video
+% streaming.
+
+\subsubsection{Limitation}
+The design of \platname{} comes with a few limitations that we discuss
+in the following. 
+
+First, all traffic is proxied through a \platname{} box, thus the Web
+services will see the \platname{} box address as the end-point and not
+the mobile device. This might have an impact in case of Web service
+tailoring the answer according to the IP address of the mobile device
+(e.g., in case of localization). The biggest problem is when a Web
+service deny access to some geographic area, but this problem can be
+worked around by installing a \platname{} box on a local (to the Web
+sevice) machine.
+
+Second, some ISPs block VPN traffic. In that case it is not possible
+to use the \platname{} plateform from a mobile device connected to
+such an ISP. There are few ISPs blocking VPN traffic, and there is a
+strong incentive to enable VPN traffic in order to attract
+professional clients. 
+
+Third, \platname{} cannot be currently use on networks using IPv6
+because IPv6 is not fully supported by mobile devices. Indeed, we
+observe that though iOS and Android support IPv6 they currently do not
+support IPv6 traffic through VPN tunnels.
+
+Finally, because all the traffic between mobile devices and \platname{}
+is encrypted, we cannot observe any traffic modification (such as
+advertisement insertion \tbd{AR: give a reference}) or optimization
+(such as traffic compression \tbd{AR: give a reference}) made by
+ISPs. Indeed, ISPs that modify traffic must perform deep packet
+inspection, which is not possible when the traffic is encrypted.  
+
+In summary, despite these limitations, we believe that \platname is a
+powerful and flexible plateform to monitor the mobile Internet traffic.
 
 
-\tbd{AL: put tripwire experiments here to show that ISP traffic
-  modification does not impact much Mobiscope. }
+\tbd{Should we use the tripewire experiment? Currently the description
+looks like a very small contribution, and it does not bring much to
+the discussion. }
+
+% To understand whether traffic interposition by ISPs is frequent, we
+% made a dedicated experiment using tripewires\tbd{cite the paper}.  In
+% particular, we exploit Android's support for apps providing VPN
+% services; instead of establishing a secure connection we simply
+% forward traffic to a proxy server without additional encryption. In
+% this way, the mobile device's ISP can inspect the contents of all
+% non-SSL traffic and interpose accordingly.  Note that one limitation
+% of this approach is that the ISP will see the destination for all
+% network traffic is our proxy server (instead of the original
+% destination), which could impact how ISPs treat the corresponding
+% traffic.
+
+% T-Mobile  AT&T 1000 first alexa rank, in France Orange and Free. 
+
+% VPN proxying via secure tunnels prevent ISPs from inspecting or
+% interposing on network traffic, thus preventing us from measuring this
+% behavior. To understand ISP interference with mobile Internet traffic,
+% we additionally support measurement using an \emph{insecure}
+% transparent proxy.  In particular, we exploit Android's support for
+% apps providing VPN services; instead of establishing a secure
+% connection we simply forward traffic to a proxy server without
+% additional encryption. In this way, the mobile device's ISP can
+% inspect the contents of all non-SSL traffic and interpose accordingly.
+% Note that one limitation of this approach is that the ISP will see the
+% destination for all network traffic is our proxy server (instead of
+% the original destination), which could impact how ISPs treat the
+% corresponding traffic.
+
+
+% \tbd{In summary, despite these shortcoming we believe that \platname can be used for realistic measurements of mobile Internet traffic.}
+
+
+
+\subsection{Ethical Issues}
+Capturing all of a subject's Internet traffic raises significant
+privacy concerns. Our IRB-approved study entails informed consent from
+subjects who are interviewed in lab, where the risks and benefits of
+our study are clearly explained. Subjects are incentivized to use the
+VPN though a lottery for Amazon.com gift certificates. All data from
+tcpdump is encrypted before touching persistent storage; the private
+key is maintained on separate secure severs and only approved
+researchers can access it. Users may delete their data and/or disable
+monitoring at any time. For privacy reasons, we cannot make this data
+publicly available.
 
 %%% Local Variables: 
 %%% mode: latex
