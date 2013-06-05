@@ -38,9 +38,25 @@ We now present the description of the dataset and the methodology we used to cla
 For this study, we deployed two \platname servers, one in USA and one in France, to proxy Internet traffic from 26 devices, 10 iPhones, 4 iPads, 1 iPodTouch, and 11 Android phones.
 The Android devices in this dataset include the Nexus, Sony, Samsung, and Gsmart brands while the iPhones include one iPhone~3gs, five iPhone~5, and five iPhone~4S.
 These devices belonged to 21 users, volunteers for our IRB approved study.
-To protect the identity of the users and their data, we used public key cryptography to encrypt the \emph{pcap} files that log the data traffic flowing through our \platname servers. 
+%To protect the identity of the users and their data, we used public key cryptography to encrypt the \emph{pcap} files that log the data traffic flowing through our \platname servers. 
 This dataset, called \mobWild, consists of 218 days of data that flowed through our \platname servers; the number days for each user varies from 5 to 215 with a median of 35 days.
 We would like to point out that though we performed SSL-Bumping during our controlled experiments, we did not perform SSL-Bumping for the traffic in this dataset.
+
+\subsubsection{Ethical Issues}
+
+Capturing all of a subject's Internet traffic raises significant
+privacy concerns. Our IRB-approved study entails informed consent from
+subjects who are interviewed in lab, where the risks and benefits of
+our study are clearly explained. Subjects are incentivized to use the
+VPN though a lottery for Amazon.com gift certificates. All data from
+tcpdump is encrypted before touching persistent storage; the private
+key is maintained on separate secure severs and only approved
+researchers can access it. Users may delete their data and/or disable
+monitoring at any time. For privacy reasons, we cannot make this data
+publicly available.
+
+
+\subsubsection{Identification of Access Technology}
 
 A mobile devices can tunnel the traffic through our \platname servers using either \wifi or cellular networks. 
 We estimate the access technology with the description of the AS through which the mobile client connects to our \platname server. 
@@ -52,7 +68,7 @@ The devices connected to our system from at most two cellular ASes.
 In contrast, a median of 4 \wifi ASes were observed per device and for one device we observed traffic from 25 different \wifi ASes that are spread across 5 countries. 
 
 
-\subsubsection{Traffic Classification Methodology}
+\subsubsection{Traffic Summary}
 
 \begin{table}
 \begin{small}
@@ -104,7 +120,7 @@ We focus our application classification on TCP because TCP is responsible for th
 Furthermore more than 95\% of the TCP traffic is due to SSL and HTTP.
 We therefore focus our attention on HTTP and SSL traffic. 
 
-\textbf{Classification of HTTP Traffic.}
+\subsubsection{Classification of HTTP Traffic}
 
 The HTTP headers for HTTP Request, HTTP Response, and HTTP Entity contain a wealth of information including \useragent, \emph{Referrer}, \emph{Content-Type}, and \emph{Content-Encoding} that can be used to classify HTTP traffic~\cite{rfc:http}.
 Recent studies on mobile traffic classification have relied heavily on the \useragent field to classify mobile HTTP traffic~\cite{qian:webcache, maier:mobtraffic, xu:appusage}.
@@ -147,46 +163,51 @@ Therefore, because HTTP traffic for Android devices cannot be classified solely 
 In \fref{fig:http-classification-app-user-agent-host} we present the HTTP traffic share that we could classify using the \useragent and \httphost field in the HTTP headers. 
 The rest of the flows belong to traffic from Web-browsers and those that do not include any signatures in the \useragent field. 
 
-\textbf{Classification of SSL Traffic.}
+\subsubsection{Classification of SSL Traffic.}
 
 Unlike HTTP flows, SSL flows provide limited information that can be used to identify the applications. 
 We now show how we used the \sslservername and the DNS queries to classify SSL traffic. 
 
-\begin{figure}
+\begin{figure}[t]
 \includegraphics[width=\columnwidth]{plots/sslanalysis_someservername_traffic.pdf}
 \caption{SSL flows classified using the \sslservername in the flows.}
 \label{fig:ssl-classification-servername}
 \end{figure}
-
-
-\begin{figure}
-\includegraphics[width=\columnwidth]{plots/sslanalysis_dns_timediff_distrib.pdf}
-\caption{Distribution of the time between DNS response that contained the IP address of the SSL server and the SYN from the SSL flows. 
-\emph{The lack of difference in the curves for Android devices implies that the first entry in the most recent DNS response contained the IP address of the SSL flow.\tbd{rename xlab to DNS response.}}}
-\label{fig:ssl-dns-first-recent-distrib}
-\end{figure}
-
-We use the DNS flows that passed through \platname to further classify the SSL flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
-DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices prefer the the first entry in DNS response while resolving hostnames.
-Popular webservices such as google are known to use the same pool of IP addresses for various applications, for example the IP for gmail may also be used for search. 
-To analyze the impact of the ambiguity, in \fref{fig:ssl-dns-first-recent-distrib} we plot the distribution of the time between the DNS response that contained the IP address and SYN packet from the SSL flow. 
-For this plot, we consider two types of DNS responses: the most recent DNS response that contain the IP address in the SSL flows, and the most recent DNS response that contained the IP address as the first entry in the DNS response. 
-We observe that for Android flows we do not observe a difference in the curves for the distribution, implying that the first entry in the most recent DNS response contained the IP address of the SSL flow.
-However, for iOS devices we observe a difference in the distribution when the time difference between the SYN and DNS response is larger than three seconds. 
-This difference creates an ambiguity which can be aggravated by caching of name resolution by the applications. 
-
-\begin{figure}
+\begin{figure}[t]
 \includegraphics[width=\columnwidth]{plots/sslanalysis_samedns_traffic.pdf}
 \caption{SSL traffic share where the most recent DNS response contained the IP address of the SSL flow in the first position.}
 \label{fig:ssl-classification-app-service}
 \end{figure}
 
+
+In \fref{fig:ssl-classification-servername} we observe that relying on the \sslservername is not sufficient to classify the traffic. 
+We observe a huge disparity in the fraction of traffic that can be classified using this technique.
+Along with the \sslservername, the common name field of the certificate can be used to identify the traffic. 
+However, the use of CDNs and the use of regular expression to support a large set of hostnames gives a us a result similar to that observed in \fref{fig:ssl-classification-servername}.
+
+\tbd{The plot can be removed and the discussion with CN field can be merged to indicate relying on certificates and server-names on their own is not sufficient}
+% \begin{figure}
+% \includegraphics[width=\columnwidth]{plots/sslanalysis_dns_timediff_distrib.pdf}
+% \caption{Distribution of the time between DNS response that contained the IP address of the SSL server and the SYN from the SSL flows. 
+% \emph{The lack of difference in the curves for Android devices implies that the first entry in the most recent DNS response contained the IP address of the SSL flow.\tbd{rename xlab to DNS response.}}}
+% \label{fig:ssl-dns-first-recent-distrib}
+% \end{figure}
+
+% To analyze the impact of the ambiguity, in \fref{fig:ssl-dns-first-recent-distrib} we plot the distribution of the time between the DNS response that contained the IP address and SYN packet from the SSL flow. 
+% For this plot, we consider two types of DNS responses: the most recent DNS response that contain the IP address in the SSL flows, and the most recent DNS response that contained the IP address as the first entry in the DNS response. 
+% We observe that for Android flows we do not observe a difference in the curves for the distribution, implying that the first entry in the most recent DNS response contained the IP address of the SSL flow.
+% However, for iOS devices we observe a difference in the distribution when the time difference between the SYN and DNS response is larger than three seconds. 
+% This difference creates an ambiguity which can be aggravated by caching of name resolution by the applications. 
+
+We use the DNS flows that passed through \platname to further classify the SSL flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
+DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices prefer the the first entry in DNS response while resolving \emph{hostnames}.
+Popular webservices such as google are known to use the same pool of IP addresses for various applications, for example the IP for gmail may also be used for search. 
 In \fref{fig:ssl-classification-app-service} we present the fraction of SSL traffic where the most recent DNS response contained the IP address of the SSL flow in the first position. 
 We observe that for the majority of SSL traffic by volume and flows can be classified by using the DNS responses. 
 
 In summary, we use \platname to perform controlled experiments and in the wild measurements to characterize mobile Internet traffic. 
+We use Bro to analyze the data and build on the output of bro to further classify HTTP flows and SSL flows to identify the source of the traffic. 
 We now present the results of our experiments and measurements study. 
-
 
 
 %%% Local Variables: 

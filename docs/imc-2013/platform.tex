@@ -28,9 +28,11 @@
 %     experiments}
 % \end{packedenumerate}
 
-In this section, we present the \platname{} plateform whose goal is
-\emph{to monitor all the Internet traffic from and to mobile devices}
-with the following constraints.
+In this section, we present the \platname{} plateform\footnote{At the
+  time of the camera ready version, we will make the \platname{}
+  software publicly available.} whose goal is \emph{to monitor all
+  the Internet traffic from and to mobile devices} with the following
+constraints.
 \begin{packedenumerate}
 \item \emph{OS agnostic.} We want to monitor traffic independently of
   the OS run by the monitored device. In particular, we do not want to
@@ -50,8 +52,8 @@ with the following constraints.
   single machine to facilitate its installation and deployment. 
  \end{packedenumerate}    
 
-At the time of the camera ready version, we will make the \platname{}
-software publicly available. 
+In the following, we describe in detail the design of \platname{},
+then we discuss the limitations of the platform.
 
 
 \subsection{MobiScope Design}
@@ -108,7 +110,7 @@ that is on the \platname{} platform, we use
 \textit{Strongswan}~\cite{strongswan}, an open source software used to
 manage VPN tunnels. Strongswan supports the required protocols and
 encryption algorithms required by iOS and Android, in particullar
-IPsec for the encryption of IP datagrams and IKEv1 and
+IPsec for the encryption of IP datagrams, and IKEv1 and
 IKEv2~\cite{rfc5996} for authentication and key negotiation.
 
 
@@ -133,7 +135,7 @@ IKEv2~\cite{rfc5996} for authentication and key negotiation.
 Surprisingly, monitoring traffic on \platname{} is particularly
 involved. When we monitor traffic on \platname, we need to dump
 all traffic between the mobile devices and the Internet, and we need to
-associate the dumped traffic to the right mobile device and Webservice. The
+associate the dumped traffic to the right mobile device and Web service. The
 former is easy using a \textit{tcpdump} process, but the later is more
 complex. To explain this complexity, we first need to explain how
 packets are processed on \platname. 
@@ -165,7 +167,7 @@ Symbol & Description \tabularnewline
 \hline
 d & IP address of the mobile device assigned by its ISP. \tabularnewline
 m & IP address of the \platname server. \tabularnewline
-w & IP address of the server providing the Webservice. \tabularnewline
+w & IP address of the server providing the Web service. \tabularnewline
 (i) & The i-th step of packet processing. \tabularnewline
 \fbox{a $\rightarrow$ b} & Packet with source IP \emph{a} and destination IP \emph{b}. \tabularnewline
 v & IP address of the mobile device in the VPN tunnel. \tabularnewline
@@ -188,16 +190,16 @@ datagram is encapsulated in a regular IP datagram sent from the device
 IPsec layer decrypts at step (3) the datagram whose source IP address
 is the private address of the mobile device in the VPN tunnel (address
 \emph{v}) and the destination is the IP address of the destination
-Webservice (address \emph{w}). In order to send this datagram in the
+Web service (address \emph{w}). In order to send this datagram in the
 Internet, the NAT must convert in step (5) the private IP address
 \emph{v} to the public IP address \emph{m} of the \platname{}
 box. Then this packet is sent in the Internet. As the tcpdump process
 runs just above the Ethernet layer, it dumps packets at step (2), (4),
 and (7). In addition, we also dump the NAT translation
-table. To associate packets to a device and a Webservice,
+table. To associate packets to a device and a Web service,
 we only need the packet captured at step (4) that associates the
 packet to the private address \emph{v} of the device in the VPN tunnel
-and the Webservice (address \emph{w}), and the NAT translation table
+and the Web service (address \emph{w}), and the NAT translation table
 that gives the mapping between the device in the VPN tunnel (address
 \emph{v}) and the public IP address \emph{d} of the mobile device.
 
@@ -205,7 +207,7 @@ However, in the reverse direction, when packets flows from the
 Internet to the mobile device, it is no more possible to associate a
 mobile device to the packets, see
 Figure~\ref{fig:packet-monitor-b}. Indeed, from the dumped packets at
-step (2) and (7), we know that a packet in sent by the Webservice to
+step (2) and (7), we know that a packet in sent by the Web service to
 the \platname{} box (step (2)), but then this packet is encapsulated
 at the IPsec layer, and the address resolution is performed by the NAT
 without any dump. So, when we see the datagram at step(7), we have no
@@ -373,12 +375,13 @@ Using \platname{} to monitor traffic from mobile devices leads to
 limitations that we discuss in the following. We discuss first the
 overheads due to the VPN on the monitoring: VPN establishment delay,
 data consumption overhead due to the VPN encapsulation, power
-consumption overhead on the mobile device. Then we discuss the
-limitation such as the one due to the encryption of all the traffic
+consumption overhead on the mobile device. Then we discuss additional
+limitations such as the one due to the encryption of all the traffic
 between the mobile device and the \platname{} box, encryption
 preventing the access ISP to perform traffic modification and
-optimization. Finally, we discuss the scalability of a single
-\platname{} box.
+optimization. 
+% Finally, we discuss the scalability of a single
+% \platname{} box.
 
 \subsubsection{VPN Establishment Delay}
 To establish a VPN tunnel, the mobile device and the \platname{} box
@@ -433,10 +436,10 @@ negligible.
 
 \subsubsection{Data Consumption Overhead}
 \platname{} uses IPsec for datagram encryption, thus there is
-encapsulation overhead for each packet exchanged between the mobile
+an encapsulation overhead for each packet exchanged between the mobile
 device and the \platname{} box. To evaluate this overhead, we logged
 for 30 days and 25 mobile devices the size of all IPsec packets and of
-the encapsulated packet. We observed a maximum increase in the packet
+the encapsulated packet. We observe a maximum increase in the packet
 size due to the IPsec encapsulation of 12.8\%. Within the scope of the
 traffic monitoring experiments performed with \platname{}, the impact
 of this overhead is negligible. However, in case of experiments with a
@@ -473,8 +476,8 @@ streaming. We found that the VPN leads to a 10\% power overhead.
 
 We used a power meter on an Android device only because power
 measurements require physical access to the battery for a device,
-which is not feasible for iOS devices. For iOS devices with made
-simpler experiment consisting in draining a fully charged battery with
+which is not feasible for iOS devices. For iOS devices we made
+simpler experiments consisting in draining a fully charged battery with
 a video streaming with a without the VPN enabled. We found also around
 a 10\% power overhead. 
 
@@ -501,8 +504,8 @@ using mobile devices on \platname.
 % streaming.
 
 \subsubsection{Limitation}
-The design of \platname{} comes with a few limitations that we discuss
-in the following. 
+The design of \platname{} comes with a few additional limitations that
+we discuss in the following.
 
 First, all traffic is proxied through a \platname{} box, thus the Web
 services will see the \platname{} box address as the end-point and not
@@ -519,7 +522,7 @@ such an ISP. There are few ISPs blocking VPN traffic, and there is a
 strong incentive to enable VPN traffic in order to attract
 professional clients. 
 
-Third, \platname{} cannot be currently use on networks using IPv6
+Third, \platname{} cannot be currently used on networks using IPv6
 because IPv6 is not fully supported by mobile devices. Indeed, we
 observe that though iOS and Android support IPv6 they currently do not
 support IPv6 traffic through VPN tunnels.
@@ -529,7 +532,10 @@ is encrypted, we cannot observe any traffic modification (such as
 advertisement insertion \tbd{AR: give a reference}) or optimization
 (such as traffic compression \tbd{AR: give a reference}) made by
 ISPs. Indeed, ISPs that modify traffic must perform deep packet
-inspection, which is not possible when the traffic is encrypted.  
+inspection, which is not possible when the traffic is
+encrypted. Whereas \platname{} can be used to explore specificities of
+ISPs, it has been primarily designed to explore specificities of
+mobile devices and access technology. 
 
 In summary, despite these limitations, we believe that \platname is a
 powerful and flexible plateform to monitor the mobile Internet traffic.
@@ -572,17 +578,6 @@ the discussion. }
 
 
 
-\subsection{Ethical Issues}
-Capturing all of a subject's Internet traffic raises significant
-privacy concerns. Our IRB-approved study entails informed consent from
-subjects who are interviewed in lab, where the risks and benefits of
-our study are clearly explained. Subjects are incentivized to use the
-VPN though a lottery for Amazon.com gift certificates. All data from
-tcpdump is encrypted before touching persistent storage; the private
-key is maintained on separate secure severs and only approved
-researchers can access it. Users may delete their data and/or disable
-monitoring at any time. For privacy reasons, we cannot make this data
-publicly available.
 
 %%% Local Variables: 
 %%% mode: latex
