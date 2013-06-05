@@ -143,33 +143,27 @@ In contrast, 56.52\% of YouTube content was downloaded by Android devices withou
 \caption{HTTP traffic classification using User-Agent or name of media service.}
 \label{fig:http-classification-app-service}
 \end{figure}
+
 To further classify the media content, we use the \emph{HOST} field in the HTTP GET requests.
 We assign flows a label based on the host names of popular media sites. 
 In \fref{fig:http-classification-app-service} we plot the fraction of traffic that we could classify by using the User-Agent along with the host names. 
 We observe that despite this technique the traffic share of classified traffic for Android devices still lags behind that of iOS devices. 
 
-What we show
-Difference in media content download in iOS and Android
-The fields in the HTTP requests that can be used to classify HTTP content and identify traffic sources. 
-The difference in the use of UserAgents in Android and iOS. 
 
 \subsection{Classification of SSL Traffic}
 
-Field observed in traffic:
-server name and the 
-Use of subject field in the certificates. 
-Issues with generic certificates CN=*.google.com.
-Workaround:
-Use of DNS
+Unlike HTTP flows, SSL flows provide limited information that can be used to identify the applications. 
+%We now show how we used the \sslservername and the DNS queries to classify SSL traffic. 
+
+%\begin{figure}
+%\includegraphics[width=\columnwidth]{plots/sslanalysis_someservername_traffic.pdf}
+%\caption{SSL flows classified using the \sslservername in the flows.}
+%\label{fig:ssl-classification-servername}
+%\end{figure}
+
 
 \cite{chen:wifi}
 
-
-\begin{figure}
-\includegraphics[width=\columnwidth]{plots/sslanalysis_someservername_traffic.pdf}
-\caption{HTTP traffic classification using User-Agent or name of media service.}
-\label{fig:http-classification-app-service}
-\end{figure}
 
 
 \begin{figure}

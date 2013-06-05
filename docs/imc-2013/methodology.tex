@@ -31,12 +31,28 @@ The results of the controlled experiments can be found in \fref{sec:manual-testi
 \subsection{In The Wild Measurements}
 
 Along with controlled experiments we also conducted a measurement study to characterize the mobile Internet in the wild.
+We now present the description of the dataset and the methodology we used to classify the traffic in this dataset.
+
+\subsubsection{Dataset Description}
+
 For this study, we deployed two \platname servers, one in USA and one in France, to proxy Internet traffic from 26 devices, 10 iPhones, 4 iPads, 1 iPodTouch, and 11 Android phones.
 The Android devices in this dataset include the Nexus, Sony, Samsung, and Gsmart brands while the iPhones include one iPhone~3gs, five iPhone~5, and five iPhone~4S.
 These devices belonged to 21 users, volunteers for our IRB approved study.
 To protect the identity of the users and their data, we used public key cryptography to encrypt the \emph{pcap} files that log the data traffic flowing through our \platname servers. 
 This dataset, called \mobWild, consists of 218 days of data that flowed through our \platname servers; the number days for each user varies from 5 to 215 with a median of 35 days.
 We would like to point out that though we performed SSL-Bumping during our controlled experiments, we did not perform SSL-Bumping for the traffic in this dataset.
+
+A mobile devices can tunnel the traffic through our \platname servers using either \wifi or cellular networks. 
+We estimate the access technology with the description of the AS through which the mobile client connects to our \platname server. 
+We get this AS description by performing a \emph{WHOIS} lookup on the IP address used by the mobile client to tunnel Internet traffic. 
+For our analysis, we use the WHOIS databases available at \emph{whois.cmyru.com} and \emph{utrace.de}.
+We use the information from these \emph{WHOIS} databases to manually classify the ASes to be either cellular or \wifi.
+Our dataset consists of data traffic from 54 distinct ASes, of which we classify 9 to be belong to cellular networks.
+The devices connected to our system from at most two cellular ASes.
+In contrast, a median of 4 \wifi ASes were observed per device and for one device we observed traffic from 25 different \wifi ASes that are spread across 5 countries. 
+
+
+\subsubsection{Traffic Classification Methodology}
 
 \begin{table}
 \begin{small}
@@ -71,15 +87,7 @@ We would like to point out that though we performed SSL-Bumping during our contr
 \label{tab:summaryIOSAndroidTraffic}
 \end{table}
 
-A mobile devices can tunnel the traffic through our \platname servers using either \wifi or cellular networks. 
-We estimate the access technology with the description of the AS through which the mobile client connects to our \platname server. 
-We get this AS description by performing a \emph{WHOIS} lookup on the IP address used by the mobile client to tunnel Internet traffic. 
-For our analysis, we use the WHOIS databases available at \emph{whois.cmyru.com} and \emph{utrace.de}.
-We use the information from these \emph{WHOIS} databases to manually classify the ASes to be either cellular or \wifi.
-Our dataset consists of data traffic from 54 distinct ASes, of which we classify 9 to be belong to cellular networks.
-The devices connected to our system from at most two cellular ASes.
-In contrast, a median of 4 \wifi ASes were observed per device and for one device we observed traffic from 25 different \wifi ASes that are spread across 5 countries. 
-
+We used Bro~\cite{bro} to analyze the traffic the passed through our \platname servers.
 In \fref{tab:summaryIOSAndroidTraffic} we summarize \mobWild based on the classification performed using Bro~\cite{bro}.
 Bro classifies IP flows using the protocol field in the IP header.
 We use this classification to label flows as either TCP, UDP, or \emph{other}; flows that are neither TCP nor UDP are classified as \emph{other}. 
@@ -92,87 +100,94 @@ We also observe the share of SSL traffic over cellular networks is considerably 
 This increase is a result of the reduced share of media traffic and the use of email and for social networking applications that rely on SSL.
 We detail the HTTP and SSL traffic from iOS and Android devices in \fref{sec:}
 
+We focus our application classification on TCP because TCP is responsible for than 90\% of the traffic volume in our dataset (see~\fref{tab:summaryIOSAndroidTraffic}).
+Furthermore more than 95\% of the TCP traffic is due to SSL and HTTP.
+We therefore focus our attention on HTTP and SSL traffic. 
+
+\textbf{Classification of HTTP Traffic.}
+
+The HTTP headers for HTTP Request, HTTP Response, and HTTP Entity contain a wealth of information including \useragent, \emph{Referrer}, \emph{Content-Type}, and \emph{Content-Encoding} that can be used to classify HTTP traffic~\cite{rfc:http}.
+Recent studies on mobile traffic classification have relied heavily on the \useragent field to classify mobile HTTP traffic~\cite{qian:webcache, maier:mobtraffic, xu:appusage}.
+We quantify the usefulness of the \useragent field and show how other fields such as \httphost are essential to characterize mobile HTTP traffic. 
+
+Webservices are known to use the \useragent field to distinguish flows from their mobile applications from the flows originating from Web-browsers.
+We observe that more than 98\% of HTTP traffic from Android and iOS devices in the \mobWild dataset have a valid \useragent string; we observe a total of 1435 unique \useragent strings across Android and iOS devices. 
+In these \useragent strings we observe that along with the application identifier, the \useragent strings also contain details of the OS, manufacturer, display resolutions, carrier, and other information such as versions and compatibility with other browser engines. 
+We use regular expression to extract the tokens containing the application information and we then cluster these tokens using edit distance between individual tokens and number of matching tokens. 
+We plan to release this code along with \platname package.
+At the end of this process we were able to identify 361 unique application signatures.
+We use the extracted application signature to label the HTTP traffic that flows through \platname.
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{plots/appusage_someappsig_traffic.pdf}
+\caption{HTTP traffic with a \useragent field containing an identifier of an application (other than Web-browser) or an OS service. 
+\emph{A smaller share of Android HTTP traffic can be classified using User-Agents because Android applications are not limited to underlying OS media services such as AppleCoreMedia.}}
+\label{fig:http-classification-app-user-agent}
+\end{figure}
+
+In \fref{fig:http-classification-app-user-agent} we plot the fraction of HTTP traffic for we were able to identify an application signature; the devices are ordered according to the operating system, and for each operating system we further order the devices according to the total traffic from the device that flowed through \platname. 
+We observe that a significantly larger fraction of traffic from iOS device can be mapped to an application in comparison to the traffic from Android devices. 
+For example, while more than 80\% of HTTP traffic from iOS devices contain an application or OS service signature in the \useragent field, only 23.9\% and 19.5\% from Android devices with id 16 and 18 contained useful signatures in the \useragent field.
+On further inspection we observe that this difference is because of the techniques used by Android and iOS application to download audio and video content. 
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{plots/appusage_someappservicesig_traffic.pdf}
+\caption{HTTP traffic classified using \useragent or \httphost field provided by popular media services in the HTTP header. \emph{The rest of the traffic is either from Web-browsers and flows that do not include any application signatures in the \useragent field.}}
+\label{fig:http-classification-app-user-agent-host}
+\end{figure}
+
+We observe that the iOS devices primarily download media content using the AppleCoreMedia service~\cite{apple:coremedia}.
+We therefore observed a signature for AppleCoreMedia in the \useragent string for more than 98.45\% of the content downloaded from the YouTube servers (which we identify based on the \httphost field in the \httpget requests). 
+We also observed AppleCoreMedia signatures in the content fetched from other media sites such as Netflix and iTunes.
+Though Android provides a similar service, Stagefright\cite{android:stagefright}, we observe that only 41.91\% of YouTube content in our dataset was fetched using Stagefright in the \useragent field. 
+Similarly, we observed content from other media sites were fetched without any unique signatures in the \useragent field. 
+Therefore, because HTTP traffic for Android devices cannot be classified solely based on the \useragent field, and most of the unclassified traffic was media content, we use the \httphost field to further classify flows that do not contain a signature in the \useragent field. 
+\tbd{Results to show when Stagefright is used and when it is not based on controlled experiments performed}
+
+In \fref{fig:http-classification-app-user-agent-host} we present the HTTP traffic share that we could classify using the \useragent and \httphost field in the HTTP headers. 
+The rest of the flows belong to traffic from Web-browsers and those that do not include any signatures in the \useragent field. 
+
+\textbf{Classification of SSL Traffic.}
+
+Unlike HTTP flows, SSL flows provide limited information that can be used to identify the applications. 
+We now show how we used the \sslservername and the DNS queries to classify SSL traffic. 
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{plots/sslanalysis_someservername_traffic.pdf}
+\caption{SSL flows classified using the \sslservername in the flows.}
+\label{fig:ssl-classification-servername}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{plots/sslanalysis_dns_timediff_distrib.pdf}
+\caption{Distribution of the time between DNS response that contained the IP address of the SSL server and the SYN from the SSL flows. 
+\emph{The lack of difference in the curves for Android devices implies that the first entry in the most recent DNS response contained the IP address of the SSL flow.\tbd{rename xlab to DNS response.}}}
+\label{fig:ssl-dns-first-recent-distrib}
+\end{figure}
+
+We use the DNS flows that passed through \platname to further classify the SSL flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
+DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices prefer the the first entry in DNS response while resolving hostnames.
+Popular webservices such as google are known to use the same pool of IP addresses for various applications, for example the IP for gmail may also be used for search. 
+To analyze the impact of the ambiguity, in \fref{fig:ssl-dns-first-recent-distrib} we plot the distribution of the time between the DNS response that contained the IP address and SYN packet from the SSL flow. 
+For this plot, we consider two types of DNS responses: the most recent DNS response that contain the IP address in the SSL flows, and the most recent DNS response that contained the IP address as the first entry in the DNS response. 
+We observe that for Android flows we do not observe a difference in the curves for the distribution, implying that the first entry in the most recent DNS response contained the IP address of the SSL flow.
+However, for iOS devices we observe a difference in the distribution when the time difference between the SYN and DNS response is larger than three seconds. 
+This difference creates an ambiguity which can be aggravated by caching of name resolution by the applications. 
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{plots/sslanalysis_samedns_traffic.pdf}
+\caption{SSL traffic share where the most recent DNS response contained the IP address of the SSL flow in the first position.}
+\label{fig:ssl-classification-app-service}
+\end{figure}
+
+In \fref{fig:ssl-classification-app-service} we present the fraction of SSL traffic where the most recent DNS response contained the IP address of the SSL flow in the first position. 
+We observe that for the majority of SSL traffic by volume and flows can be classified by using the DNS responses. 
+
 In summary, we use \platname to perform controlled experiments and in the wild measurements to characterize mobile Internet traffic. 
 We now present the results of our experiments and measurements study. 
 
 
-% \subsubsection{Access Technology Estimation}
-
-% \platname's passive traffic monitoring implies that we need to estimate the access technology, cellular or \wifi, used by the device.
-% We estimate the access technology using the description of the AS through which the mobile client connected to our \platname server. 
-% We get the AS description by performing a \emph{WHOIS} lookup on the IP address used by the mobile client to tunnel Internet traffic. 
-% For our analysis, we use the WHOIS databases available at \emph{whois.cmyru.com} and \emph{utrace.de}.
-% We use the information from these \emph{WHOIS} databases to manually classify the ASes to be either cellular or \wifi.
-% Our dataset consists of data traffic from \tbd{} distinct ASes, of which we classify \tbd{} as ASes belonging to cellular networks.
-% We observe that these \tbd{} ASes belong to \tbd{} distinct ISPs. 
-% This observation confirms our intuition that studies based traces from a single ISP~\cite{maier:mobtraffic, vallina-rod:ads}, shall not be able to analyze how specific users use mobile devices. 
-
-% A shortcoming of this approach is when mobile clients are served by a \wifi access point that internally uses a cellular connection to connect the Internet.
-% In this case, though the device uses \wifi to connect to the Internet, our servers will observe the connection from a cellular AS. 
-%\subsubsection{Overview of Measured Traffic}
-
-
-%   {\bf iOS Push Notifications.}
-%   The applications running on iOS devices receive notifications from Web services using \emph{iOS push notification}. 
-%   Push notifications allow an application to alert the user of updates (\eg{}, Facebook messages) while the phone is idle/not in active use.
-%   iPhone users are typically warned not to enable push notifications for too many apps due to the potential for these background tasks to (1) consume bandwidth resources and (2) consume battery resources, all without any active user behavior.
-%   However, these warnings come with little quantification of exactly {\it how much} an application's push notifications might impact battery life or bandwidth; to date the research community has not measured these properties due to the closed-source nature of iOS and consequent difficulty to measure these properties.
-%   Nevertheless, with \platname we can monitor the traffic generated due to push notifications and thus quantify the impact of push notifications despite the iOS lockdown; to the best of our knowledge this is the first measurement characterization of iOS push notifications.
-
-%   Our experiments to study push notifications proceeded as follows:\tbd{...Ashwin?}
-
-%   The results of these tests can be found in \S\ref{sec:pushresults}.
-
-%   {\bf Android Applications.}
-%   Both Android and iPhone apps generate traffic to load and upload user data, app content, and advertisements.
-%   Although users are informed upon application installation whether or not an app is allowed to access the Internet, the user is unaware {\it what} data is sent, {\it how much} data is sent or accessed, or {\it with whom} the app communications.
-%   We define a `well-behaved' application as one which (a) makes limited use of network and battery resources (\ie{} by accessing little bandwidth and by batching traffic to allow radio shutdown during idle periods); (b) contacts only those servers necessary to perform application behavior (\ie{} contacting only a limited number of advertising networks and no tracking sites); and (c) not leaking any personally identifiable information over the network, (\ie{} using HTTPS whenever uploading needed private information like email addresses, and never uploading unnecessary personal information like address book contents or device IMEI). 
-% \tbd{Justine: I need your help to rewrite the text here. I have put some crappy text as placeholder.}
-
-%   We test how many applications actually meet these criteria of well-behaved network usage, we performed controlled experiments on blank Android smartphones, iteratively installing, playing with, and monitoring the behavior of hundreds of Android apps whilst running the \platname app in the background.
-%   We tested the top 100 most popular free Android apps manually -- installing each app by hand, entering user credentials for accounts like Facebook and Twitter, and toying with the app. In addition to this manual setup, we used an automatic test-click generator to further toy with the app. Afterwards, we uninstalled the app and reset the device.
-  
-%   Android, unlike iOS, allows users to `side-load' third-party apps on to their device; consequently there are numerous third-party app markets on the web in addition to Google's official Play Store.
-%   To study these apps, we performed fully-automated tests on 1003 apps from a free, third-party app market.
-%   Our automation used the adb Android command shell to install each app, enable \platname, and start the app.
-%   The system then used Monkey, the built-in adb stress tool, to perform a series of 10,000 actions. These actions consisted of random swipes, touches, and text entries.
-%   The system then once again used adb to uninstall the app and reboot the device (thus ending all lingering connections and metadata from the previous app.)
-
-%   The results of these tests can be found in \S\ref{sec:androidresults}.
-%   {\bf iPhone Applications.}
-% \tbd{Dave/Ashwin: Complete the text here for iOS -- subset of apps}. 
-% Dummy text for the paragraph.
-% \tbd{Dave: Text Here}
-
-% \subsection{In The Wild}
-
-% Along with controlled experiments we also conducted a measurement study to characterize the mobile Internet in the wild.
-% We deployed two \platname servers in USA and one server in France. 
-% These servers tunnel Internet traffic using VPNs from 25 devices, belonging to 19 users who are volunteers for our IRB approved study.
-% To protect the identity of the users and their data, on each server we use public key cryptography to encrypt the files that log the data traffic that flow through the server. 
-% We call this dataset the \mobWild dataset. 
-
-% The 25 devices that contribute to the \mobWild dataset consists of 10 iPhones, 4 iPads, 1 iPodTouch, 9 Android phones, and 1 Android tablet.
-% Though \emph{tablets} can access the Internet via a cellular data connections, for the \mobWild we included tablets that only use \wifi to access the Internet.
-% The Android devices in this dataset include the Nexus, Sony, Samsung, and Gsmart brands.
-
-% This dataset consists of 202 days of data that flowed through our VPN servers; the number days for each user varies from 5 to 198 with a median of 35 days.
-
-% We estimate the access technology used by the mobile device by performing a \emph{WHOIS} lookup on the IP address used by the mobile client for creation of the VPN tunnel. 
-% We use the WHOIS databases available at \emph{whois.cmyru.com} and \emph{utrace.de} to get the ISP details.
-% We observe that ISPs that provide Internet access over cellular connections use dedicated ASes for cellular traffic. 
-% We use the information provided by the \emph{WHOIS} databases to manually classify the ASes used by the mobile devices to be either cellular or \wifi.
-% This classification gives incorrect results when mobile clients are served by a \wifi access point that internally uses a cellular connection to connect the Internet.
-% In this case, though the device uses \wifi to connect to the Internet, our servers will log the connection to be from a cellular ISP. 
-
-% \tbd{we need some wording and consitency for the usage of ISP -- for example ATT can provide cellular and DSL. Also mobile data cannot be used and we need some word for cellular data and wifi data and this must be defined in the dataset description.}
-
-% Based on the above classification of access technology and ISPs, our dataset consists of data traffic from 52 distinct ISPs, of which 10 provided cellular services.
-% Of the 18 devices that used cellular data, we observed that 15 devices restricted their cellular data traffic to one ISP each; we observed that the other three devices accessed the Internet using the services of two different ISPs.
-% We observed that the devices in our dataset used a higher number of \wifi ISPs.
-% We observed a median of 4 \wifi ISPs per device with a maximum of 25 \wifi ISPs that were used by one device.
-% %The device that used \tbdv{24} distinct ISPs was used by a user who traveled across 6 different countries during the data collection process. 
-% This observation confirms our intuition that studies based traces from a single ISP~\cite{maier:mobtraffic, vallina-rod:ads}, shall not be able to analyze how specific users use mobile devices. 
 
 %%% Local Variables: 
 %%% mode: latex

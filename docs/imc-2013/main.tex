@@ -10,6 +10,10 @@
 \newcommand{\ie}{{\it i.e.}}
 \newcommand{\eg}{{\it e.g.}}
 \newcommand{\etc}{{\it etc.}}
+\newcommand{\useragent}{{\it User-Agent}\xspace}
+\newcommand{\httphost}{{\it Host}\xspace}
+\newcommand{\httpget}{{\it HTTP GET}\xspace}
+\newcommand{\sslservername}{{\it Server-Name}\xspace}
 \newcommand{\eat}[1]{}
 \usepackage[english,plain]{fancyref}
 \usepackage{times}
@@ -95,14 +99,18 @@ David Choffnes\\
 
 \input{methodology}
 
-\input{measurements}
+\input{characterize-os}
+
+\input{characterize-applications}
+
+\input{characterize-networks}
 
 \input{related}
 
 \input{conclusion}
 
-\input{placeholder-tex/classification}
-
+%\input{placeholder-tex/classification}
+%\input{placeholder-tex/characterize-applications}
 \bibliographystyle{abbrv}
 \bibliography{biblio}
 
