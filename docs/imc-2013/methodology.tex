@@ -174,6 +174,21 @@ We now present the results of our experiments and measurements study.
 % %The device that used \tbdv{24} distinct ISPs was used by a user who traveled across 6 different countries during the data collection process. 
 % This observation confirms our intuition that studies based traces from a single ISP~\cite{maier:mobtraffic, vallina-rod:ads}, shall not be able to analyze how specific users use mobile devices. 
 
+
+
+\subsection{Ethical Issues}
+Capturing all of a subject's Internet traffic raises significant
+privacy concerns. Our IRB-approved study entails informed consent from
+subjects who are interviewed in lab, where the risks and benefits of
+our study are clearly explained. Subjects are incentivized to use the
+VPN though a lottery for Amazon.com gift certificates. All data from
+tcpdump is encrypted before touching persistent storage; the private
+key is maintained on separate secure severs and only approved
+researchers can access it. Users may delete their data and/or disable
+monitoring at any time. For privacy reasons, we cannot make this data
+publicly available.
+
+
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "main"
