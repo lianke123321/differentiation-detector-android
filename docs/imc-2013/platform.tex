@@ -188,20 +188,21 @@ of packets sent from a mobile device to the Internet. At step (1),
 datagram is encapsulated in a regular IP datagram sent from the device
 (address \emph{d}) to the \platname{} box (address \emph{m}). The
 IPsec layer decrypts at step (3) the datagram whose source IP address
-is the private address of the mobile device in the VPN tunnel (address
-\emph{v}) and the destination is the IP address of the destination
-Web service (address \emph{w}). In order to send this datagram in the
-Internet, the NAT must convert in step (5) the private IP address
-\emph{v} to the public IP address \emph{m} of the \platname{}
-box. Then this packet is sent in the Internet. As the tcpdump process
-runs just above the Ethernet layer, it dumps packets at step (2), (4),
-and (7). In addition, we also dump the NAT translation
-table. To associate packets to a device and a Web service,
-we only need the packet captured at step (4) that associates the
-packet to the private address \emph{v} of the device in the VPN tunnel
-and the Web service (address \emph{w}), and the NAT translation table
-that gives the mapping between the device in the VPN tunnel (address
-\emph{v}) and the public IP address \emph{d} of the mobile device.
+\emph{v} is the private address of the mobile device in the VPN tunnel
+and the destination is the IP address \emph{w} of the destination Web
+service. In order to send this datagram in the Internet, the NAT must
+convert in step (5) the private IP address \emph{v} to the public IP
+address \emph{m} of the \platname{} box. Then this packet is sent in
+the Internet. As the tcpdump process runs just above the Ethernet
+layer, it dumps packets at step (2), (4), and (7). In addition, we
+also dump the translation table between the public IP address \emph{d}
+of the device and its private IP address \emph{v} in the tunnel. To
+associate packets to a device and a Web service, we only need the
+packet captured at step (4) that associates the packet to the private
+address \emph{v} of the device in the VPN tunnel and the Web service
+(address \emph{w}), and the translation table that gives the
+mapping between the device in the VPN tunnel (address \emph{v}) and
+the public IP address \emph{d} of the mobile device.
 
 However, in the reverse direction, when packets flows from the
 Internet to the mobile device, it is no more possible to associate a
