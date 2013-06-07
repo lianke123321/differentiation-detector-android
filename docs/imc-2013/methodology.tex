@@ -4,7 +4,7 @@ Using \platname, we collected two different datasets that we use in the
 next sections to analyze key characteristics of iOS and to compare them
 with Android. In the following, we describe these two datasets, one
 dataset has been collected using controlled experiments, the other
-dataset has been collectected using an IRB-approved in-the-wild
+dataset has been collectected using IRB-approved in-the-wild
 measurements during seven months on a small set of real users. 
 
 The collection of these two very different datasets shows the
@@ -20,15 +20,15 @@ one iPhone 3GS running iOS 6. We start each set of controlled experiments
 \platname{} platform, we enable the SSL-Bumping plugin, and we start
 the experiment. 
 
-The first set of controlled experiment consist in manually testing the
-100 most popular free Android apps the \emph{Google Play} store and \tbd{}
+The first set of controlled experiments consist in manually testing the
+100 most popular free Android apps in the \emph{Google Play} store and \tbd{}
 iOS applications from the iOS App store \tbd{give a date}. For each
 application, we install it, enter user credentials for the account if
 it is relevant, play with it for \tbd{} minutes, and uninstall
 it. This experiment is a characterization of popular applications with
-real user interactions in perfectly controlled environment. 
+real user interactions in a perfectly controlled environment. 
 
-The second set of controlled experiment consist in fully-automated
+The second set of controlled experiments consist in fully-automated
 experiments on the most popular 1003 Android applications from a free,
 third-party Android market\tbd{which market, we must give the name}.
 We perform this test because Android devices can install
@@ -36,14 +36,14 @@ We perform this test because Android devices can install
 \emph{Google Play} store. So, it is important to characterize these
 applications that do not have to follow the Android market publication
 process\tbd{Is there different constraints on this free market}. To
-automate the experiment process we use adb Android command shell to
+automate the experiment process we use the \emph{adb} Android command shell to
 install each app, connect the device to the \platname{} platform, and
-start the app. Then we use Monkey \tbd{give a ref}, an adb
+start the app. Then we use \emph{Monkey} \tbd{give a ref}, an adb
 stress tool, to perform a series of 10,000 actions which includes
 random swipes, touches, and text entries.  Finally, we use adb to
 uninstall the application and reboot the device to forcibly end any
 lingering connections. This second set of experiment is limited to
-Android devices because iOS do not provide an equivalent to adb to
+Android devices because iOS does not provide an equivalent to adb to
 manage apps installation. 
 
 % The results of our controlled experiments can be found in
@@ -54,34 +54,35 @@ manage apps installation.
 
 The controlled experiments described in
 Section~\ref{sec:dataset-contr-exper} are important to characterize
-the behavior of applications. However, it is also important to
-characterize the behavior of applications when used by real users
-during several months. For this reason, we performed an IRB-approved
-measurements during seven months with a small set of real users. 
+the behavior of applications in a controlled environment. However, it
+is also important to characterize the behavior of applications when
+used by real users during several months. For this reason, we
+performed an IRB-approved measurements during seven months, \tbd{say
+  from XXX to YYY} with a small set of real users.
 
-We deployed two \platname servers, one in the USA and one
-in France that were used by 26 devices: 10 iPhones, 4
-iPads, 1 iPodTouch, and 11 Android phones.  The Android devices in
-this dataset include the Nexus, Sony, Samsung, and Gsmart brands while
-the iPhones include one iPhone~3gs, five iPhone~5, and five iPhone~4S.
-These devices belongs to 21 different users, volunteers for our IRB approved
+We deployed two \platname servers, one in the USA and one in France
+that were used by 26 devices: 10 iPhones, 4 iPads, 1 iPodTouch, and 11
+Android phones.  The Android devices in this dataset include the
+Nexus, Sony, Samsung, and Gsmart brands while the iPhone devices
+include one iPhone~3GS, four iPhone~5, and five iPhone~4S.  These
+devices belongs to 21 different users, volunteers for our IRB approved
 study.  This dataset, called \mobWild, consists of 218 days of data
-monitored on the \platname{} servers; the number of days for each
-user varies from 5 to 215 with a median of 35 days.  We note that the
+monitored on the \platname{} servers; the number of days for each user
+varies from 5 to 215 with a median of 35 days.  We note that the
 SSL-Bumping plugin has been disabled for all experiments involving
 real users.
 
 Capturing all of a subject's Internet traffic raises significant
 privacy concerns.  Our IRB-approved study entails informed consent
-from subjects who are interviewed in lab, where the risks and benefits
-of our study are clearly explained.  The incentive to use VPNs was a
-lottery of Amazon.com gift certificates. To protect the identity of
-information leaked in the data, we use public key cryptography to
-encrypt all the tcpdump outputs; the private key is maintained on
-separate secure severs and with access limited to approved
-researchers.  Furthermore, users are free to delete their data and
-disable monitoring at any time.  For privacy reasons, we will not make
-this data publicly available.
+from subjects who are interviewed in our lab, where the risks and
+benefits of our study are clearly explained.  The incentive to use
+VPNs was a lottery of Amazon.com gift certificates. To protect the
+identity of information leaked in the data, we use public key
+cryptography to encrypt all the tcpdump outputs; the private key is
+maintained on separate secure severs and with access limited to
+approved researchers.  Furthermore, users are free to delete their
+data and disable monitoring at any time.  For privacy reasons, we will
+not make this data publicly available.
 
 \section{Classification Methodology}
 \label{sec:classification-methodology}
