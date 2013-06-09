@@ -67,7 +67,7 @@ Similarly, we use Bro to label UDP flows as either DNS or \emph{other}.
 Indeed, in \fref{tab:summaryIOSAndroidTraffic}, we observe that more than 92\% of the traffic in our \mobWild dataset is either HTTP or SSL. 
 We also observe that the share of HTTP volume over \wifi and cellular are significantly different. 
 This increase is a result of the reduced share of media traffic and the use of email and for social networking applications that rely on SSL.
-We detail the HTTP and SSL traffic from iOS and Android devices in \fref{sec:}
+%We detail the HTTP and SSL traffic from iOS and Android devices in \fref{sec:}
 
 \subsubsection{HTTP Traffic Classification}
 
@@ -116,6 +116,8 @@ Media (Ambiguous)       & 14.572  &  5.914 &  2.712 &  0.044 \tabularnewline
 \hline
 Other                   &  0.036  & 1.1963 &  0.013 &  0.081 \tabularnewline
 \hline
+{\em total}            & 100 & 100 & 100 & 100 \tabularnewline
+\hline
 \end{tabular}
 \end{small}
 \caption{Classification of HTTP Traffic.}
@@ -143,28 +145,31 @@ We now show how we used the port number, subject field in the certificate, and D
 \cline{2-5}
   & {\bf Bytes}  & {\bf Flows} & {\bf Bytes} & {\bf Flows} \tabularnewline
 \hline
-HTTPS                   & & & &    \tabularnewline
+HTTPS                   & 91.287 & 81.960 & 97.852 & 97.168    \tabularnewline
 \hline
-Mail                    & & & &  \tabularnewline
+Mail                    &  6.700 & 15.872 & 0.689  & 0.320  \tabularnewline
 \hline
-Notification            & & & &  \tabularnewline
+Notification            &  1.412 & 1.553  & 1.321  & 2.100  \tabularnewline
 \hline
-Instant Messaging       & & & &  \tabularnewline
+Other                   &  0.601 & 0.615  & 0.138  & 0.412 \tabularnewline
 \hline
-Other                   & & & & \tabularnewline
+{\em total}             & 100 & 100 & 100 & 100 \tabularnewline
 \hline
 \end{tabular}
 \end{small}
-\caption{Classification of SSL Traffic based on port number.}
+\caption{Classification of SSL Traffic based on port number. \emph{HTTPs is the most popular service that uses SSL in the \mobWild dataset.}}
 \label{tab:classify-ssl-port}
 \end{table}
 
 SSL is used by mobile devices for various services including mail, notifications, instant messaging, and web browsing.
 On using the port number of classify SSL traffic,  we observe in \fref{tab:classify-ssl-port} that a majority of SSL traffic by volume and flows is HTTPS.
-The rest of the traffic is either Mail, Notification services, Instant messaging, or other services. 
+The rest of the traffic is either Mail, Notification services, or other services such as instant messaging.
 
-Among the SSL traffic we used the common name (CN) field of certificates to identify the web-services that used HTTPs.
-We observed that 
+We use the common name (CN) field of certificates to identify the web-services that used HTTPS.
+In \fref{tab:classify-http-cert}, we observe that less than 25\% of the HTTPS traffic in Android and iOS contains the fully qualified domain name (FQDN) in the subject of the certificate;
+We observed regular expression were observed for 50.4\% of the HTTPS traffic in iOS and about 42.4\% traffic on Android. 
+Though regular expressions may be useful for webservices that use a domain name at a level for multiple services, regular expressions such as *.google.com create ambiguity regarding the service that use the HTTPS connection. 
+
 
 \begin{table}
 \centering
@@ -175,34 +180,34 @@ We observed that
 \cline{2-5}
   & {\bf Bytes}  & {\bf Flows} & {\bf Bytes} & {\bf Flows} \tabularnewline
 \hline
-FQDN                   & & & &    \tabularnewline
+FQDN                   & 24.274 & 31.423  & 19.318 & 29.424 \tabularnewline
 \hline
-RE Unique service      & & & &  \tabularnewline
+Regular expression     & 50.463 & 35.318  & 42.427 & 31.670 \tabularnewline
 \hline
-RE multiple services   & & & &  \tabularnewline
+No Subject or CN       & 25.263 & 33.259  & 38.254 & 38.906 \tabularnewline
 \hline
-Continuing session     & & & &  \tabularnewline
+{\em total}            & 100 & 100 & 100 & 100 \tabularnewline
 \hline
 \end{tabular}
 \end{small}
-\caption{Classification of SSL Traffic based on port number.}
-\label{tab:classify-ssl-port}
+\caption{Classification of HTTPs based on certificates.}
+\label{tab:classify-http-cert}
 \end{table}
 
 
-
- 
-\tbd{flows where DNS is different from that of certificate}
-
-
-\tbd{The plot can be removed and the discussion with CN field can be merged to indicate relying on certificates and server-names on their own is not sufficient}
-
-We use the DNS flows that passed through \platname to further classify the SSL flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
-DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices prefer the the first entry in DNS response while resolving \emph{hostnames}.
+To avoid this ambiguity we rely on the DNS that passed through \platname to further classify the SSL flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
+DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices use the first entry in DNS response while resolving \emph{hostnames}.
 Popular webservices such as google are known to use the same pool of IP addresses for various applications, for example the IP for gmail may also be used for search. 
 In \fref{fig:ssl-classification-app-service} we present the fraction of SSL traffic where the most recent DNS response contained the IP address of the SSL flow in the first position. 
 We observe that for the majority of SSL traffic by volume and flows can be classified by using the DNS responses. 
 
+\tbd{table for RE match}
+
+Based on the hostname, the web service can be obtained. 
+This can be used to get estimate the application.
+
+\tbd{Why only hostname is not bad -- usefull to characterize web services -- users are interested in webservices and application are medium to access webservice}
+ 
 In summary, we use \platname to perform controlled experiments and in the wild measurements to characterize mobile Internet traffic. 
 We use Bro to analyze the data and build on the output of bro to further classify HTTP flows and SSL flows to identify the source of the traffic. 
 We now present the results of our experiments and measurements study. 
@@ -212,17 +217,3 @@ We now present the results of our experiments and measurements study.
 %%% mode: latex
 %%% TeX-master: "main.tex"
 %%% End: 
-
-
-
-% \begin{figure}
-% \includegraphics[width=\columnwidth]{plots/appusage_someappservicesig_traffic.pdf}
-% \caption{HTTP traffic classified using \useragent or \httphost field provided by popular media services in the HTTP header. \emph{\tbd{AR: Add traffic from browsers because this does not include traffic from flows that have UA of browsers -- this is the reason why the number of flows is so low.}.}}
-% \label{fig:http-classification-app-user-agent-host}
-% \end{figure}
-
-% \begin{figure}[t]
-% \includegraphics[width=\columnwidth]{plots/sslanalysis_samedns_traffic.pdf}
-% \caption{SSL traffic share where the most recent DNS response contained the IP address of the SSL flow in the first position.}
-% \label{fig:ssl-classification-app-service}
-% \end{figure}
