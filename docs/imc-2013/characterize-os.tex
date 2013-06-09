@@ -5,6 +5,15 @@ Mobile operating systems provide OS level notification services to optimize netw
 The Apple Push Notification service (APNs) and Google Cloud Messaging (GCM)~\cite{gcm} are used by iOS and Android applications respectively to receive notifications from the Internet.
 In this section we show how \platname was used to compare the notification services of iOS and Android, and detailing it behavior in the wild. 
 
+\begin{figure}
+\centering
+\includegraphics[width=\columnwidth]{figures/Notification.pdf}
+\caption{Notifications on mobile OSes. \emph{Because notification messages are sent over TCP, keepalive messages are periodically exchanged to ensure TCP connections do not timeout.}}
+\label{fig:push-expt-interarrival}
+\end{figure}
+
+
+
 \subsection{Controlled Experiment on Factory Reset Devices}
 
 We first detail the detail the behavior of notification services by performing a controlled experiment on \emph{factory-reset} devices. 
