@@ -2,33 +2,42 @@
 \label{sec:characterize-os}
 
 Mobile operating systems provide OS level notification services to optimize network usage.
-The Apple Push Notification service (APNs) and Google Cloud Messaging (GCM)~\cite{gcm} are used by iOS and Android applications respectively to receive notifications from the Internet.
+The Apple Push Notification service (APNs)~\cite{apns} and Google Cloud Messaging (GCM)~\cite{gcm} are used by iOS and Android applications respectively to receive notifications from the Internet.
 In this section we show how \platname was used to compare the notification services of iOS and Android, and detailing it behavior in the wild. 
 
 \begin{figure}
 \centering
-\includegraphics[width=\columnwidth]{figures/Notification.pdf}
-\caption{Notifications on mobile OSes. \emph{Because notification messages are sent over TCP, keepalive messages are periodically exchanged to ensure TCP connections do not timeout.}}
+\includegraphics[width=0.8\columnwidth]{figures/Notification.pdf}
+\caption{Notifications on mobile OSes. \emph{Periodic keepalive messages ensure that TCP connections do not time out.}}
 \label{fig:push-expt-interarrival}
 \end{figure}
 
-
+In \fref{fig:push-expt-interarrival}, we show how the iOS and Android devices use TCP to receive notifications from their respective notification servers. 
+These notification servers aggregate notification messages from various web-services that want to push messages to the devices.
+As shown in \fref{fig:push-expt-interarrival}, the application that is allowed to receive notifications first registers itself and obtains a token from the notification server.
+This token is then shared with the Web-service from which the application desires to receive notifications. 
+The Web-service uses this token to specify the device and the application to which notification messages are to be sent. 
+On receiving a notification message, the notification server forwards the notifications based on its forwarding policies~\cite{apns, gcm}. 
+A dedicated OS service is responsible for receiving the notifications on the mobile device and sending them to the application.
+This service periodically sends keepalive messages to ensure that the TCP connection does not time out.
+The notification services for iOS use port 5223 and port 5228 on Android~\cite{apns, gcm}.
+The notification messages do not depend on user activity, therefore, they represent the minimum data traffic that any device can generate.
 
 \subsection{Controlled Experiment on Factory Reset Devices}
 
-We first detail the detail the behavior of notification services by performing a controlled experiment on \emph{factory-reset} devices. 
-The objective of this experiment was to analyze notification services for devices that are used \emph{out of the box}, and detail the impact of device manufacturer, and pre-installed applications. 
+To shed light on the network characteristics of notification services we perform a controlled experiment on \emph{factory-reset} devices. 
+Our goal was to analyze notification services on devices used \emph{out of the box}, and detail the impact of device manufacturer, access technology, and pre-installed applications. 
 
-For our experiment, we performed a \emph{factory reset} on an iPod Touch, an iPad, an iPhone, a Samsung Galaxy SIII, and a Google Nexus S Phone; the reset was performed after their batteries were fully charged. 
-We then perform the initialization step and assigned a dummy email account as the primary account to each of these devices.
-We then allowed these devices to connect to the Internet over \wifi through \platname and monitored the Internet traffic from these devices.
-We then studied the impact of access technology by letting the iPhone and Samsung Galaxy SIII tunnel traffic through \platname using cellular networks. 
+We began our experiment by first performing a \emph{factory reset} on a fully charged iPod Touch, iPad, iPhone, a Samsung Galaxy SIII, and a Google Nexus S Phone.
+We then initialized the devices with a dummy email account and observed its \wifi traffic for 24 hours using \platname.
+We then let the iPhone, Google Nexus~S, and Samsung Galaxy SIII connect to the Internet using their cellular interface for 24 hours to detail the impact of access technology.
 
-We observed that the traffic volume during the 24 hour periods varied from 19~KB to 97~KB depending on the devices. 
-We classify APNS and GCM messages using the TCP port numbers mentioned in their specifications~\cite{gcm, apns}.
-Because we did not run any applications in the foreground, notification messages were responsible for largest fraction of the traffic volume; the share was 35\% for Nexus S, 88\% for the Samsung SIII and around 50\% for each of the iOS devices. 
-The share of DNS traffic varied from 10\% to 40\% for each of the devices while the other services contributed to less than 10\% of the traffic volume.
-The only exception was the Samsumg Galaxy SIII which used location services that contributed to 26\% of 47~KB traffic volume generated by the device.
+The factory reset ensured that these devices generated very little traffic, from 19~KB to 97~KB depending on the device. 
+We filter out the notification messages in our traces using the TCP port numbers and AS mentioned in their respective specifications~\cite{gcm, apns}.
+Indeed, notification messages were responsible for largest fraction of the traffic volume; the share was 35\% for Nexus S, 88\% for the Samsung SIII and around 50\% for each of the iOS devices. 
+The rest of the traffic was primarily due to DNS requests made by the device. 
+%The share of DNS traffic varied from 10\% to 40\% for each of the devices while the other services contributed to less than 10\% of the traffic volume.
+%The only exception was the Samsumg Galaxy SIII which used location services that contributed to 26\% of 47~KB traffic volume generated by the device.
 
 \begin{figure}
 \centering
@@ -37,16 +46,14 @@ The only exception was the Samsumg Galaxy SIII which used location services that
 \label{fig:push-expt-interarrival}
 \end{figure}
 
-In \fref{fig:push-expt-interarrival} plot the time between successive messages sent by the notification servers on the ports assigned for notifications. 
-We observe that the inter-arrival time between notifications for the Android devices is at least 900 seconds for more than 80\% of the notifications observed. 
-The distribution of the inter-arrival time also depends on the access technology for the Samsung Galaxy SIII phone; we observe steps in the distribution for the SIII phone while we do not observe these steps when the same phone uses \wifi. 
-We do not observe this difference when the Nexus S phone used the cellular data connection; we do not present the figure due to lack of space. 
-\tbd{AR: Why these difference -- which applications stop coming up and so on}.
-For the iOS devices, we observe an inter-arrival time at least 1700~seconds for that more than 75\% of the notifications in \fref{fig:push-expt-interarrival}. 
-We do not observe a significant difference between the inter-arrival times for the iPhone over cell and \wifi and we do not present these results due to lack of space. 
+To detail the behavior of keepalive, we plot the time between successive messages in \fref{fig:push-expt-interarrival}.
+We observe that more than 75\% of the messages are sent after an idle period of 1700~seconds on iOS devices and 900~seconds for Android devices. 
+Furthermore, we observe that behavior for the Samsung Galaxy SIII depends on the access technology.
+Due to lack of space we do not present the results for Nexus-S and iPhone for which we did not observe any impact of access technology.
 
-On analyzing the packets exchanged, we observe that  all Android flows with an inter-arrival time larger than 800 seconds consisted of an empty TCP packet sent by the device followed by a 25 byte payload sent by the server.
-Similarly, all iOS flows with an inter-arrival time larger than 1500 seconds began with an TCP packet with a payload of 85 bytes sent by the device followed by the server responding with of a TCP packet of 37 byte payload.
+On inspecting the packets exchanges, we observe that iOS messages with an inter-arrival time larger than 1500 seconds began with an TCP packet with a payload of 85 bytes sent by the device followed by the server responding with of a TCP packet of 37 byte payload.
+Similarly, Android flows with an inter-arrival time larger than 800 seconds consisted of an empty TCP packet sent by the device followed by a 25 byte payload sent by the server.
+We speculate these messages to be keepalive messages.
 
 In summary, we observe notifications consume very little data, less than 50~KB in 24 hours, on Android and iOS devices in their default state.
 The large time between successive notifications and the small amount of data exchanged implies they consume very little power.
@@ -55,8 +62,7 @@ Furthermore, the inter-arrival time between notifications for Android devices di
 
 \subsection{Notifications In The Wild} 
 
-We now characterize our observations on the notifications we observed in the \mobWild dataset. 
-The objective of this analysis was to detail the frequency, traffic volume, and source of the notification services. 
+We now detail the frequency, traffic volume, and source of the notification services we observed in the \mobWild dataset. 
 
 \begin{figure}
 \centering
@@ -65,12 +71,10 @@ The objective of this analysis was to detail the frequency, traffic volume, and 
 \label{fig:push-wild-compare-ostech}
 \end{figure}
 
-%The advantage of \platname is that it allows for direct comparison between devices across and their behavior across access technologies. 
-To analyze the frequency of notification messages, we plot the distribution of the time between successive push notification messages for Android and iOS devices over cellular and \wifi networks in \fref{fig:push-wild-compare-ostech}.
+To analyze the frequency of notification messages, we plot the distribution of the time between successive push notification messages for iOS and Android devices over cellular and \wifi networks in \fref{fig:push-wild-compare-ostech}.
 In \fref{fig:push-wild-compare-ostech} we observe that a higher time between push notifications over cellular networks in comparison to \wifi networks for iOS and Android devices.  
 We also observe the Android devices in our dataset receive notifications less frequently compared to the iOS devices in our dataset. 
 We also observe a heavy tail for the time between notification messages which implies potentially long idle intervals.
-\tbd{Correlation between time between notification messages and size of the next idle time observed?}
 
 
 \begin{figure}
@@ -87,22 +91,9 @@ We observe that the Android and iOS devices appear to be agnostic of the time of
 The iOS devices (from verion 6.0) come with a feature called \emph{Do Not Disturb (DND)} that does raise notification alarms on receiving notifications during specific time periods. 
 We observe notification messages were received by the device that had enabled this feature during the intervals their users had configured as \emph{Do Not Disturb}.
 
-\begin{figure}
-\centering
-\includegraphics[width=\columnwidth]{plots/push_compare_trafficshare.pdf}
-\caption{Traffic share of push notifications. \emph{Push notifications are responsible for less than 5\% of the traffic volume on most devices.}}
-\label{fig:push-traffic-share}
-\end{figure}
-
-To analyze the volume of notification messages, we plot the share of notification messages as a fraction of total traffic from the device in \fref{fig:push-traffic-share}.
-We observe that the notification messages are responsible for less than 4\% of the traffic volume on most Android and iOS devices. 
-In \fref{fig:push-traffic-share}, we also plot the share of notification messages when the device exchanged data over cellular networks. 
-We observe that there is no significant difference in the traffic share of notification messages when the device used cellular traffic. 
-\tbd{Why do we care?}
-
-To further analyze the source of the notification messages we analyzed the DNS lookups that were performed before the connections for receiving notification messages was established. 
-We observed that the servers that pushed content to iOS devices correspond to the DNS requests that match the pattern \emph{*courier.push.apple.com} and \\ \emph{*courier-push-apple.com.akadns.net}.
-For the android devices we observe that the DNS requests match the pattern\\ \emph{*talk.google.com}. 
+Despite the periodic nature of notification messages, in \fref{tab:classify-ssl-port} we observe that notification messages are responsible for less than 2\% of the SSL traffic from iOS and Android devices\footnote{We observe similar fraction for notification messages from each device and also for each access technologies used by the device, we do not present these results due to lack of space}.
+We then used the DNS requests to identify the servers that pushed notifications.
+We observe that these request match the pattern \emph{*courier.push.apple.com} and \emph{*courier-push-apple.com.akadns.net} for the iOS devices and \emph{*talk.google.com} for Android devices. 
 
 In summary, we detail the behavior of the notification services using controlled experiments and the \mobWild dataset.  
 We observe that push notifications consume a small fraction of the data and exhibit a heavy tail for the time between successive messages. 
@@ -166,3 +157,14 @@ Furthermore, notification messages were received by iOS devices even during the 
 % This implies that higher usage of the device over \wifi may result in a higher number of notificatons received. 
 % In \fref{fig:wild-inter-arrival-push}, device ID 
 %Only if the cellular connection is not available or viable will the device switch to Wi-Fi for APNs connections.
+
+%Furthermore, In \fref{fig:push-traffic-share}, we also plot the share of notification messages when the device exchanged data over cellular networks. 
+%We observe that there is no significant difference in the traffic share of notification messages when the device used cellular traffic. 
+%\tbd{Why do we care?}
+
+% \begin{figure}
+% \centering
+% \includegraphics[width=\columnwidth]{plots/push_compare_trafficshare.pdf}
+% \caption{Traffic share of push notifications. \emph{Push notifications are responsible for less than 5\% of the traffic volume on most devices.}}
+% \label{fig:push-traffic-share}
+% \end{figure}
