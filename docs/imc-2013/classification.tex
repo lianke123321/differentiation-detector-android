@@ -134,7 +134,9 @@ However, we observe media (identified based on the \useragent) served from CDNs 
 \subsubsection{Classification of SSL Traffic.}
 
 Unlike HTTP flows, SSL flows provide limited information that can be used to identify the applications. 
+Because the SSL flows do not provide any hints that point to the application, our objective of SSL classification was to identify the Web-services that are responsible for the flows. 
 We now show how we used the port number, subject field in the certificate, and DNS queries to classify SSL traffic. 
+Services such as mail, instant messaging, and notifications are documented to use dedicated port numbers of their traffic. 
 
 \begin{table}
 \centering
@@ -165,11 +167,18 @@ SSL is used by mobile devices for various services including mail, notifications
 On using the port number of classify SSL traffic,  we observe in \fref{tab:classify-ssl-port} that a majority of SSL traffic by volume and flows is HTTPS.
 The rest of the traffic is either Mail, Notification services, or other services such as instant messaging.
 
-We use the common name (CN) field of certificates to identify the web-services that used HTTPS.
-In \fref{tab:classify-http-cert}, we observe that less than 25\% of the HTTPS traffic in Android and iOS contains the fully qualified domain name (FQDN) in the subject of the certificate;
-We observed regular expression were observed for 50.4\% of the HTTPS traffic in iOS and about 42.4\% traffic on Android. 
-Though regular expressions may be useful for webservices that use a domain name at a level for multiple services, regular expressions such as *.google.com create ambiguity regarding the service that use the HTTPS connection. 
+We first use the common name (CN) field of certificates to identify the web-services that used HTTPS.
+In \fref{tab:classify-http-cert}, we observe that less than 25\% of the HTTPS traffic from iOS and Android contains the fully qualified domain name (FQDN) in the subject of the certificate; the rest of the traffic either contains regular expressions such as *.google.com in the certificate or is a continuation of a previous SSL session. 
 
+HTTPS flows may also contain \emph{server name indication} that contains the FQDN used by the client to connect to the server~\cite{rfc:servernametls}.
+For example, we observe a \emph{server name indication} of \emph{plus.google.com} and \emph{s.youtube.com} in two flows that used a certificate with a cn \emph{*.google.com}.
+However, we observe that by using either the certificate or the \emph{server name} we were able to identify the name of the webservice in less than \tbd{40}\% of iOS and Android HTTPS traffic.
+
+For flows that cannot be classified either using the certificate or the \emph{server name} we use DNS requests made by the mobile devices before starting the HTTPS flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
+DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices use the first entry in DNS response while resolving \emph{hostnames}.
+We therefore use the latest DNS response that contains the IP address of the webservice in the first position of the DNS response. 
+Indeed, for 97.8\% of the Android and 83.4\% of the iOS HTTPS traffic that we could not classify using other fields, we observe that the latest DNS response before the flow started contained the IP address of the webservice as the first entry in the DNS response\footnote{The share of SSL traffic where the latest DNS response contains the IP address of the web-service in the first position is 97.4\% for Android and 88.6\% of iOS}. 
+Despite the usefulness of DNS responses, we give a high priority to the server-name and the certificates because we observed that for flows that contained the server name did not contain the same name in the DNS response for 9.2\% of the iOS traffic and 5.6\% of Android traffic.
 
 \begin{table}
 \centering
@@ -180,34 +189,20 @@ Though regular expressions may be useful for webservices that use a domain name 
 \cline{2-5}
   & {\bf Bytes}  & {\bf Flows} & {\bf Bytes} & {\bf Flows} \tabularnewline
 \hline
-FQDN                   & 24.274 & 31.423  & 19.318 & 29.424 \tabularnewline
+Mail                 & 9.970  & 62.168  & 1.626 & 1.565 \tabularnewline
 \hline
-Regular expression     & 50.463 & 35.318  & 42.427 & 31.670 \tabularnewline
-\hline
-No Subject or CN       & 25.263 & 33.259  & 38.254 & 38.906 \tabularnewline
-\hline
-{\em total}            & 100 & 100 & 100 & 100 \tabularnewline
+Social Networking    & 12.49030 & 6.683  & 36.66161 & 22.352282 \tabularnewline
 \hline
 \end{tabular}
 \end{small}
-\caption{Classification of HTTPs based on certificates.}
-\label{tab:classify-http-cert}
+\caption{Sample classification of SSL traffic based on names in certificate, server name indentification, and DNS request.}
+\label{tab:classify-ssl-traffic}
 \end{table}
 
+In \fref{tab:classify-ssl-traffic}
 
-To avoid this ambiguity we rely on the DNS that passed through \platname to further classify the SSL flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
-DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices use the first entry in DNS response while resolving \emph{hostnames}.
-Popular webservices such as google are known to use the same pool of IP addresses for various applications, for example the IP for gmail may also be used for search. 
-In \fref{fig:ssl-classification-app-service} we present the fraction of SSL traffic where the most recent DNS response contained the IP address of the SSL flow in the first position. 
-We observe that for the majority of SSL traffic by volume and flows can be classified by using the DNS responses. 
 
-\tbd{table for RE match}
 
-Based on the hostname, the web service can be obtained. 
-This can be used to get estimate the application.
-
-\tbd{Why only hostname is not bad -- usefull to characterize web services -- users are interested in webservices and application are medium to access webservice}
- 
 In summary, we use \platname to perform controlled experiments and in the wild measurements to characterize mobile Internet traffic. 
 We use Bro to analyze the data and build on the output of bro to further classify HTTP flows and SSL flows to identify the source of the traffic. 
 We now present the results of our experiments and measurements study. 
@@ -217,3 +212,37 @@ We now present the results of our experiments and measurements study.
 %%% mode: latex
 %%% TeX-master: "main.tex"
 %%% End: 
+
+% Popular webservices such as google are known to use the same pool of IP addresses for various applications, for example the IP for gmail may also be used for search. 
+% In \fref{fig:ssl-classification-app-service} we present the fraction of SSL traffic where the most recent DNS response contained the IP address of the SSL flow in the first position. 
+% We observe that for the majority of SSL traffic by volume and flows can be classified by using the DNS responses. 
+
+% \begin{table}
+% \centering
+% \begin{small}
+% \begin{tabular}{|p{0.35\columnwidth}|c|c|c|c|}
+% \hline
+% \multirow{2}{*}{\bf Service} & \multicolumn{2}{c|}{\bf iOS} &  \multicolumn{2}{c|}{\bf Android} \tabularnewline
+% \cline{2-5}
+%   & {\bf Bytes}  & {\bf Flows} & {\bf Bytes} & {\bf Flows} \tabularnewline
+% \hline
+% FQDN in Certificate    & 24.274 & 31.423  & 19.318 & 29.424 \tabularnewline
+% \hline
+% Regular expression     & 50.463 & 35.318  & 42.427 & 31.670 \tabularnewline
+% \hline
+% No Subject or CN       & 25.263 & 33.259  & 38.254 & 38.906 \tabularnewline
+% \hline
+% {\em total}            & 100 & 100 & 100 & 100 \tabularnewline
+% \hline
+% \end{tabular}
+% \end{small}
+% \caption{Classification of HTTPs based on certificates.}
+% \label{tab:classify-http-cert}
+% \end{table}
+
+% \begin{figure}
+% \centering
+% \includegraphics[width=\columnwidth]{plots/sslanalysis_dns_timediff_distrib.pdf}
+% \caption{DNS SSL}
+% \label{fig:sslclassification-dns-timedistrib}
+% \end{figure}
