@@ -107,7 +107,7 @@ Media (Popular)         & 51.405  & 12.131 & 65.922 & 22.377 \tabularnewline
 \hline
 Application             & 33.987  & 80.758 & 31.353 & 77.498 \tabularnewline
 \hline
-Media (Ambiguous)       & 14.572  &  5.914 &  2.712 &  0.044 \tabularnewline
+Media (Other)       & 14.572  &  5.914 &  2.712 &  0.044 \tabularnewline
 \hline
 Other                   &  0.036  & 1.1963 &  0.013 &  0.081 \tabularnewline
 \hline
@@ -219,20 +219,21 @@ Instant Messages     & 0.982    & 7.089    & 1.411  & 3.109 \tabularnewline
 Other Google Services & 58.665   & 13.32510 & 45.024 & 46.089 \tabularnewline
 \hline
 \emph{total}         & 87.564   & 92.728   & 84.776 & 73.151 \tabularnewline
+\hline
 \end{tabular} 
 \end{small}
 \caption{Sample classification of SSL traffic based on names in certificate, server name identification, and DNS request.}
 \label{tab:classify-ssl-traffic}
 \end{table}
 
-In \fref{tab:classify-ssl-traffic} we present a classification of SSL traffic based on names identified using the SSL fields and DNS queries and port numbers.
+In \fref{tab:classify-ssl-traffic} we show how we grouped SSL traffic based on names identified using the SSL fields and DNS queries and port numbers.
 We observe that the iOS devices in our dataset generated a significant number of flows to email sites.
-Similarly, we were able to label 12.49\% of iOS traffic and 36.661\% to social network services including \emph{google plus, facebook, and twitter}.
-We speculate the increase in traffic share for Android devices is because Android devices offer services to backup photos on \emph{google plus}.
+Similarly, we were able to group 12.49\% of iOS and 36.661\% of Android traffic with social network services that includes \emph{Google Plus, Facebook, and Twitter}.
+We speculate the increase in traffic share for Android devices is because Android devices offer services to backup photos on \emph{Google Plus}.
 Similarly, we observe that 5.4\% of the traffic from iOS devices was from Apple stores while we observe only 0.04\% of traffic to the \emph{Google Play} store. 
-This low share is because google can use hosts matching the pattern \emph{client*.google.com} to fetch data for different applications and services; we observed a similar behavior in our controlled experiments. 
-We therefore group such traffic as traffic from google services.
-Indeed, traffic from google is the largest source of SSL traffic for iOS and Android devices in our dataset. 
+This low share is because google can use hosts matching the pattern \emph{client*.google.com} to serve for different Web-services.
+We observed a similar behavior in our controlled experiments, and we group such traffic as \emph{other google services}.
+Indeed, in \fref{tab:classify-ssl-traffic} we observe that traffic from Google is the largest source of SSL traffic for iOS and Android devices in our dataset. 
 
 In summary, we use \platname to perform controlled experiments and in the wild measurements to characterize mobile Internet traffic. 
 We use Bro to analyze the data and build on the output of bro to further classify HTTP flows and SSL flows to identify the source of the traffic. 
@@ -270,10 +271,3 @@ We now present the results of our experiments and measurements study.
 % \caption{Classification of HTTPs based on certificates.}
 % \label{tab:classify-http-cert}
 % \end{table}
-
-% \begin{figure}
-% \centering
-% \includegraphics[width=\columnwidth]{plots/sslanalysis_dns_timediff_distrib.pdf}
-% \caption{DNS SSL}
-% \label{fig:sslclassification-dns-timedistrib}
-% \end{figure}
