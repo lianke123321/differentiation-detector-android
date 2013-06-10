@@ -1,45 +1,81 @@
-\section{Application Characterization}
+\section{Privacy Invasive Services}
 \label{sec:characterize-app}
 
-To analyze applications, we need to first identify the applications that is responsible for the flows. 
-Once identified we need to analyze the applications. 
-For analysis we concentrate on including {\it how much} data is sent or accessed, {\it what} data is sent,  or {\it with whom} the app communications.
-``How much'' is important to conserve both bandwidth caps and battery capacity.
-``With whom'' is important to protect users from excessive tracking.
-Finally, ``what data'' is important because apps may unnecessarily leak personally identifiable information (PII) such as user email address, IMEI, contact information, or other stored data either to the app provider or worse, to any eavesdropper on a public WiFi connection.
+We now use pervasive nature of \platname to detail  the privacy invasiveness of applications and Web-services. 
+For our analysis we concentrated on the data sent from the mobile devices with a focus on the {\it what} data is sent,  {\it to whom} is the data sent, and {\it how frequently} is data sent.
+%To answer these questions, we rely on the controlled experiments and the \mobWild dataset.
 
-\subsection{Application Usage}
+\subsection{Personally Identifiable Information Leaks}
+
+For our experiments we created fake user accounts with fake contact information and fake Twitter and Facebook accounts.  
+Our objective for was to detect if any personally identifiable information -- email address, phone number, IMEI number -- is leaked across the network under HTTP or HTTPS.  
+While we acknowledge that some of this information may be relevant for the application, we strongly believe that this information should never travel across the network in plaintext (HTTP), which we see violated in several cases.
 
 
-\subsubsection{Bandwidth Usage with time of specific application}
+\begin{table*}[t]    
+    \centering
+    \begin{small}
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+       \hline
+       {\bf Store}&{\bf Platform}&{\bf \# Apps}&{\bf Email}& {\bf Location}& {\bf Name} &{\bf Password}& {\bf Device ID}& {\bf Contacts}& {\bf IMEI}\\
+       \hline
+       App Store&iPhone&100&?&20 (20\%)&4 (4\%)&?&4 (4\%)&0 (0\%)&1 (1\%)\\
+       \hline
+       Google Play&Android&100&3 (3\%)&10 (10\%)&2 (2\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
+       \hline
+       Third Party&Android&908&1 (0.1\%)&32 (3.5\%)&2 (0.2\%)&0 (0\%)&95 (10.4\%)&4 (0.4\%)&48 (5.3\%)\\
+       \hline
+    \end{tabular}
+    \end{small}
+    \caption{Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone applications. \emph{The popular iOS applications tend to leak the location information in the clear while Android applications leak the IMEI number and Android ID in the clear.}}
+    \label{tbl:pii}
+\end{table*}
 
-X-axis is the user and y-axis is the share over cell, wifi, and combined for each user.
-
-X-axis is the day and y axis is the share over cell and wi-fi.
-
-SSL + Cellular 
-
-\subsubsection{Multimedia Traffic in he Wild}
-
-X-axis is the user and y-axis is the share over cell, wifi, and combined.
-
-\subsection{User Tracking}
+In Table~\ref{tbl:pii}, we present the different personally identifiable information (PII) leaked for both Android and iPhone apps.  
+We observe that the IMEI, a unique identifier tied to a phone, is the one of the most commonly leaked PII.
+Although IMEI is not private, it can be used to track and correlate a user's behavior across the Web-services.
+Similarly, we observe that Android application tend to leak the Android ID, a unique identifier tied to an Android device.
+In table~\ref{tbl:pii}, we also observe that other information like contacts, email, and passwords were rarely leaked in the clear, but all were leaked on occasionally.
+On analysing the HTTPS traffic we observed that ads sites \emph{flurry.com}, \emph{tapjoyads.com}, ... leak information not only in clear but also over SSL. 
+\tbd{This analysis previously required warranty voiding the phone to install software capable of monitoring traffic.}
 
 \subsubsection{Behavior of Ads and Analytics}
 
-Fraction of ads and analytics over cell and wifi. 
-The number of devices that were tracked by ads and analytics sites.
-
-\subsubsection{Personally Identifiable Information}
-
-The frequency of tracking events per user per day in http.
-
-SSL Bumping controlled experiments: sites that leaked pii in the clear and in ssl.
-
-CDNs and other sites through which the traffic flowed.
-
-\subsection{Discussion}
-
+\begin{table}[t]
+\centering
+\begin{small}
+\begin{tabular}{|p{0.35\columnwidth}|p{0.1\columnwidth}|p{0.15\columnwidth}|p{0.1\columnwidth}|}
+\hline
+\multirow{2}{*}{\bf Tracker} & \multicolumn{3}{c|}{\bf Number of devices tracked}\tabularnewline
+\cline{2-4}
+   &  {\bf Total} & {\bf Android} & {\bf iOS} \tabularnewline
+\hline
+doubleclick.net & 26 & 11 & 15 \tabularnewline
+\hline
+google-analytics.com   & 26 & 11 & 15 \tabularnewline
+\hline
+googlesyndication.com  & 22 & 10 & 12 \tabularnewline
+\hline
+admob.com  & 21 & 10 & 11 \tabularnewline
+\hline
+scorecardresearch.com &  21 & 10 & 11 \tabularnewline
+\hline
+%2mdn.net  &  20 & 9 &  11 \tabularnewline
+%\hline
+%atdmt.com  & 18 & 9 &  9 \tabularnewline
+%\hline
+%imrworldwide.com & 18 &  9 &  9 \tabularnewline
+%\hline
+%flurry.com & 17 & 7 &  10 \tabularnewline
+%\hline
+%googleadservices.com  & 17 & 8 &  9 \tabularnewline
+%\hline
+\end{tabular}
+\end{small}
+\caption{The top 5 ads and analytics sites that tracked the devices in our dataset.
+\emph{Trackers, doubleclick.net and google-analytics.com, tracked all the 26 devices in} \mobWild.}
+\label{tab:top_trackers}
+\end{table}
 
 
 %%% Local Variables: 
@@ -66,6 +102,34 @@ CDNs and other sites through which the traffic flowed.
 % \end{table}
 
 
+
+% \subsubsection{Bandwidth Usage with time of specific application}
+
+% X-axis is the user and y-axis is the share over cell, wifi, and combined for each user.
+
+% X-axis is the day and y axis is the share over cell and wi-fi.
+
+% SSL + Cellular 
+
+% \subsubsection{Multimedia Traffic in he Wild}
+
+% X-axis is the user and y-axis is the share over cell, wifi, and combined.
+
+% \subsection{User Tracking}
+
+% \subsubsection{Behavior of Ads and Analytics}
+
+% Fraction of ads and analytics over cell and wifi. 
+% The number of devices that were tracked by ads and analytics sites.
+
+
+% The frequency of tracking events per user per day in http.
+
+% SSL Bumping controlled experiments: sites that leaked pii in the clear and in ssl.
+
+% CDNs and other sites through which the traffic flowed.
+
+% \subsection{Discussion}
 
 
 
