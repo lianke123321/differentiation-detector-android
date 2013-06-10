@@ -180,28 +180,26 @@ We therefore use the latest DNS response that contains the IP address of the web
 Indeed, for 97.8\% of the Android and 83.4\% of the iOS HTTPS traffic that we could not classify using other fields, we observe that the latest DNS response before the flow started contained the IP address of the webservice as the first entry in the DNS response\footnote{The share of SSL traffic where the latest DNS response contains the IP address of the web-service in the first position is 97.4\% for Android and 88.6\% of iOS}. 
 Despite the usefulness of DNS responses, we give a high priority to the server-name and the certificates because we observed that for flows that contained the server name did not contain the same name in the DNS response for 9.2\% of the iOS traffic and 5.6\% of Android traffic.
 
-\begin{table}
-\centering
-\begin{small}
-\begin{tabular}{|p{0.35\columnwidth}|c|c|c|c|}
-\hline
-\multirow{2}{*}{\bf Service} & \multicolumn{2}{c|}{\bf iOS} &  \multicolumn{2}{c|}{\bf Android} \tabularnewline
-\cline{2-5}
-  & {\bf Bytes}  & {\bf Flows} & {\bf Bytes} & {\bf Flows} \tabularnewline
-\hline
-Mail                 & 9.970  & 62.168  & 1.626 & 1.565 \tabularnewline
-\hline
-Social Networking    & 12.49030 & 6.683  & 36.66161 & 22.352282 \tabularnewline
-\hline
-\end{tabular}
-\end{small}
-\caption{Sample classification of SSL traffic based on names in certificate, server name indentification, and DNS request.}
-\label{tab:classify-ssl-traffic}
-\end{table}
+% \begin{table}
+% \centering
+% \begin{small}
+% \begin{tabular}{|p{0.35\columnwidth}|c|c|c|c|}
+% \hline
+% \multirow{2}{*}{\bf Service} & \multicolumn{2}{c|}{\bf iOS} &  \multicolumn{2}{c|}{\bf Android} \tabularnewline
+% \cline{2-5}
+%   & {\bf Bytes}  & {\bf Flows} & {\bf Bytes} & {\bf Flows} \tabularnewline
+% \hline
+% Mail                 & 9.970  & 62.168  & 1.626 & 1.565 \tabularnewline
+% \hline
+% Social Networking    & 12.49030 & 6.683  & 36.66161 & 22.352282 \tabularnewline
+% \hline
+% \end{tabular}
+% \end{small}
+% \caption{Sample classification of SSL traffic based on names in certificate, server name indentification, and DNS request.}
+% \label{tab:classify-ssl-traffic}
+% \end{table}
 
-In \fref{tab:classify-ssl-traffic}
-
-
+% In \fref{tab:classify-ssl-traffic}
 
 In summary, we use \platname to perform controlled experiments and in the wild measurements to characterize mobile Internet traffic. 
 We use Bro to analyze the data and build on the output of bro to further classify HTTP flows and SSL flows to identify the source of the traffic. 
