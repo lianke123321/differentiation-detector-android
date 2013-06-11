@@ -79,6 +79,7 @@ public class CharonVpnService extends VpnService implements Runnable
 	private static CharonVpnService thisStaticObject;
 	/* keep track the auto reconnect status */
 	private boolean isAutoReconnect;
+	private Timer timer;
 	
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
@@ -175,11 +176,13 @@ public class CharonVpnService extends VpnService implements Runnable
 	{	/* the system revoked the rights grated with the initial prepare() call.
 		 * called when the user clicks disconnect in the system's VPN dialog */
 		setNextProfile(null);
+		Log.e(TAG, "On revoke");
 	}
 
 	@Override
 	public void onDestroy()
 	{
+		Log.e(TAG, "On destroy");
 		mTerminate = true;
 		setNextProfile(null);
 		try
@@ -196,6 +199,8 @@ public class CharonVpnService extends VpnService implements Runnable
 		}
 		mDataSource.close();
 	}
+	
+	
 
 	/**
 	 * Set the profile that is to be initiated next. Notify the handler thread.
@@ -283,7 +288,7 @@ public class CharonVpnService extends VpnService implements Runnable
 	 */
 	private void runTimer() {
 //		final Thread thisThread = Thread.currentThread();
-		Timer timer = new Timer();
+		timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask(){
 
 			@Override
