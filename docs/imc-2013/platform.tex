@@ -32,7 +32,7 @@ In this section, we present the \platname{} plateform\footnote{At the
   time of the camera ready version, we will make the \platname{}
   software publicly available.} whose goal is \emph{to monitor all
   the Internet traffic from and to mobile devices} with the following
-constraints.
+constraints. \drc{These are not constraints}
 \begin{packedenumerate}
 \item \emph{OS agnostic.} We want to monitor traffic independently of
   the OS run by the monitored device. In particular, we do not want to
@@ -51,6 +51,8 @@ constraints.
 \item \emph{Single machine.} We want \platname{} to fit on a
   single machine to facilitate its installation and deployment. 
  \end{packedenumerate}    
+ 
+ \drc{Not sure I agree with the last two.}
 
 In the following, we describe in detail the design of \platname{},
 then we discuss the limitations of the platform.
@@ -327,7 +329,7 @@ Plugins can be used for many different purposes such as replaying
 traffic, testing reliability to data corruption or delays, or
 decrypting SSH traffic. In the following, we describe how easy it is
 to perform SSH traffic decryption using the \platname{} plugin
-infrastructure.
+infrastructure. \drc{SSL?}
 
 In order to perform SSH traffic decryption, we use a 
 feature of the Squid proxy called SSL bumping\tbd{AR: give a
@@ -373,6 +375,7 @@ further this issue in Section~\ref{sec:classification}.
 
 \subsection{Limitations}
 \label{sec:addit-limit}
+\drc{Add text about monitoring only one interface.}
 Using \platname{} to monitor traffic from mobile devices leads to
 limitations that we discuss in the following. We discuss first the
 overheads due to the VPN on the monitoring: VPN establishment delay,
@@ -405,7 +408,7 @@ and of 1.59 second on cellular. For iOS that uses the older IKEv1, the
 VPN establishment takes longer: we observe a maximum of 2 seconds on
 \wifi{} and 2.18 seconds on cellular.  In summary, for most long term
 traffic monitoring experiments, the VPN establishment delay is
-negligible.
+negligible. \drc{median?}
 
 % To measure the time required to establish a VPN tunnel, we performed
 % controlled tests using one Android device and an iPhone 5.  We
