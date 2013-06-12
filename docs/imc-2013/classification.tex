@@ -61,10 +61,13 @@ Bro uses the protocol field in the IP header to broadly classify the flows, and 
 Bro further classifies TCP flows using well defined port numbers, and we use this classification to label flows as either HTTP, SSL (which includes HTTPS, IMAP, etc.) or \emph{other} flows.
 Similarly, we use Bro to label UDP flows as either DNS or \emph{other}. 
 Indeed, in \fref{tab:summaryIOSAndroidTraffic}, we observe that more than 92\% of the traffic in our \mobWild dataset is either HTTP or SSL. 
-We also observe that the share of HTTP volume over \wifi and cellular are significantly different. 
+We also observe that the share of HTTP volume over \wifi and ce
+llular are significantly different. 
 This increase is a result of the reduced share of media traffic and the use of email and for social networking applications that rely on SSL.
 
 \subsubsection{HTTP Traffic Classification}
+
+Differences with ~\cite{erman2011http,xu:appusage,maier:mobtraffic}.
 
 Web-services rely on the \useragent field to distinguish HTTP flows from their mobile applications from the flows originating from Web-browsers.
 In our controlled experiments we observed a valid \useragent string in more than 99\% of the HTTP flows from Android and iOS.
