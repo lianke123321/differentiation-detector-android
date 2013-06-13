@@ -28,31 +28,33 @@
 %     experiments}
 % \end{packedenumerate}
 
-In this section, we present the \platname{} plateform\footnote{At the
+In this section, we present an overview of the \platname{} platform\footnote{At the
   time of the camera ready version, we will make the \platname{}
-  software publicly available.} whose goal is \emph{to monitor all
-  the Internet traffic from and to mobile devices} with the following
-constraints. \drc{These are not constraints}
+  software publicly available.}. The goal of \platname{} is straightforward: we 
+ seek to enable passive monitoring of \emph{all
+  the Internet traffic from and to mobile devices}. While previous work has accomplished 
+  this for a limited set of devices or networks, we seek to avoid such limitations: 
 \begin{packedenumerate}
-\item \emph{OS agnostic.} We want to monitor traffic independently of
-  the OS run by the monitored device. In particular, we do not want to
-  develop OS specific applications, or to root or jailbreak the phone.
-\item \emph{ISP agnostic.} We want to monitor traffic without any
+\item \emph{OS agnostic.} Monitor traffic independently of
+  the OS run by the monitored device. In particular, we avoid the need to 
+  develop OS-specific applications, or to root or jailbreak the phone.
+\item \emph{ISP agnostic.} Monitor traffic without any
   support from ISPs and cellular providers.
-\item \emph{Access technology agnostic.} We want to monitor traffic
+\item \emph{Access technology agnostic.} Monitor traffic
   whatever the access technology used by the mobile device (Wifi, GSM,
   CDMA, UMTS, LTE, etc.)
-\item \emph{Encryption agnostic.} We want to monitor traffic both in
-  clear and encrypted.
-\item \emph{Flow modification.} We want to not only monitor, but
-  also possibly modify data packets in order to experiment. This makes
-  \platname{} both a passive monitoring and an experimental
-  platform. 
-\item \emph{Single machine.} We want \platname{} to fit on a
-  single machine to facilitate its installation and deployment. 
+\item \emph{Continuous.} Monitor traffic continuously, even when devices switch 
+between networks or return from being idle.
+\item \emph{Encryption agnostic.} Achieve visibility of both encrypted and plaintext traffic.
+
+%\item \emph{Flow modification.} We want to not only monitor, but
+ % also possibly modify data packets in order to experiment. This makes
+ % \platname{} both a passive monitoring and an experimental
+ % platform. 
+\item \emph{Scalability.} \platname{} should be equally feasible to deploy 
+on a single machine or using a collection of VMs in a hosted/cloud deployment. 
  \end{packedenumerate}    
  
- \drc{Not sure I agree with the last two.}
 
 In the following, we describe in detail the design of \platname{},
 then we discuss the limitations of the platform.
@@ -69,51 +71,66 @@ then we discuss the limitations of the platform.
 % \subsubsection{VPN Proxying}
 % \label{sec:platform-vpn}
 
-In order to monitor all Internet traffic from and to mobile devices
-with the constraints we described, we designed the \platname{} plaform
-on a VPN infrastructure. By instrumenting the VPN server that
-mobile devices are using, we can monitor all the Internet traffic going
-through the VPN tunnels. But, using a VPN infrastructure raises three
-important questions. i) How ubiquitous is the VPN technology on mobile
-devices?  ii) How to monitor traffic on \platname{}? iii) How to
-modify traffic on \platname? We explore in the following these three key questions.
+To meet the above goals, we exploit the observation that nearly all 
+devices support network traffic indirection via virtual private networks (VPNs). 
+In particular, instead of using the VPN server to access a private network, 
+we use it as a proxy for all of a device's mobile Internet traffic. This enables passive monitoring 
+of Internet traffic regardless of device OS, carrier/ISP or access technology. 
+Further, we show that this approach has minimal impact on 
+performance and measurement fidelity -- making \platname{} a practical 
+approach for pervasive passive network monitoring.
 
-\subsubsection{VPN Technology on Mobile Devices}
+In the following sections, we describe how our measurement infrastructure 
+achieves the goals states in the previous section. We begin by describing 
+how we addressed several challenges with implementing our VPN-based 
+proxy. 
+
+
+% designed the \platname{} platform
+%on a VPN infrastructure. By instrumenting the VPN server that
+%mobile devices are using, we can monitor all the Internet traffic going
+%through the VPN tunnels. But, using a VPN infrastructure raises three
+%important questions. i) How ubiquitous is the VPN technology on mobile
+%devices?  ii) How to monitor traffic on \platname{}? iii) How to
+%modify traffic on \platname? We explore in the following these three key questions.
+
+\subsubsection{VPNs for Mobile Devices}
 \label{sec:vpn-tech-mobile-device}
-The VPN technology is widely supported on the most popular mobile
-OSes. Indeed, Android, BlackBerry, Bada, and iOS all support VPNs,
-primarily to satisfy their enterprise clients that use VPNs to
-securely connect to their enterprise networks. Also, the VPN
-technology on mobile devices encapsulates all the data traffic---both
-Wi-Fi and cellular. Consequently, it is possible to reach our three
-first design goals: OS, ISP, and access technology agnostic.
+In this section, we provide a detailed description of how VPNs allow 
+us to achieve many of our \platname{} design goals.  
+Our first goal is to provide a measurement system that works regardless 
+of device OS. To achieve this goal, we note that VPNs are widely supported 
+on the most popular mobile OSes. Indeed, Android, BlackBerry, Bada, and iOS all support VPNs,
+primarily to satisfy their enterprise clients. In this work, we focus on 
+the two most popular OSes: iOS and Android. 
 
-However, to capture all Internet traffic from and to a mobile device,
+Our second and third goals are 
+to enable measurements regardless of ISP or access technology. 
+Fortunately, iOS and Android support VPN connectivity regardless of  
+ISP or access technology -- so long as the network supports the Internet Protocol. 
+
+We note that both iOS and Android support VPN connections 
+using the IPSec standard, meaning we can implement our VPN proxy 
+server using robust, open-source code from Strongswan~\cite{strongswan}. 
+\platname{} thus supports IPSec tunnels using either IKEv1 or
+IKEv2~\cite{rfc5996} for authentication and key negotiation.
+
+
+To meet our goal of continuous network monitoring,
 a VPN must always be enabled. Currently, all iOS devices (version 3.0
 and above) support a feature called \textit{VPN On-Demand}.  VPN
 On-Demand forces the iOS device to use VPN tunnels when connecting to
-a specified set of domains, and we configured it to be enabled for all
-Internet domains. Android version 4.2 and above support an
+a specified set of domains. To ensure all possible addresses match this list, 
+we observed that iOS uses suffix matching to determine which connections 
+should be tunneled; accordingly, we specified the domain list as the set of 
+alphanumeric characters (a-z, 0-9, one character per domain). 
+Android version 4.2 and above support an
 \textit{Always On VPN} connection that is always enabled for all data
 traffic, and Android version 4.0 and above provide an API that allows
-applications to manage VPN tunnels. We implemented an application that
-uses this API in order to provide the always on functionality for
+applications to manage VPN tunnels. We support both options: we have distributed Always On VPN 
+configurations and implemented an application that
+uses the VPN API to provide equivalent functionality for
 Android 4.0 and 4.1.
-
-In addition, to facilitate the creation of certificates to configure
-the VPN tunnels between the mobile devices and the \platname{}
-platform, we created our own \platname{} root certificate that is used
-to sign all subsequent certificates issues to mobile devices that want
-to use the \platname{} platform. 
-
-In summary, the VPN technology is available out-of-the-box for the
-latest versions of the most popular mobile OSes. From the server side,
-that is on the \platname{} platform, we use
-\textit{Strongswan}~\cite{strongswan}, an open source software used to
-manage VPN tunnels. Strongswan supports the required protocols and
-encryption algorithms required by iOS and Android, in particullar
-IPsec for the encryption of IP datagrams, and IKEv1 and
-IKEv2~\cite{rfc5996} for authentication and key negotiation.
 
 
 % The use IPsec by mobile devices for pervasive VPN tunnels limited our
@@ -134,16 +151,97 @@ IKEv2~\cite{rfc5996} for authentication and key negotiation.
 \subsubsection{Monitoring Traffic on MobiScope}
 \label{sec:monit-traff-mobiscope}
 
-Surprisingly, monitoring traffic on \platname{} is particularly
-involved. When we monitor traffic on \platname, we need to dump
-all traffic between the mobile devices and the Internet, and we need to
-associate the dumped traffic to the right mobile device and Web service. The
-former is easy using a \textit{tcpdump} process, but the later is more
-complex. To explain this complexity, we first need to explain how
-packets are processed on \platname. 
 
 
-\begin{figure}[ht]
+Having shown that VPNs support many of \platname{}'s goals, 
+we now describe how we implement passive network monitoring 
+using VPN proxying. While the high-level design for capturing 
+network traffic from mobile devices is straightforward, the implementation 
+is not. In particular, the interactions between IPSec, routing and NAT 
+complicate our ability to map bidirectional flows to individual devices. 
+The following paragraphs describe these challenges and how we 
+addressed them to provide a stand-alone (\ie single server) mobile-traffic monitoring 
+proxy. We conclude by describing how our architecture facilitates 
+pluggable modules for performing custom monitoring.
+
+At first glance, capturing all traffic traversing a VPN server should be 
+as simple as running a tap on the network interface, \eg using \textit{tcpdump}. 
+While this indeed captures all traffic, it does not capture sufficient information 
+to distinguish bidirectional flows and map them to individual devices. We now 
+describe how to provide this mapping.
+
+First, we describe how the Linux network stack interacts with IPSec. 
+We assume the \platname{} server is assigned 
+IP address $m$ and the mobile device's public IP address is $d$. When 
+the VPN connection is established, the proxy assigns the device a private address 
+$v$. Last, the device is attempting to access a service located at address $w$. 
+We denote a packet from source $s$ to destination $d$ as $s \rightarrow d$.
+
+\noindent \textbf{Forward path.} The first step is to map flows in the forward direction. Figure~\ref{fig:packet-monitor-a} shows the path that packets take 
+through a \platname{} proxy.  At steps (1),
+(2), and (3) the encrypted datagram (in gray, $d \rightarrow m$) is passed to the IPSec 
+module to decrypt and process the encapsulated IP datagram ($v \rightarrow w$) sent from 
+the device. Because the \platform{} assigns private address space to 
+clients, it must use NAT in step (5) to convertthe private IP address \emph{v} to the public IP
+address \emph{m}. Last, the packet is forwarded to the Internet. 
+
+We now describe how running tcpdump and tracking the NAT table are 
+sufficient for mapping flows in the forward direction. Running \emph{tcpdump} on the Ethernet device captures packets at 
+step (2), (4), and (7). The translation table provides a map between the public IP address \emph{d}
+of the device and its private IP address \emph{v} in the tunnel. To
+associate packets to a device and a Web service, we only need the
+packet captured at step (4) that associates the packet to the private
+address \emph{v} of the device in the VPN tunnel and the Web service
+(address \emph{w}), and the translation table that gives the
+mapping between the device in the VPN tunnel (address \emph{v}) and
+the public IP address \emph{d} of the mobile device.
+
+\noindent \textbf{Reverse path.} In the reverse direction (when packets flow from the
+Internet to the mobile device), it is no longer possible to associate a
+mobile device to the packets. We refer to 
+Figure~\ref{fig:packet-monitor-b}, where we continue to dump packets from 
+the Ethernet device. From
+steps (2) and (7), we know that a packet in sent by the service at address $w$ to
+the \platname{} box (step (2)), but then this packet is encapsulated
+at the IPsec layer -- address resolution is performed by the NAT
+without passing through tcpdump. So, when we see the datagram at step (7), we have no
+way to know which encrypted packet is encapsulated. We need to dump
+the packet at step (4), but we have no access to it via the standard Linux networking stack. 
+
+\noindent \textbf{Bidirectional mappings.} A straightforward solution to 
+the reverse path mapping problem is to forward traffic to a separate NAT 
+device and dump traffic there. To avoid the need for additional hardware/VMs,
+we simply virtualize an additional network interface and route traffic through it. 
+
+Namely, we use a Linux TUN device, send packets from \emph{w} to \emph{v} through 
+it and run packet captures on that TUN device (Figure~\ref{fig:packet-monitor-d}). 
+Indeed, when a packet is
+received from the Internet and arrives at NAT at step
+(3), the NAT resolves the public address of the
+\platname{} box \emph{m} to the address of the device in the VPN
+tunnel \emph{v}. We design the NAT such that each client is assigned an 
+address from a space of prefix length $p+1$. The $p$th bit has a
+specific role. By default it is set to 0, but we modified the NAT so
+that when it receives a packet that resolve to \emph{v}, it changes it
+to \emph{v'} that only differ from \emph{v} by the $p$th bit that is
+set to 1. This facilitates routing traffic to the TUN device for all
+packets whose destination is \emph{v}, and facilitates forwarding  
+all packet with a \emph{v'} destination address ($p$th bit set
+to 1) to the TUN device, step (5). Then, we implement a process at the
+TUN device that changes the destination address
+from \emph{v'} to \emph{v}, and to sends the packet to the IP
+layer, step (6). Then the packet follows the path of a regular packet
+in a VPN tunnel. 
+
+When a packet is received from the mobile device, we perform a similar
+process that is described in Figure~\ref{fig:packet-monitor-c}. 
+
+In summary, exploiting the notion of TUN device, we are now able to
+dump all Internet traffic from and to a mobile device connected to the
+\platname{} platform from a single machine, and to associate this
+traffic to corresponding mobile devices and Web services. 
+
+\begin{figure}
 \begin{center}
   \subfloat[Packet from mobile device. \emph{Tcpdump can capture
     packets at step (2)~d~$\rightarrow$~m, (4)~v~$\rightarrow$~w, and
@@ -183,74 +281,6 @@ to the TUN device. \tabularnewline
 \caption{Packet monitoring in the \platname{} box.}
 \label{fig:packet-monitoring}
 \end{figure}
-
-Figure~\ref{fig:packet-monitor-a} shows the processing on \platname{}
-of packets sent from a mobile device to the Internet. At step (1),
-(2), and (3) the encrypted datagram (in gray) goes up the layers, this
-datagram is encapsulated in a regular IP datagram sent from the device
-(address \emph{d}) to the \platname{} box (address \emph{m}). The
-IPsec layer decrypts at step (3) the datagram whose source IP address
-\emph{v} is the private address of the mobile device in the VPN tunnel
-and the destination is the IP address \emph{w} of the destination Web
-service. In order to send this datagram in the Internet, the NAT must
-convert in step (5) the private IP address \emph{v} to the public IP
-address \emph{m} of the \platname{} box. Then this packet is sent in
-the Internet. As the tcpdump process runs just above the Ethernet
-layer, it dumps packets at step (2), (4), and (7). In addition, we
-also dump the translation table between the public IP address \emph{d}
-of the device and its private IP address \emph{v} in the tunnel. To
-associate packets to a device and a Web service, we only need the
-packet captured at step (4) that associates the packet to the private
-address \emph{v} of the device in the VPN tunnel and the Web service
-(address \emph{w}), and the translation table that gives the
-mapping between the device in the VPN tunnel (address \emph{v}) and
-the public IP address \emph{d} of the mobile device.
-
-However, in the reverse direction, when packets flows from the
-Internet to the mobile device, it is no more possible to associate a
-mobile device to the packets, see
-Figure~\ref{fig:packet-monitor-b}. Indeed, from the dumped packets at
-step (2) and (7), we know that a packet in sent by the Web service to
-the \platname{} box (step (2)), but then this packet is encapsulated
-at the IPsec layer, and the address resolution is performed by the NAT
-without any dump. So, when we see the datagram at step(7), we have no
-way to know which encrypted packet is encapsulated. We need to dump
-the packet at step (4), but we have no access to it. One way would be
-to run the NAT on a separate box, and to dump traffic from that box,
-but it would require two different boxes. Instead, we propose a
-solution that allows to dump the packet from \emph{w} to \emph{v} from
-a single box, which we describe in the following. 
-
-Our solution is to force the packets from \emph{w} to \emph{v} to make
-a loop on a TUN device, and to dump these packets at the TUN device,
-see Figure~\ref{fig:packet-monitor-d}. Indeed, when a packet is
-received from the Internet is goes up the layers up to the NAT at step
-(3). At that point, the NAT resolve the public address of the
-\platname{} box \emph{m} to the address of the device in the VPN
-tunnel \emph{v}. In the NAT all addresses in the VPN tunnel are class
-A private addresses using only 23 bits out of 24. The 24th bit has a
-specific role. By default it is set to 0, but we modified the NAT so
-that when it receives a packet that resolve to \emph{v}, it changes it
-to \emph{v'} that only differ from \emph{v} by the 24th bit that is
-set to 1. The only one reason to make this conversation is to send all
-packets whose destination is \emph{v} to the TUN device, by creating a
-specific forwarding rule that forwards all packet with a \emph{v'}
-destination address (a class A private address with the 24th bit set
-to 1) to the TUN device, step (5). Then, we implement a process at the
-TUN device whose only one goal is to change the destination address
-from \emph{v'} to \emph{v}, and to sends back the packet to the IP
-layer, step (6). Then the packet follows the path of a regular packet
-in a VPN tunnel. 
-
-When a packet is received from the mobile device, we perform a similar
-process that is described in Figure~\ref{fig:packet-monitor-c}. 
-
-In summary, exploiting the notion of TUN device, we are now able to
-dump all Internet traffic from and to a mobile device connected to the
-\platname{} platform from a single machine, and to associate this
-traffic to corresponding mobile devices and Web services. 
-
-
 
 % %start the discussion of the technical details. TO REWRITE
 % The IPsec implementation in the Linux kernel is not suitable to
@@ -330,6 +360,13 @@ traffic, testing reliability to data corruption or delays, or
 decrypting SSH traffic. In the following, we describe how easy it is
 to perform SSH traffic decryption using the \platname{} plugin
 infrastructure. \drc{SSL?}
+
+
+First, we note that our VPN proxy implementation uses a self-generated 
+\platname{} root certificate that is used to sign all subsequent certificates 
+issues to mobile devices that want to use the \platname{} platform. This design 
+choice enables the following technique.
+
 
 In order to perform SSH traffic decryption, we use a 
 feature of the Squid proxy called SSL bumping\tbd{AR: give a
