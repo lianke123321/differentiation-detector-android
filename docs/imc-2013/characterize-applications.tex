@@ -1,217 +1,200 @@
-\section{Application Characterization}
+\section{Privacy Invasive Services}
 \label{sec:characterize-app}
 
-  We now turn to measurements of specific popular iOS and Android applications. 
-  When users install apps, they grant them Internet access without detailed knowledge of how that access will be used, including {\it how much} data is sent or accessed, {\it what} data is sent,  or {\it with whom} the app communications.
-  ``How much'' is important to conserve both bandwidth caps and battery capacity: an app which consumes or produces too much data will waste bandwidth resources, while an app which consumes or produces data too frequently will prevent the device radio from going idle to save power.
-  ``With whom'' is important to protect users from excessive tracking -- the more organization's servers an app connects to, the more organizations which are able to track user behavior, location, or other private data.
-  Finally, ``what data'' is important because apps may unnecessarily leak personally identifiable information (PII) such as user email address, IMEI, contact information, or other stored data either to the app provider or worse, to any eavesdropper on a public WiFi connection.
-  We  report on our findings in all three of these dimensions for the iPhone and Android apps in our study.
+We now use pervasive nature of \platname to detail  the privacy invasiveness of applications and Web-services. 
+For our analysis we concentrated on the data sent from the mobile devices with a focus on the {\it what} data is sent,  {\it to whom} is the data sent, and {\it how frequently} is data sent.
+%To answer these questions, we rely on the controlled experiments and the \mobWild dataset.
 
-\subsection{Bandwidth and Radio Usage}
+\begin{table*}[t]    
+    \centering
+    \begin{small}
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+       \hline
+       {\bf Store}&{\bf Platform}&{\bf \# Apps}&{\bf Email}& {\bf Location}& {\bf Name} &{\bf Password}& {\bf Device ID}& {\bf Contacts}& {\bf IMEI}\\
+       \hline
+       App Store&iPhone&100&13 (13\%) &20 (20\%)&4 (4\%)&0 (0\%)&0 (0\%)&0 (0\%)&1 (1\%)\\
+       \hline
+       Google Play&Android&100&3 (3\%)&10 (10\%)&2 (2\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
+       \hline
+       Third Party&Android&908&1 (0.1\%)&32 (3.5\%)&2 (0.2\%)&0 (0\%)&95 (10.4\%)&4 (0.4\%)&48 (5.3\%)\\
+       \hline
+    \end{tabular}
+    \end{small}
+    \caption{Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone applications. \emph{The popular iOS applications tend to leak the location information in the clear while Android applications leak the IMEI number and Android ID in the clear.}}
+    \label{tab:pii}
+\end{table*}
 
-  {\bf In the Wild.}
-    \begin{itemize}
-      \item Stats on how much bandwidth each user used; time of day; how frequent...
-    \end{itemize}
+\subsection{Personally Identifiable Information Leaks}
 
-  {\bf Android Apps.}
-    To dig in to the root cause of these usage patterns, we also did an `app-by-app` analysis of network usage to see if most bandwidth consumption/radio time was the result of a few heavy applications, with most applications relatively idle, or whether usage was divided amongst all applications equally.
-    In Figure~\ref{fig:app-by-app-usage}, we plot the CDF of total bytes transferred by each app in our study, one line for the top-100 Google Play apps we tested manually, and another for the top 2000 apps, tested automatically, from a third-party market.
-    We see that...\tbd{Amy...}
-    We see that in general, more bytes are received than sent (289711536 vs 3040151). This is probably due to advertising, where the size of the requests is much smaller than the advertisements received. Indeed, most of the applications contacted Google, through AdMob. A few third-party advertising servers were also contacted. 
-    
-Applications in general fit their expected bandwidth usage(Spotify, predictably sent the most bytes (sent 318980 received 12108538) and a notepad application used the least (sent 414 received 262). However, some games used a surprisingly large amount of bandwidth (The Simpsons(TM): Tapped Out 149291 88932890 and Jurassic Park(TM) Builder
- 312912 127163147 (These two received the most bytes)). Ludia games in particular used an unusually large amount of bandwidth. Ludia's Jurassic Park(TM) Builder ran for 13 minutes, and Ludia's Family Feud and Friends Free ran for 7 minutes. Ludia's Jurassic Park(TM) Builder was 38.1 MB  and Ludia's Family Feud and Friends Free was 27.6 MB. This may be because of game updates (for example, a lot of these games may have released more in-game content for Easter, new textures, new models, etc.) This is confirmed by the fact that most of the data transmitted is near the beginning. These applications were tested before Google updated its Play Developer Program Policies on May 1, 2013 to say, "an app downloaded from Google Play may not modify, replace or update its own APK binary code using any method other than Google Play's update mechanism." However, companies may still subvert this new policy by pushing textures and other in-app purchases aren't necessarily modifying the apk binary code, but still use excessive bandwidth. 
- 
-In terms of categories, games had the most variable amount of usage. For example, The aforementioned Jurassic Park sent  (com.ludia.jurassicpark 312912 127163147), but Angry Birds StarWars only had (com.rovio.angrybirdsstarwars.ads.iap 5463 9416)  Fruit Ninja only had (com.halfbrick.fruitninjafree 4326 28639). Music/video applications were consistently the biggest users of bandwidth (com.spotify.mobile.android.ui 318980 12108538
-), (com.pandora.android 87753 7744094), (com.oovoo 148905 1402490). ooVoo is a video chat and I'm application.  Pinterest, through sheer number of pictures, also sent and received a lot. (com.pinterest 156963 3309776) Productivity/tool apps tended to use the least (com.socialnmobile.dictapps.notepad.color.note 414 262),(com.sirma.mobile.bible.android 2255 6523) .
+For our experiments we created fake user accounts with fake contact information and fake Twitter and Facebook accounts.  
+Our objective for was to detect if any personally identifiable information -- email address, phone number, IMEI number -- stored on the device is leaked across the network over HTTP or HTTPS.
+While we acknowledge that some of this information may be relevant for the application, we strongly believe that this information should never travel across the network in plaintext (HTTP), which we see violated in several cases.
 
-Methodology: Each pcap file is associated with an application. Simply look through all packets sent/received and find their lengths. Sum to get bytes sent and received. Script to do this is in totalBytes.sh. 
-To get size of packets over time, simply remove the summing part. This script is in bytesSentOverTime.sh
-Unfortunately, due to the usage of many computers with differing timestamps while working with the hundred pcaps, these need to be manually transcribed from pcap to app name. file\_to\_appname.txt has a rough approximation. Use map\_file\_to\_name.rb file\_to\_appname.txt $<$file$>$.
-For the third party apps though, these were all conducted on a single computer, so just simply use the map\_results\_to\_app.rb script. (If conducting these experiments in the future, would recommend synchronizing the time of the computer(s) running the experiment and the time of the thing handling the pcap-captures)
+In \fref{tab:pii}, we present the different personally identifiable information (PII) leaked for both Android and iPhone apps.  
+We observe that the IMEI, a unique identifier tied to a phone, is the one of the most commonly leaked PII for Android applications.
+Although IMEI is not private, it can be used to track and correlate a user's behavior across the Web-services.
+Similarly, we observe that Android application tend to leak the Android ID, a unique identifier tied to an Android device.
+In \fref{tab:pii}, we also observe that other information like contacts, email, and passwords were leaked in the clear.
+The email address, the address used to sign up for the services, was leaked in the clear by 13 iOS and 3 Android applications from our set of 100 popular applications.
 
-    Regarding radio usage,...\tbd{Do we even have time to do this? I don't remember the exact metrics we used for the MobiSys submission.}
 
-  {\bf iPhone Apps.}
+\begin{table}
+    \centering
+    \begin{small}
+    \begin{tabular}{|l|c|c||c|}
+       \hline
+       {\bf Host}&{\bf IMEI}&{\bf Device ID} & {\em Ads \& Analytics} \tabularnewline
+       \hline              
+       chartboost.com                & \checkmark & \checkmark & \checkmark  \tabularnewline
+       tapjoyads.com                 & \checkmark & -          & \checkmark  \tabularnewline
+       getjar.com                    & \checkmark & \checkmark & -   \tabularnewline
+       pocketchange.com              & \checkmark & \checkmark & -   \tabularnewline
+       iheart.com                    & \checkmark & \checkmark & -   \tabularnewline
+       aarki.net                     & \checkmark & -          & \checkmark  \tabularnewline
+       zynga.com                     & \checkmark & -          & -   \tabularnewline
+       droidsecurity.appspot.com     & \checkmark & -          & -   \tabularnewline
+       google.com                    & -          & \checkmark & -   \tabularnewline
+       flurry.com                    & -          & \checkmark & \checkmark  \tabularnewline
+       groupon.com                   & -          & \checkmark & -   \tabularnewline
+       \hline
+    \end{tabular}
+    \end{small}
+    \caption{Top 10 hosts that receive the IMEI or Device ID over HTTPS. \emph{Hosts are ordered by the number of flows that send the IMEI number, followed by the number of flows that send the device ID over HTTPS. Four of the top 10 hosts that receive this information are ads and analytics sites.}}
+    \label{tab:pii-leakage-https-sites}
+\end{table}
 
-\subsection{Third Party Servers}
-  Many free applications support themselves financially by serving ads or providing resources for third parties to track user behavior.
-  We now explore how many servers are contacted by a given app (\ie{} how many providers are tracking a user with this app) -- most of these typically for ads, tracking, or analytics -- as well as how much data is transferred to and from these servers (\ie{} how much does this traffic impact the user's data cap?).
+During our experiments we observed that PII information was also sent over HTTPs. 
+However, because applications requests for email and other information for authentication, we focus our attention on the IMEI number and the device ID.
+In \fref{tab:pii-leakage-https-sites}, we present the top 10 sites, based on the number of flows that sent the IMEI over HTTPS. 
+We observe that four of the top 10 hosts that receive this information are ads and analytics sites.
+Furthermore, of the 77 sites that received either the IMEI or Device ID in the clear or over HTTPS, we observe that 35 sites were ads and analytics sites, the rest of the sites correspond to other Web-services contacted by the application. 
+This is a serious concern because it corresponds to misuse of the permissions a user has given to the app.
 
-  {\bf In the Wild.}
-  We first consider the overall impact of these ads, analytic, and tracking services on typical user behavior in our IRB study...
-  \tbd{Ashwin...}
+In summary, we use our controlled experiments to identify PII leaks to highlight the usefulness of \platname in analyzing mobile traffic, analysis that previously required warranty voiding the devices.
+%However, we would like to point out that we were not able to analyze traffic in which the data sent was encoded and exchanged as binary objects. 
 
-\begin{figure}[t]
-\includegraphics[width=\columnwidth]{plots/ad_share_bytes.pdf}
-\caption{Fraction of traffic volume because of Ads and Analytics. \emph{\tbd{Check for id1 and id25}}}
-\label{fig:description}
+%Stats value 13 of 22 in the clear device ID, 16 of 39 IMEI clear,  3 of 6 IMEI HTTPs, 3 of 10 device HTTPs}
+
+\subsection{PII in the Wild}
+
+\begin{figure} 
+\includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_location_image.png}
+\caption{Applications that send the location information in the clear. \emph{The font size represent the number of flows that sent the location information in the clear.}}
+\label{fig:location-wordcloud}
 \end{figure}
 
-\begin{figure}[t]
-\includegraphics[width=\columnwidth]{plots/distrib_ad_uploads.pdf}
-\caption{Distribution of bytes uploaded by ads and analytics sites. \emph{The distribution of bytes uploaded by all ads and analytics sites and the top four ads sites based on traffic volume across all users}.}
-\label{fig:description}
-\end{figure}
+In \fref{fig:location-wordcloud} we present a \emph{word cloud} of the applications that send the location information of the devices in the \mobWild dataset in the clear. 
+We observe that a bus service application, \emph{One Bus Away}, the application that manages the iOS homescreen, \emph{springboard}, and  weather applications, \emph{twc}, \emph{weather}, and \emph{hurricane} were responsible for more 78\% of the flows that sent the location information in the clear. 
+On further analysis, we observe that 4\% of the flows sent the location information to ads and analytics sites; more than 80\% of \emph{ad-flows} leaking location information did not include the an application signature in the user-agent field, the rest of the flows were from apps including, browsers, facebook, and angry birds.
 
-\begin{figure}[t]
-\includegraphics[width=\columnwidth]{plots/distrib_ad_downloads.pdf}
-\caption{Distribution of bytes downloaded by ads and analytics sites. \emph{The distribution of bytes uploaded by all ads and analytics sites and the top four ads sites based on traffic volume across all users}.}
-\label{fig:description}
-\end{figure}
+Along with the location, we also observed that the device ID and IMEI number are leaked in the clear in the \mobWild dataset. 
+Based on our classification methodology we observe that the IMEI number and device ID was leaked primarily through the Web-browser; we did not observe any application signature in non-browser flows in the \mobWild dataset that leaked the IMEI number or the device ID in the clear. 
+As in the case of controlled experiments, ads and analytics sites were the most popular destination for the IMEI number leaks.
+Among the 16 sites that sent the IMEI number in the clear, only 10 sites were ads and analytics sites; the rest of the sites included sites for games, news, and manufacturer updates.
 
-\begin{table}[t]
+%Similarly, from the device of one of the authors of the paper, we observed that the latest three versions YahooMail application, up to the time of the measurements, leaked the user's email address in the clear.
+
+
+
+
+%\tbd{This should come before 
+%We first identify A\&A flows using the publicly available database of~\cite{YoyoAds}; we augment this list of domains using recent research on mobile ads~\cite{hornyack:appfence, leontiadis:mobileads}.
+%Based on this classification, we observe that the ads and analytics traffic was responsible for up to 6\% of the traffic by volume per device, an observation in line to the one made by Vallina-Rodriguez~\etal~\cite{vallina-rod:ads}}.
+
+%\subsection{Ads and Analytics in the Wild}
+
+We now focus our attention on the extent to which devices in the \mobWild dataset contact ads and analytics (A\&A) sites, an activity that is receiving considerable attention~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}.
+Using our classification based on the \httphost, we observe that the ads and analytics traffic was responsible for up to 6\% of the traffic by volume per device, an observation in line to the one made by Vallina-Rodriguez~\etal~\cite{vallina-rod:ads}.
+Rather that focusing on the traffic volume we focus on the extent to which these sites are able to track the users in the dataset and the applications that facilitate this tracking. 
+
+\begin{table}
 \centering
 \begin{small}
 \begin{tabular}{|p{0.35\columnwidth}|p{0.1\columnwidth}|p{0.15\columnwidth}|p{0.1\columnwidth}|}
 \hline
 \multirow{2}{*}{\bf Tracker} & \multicolumn{3}{c|}{\bf Number of devices tracked}\tabularnewline
 \cline{2-4}
-   &  {\bf Total} & {\bf Android} & {\bf iOS} \tabularnewline
+                      &  {\bf Total} & {\bf iOS} & {\bf Android} \tabularnewline
 \hline
-doubleclick.net & 25 & 11 & 14 \tabularnewline
+doubleclick.net       & 26 {\em(all)} & 15 {\em(all)} & 11 {\em(all)} \tabularnewline
 \hline
-google-analytics.com   & 25 & 11 & 14 \tabularnewline
+google-analytics.com  & 26 {\em(all)} & 15 {\em(all)}  & 11 {\em(all)} \tabularnewline
 \hline
-googlesyndication.com  & 22 & 10 & 12 \tabularnewline
+googlesyndication.com & 22 & 12 & 10 \tabularnewline
 \hline
-admob.com  & 21 & 10 & 11 \tabularnewline
+admob.com             & 21 & 11 & 10 \tabularnewline
 \hline
-scorecardresearch.com &  21 & 10 & 11 \tabularnewline
-\hline
-2mdn.net  &  20 & 9 &  11 \tabularnewline
-\hline
-atdmt.com  & 18 & 9 &  9 \tabularnewline
-\hline
-imrworldwide.com & 18 &  9 &  9 \tabularnewline
-\hline
-flurry.com & 17 & 7 &  10 \tabularnewline
-\hline
-googleadservices.com  & 17 & 8 &  9 \tabularnewline
+scorecardresearch.com &  21 & 11 & 10 \tabularnewline
 \hline
 \end{tabular}
 \end{small}
-\caption{The top 10 ads and analytics sites that tracked the devices in our dataset.
-\emph{Two trackers, \emph{doubleclick.net} and\emph{google-analytics.com}, were tracking all the 25 devices in our dataset.}}
-\label{tab:top_trackers}
+\caption{The top 5 ads and analytics sites that were contacted by the devices in our dataset.
+\emph{The sites, doubleclick.net and google-analytics.com, were contacted by all the 26 devices in} \mobWild.}
+\label{tab:top-trackers}
 \end{table}
 
-
-\begin{table*}[t]
-    \centering
-    \begin{tabular}{l|l|l|l|l|l|l|l|l|l}
-       Dataset&Platform&\# Apps&Email&Location&Name&Password&Android ID&Contacts&IMEI\\
-       \hline
-       \hline
-       Google Play&Android&100&3 (3\%)&10 (10\%)&2 (2\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
-       \hline
-       Third Party&Android&908&1 (0.1\%)&32 (3.5\%)&2 (0.2\%)&0 (0\%)&95 (10.4\%)&4 (0.4\%)&48 (5.3\%)\\
-       \hline
-       App Store&iPhone&100&?&?&?&?&?&?&?\\
-    \end{tabular}
-    \caption{\label{tbl:pii}Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone apps.}
-  \end{table*}
-  
-
-  {\bf Android Apps.}
-  When we inspect the data from our controlled study, we see that some apps contact a large number of external servers while others contact significantly fewer.
-  In Figure~\ref{fig:android-cdns}, we show both the total number of servers contacted (solid lines) as well as the number of organizations contacted (dotted lines) for both the top-100 Google Play dataset and the top-2000 third-party dataset.
-  To quantify ``organizations contacted'', we performed whois lookups on all servers contacted and mapped them to an organization name, allowing us to tighten our upper bound on the number of companies/entities able to track the user through a single app.
-  Returning to the figure, we see...~\ref{fig:android-cdns}...\tbd{Amy...}
-After doing whois lookups on all contacted servers, we categorized by hand each server.
-For all of the hundred apps, we broke down the 51 servers that each visited into these categories:
-\begin{itemize}
-   \item 3 Advertising
-   \item 1 Analytics
-   \item 6 CDN
-  \item 10 Hosting
-  \item  1 IANA
-  \item  1 ISP
-   \item 3 Network
-  \item 23 PrivateCompany
-   \item 3 RegionalInternetRegistry
-\end{itemize}
-   For all of the third party apps, we broke down the 96 servers that each visited into these categories:
-\begin{itemize}
-\item      4 Advertising
- \item   1 Analytics
- \item   8 CDN
- \item  31 Hosting
- \item   1 IANA
- \item   2 ISP
-\item    8 Network
-\item   37 PrivateCompany
- \item   4 RegionalInternetRegistry
- \end{itemize}
-   
-   Words with Friends contacted an astounding 21 servers:
-\begin{itemize}
-\item    1 Advertising
-\item    3 CDN
-\item    7 Hosting
-\item    1 IANA
-\item    1 Network
-\item    5 PrivateCompany
-\item    1 RegionalInternetRegistry
-\end{itemize}
-ooVoo Video Call also contacted 21 servers, and interestingly, contacted Fastly, an analytics company. 
-\begin{itemize}
-\item    2 Advertising
-\item    1 Analytics
-\item    5 CDN
-\item    1 Hosting
-  \item  1 IANA
-\item    1 ISP
- \item   1 Network
-\item    8 PrivateCompany
-  \item  1 RegionalInternetRegistry
-\end{itemize}
-
-Small practical apps such as PhotoGrid - Collage Maker and ColorNote Notepad Notes generally did not contact many servers at all.
-\begin{itemize} 
-\item com.socialnmobile.dictapps.notepad.color.note
-\item 10.11.4.21	Internet Assigned Numbers Authority
-\item 128.208.4.1	University of Washington
-\item 74.217.75.7	Internap "
-\item com.roidapp.photogrid
-\item 10.11.4.22	Internet Assigned Numbers Authority
-\item 128.208.4.1	University of Washington
-\item 173.194.33.45	Google Inc."
-\end{itemize}
-
-Comments: wasn't entirely sure how to differentiate between 1.  server requested and getting CDNs back and 2. server requested, getting actual server back.
-
-  {\bf iPhone Apps.}
-  \tbd{Shen...}
-
-\subsection{Personally Identifiable Information}
- 
-  Finally, we turn to information leaked by individual applications. We do not report on data leaked for our real users here, but only the data leaked by our controlled apps in isolation.
-  We created fake user accounts on the test phones for a fake user named ``Tess Droid'', with fake contact information and fake Twitter and Facebook accounts. 
-  We were then able to check that none of this data ever was released over the network, either in plaintext (HTTP) or encrypted (HTTPS, see \S\ref{sec:bumping}).
-  
-  We consider data to be `leaked' when any personally identifiable information -- email address, phone number, IMEI number -- is sent across the network under HTTP or HTTPS.
-  Some of this information may be relevant to the app -- \eg{}, many apps legitimately require email access. 
-  However, none of this information should ever travel across the network in plaintext (HTTP), which we see violated in serveral cases.
-
-  In Table~\ref{tbl:pii}, we see the type of PII leaked for both Android and iPhone apps.
-  For Android apps, IMEI and Android ID are the most commonly leaked forms of PII in both the Google Play and third-party dataset.
-  Although not popularly thought of as ``private'' data, each of these identifiers are globally unique: IMEI is a unique identifier tied to a phone, and an Android ID is an identifier tied to a user's Google Account, used across many services on the Internet. 
-  Consequently, either of these datapoints can be used to track or correlate a user's behavior across all sites the user visits that sell or collaborate with tracking data: a user's behavior on one site can easily be linked to their behavior on any other site they visit.
-  With Android ID being tracked by between 10 and 20\% of apps in our study, and IMEI being tracked by between 5\% and 13\% of apps in our study, this suggests that global user tracking across collaborating services can be easily achieved today just by using this identifier.
-  \tbd{...}
-
-  Other informaiton like contacts, email, and passwords were rarely leaked in the clear, but all were leaked on occaision, suggesting that stricter monitoring of Android app behavior is needed -- contrastingly, no iPhone apps (which are manually given clearance by Apple before hitting the iPhone store) leaked passwords in plaintext~\tbd{is this true.}
-
-  Moving to iPhone apps, \tbd{...}
-%\subsection{Characterize Facebook Applications}
-
-%Why Facebook was chosen?
-
-%What do we observe ?
-
-%What do we see in the User Agent Fields. 
+In \fref{tab:top-trackers} we present the number of A\&A sites ordered according to the number of devices that contacted them.
+We observe that all the devices in the \mobWild dataset contacted doubleclick.com, an ad site, and google-analytics.com, a tracking site.
+Furthermore, we observe that 66.12\% of the volume of ad traffic in the \mobWild dataset was from the browsers, 6.46\% of the traffic contained a blank user-agent field, and 4.8\% of the traffic contained a signature of \emph{Google-Analytics}\footnote{This signature was observed even in the flows for users that did not have the Google Analytics application installed on the device.}.
+The rest of the traffic contained signatures of other applications such as Facebook, Pandora, and YouTube.
+%\tbd{This must come before Furthermore, we observed that 7\% of the traffic contained the Google-Analytics in the signature field; this signature was observed even in the flows for users that did not have the Google Analytics application installed on the device. Mention that we will wrongly classify the flows from Google Analytics app as ads and analytics traffic} 
 
 
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End: 
+
+%       getjar.com     & - S & - S \tabularnewline
+%       aarki.net      & - S & - - \tabularnewline
+%       chartboost.com & - S & - S \tabularnewline
+%       *pocketexchange&   S &   S \tabularnewline
+%       *vserv.mobi    & - - & C   \tabularnewline
+%       *groupon.com   &     &   S
+%       *flurry.com    &     &   S
+%       *bankofamerica &     &   S
+%       *google.com    & - - & - S
+
+\section{MISC}
+
+% \begin{figure}
+% \centering
+% \includegraphics[width=\columnwidth]{plots/ads_wild_gatracking.pdf}
+% \caption{Number of devices tracked by Google-Analytics. \emph{We observe that devices }}
+% \label{fig:tracking-analytics}
+% \end{figure}
+
+% \begin{figure}
+% \centering
+% \includegraphics[width=\columnwidth]{plots/ads_wild_usertracking.pdf}
+% \caption{Number of sites that track a user. \emph{We observe that devices }}
+% \label{fig:tracking-analytics}
+% \end{figure}
+
+% \begin{figure}
+% \centering
+% \includegraphics[width=\columnwidth]{plots/ads_wild_sitescontacted.pdf}
+% \caption{Number of visits to A\&A sites per device. \emph{The error bars indicate the 25$^{th}$ and 75$^{th}$ percentiles. Each visit is a potential tracking visit.}}
+% \label{fig:tracking-analytics}
+% \end{figure}
+
+% \begin{table}    
+%     \centering
+%     \begin{small}
+%     \begin{tabular}{|l|c|c|}
+%        \hline
+%        {\bf Host}&{\bf IMEI}&{\bf Device ID}\tabularnewline
+%        \hline              
+%        tapjoyads.com  & Y & - \tabularnewline
+%        zynga.com      & Y & - \tabularnewline
+%        iheart.com     & Y & Y \tabularnewline
+%        google.com     & - & Y \tabularnewline
+%        flurry.com     & - & Y \tabularnewline
+%        \hline
+%     \end{tabular}
+%     \end{small}
+%     \caption{Hosts to which the IMEI or Device ID was sent in the clear and over HTTPS. \emph{The value Y for a column implies that data was sent over HTTP and HTTPS. We order these hosts based on the number of flows that sent the IMEI number in the clear and over HTTPS.}}
+%     \label{tab:pii-leakage-sites}
+% \end{table}
