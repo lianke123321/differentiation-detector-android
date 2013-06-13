@@ -29,21 +29,21 @@
 			if(!isset($_GET['device']) || !isset($_GET['min']) || !isset($_GET['max'])){
 				fail("Device, Min or Max not set");
 			}
-			echo getData($user, $_GET['device'], $_GET['min'], $_GET['max']);
+			echo getData($user, $_GET['device'], $_GET['min'], $_GET['max'],  isset($_GET['subdomainDepth']) ? $_GET['subdomainDepth'] : 0);
 			break;
 
 		case "banLink":
 			if(!isset($_POST[OBJECT_POST_KEY])){
 				fail("No object posted with key ".OBJECT_POST_KEY);
 			}
-			echo banLink(JSON_decode($_POST[OBJECT_POST_KEY], true));
+			echo banLink($user, JSON_decode($_POST[OBJECT_POST_KEY], true));
 			break;
 
 		default:
 			fail("Invalid action.");
 	}
 
-	function getData($user, $device, $min, $max){
+	function getData($user, $device, $min, $max, $subdLevels){
 		try{
 			// min and max are unix timestamps to return requests between. 
 			// Banned results should be marked as such.
@@ -67,31 +67,34 @@
 			$obj = array();
 			$apps = array();
 			while($row = $result->fetch()){
-				if(!isset($apps[$row['appId']])){
+				$hostname = subdomainToLevel($row['hostDomain'], $subdLevels);
+				$appId = $row['appId'];
+				if(!isset($apps[$appId])){
 					//Grab app name
-					$getName->execute(array($row['appId']));
+					$getName->execute(array($appId));
 					$name = $getName->fetch()['appName'];
 
 					//Create app record
-					$apps[$row['appId']] = array(
+					$apps[$appId] = array(
 						'contacts' => array(),
 						'uses' => 0,
-						'name' => $name
+						'name' => $name,
+						'id'   => $appId
 						);
 
-					if(isset($banned[$row['appId']]) && 1 === preg_match($row['hostDomain']."|", $banned[$row['appId']]))
-						$apps[$row['appId']]['banned'] = true;
+					if(isset($banned[$appId]) && 1 === preg_match("/".$hostname."|/", $banned[$appId]))
+						$apps[$appId]['banned'][$hostname] = 1;
 				}
 
 				// Increment the use count for the app
-				$apps[$row['appId']]['uses']++;
+				$apps[$appId]['uses']++;
 
-				if(!isset($apps[$row['appId']]['contacts'][$row['hostDomain']]))
-					$apps[$row['appId']]['contacts'][$row['hostDomain']] = array(
+				if(!isset($apps[$appId]['contacts'][$hostname]))
+					$apps[$appId]['contacts'][$hostname] = array(
 						'hits' => 1
 						);
 				else
-					$apps[$row['appId']]['contacts'][$row['hostDomain']]['hits']++;
+					$apps[$appId]['contacts'][$hostname]['hits']++;
 			}
 
 			$obj['apps'] = $apps;
@@ -105,25 +108,34 @@
 		}
 	}
 
-	function banLink($obj){
+	function banLink($user, $obj){
 		// Adds this item to the ban list with 3 tuple
-		// (userIp, hostDomain, appId)
-		$userIp = $_SERVER['REMOTE_ADDR'];
-		$appId = $obj['source']['json']['appId'];
-		$hostDomain = $obj['target']['json']['shortname'];
+		// (userId, hostDomain, appId)
+
+		$userId = $user;
+		$appId = $obj['source']['appId'];
+		$hostDomain = $obj['target']['name'];
 
 		$mysql = connectToAppDb();
-		$result = $mysql->query("SELECT *  FROM `banList` WHERE `userIp` = '$userIp' AND `hostDomain` = '$hostDomain' AND `appId` = '$appId'");
-		if($result->num_rows == 0){
-			if(!$mysql->query("INSERT INTO `meddleConVis`.`banList` (`userIp`, `hostDomain`, `appId`) VALUES ('$userIp', '$hostDomain', '$appId');"))
+		$query = $mysql->prepare("SELECT count(*)  FROM `banList` WHERE `userId` = :userId AND `hostDomain` = :hostDomain AND `appId` = :appId");
+		$query->bindParam(":userId", $userId);
+		$query->bindParam(":hostDomain", $hostDomain);
+		$query->bindParam(":appId", $appId);
+		$query->execute();
+		$count = $query->fetch(PDO::FETCH_NUM)[0];
+		if($count == 0){
+			if(!$mysql->query("INSERT INTO `meddleConVis`.`banList` (`userId`, `hostDomain`, `appId`) VALUES ('$userId', '$hostDomain', '$appId');"))
 				fail("Could not ban");
-		} else if ($result->num_rows == 1){
-			if(!$mysql->query("DELETE FROM `meddleConVis`.`banList` WHERE `banList`.`userIp` = '$userIp' AND `banList`.`hostDomain` = '$hostDomain' AND `banList`.`appId` = '$appId' LIMIT 1;"))
+			else
+				return '{"success":"banned"}';
+		} else if ($count == 1){
+			if(!$mysql->query("DELETE FROM `meddleConVis`.`banList` WHERE `banList`.`userId` = '$userId' AND `banList`.`hostDomain` = '$hostDomain' AND `banList`.`appId` = '$appId' LIMIT 1;"))
 				fail("Could not unban");
+			else
+				return '{"success":"unbanned"}';
 		} else {
 			fail("More than one entry in ban db");
 		}
-		return SUCCESS_REPLY;
 	}
 
 	function getDevices($user){
@@ -164,6 +176,20 @@
 			'reason' => $reason
 			));
 		exit(0);
+	}
+
+	function subdomainToLevel($domain, $subdLevels){
+		if($subdLevels == 0)
+			return $domain;
+
+		$parts = explode('.', $domain);
+		$levels = count($parts);
+		$newDomain = $parts[$levels - 1];
+
+		for($i = 1; $i < $subdLevels && $i < $levels; $i++)
+			$newDomain = $parts[$levels - $i - 1].".".$newDomain;
+
+		return $newDomain;
 	}
 
 	function connectToLogDb($user){

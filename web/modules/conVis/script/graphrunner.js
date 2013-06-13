@@ -127,7 +127,8 @@ var ConVis = (function(jQuery, d3) {
 						// <g> doesn't take x or y attributes but it can be positioned with a transformation
 						return "translate(" + d.x + "," + d.y + ")";
 					})
-					.on("mouseover", function(d) {
+				.call(forceGraph.drag)
+				.on("mouseover", function(d) {
 						if (isNodeBeingDragged)
 							return;
 						// Hide all lines except the ones going in or out of this node;
@@ -145,7 +146,7 @@ var ConVis = (function(jQuery, d3) {
 								return (subGraph.indexOf(d.name) == -1);
 						});
 					})
-					.on("mouseout", function(d) {
+				.on("mouseout", function(d) {
 						if (isNodeBeingDragged)
 							return;
 						vis.selectAll("line").classed("hidden", false);
@@ -156,7 +157,7 @@ var ConVis = (function(jQuery, d3) {
 						d3.select("#node"+d.index+" path").classed("hidden", true);
 						d3.select("#node"+d.index+" text").classed("hidden", true);
 					})
-				.call(forceGraph.drag).append("svg:g")
+				.append("svg:g")
 				.attr("class", "nozoom");
 
 			// glow if site is visited
@@ -176,7 +177,7 @@ var ConVis = (function(jQuery, d3) {
 					.attr("r", radius)
 					.attr("class", function(d) {
 								return "node round-border " + getClassForSite(d);
-								});
+					});
 
 			gs.append("svg:image")
 					.attr("class", "node")

@@ -35,7 +35,10 @@ ini_set('display_errors', '1');
 		<h5>Best viewed in Google Chrome</h5>
 		</div>
 		<div id="chooserButton" style="position:fixed; top:0; right:10px;">
-		<button type="button" onclick="showChooser()">Pick Data Set</button>
+			<?php /* This should show the chooser with showChooser() but at the 
+			moment, I dont know how to clear the graph other than refreshing the 
+			page*/ ?>
+		<button type="button" onclick="location.reload()">Pick Data Set</button>
 		</div>
 		<div id="linkInfo" class="hidden">
 		</div>
@@ -79,10 +82,16 @@ ini_set('display_errors', '1');
 					<div id="step1" class="step">
 						<div class="stepHeader">
 							<div class="stepNum">1</div>
-							<h3>Select the device to view</h3>
+							<h3>Select device and domain name detail</h3>
 						</div>
 						<div class="stepBody">
 							<select id="selectDevice" onchange="changeDevice()">
+							</select>
+							<select id="subDomainDepth">
+								<option value="1">Top Level Domain - "com"</option>
+								<option value="2" selected>Domain - "google.com"</option>
+								<option value="3">Sub Domains - "maps.google.com"</option>
+								<option value="0">Unlimited</option>
 							</select>
 						</div>
 					</div>
@@ -94,10 +103,7 @@ ini_set('display_errors', '1');
 						</div>
 						<div class="stepBody">
 							<div id="sliderContainer">
-								<div id="slider">Select a device.</div>
-							</div>
-							<div id="sliderButton">
-									<button type="button" onclick="changeRange()">Go</button>
+								<div id="slider" onmouseup="changeRange()">Select a device.</div>
 							</div>
 						</div>
 					</div>
@@ -130,7 +136,7 @@ ini_set('display_errors', '1');
 							<h3>Visualize</h3>
 						</div>
 						<div id="chooserSubmit" class="stepBody">
-							<button type="button" onclick="chooserSubmit()">Graph</button>
+							<button type="button" onclick="makeGraph(); hideChooser();">Graph</button>
 						</div>
 					</div>
 
@@ -146,7 +152,7 @@ ini_set('display_errors', '1');
 		var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
 		var data = null;
 
-		function chooserSubmit(){
+		function makeGraph(){
 			if(data == null){
 				alert("Select some data before trying to graph.");
 			} else {
@@ -165,9 +171,6 @@ ini_set('display_errors', '1');
 					console.log("Graph is null.");
 				}
 			}
-
-			//Hide window
-			hideChooser();
 		}
 
 		function showChooser(){
@@ -183,7 +186,7 @@ ini_set('display_errors', '1');
 
 					obj.forEach(function(device){
 						var name = device.charAt(0).toUpperCase() + device.slice(1);
-						$('#selectDevice').append('<option value="'+device+'">'+name+'</item>');
+						$('#selectDevice').append('<option value="'+device+'">'+name+'</option>');
 					})
 					changeDevice();
 					$('#chooser').show(0);
@@ -216,10 +219,12 @@ ini_set('display_errors', '1');
 
 				var startDate = new Date(obj.min * 1000);
 				var endDate = new Date(obj.max * 1000);
+				var lastWeek = new Date(obj.max * 1000);
+				lastWeek.setDate(lastWeek.getDate() - 7);
 
 				$("#slider").dateRangeSlider({
 					bounds: {min: startDate, max: endDate},
-					defaultValues: {min: startDate, max: endDate},
+					defaultValues: {min: lastWeek, max: endDate},
 					formatter: function(val){
 					    var days = val.getDate(),
 					    month = val.getMonth(),
@@ -247,13 +252,16 @@ ini_set('display_errors', '1');
 					}],
 					//range: {min: {days: 0}, max: {days: 14}},
 				});
+
+				changeRange();
 			});
 		}
 
 		function changeRange(){
 			var range = $('#slider').dateRangeSlider("values");
 			var device = $('#selectDevice')[0].value;
-			jQuery.getJSON("action.php?action=getData&device="+device+"&min="+(range.min.getTime()/1000)+"&max="+(range.max.getTime()/1000), function(obj){
+			var subDomainDepth = $('#subDomainDepth')[0].value;
+			jQuery.getJSON("action.php?action=getData&device="+device+"&min="+(range.min.getTime()/1000)+"&max="+(range.max.getTime()/1000)+"&subdomainDepth="+subDomainDepth, function(obj){
 				if(obj.fail){
 					alert("Could not complete action. Please try again later.");
 					console.log(obj);
