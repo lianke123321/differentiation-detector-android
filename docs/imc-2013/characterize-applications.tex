@@ -1,6 +1,6 @@
 \section{Privacy Invasive Services}
 \label{sec:characterize-app}
-
+\tbd{to revise}
 We now use pervasive nature of \platname to detail  the privacy invasiveness of applications and Web-services. 
 For our analysis we concentrated on the data sent from the mobile devices with a focus on the {\it what} data is sent,  {\it to whom} is the data sent, and {\it how frequently} is data sent.
 %To answer these questions, we rely on the controlled experiments and the \mobWild dataset.
@@ -26,16 +26,27 @@ For our analysis we concentrated on the data sent from the mobile devices with a
 
 \subsection{Personally Identifiable Information Leaks}
 
-For our experiments we created fake user accounts with fake contact information and fake Twitter and Facebook accounts.  
-Our objective for was to detect if any personally identifiable information -- email address, phone number, IMEI number -- stored on the device is leaked across the network over HTTP or HTTPS.
-While we acknowledge that some of this information may be relevant for the application, we strongly believe that this information should never travel across the network in plaintext (HTTP), which we see violated in several cases.
+For our experiments, we created fake user accounts with fake contact
+information, and fake Twitter and Facebook accounts.  Our goal is to
+detect if any Personally Identifiable Information (PII)---email
+address, phone number, IMEI number---stored on the device is leaked
+across the network over HTTP or HTTPS (using the SSL bumping plugin).
+While we acknowledge that some of this information may be relevant for
+the application, we strongly believe that this information should
+never travel across the network in plaintext (HTTP).
 
-In \fref{tab:pii}, we present the different personally identifiable information (PII) leaked for both Android and iPhone apps.  
-We observe that the IMEI, a unique identifier tied to a phone, is the one of the most commonly leaked PII for Android applications.
-Although IMEI is not private, it can be used to track and correlate a user's behavior across the Web-services.
-Similarly, we observe that Android application tend to leak the Android ID, a unique identifier tied to an Android device.
-In \fref{tab:pii}, we also observe that other information like contacts, email, and passwords were leaked in the clear.
-The email address, the address used to sign up for the services, was leaked in the clear by 13 iOS and 3 Android applications from our set of popular applications.
+
+In \fref{tab:pii}, we present the different personally identifiable
+information leaked for both Android and iPhone apps.  We observe that
+the IMEI, a unique identifier tied to a phone, is the most commonly
+leaked PII for Android applications.  This IMEI can be used to track
+and correlate a user's behavior across Web-services.  Similarly, we
+observe that Android applications leak the Android ID, a unique
+identifier tied to an Android device.  In \fref{tab:pii}, we also
+observe that other information like contacts, emails, and passwords
+are leaked in the clear.  The email address, the address used to sign
+up for the services, was leaked in the clear by 13 iOS and 3 Android
+applications from our set of popular applications.
 
 \begin{table}
     \centering
@@ -62,19 +73,39 @@ The email address, the address used to sign up for the services, was leaked in t
     \label{tab:pii-leakage-https-sites}
 \end{table}
 
-During our experiments we observed that PII information was also sent over HTTPs. 
-However, because applications requests for email and other information for authentication, we focus our attention on the IMEI number and the device ID.
-In \fref{tab:pii-leakage-https-sites}, we present the top 10 sites, based on the number of flows that sent the IMEI over HTTPS. 
-We observe that four of the top 10 hosts that receive this information are ads and analytics sites.
-Furthermore, of the 77 sites that received either the IMEI or Device ID in the clear or over HTTPS, we observe that 35 sites were ads and analytics sites, the rest of the sites correspond to other Web-services contacted by the application. 
-This is a serious concern because it corresponds to misuse of the permissions a user has given to the app.
+During our experiments, we observed that personally identifiable
+information information is also sent over HTTPS.  In the following, we
+focus on device identifiers such as the IMEI and the Android device
+ID.  In \fref{tab:pii-leakage-https-sites}, we present the top 10
+sites ordered by the number of flows that sent the IMEI over HTTPS.  We
+observe that four of the top 10 sites that receive this information
+are ads and analytics sites.
 
-In summary, we use our controlled experiments to identify PII leaks to highlight the usefulness of \platname in analyzing mobile traffic, analysis that previously required warranty voiding the devices.
+Finding ads and analytics sites that receive personally identifiable
+information from apps is an abuse of the permission the user is giving
+to the apps. Indeed, if an app ask to access device identifiers and
+the user grant this access, the user is never notified that third
+parties will have access to these identifiers. Out of the 77 sites
+that received either the IMEI or Device ID in the clear or over HTTPS,
+35 sites were third party ads and analytics sites.
+
+In summary, we use our controlled experiments to identify PII leaks on
+both HTTP and HTTPS, and we show that PII are leaked to third party
+sites such as ads and analytics. These controlled experiments are a
+practical use case of \platname, experiments requiring warranty
+voiding the devices otherwise. In particular, \platname{} enable to
+reveal PII leaks over HTTPS.
 %However, we would like to point out that we were not able to analyze traffic in which the data sent was encoded and exchanged as binary objects. 
 
 %Stats value 13 of 22 in the clear device ID, 16 of 39 IMEI clear,  3 of 6 IMEI HTTPs, 3 of 10 device HTTPs}
 
 \subsection{PII in the Wild}
+In the previous section, we focused on controlled experiments. We now
+focus on the analysis of the \mobWild{} dataset. For this dataset, for
+evident ethical reasons, we did not run the SSL bumping plugin because
+it would have revealed credentials of most of the applications used by
+our pool of real users. Instead, we focus on which information is
+leaked in the clear.
 
 \begin{figure} 
 \includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_location_image.png}
@@ -82,14 +113,29 @@ In summary, we use our controlled experiments to identify PII leaks to highlight
 \label{fig:location-wordcloud}
 \end{figure}
 
-In \fref{fig:location-wordcloud} we present a \emph{word cloud} of the applications that send the location information of the devices in the \mobWild dataset in the clear. 
-We observe that a bus service application, \emph{One Bus Away}, the application that manages the iOS homescreen, \emph{springboard}, and  weather applications, \emph{twc}, \emph{weather}, and \emph{hurricane} were responsible for more 78\% of the flows that sent the location information in the clear. 
-On further analysis, we observe that 4\% of the flows sent the location information to ads and analytics sites; more than 80\% of \emph{ad-flows} leaking location information did not include the an application signature in the user-agent field, the rest of the flows were from apps including, browsers, facebook, and angry birds.
+In \fref{fig:location-wordcloud}, we present a \emph{word cloud} of
+the applications that send the location information of the devices.
+We observe that a bus service application (\emph{One Bus Away}), the
+application that manages the iOS homescreen (\emph{springboard}), and
+weather applications (\emph{twc}, \emph{weather}, \emph{hurricane})
+were responsible for more 78\% of the flows that sent the location
+information in the clear.  Moreover, we observe that 4\% of the flows
+sent the location information to ads and analytics sites; more than
+80\% of \emph{ad-flows} leaking location information did not include
+an application signature in the user-agent field, the rest of the
+flows being from apps including browsers, the Facebook app, and angry birds.
 
-Along with the location, we also observed that the device ID and IMEI number are leaked in the clear in the \mobWild dataset. 
-Based on our classification methodology we observe that the IMEI number and device ID was leaked primarily through the Web-browser; we did not observe any application signature in non-browser flows in the \mobWild dataset that leaked the IMEI number or the device ID in the clear. 
-As in the case of controlled experiments, ads and analytics sites were the most popular destination for the IMEI number leaks.
-Among the 16 sites that sent the IMEI number in the clear, only 10 sites were ads and analytics sites; the rest of the sites included sites for games, news, and manufacturer updates.
+In addition, we also observe that the device ID and IMEI
+number are leaked in the clear in the \mobWild dataset.  Based on our
+classification methodology, we observe that the IMEI number and device
+ID is leaked by the Web-browser; we do not observe
+any application signature in non-browser flows in the \mobWild dataset
+that leaked the IMEI number or the device ID in the clear.  As in the
+case of controlled experiments, ads and analytics sites are the most
+popular destination for the IMEI number leaks.  Among the 16 sites
+that sent the IMEI number in the clear, 10 sites are ads and
+analytics sites; the rest of the sites includes sites for games, news,
+and manufacturer updates.
 
 %Similarly, from the device of one of the authors of the paper, we observed that the latest three versions YahooMail application, up to the time of the measurements, leaked the user's email address in the clear.
 
@@ -102,9 +148,19 @@ Among the 16 sites that sent the IMEI number in the clear, only 10 sites were ad
 
 %\subsection{Ads and Analytics in the Wild}
 
-We now focus our attention on the extent to which devices in the \mobWild dataset contact ads and analytics (A\&A) sites, an activity that is receiving considerable attention~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}.
-Using our classification based on the \httphost, we observe that the ads and analytics traffic was responsible for up to 6\% of the traffic by volume per device, an observation in line to the one made by Vallina-Rodriguez~\etal~\cite{vallina-rod:ads}.
-Rather that focusing on the traffic volume we focus on the extent to which these sites are able to track the users in the dataset and the applications that facilitate this tracking. 
+\tbd{focusing on ads and analytics is just what you did in the
+  previous paragraph. What is new or different in this one.}
+We now focus our attention on the extent to which devices in the
+\mobWild dataset contact ads and analytics (A\&A) sites, an activity
+that is receiving considerable
+attention~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}.
+Using our classification based on the \httphost, we observe that the
+ads and analytics traffic was responsible for up to 6\% of the traffic
+by volume per device, an observation in line with the one made by
+Vallina-Rodriguez~\etal~\cite{vallina-rod:ads}.  Rather that focusing
+on the traffic volume we focus on the extent to which these sites are
+able to track the users in the dataset and the applications that
+facilitate this tracking.
 
 \begin{table}
 \centering
@@ -132,10 +188,18 @@ scorecardresearch.com &  21 & 11 & 10 \tabularnewline
 \label{tab:top-trackers}
 \end{table}
 
-In \fref{tab:top-trackers} we present the number of A\&A sites ordered according to the number of devices that contacted them.
-We observe that all the devices in the \mobWild dataset contacted doubleclick.com, an ad site, and google-analytics.com, a tracking site.
-Furthermore, we observe that 66.12\% of the volume of ad traffic in the \mobWild dataset was from the browsers, 6.46\% of the traffic contained a blank user-agent field, and 4.8\% of the traffic contained a signature of \emph{Google-Analytics}\footnote{This signature was observed even in the flows for users that did not have the Google Analytics application installed on the device.}.
-The rest of the traffic contained signatures of other applications such as Facebook, Pandora, and YouTube.
+In \fref{tab:top-trackers} we present the number of A\&A sites ordered
+according to the number of devices that contacted them.  We observe
+that all the devices in the \mobWild dataset contacted
+doubleclick.com, an ad site, and google-analytics.com, a tracking
+site.  Furthermore, we observe that 66.12\% of the volume of ad
+traffic in the \mobWild dataset was from the browsers, 6.46\% of the
+traffic contained a blank user-agent field, and 4.8\% of the traffic
+contained a signature of \emph{Google-Analytics}\footnote{This
+  signature was observed even in the flows for users that did not have
+  the Google Analytics application installed on the device.}.  The
+rest of the traffic contained signatures of other applications such as
+Facebook, Pandora, and YouTube.
 %\tbd{This must come before Furthermore, we observed that 7\% of the traffic contained the Google-Analytics in the signature field; this signature was observed even in the flows for users that did not have the Google Analytics application installed on the device. Mention that we will wrongly classify the flows from Google Analytics app as ads and analytics traffic} 
 
 
