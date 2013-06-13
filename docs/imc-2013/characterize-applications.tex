@@ -12,7 +12,7 @@ For our analysis we concentrated on the data sent from the mobile devices with a
        \hline
        {\bf Store}&{\bf Platform}&{\bf \# Apps}&{\bf Email}& {\bf Location}& {\bf Name} &{\bf Password}& {\bf Device ID}& {\bf Contacts}& {\bf IMEI}\\
        \hline
-       App Store&iPhone&100&13 (13\%) &20 (20\%)&4 (4\%)&0 (0\%)&0 (0\%)&0 (0\%)&1 (1\%)\\
+       App Store&iPhone&209&13 (6.2\%) &20 (9.5\%)&4 (1.9\%)&0 (0\%)&16 (7.6\%)&0 (0\%)&0 (0\%)\\
        \hline
        Google Play&Android&100&3 (3\%)&10 (10\%)&2 (2\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
        \hline
@@ -35,8 +35,7 @@ We observe that the IMEI, a unique identifier tied to a phone, is the one of the
 Although IMEI is not private, it can be used to track and correlate a user's behavior across the Web-services.
 Similarly, we observe that Android application tend to leak the Android ID, a unique identifier tied to an Android device.
 In \fref{tab:pii}, we also observe that other information like contacts, email, and passwords were leaked in the clear.
-The email address, the address used to sign up for the services, was leaked in the clear by 13 iOS and 3 Android applications from our set of 100 popular applications.
-
+The email address, the address used to sign up for the services, was leaked in the clear by 13 iOS and 3 Android applications from our set of popular applications.
 
 \begin{table}
     \centering
