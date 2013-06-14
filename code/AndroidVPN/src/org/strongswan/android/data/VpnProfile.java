@@ -18,12 +18,15 @@
 package org.strongswan.android.data;
 
 public class VpnProfile implements Cloneable {
-	
+	/** google url is for US locale */
 	private static final String GOOGLE = "www.google.com";
+	/** baidu url is for China locale */
 	private static final String BAIDU = "www.baidu.com";
 	
 	private String mName, mGateway, mUsername, mPassword, mCertificate,
 			mUserCertificate, mAutoReconnect, mURLAddress;
+	
+	
 	private VpnType mVpnType;
 	private long mId = -1;
 
@@ -113,19 +116,37 @@ public class VpnProfile implements Cloneable {
 		}
 	}
 
+
 	public String getAutoReconnect() {
 		return mAutoReconnect;
 	}
 
+	/**
+	 * set the auto reconnect check box.
+	 * @param mAutoReconnect
+	 */
 	public void setAutoReconnect(Boolean mAutoReconnect) {
+		// mAutoReconnect should only be string "true" or "false"
 		this.mAutoReconnect = mAutoReconnect.toString();
 	}
 	
+	/**
+	 * set the url address depends on the locale.
+	 * @param url
+	 */
 	public void setURLAddress(String url){
 		this.mURLAddress = url;
 	}
 	
+	/**
+	 * The position of the spinner corresponding to the url address.<br>
+	 * 0 = Google<br>
+	 * 1 = baidu<br>
+	 * 
+	 * @param position
+	 */
 	public void setURLAddressPosition(int position){
+		// default is google.
 		String urlAddress = GOOGLE;
 		if (position == 1){
 			urlAddress = BAIDU;
@@ -133,6 +154,10 @@ public class VpnProfile implements Cloneable {
 		this.mURLAddress = urlAddress;
 	}
 	
+	/**
+	 * get the position for the spinner.
+	 * @return 0 = google, 1 = baidu
+	 */
 	public int getURLAddressPosition(){
 		if (mURLAddress.equals(GOOGLE)){
 			return 0;
@@ -143,6 +168,10 @@ public class VpnProfile implements Cloneable {
 		return 0;
 	}
 	
+	/**
+	 * @return the current url address. Should be www.google.com or
+	 *         www.baidu.com
+	 */
 	public String getURLAddress(){
 		return mURLAddress;
 	}
@@ -152,7 +181,6 @@ public class VpnProfile implements Cloneable {
 	 * mAutoReconnect needed to be access by CharonVpnService in order to enable
 	 * or disable auto reconnection timer
 	 * 
-	 * @author Sam Wilson
 	 * @return true if auto reconnect button is clicked
 	 */
 	public boolean isAutoReconnectClicked() {

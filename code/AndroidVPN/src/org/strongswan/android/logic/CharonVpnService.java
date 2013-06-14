@@ -58,9 +58,6 @@ public class CharonVpnService extends VpnService implements Runnable
 {
 	private static final String TAG = CharonVpnService.class.getSimpleName();
 	public static final String LOG_FILE = "charon.log";
-	/* baidu is chinese's google */
-	private static final String CHINESE_URL = "www.baidu.com";
-	private static final String US_URL = "www.google.com";
 	/* set one minute for the timer time*/
 	private static final int ONE_MINUTE  = 60 * 1000;
 	private String mLogFile;
@@ -79,14 +76,15 @@ public class CharonVpnService extends VpnService implements Runnable
 	private static CharonVpnService thisStaticObject;
 	/* keep track the auto reconnect status */
 	private boolean isAutoReconnect;
-	private Timer timer;
+	/* change the timer into public so we can cancel the timer */
+	public Timer timer;
 	
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceDisconnected(ComponentName name)
 		{	/* since the service is local this is theoretically only called when the process is terminated */
 			synchronized (mServiceLock)
-			{
+			{	
 				mService = null;
 			}
 		}
@@ -117,7 +115,6 @@ public class CharonVpnService extends VpnService implements Runnable
 	        }
         }
 	};
-	
 	
 
 	/**
@@ -176,13 +173,12 @@ public class CharonVpnService extends VpnService implements Runnable
 	{	/* the system revoked the rights grated with the initial prepare() call.
 		 * called when the user clicks disconnect in the system's VPN dialog */
 		setNextProfile(null);
-		Log.e(TAG, "On revoke");
 	}
 
 	@Override
 	public void onDestroy()
 	{
-		Log.e(TAG, "On destroy");
+		Log.d(TAG, "On destroy");
 		mTerminate = true;
 		setNextProfile(null);
 		try
@@ -224,6 +220,7 @@ public class CharonVpnService extends VpnService implements Runnable
 		syncObject = this;
 		
 		// start the timer
+		// Reactor this into a new method.
 		runTimer();
 		
 		while (true)
@@ -776,6 +773,13 @@ public class CharonVpnService extends VpnService implements Runnable
 		return thisStaticObject;
 	}
 
+	/**
+	 * check the auto reconnect checkbox is checked or not
+	 * @return true if it's checked.
+	 */
+	public boolean isAutoReconnected(){
+		return isAutoReconnect;
+	}
 	
 	
 	/*

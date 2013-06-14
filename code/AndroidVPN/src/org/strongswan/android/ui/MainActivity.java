@@ -42,7 +42,6 @@ import android.content.Intent;
 import android.net.VpnService;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,7 +51,8 @@ import android.widget.EditText;
 
 public class MainActivity extends Activity implements
 		OnVpnProfileSelectedListener {
-	
+	// add the tag for the log and style
+	@SuppressWarnings("unused")
 	private static final String TAG = "MainActivity";
 	public static final String CONTACT_EMAIL = "android@strongswan.org";
 	private static final int PREPARE_VPN_SERVICE = 0;
@@ -301,8 +301,27 @@ public class MainActivity extends Activity implements
 		}
 	}
 	
+	/**
+	 * change the back button function as the home button.
+	 */
 	@Override
 	public void onBackPressed() {
 		moveTaskToBack(true);
+	}
+	
+	/**
+	 * Will be called when user kill or disable the app.
+	 */
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		// get the "singleton" object from the CharonVpnService
+		CharonVpnService service = CharonVpnService.getInstance();
+		// check it is connected right now
+		if (!service.isAutoReconnected()) {
+			// cancel the timer and exit the app
+			service.timer.cancel();
+			System.exit(0);
+		}
 	}
 }

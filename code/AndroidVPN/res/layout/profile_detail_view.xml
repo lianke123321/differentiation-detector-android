@@ -143,7 +143,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/profile_auto_reconnect" />   
-            
+           
+        <!-- add the url location option -->
+        
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

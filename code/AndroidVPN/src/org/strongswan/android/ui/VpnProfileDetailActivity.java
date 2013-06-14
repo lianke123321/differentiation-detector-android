@@ -338,8 +338,9 @@ public class VpnProfileDetailActivity extends Activity
 			setResult(RESULT_OK, new Intent().putExtra(VpnProfileDataSource.KEY_ID, mProfile.getId()));
 			// get the singleton object.
 			CharonVpnService cvc = CharonVpnService.getInstance();
+			// TODO: right now it will force to refresh even the profile didn't changed.
 			if (cvc.isConnect()){
-				// force to restart the profile
+				// force to restart the profile if is connected
 				cvc.setNextProfile(mProfile);
 			}
 			finish();

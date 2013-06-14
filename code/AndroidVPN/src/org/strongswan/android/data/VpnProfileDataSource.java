@@ -51,6 +51,7 @@ public class VpnProfileDataSource
 	private static final String DATABASE_NAME = "strongswan.db";
 	private static final String TABLE_VPNPROFILE = "vpnprofile";
 
+	/* update version 6 which the url_location is added */
 	private static final int DATABASE_VERSION = 6;
 
 	public static final String DATABASE_CREATE =
@@ -117,7 +118,7 @@ public class VpnProfileDataSource
 						   " TEXT DEFAULT '';");
 			}
 			if (oldVersion < 6)
-			{
+			{	// add the key url locale into the database
 				db.execSQL("ALTER TABLE " + TABLE_VPNPROFILE + " ADD " + KEY_URL_LOC + 
 						" TEXT DEFAULT '';");
 			}

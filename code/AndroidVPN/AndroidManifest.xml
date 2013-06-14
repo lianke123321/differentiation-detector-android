@@ -41,6 +41,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!-- fix all the screen orientation in portrait mode -->
         <activity
             android:name=".ui.VpnProfileDetailActivity"
             android:screenOrientation="portrait"  >
