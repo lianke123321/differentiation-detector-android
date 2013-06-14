@@ -310,11 +310,6 @@ We use Bro to analyze the data and build on the output of bro to further classif
 We now present the results of our experiments and measurements study. 
 
 
-%%% Local Variables: 
-%%% mode: latex
-%%% TeX-master: "main.tex"
-%%% End: 
-
 % Popular webservices such as google are known to use the same pool of IP addresses for various applications, for example the IP for gmail may also be used for search. 
 % In \fref{fig:ssl-classification-app-service} we present the fraction of SSL traffic where the most recent DNS response contained the IP address of the SSL flow in the first position. 
 % We observe that for the majority of SSL traffic by volume and flows can be classified by using the DNS responses. 
@@ -356,3 +351,10 @@ We now present the results of our experiments and measurements study.
 % Similarly, depending the Android version we observe either the signature for Stagefright\cite{android:stagefright} or no application or OS service signature for YouTube traffic to Android devices. 
 % Indeed, we observed signatures for popular media services such as Netflix, YouTube, Vimeo, Pandora, etc. in the \httphost field in the majority traffic from iOS devices and Android devices. 
 % We therefore used the \httphost field to classify media content.
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "main.tex"
+%%% End: 
