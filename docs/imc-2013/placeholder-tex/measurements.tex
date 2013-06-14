@@ -2,6 +2,22 @@
 \section{Measurement Results}
 \label{sec:measurements}
 
+Analysis of Apps.
+
+We use the user agent field to classify the HTTP traffic. 
+
+User agents have been previously used by \tbd{} to identify mobile devices.
+Sites also use user agents to suggest users to access sites using their dedicated apps.
+Applications use the user agent to identify themselves, along with the underlying operating system, software vendor, and software revision.
+These identifiers are submitted with the help of an identification string sent with the HTTP requests made by the client.
+We use this field to identify the applications. 
+We filter out components of the underlying OS, device, and other version information. 
+This filtering leaves us with the identifier of the applications along with other strings. We then use the edit distance to cluster these tokens and group the user agents according to the applications. 
+Using this technique we were able to classify   
+
+
+
+
 \tbd{In this section we ... }
 
 \subsection{Descriptive Statistics}  

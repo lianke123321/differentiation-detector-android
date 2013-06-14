@@ -1,4 +1,4 @@
-%% This BibTeX bibliography file was created using BibDesk.
+% This BibTeX bibliography file was created using BibDesk.
 %% http://bibdesk.sourceforge.net/
 
 
@@ -438,10 +438,30 @@
 
 @misc{rfc:ipsec,
 	Author = {Kent, S. and Seo, K.},
-	Publisher = {RFC 4301},
-	Title = {Security architecture for the internet protocol},
+	Title = {RFC 4301: Security architecture for the internet protocol},
 	Year = {2008}}
 
+@misc{rfc:http,
+	Title={RFC 2616: Hypertext Transfer Protocol--HTTP/1.1},
+	Author={Fielding, R and Gettys, J and Mogul, J and Frystyk, H and Masinter, L and Leach, P and Berners-Lee, T},
+	year={1999}}
+	
+@misc{rfc:ikev1,
+	Author = {Hoffman, P.},
+	Title = {RFC 4109: Algorithms for internet key exchange version 1 (IKEv1)},
+	Year = {2005}}
+
+@misc{rfc:ikev2,
+	Author = {Kaufman, C. and Hoffman, P. and Nir, Y. and Eronen, P.},
+	Title = {RFC 5996: Internet Key Exchange Protocol Version 2 (IKEv2)},
+	Year = {2010}}
+
+@misc{rfc:servernametls,
+	title={RFC 6066: Transport Layer Security (TLS) Extensions: Extension Definitions},
+	author={Eastlake, Donald and others},
+	year={2011}}
+	
+	
 @misc{samknows:ofcom,
 	Howpublished = {\url{www.samknows.com/broadband/ofcom_and_samknows}},
 	Key = {SamKnows},
@@ -460,6 +480,15 @@
 	Howpublished = {\url{www.vyatta.com}},
 	Key = {Vyatta},
 	Title = {Vyatta}}
+	
+@misc{gcm,
+	Title= {{GCM Architectural Overview}},
+	Howpublished={\url{http://developer.android.com/google/gcm/gcm.html}}}
+
+@misc{apns,
+	Title={{Local and Push Notification Programming Guide}},
+	Howpublished={\url{http://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Introduction.html}}}
+	
 
 @inproceedings{leontiadis:mobileads,
 	Author = {Leontiadis, Ilias and Efstratiou, Christos and Picone, Marco and Mascolo, Cecilia},
@@ -480,7 +509,7 @@
 	Title = {{OCALA: An architecture for supporting legacy applications over overlays}},
 	Year = {2005}}
 
-@misc{YoyoAds,
+@misc{yoyoads,
 	Note = {\url{http://pgl.yoyo.org/adservers/}},
 	Title = {Ad blocking with ad server hostnames and IP addresses}}
 
@@ -543,18 +572,6 @@
 	Booktitle = nsdi,
 	Title = {P3: Privacy-Preserving Photo Sharing},
 	Year = {2013}}
-
-@article{rfc4109,
-	Author = {Hoffman, P.},
-	Journal = {IETF Request For Comments, \url{http://www.ietf.org/rfc/rfc5996.txt}},
-	Title = {RFC 4109: Algorithms for internet key exchange version 1 (IKEv1)},
-	Year = {2005}}
-
-@article{rfc5996,
-	Author = {Kaufman, C. and Hoffman, P. and Nir, Y. and Eronen, P.},
-	Journal = {IETF Request For Comments, \url{http://www.ietf.org/rfc/rfc5996.txt}},
-	Title = {RFC 5996: Internet Key Exchange Protocol Version 2 (IKEv2)},
-	Year = {2010}}
 
 @article{ravindranath:appinsight,
 	Author = {Ravindranath, Lenin and Padhye, Jitendra},
@@ -644,3 +661,79 @@
 @misc{httparchive,
 	Note = {\url{http://httparchive.org}},
 	Title = {{HTTP Archive}}}
+
+@inproceedings{xu:appusage,
+	address = {New York, New York, USA},
+	author = {Xu, Qiang and Erman, Jeffrey and Gerber, Alexandre and Mao, Zhuoqing and Pang, Jeffrey and Venkataraman, Shobha},
+	booktitle = imc,
+	doi = {10.1145/2068816.2068847},
+	isbn = {9781450310130},
+	keywords = {app usage behavior,smartphone apps},
+	month = nov,
+	pages = {329},
+	publisher = {ACM Press},
+	title = {{Identifying diverse usage behaviors of smartphone apps}},
+	url = {http://dl.acm.org/citation.cfm?id=2068816.2068847},
+	year = {2011}}
+
+
+@inproceedings{qian:webcache,
+	address = {New York, New York, USA},
+	author = {Qian, Feng and Quah, Kee Shen and Huang, Junxian and Erman, Jeffrey and Gerber, Alexandre and Mao, Zhuoqing and Sen, Subhabrata and Spatscheck, Oliver},
+	booktitle = {Proceedings of the 10th international conference on Mobile systems, applications, and services - MobiSys '12},
+	month = jun,
+	pages = {127--140},
+	publisher = {ACM Press},
+	title = {{Web caching on smartphones}},
+	url = {http://dl.acm.org/citation.cfm?id=2307636.2307649},
+	year = {2012}}
+
+
+@article{bro,
+	author  = {Vern Paxson},
+	title   = {{Bro: a System for Detecting Network Intruders in Real-Time}},
+	journal = {Computer Networks},
+	volume  = {31},
+	number  = {23-24},
+	pages   = {2435--2463},
+	year    = {1999},
+	url     = {http://www.icir.org/vern/papers/bro-CN99.pdf}
+}
+
+@misc{android:stagefright,
+	Note = {\url{http://source.android.com/devices/media.html}},
+	Title = {{Media | Android Developers}}}
+
+@misc{apple:coremedia,
+	Note = {\url{https://developer.apple.com/library/mac/documentation/CoreMedia/Reference/CoreMediaFramework/}},
+	Title = {{Core Media Framework Reference}}}
+
+@inproceedings{bermudez:dnhunter,
+	author = {Bermudez, Ignacio N. and Mellia, Marco and Munafo, Maurizio M. and Keralapura, Ram and Nucci, Antonio},
+	title = {{DNS to the Rescue: Discerning Content and Services in a Tangled Web}},
+	booktitle = imc,
+	year = {2012},	
+	pages = {413--426},
+	publisher = {ACM},
+	address = {New York, NY, USA}} 
+	
+@misc{mozilla:useragentdetection,
+	Note = {\url{https://developer.mozilla.org/en-US/docs/Browser_detection_using_the_user_agent}},
+	Title = {{Browser detection using the user agent}}}
+
+@article{roesner:webtrackers,
+	author = {Roesner, Franziska and Kohno, Tadayoshi and Wetherall, David},
+	journal = nsdi,
+	title = {{Detecting and Defending Against Third-Party Tracking on the Web}},
+	year = {2012}}
+	
+
+@article{erman2011http,
+	title={{HTTP in the Home: It is not just about PCs}},
+	author={Erman, Jeffrey and Gerber, Alexandre and Sen, Subhabrata},
+	journal=sigcomm-ccr,
+	volume={41},
+	number={1},
+	pages={90--95},
+	year={2011},
+	publisher={ACM}}
