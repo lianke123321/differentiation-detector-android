@@ -51,33 +51,39 @@ on middlebox technologies that interpose of plaintext traffic (\eg page rewritin
 \begin{table}
 \begin{small}
 \begin{center}
-\begin{tabular}{|p{0.15\columnwidth}|p{0.12\columnwidth}|r|r|r|r|}
+\begin{tabular}{|p{0.11\columnwidth}|p{0.14\columnwidth}|r|r|r|r|}
 \hline
-\multirow{2}{*}{\bf IP Protocol} & \multirow{2}{*}{\bf Service} & \multicolumn{2}{|c|}{\bf Android} & \multicolumn{2}{|c|}{\bf iOS} \tabularnewline
+{\bf IP} & \multirow{2}{*}{\bf Service} & \multicolumn{2}{|c|}{\bf Android} & \multicolumn{2}{|c|}{\bf iOS} \tabularnewline
 \cline{3-6}
-           &           &  \textbf{Cell.}  &  \textbf{\wifi}  &  \textbf{Cell.}  &  \textbf{\wifi}  \tabularnewline
+{\bf Protocol} &           &  \textbf{Cell.}  &  \textbf{\wifi}  &  \textbf{Cell.}  &  \textbf{\wifi}  \tabularnewline
 \hline
 \multirow{3}{*}{TCP}
-       &  HTTP  & 35.386 & 68.686 & 52.109 & 75.506 \tabularnewline
+       &  HTTP (\%)  & 35.39 & 68.67 & 52.11 & 75.51 \tabularnewline
 \cline{2-6}
-       &  SSL   & 61.135 & 27.366 & 46.765 & 18.777 \tabularnewline
+       &  SSL (\%)   & 61.14 & 27.37 & 46.76 & 18.76 \tabularnewline
 \cline{2-6}
-       &  other & 2.346  & 3.290  & 0.256  & 1.818 \tabularnewline
+       &  other (\%) & 2.34  & 3.29  & 0.26  & 1.81 \tabularnewline
 \hline
 \multirow{2}{*}{UDP}
-       &  DNS   & 0.682  & 0.496  & 0.545  & 0.305  \tabularnewline
+       &  DNS (\%)   & 0.67  & 0.49  & 0.56  & 0.34  \tabularnewline
 \cline{2-6}
-       &  other & 0.316  & 0.098  & 0.286  & 3.583  \tabularnewline
+       &  other (\%) & 0.32  & 0.11  & 0.27  & 3.57  \tabularnewline
 \hline
- Other &  -     & 0.135  & 0.064 & 0.039  & 0.011  \tabularnewline
+ Other &  other (\%) & 0.14  & 0.07 & 0.04  & 0.01  \tabularnewline
 \hline
-\multicolumn{2}{|c|}{\emph{total}} & 100.00 & 100.00 & 100.00 & 100.00 \tabularnewline
+\multicolumn{2}{|c|}{\emph{total (\%)}} & 100.00 & 100.00 & 100.00 & 100.00 \tabularnewline
+\hline
+\multicolumn{2}{|c|}{\emph{Volume (GB)}}& 9.467 & 18.79 & 14.89  & 89.54 \tabularnewline
+\hline
+\multicolumn{2}{|c|}{\emph{\# Flows}}   & 851074 & 658331 & 661736 & 2167448 \tabularnewline
+\hline
+\multicolumn{2}{|c|}{\emph{\# Devices}} & 11 & 10 & 10 & 15 \tabularnewline
 \hline
 \end{tabular}
 \end{center}
 \end{small}
 \caption{Traffic volume (in percentage) of popular protocols and services on Android and iOS devices over cellular and \wifi.
-\emph{TCP flows are responsible for more than 90\% of traffic volume. Traffic share of SSL over cellular networks is more than twice the traffic share of SSL over \wifi.}\drc{Total->overall, put fractions of overall traffic for cell/wifi}} 
+\emph{TCP flows are responsible for more than 90\% of traffic volume. Traffic share of SSL over cellular networks is more than twice the traffic share of SSL over \wifi.}\drc{Total->overall, put fractions of overall traffic for cell/wifi. AR: I put the actual numbers which gives more clarity. }} 
 \label{tab:summaryIOSAndroidTraffic}
 \end{table}
 
@@ -303,7 +309,7 @@ We observe that less than 25\% of the HTTPS traffic from iOS and Android contain
 To further resolve the hostnames, we rely on \emph{server name indication} used by SSL flows~\cite{rfc:servernametls}.
 Servers that host multiple services use the \emph{server name indication} to distinguish these services.   
 For example, we observe a \emph{server name indication} of \emph{plus.google.com} and \emph{s.youtube.com} in two flows that used a certificate with a CN \emph{*.google.com}.
-However, we observe that by using either the certificate or the \emph{server name} we were able to identify the name of the Web-service in less than \tbd{40}\% of iOS and Android HTTPS traffic.
+However, we observe that by using either the certificate or the \emph{server name} we were able to identify the name of the Web-service in less than 40\% of iOS and Android HTTPS traffic.
 
 \noindent\textbf{DNS mapping.} For such flows we use DNS requests made by the mobile devices before starting the HTTPS flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
 DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices use the first entry in DNS response while resolving \emph{hostnames}.
@@ -327,7 +333,7 @@ m.google.com & fbcdn-photos-a.akamaihd.net \tabularnewline
 \hline
 \end{tabular}
 \end{small}
-\caption{Popular hostnames for iOS and Android based on traffic volume.}
+\caption{Popular hostnames in observed in SSL flows from iOS and Android based on traffic volume. \emph{Hostnames such as www.googleapis.com hide the underlying application and Web-service.}}
 \label{tab:sslclassify-popular-host}
 \end{table}
 
@@ -341,7 +347,7 @@ In contrast, the  hostname \emph{fbcdn-photos-a.akamaihd.net} is a strong indica
 \begin{small}
 \begin{tabular}{|p{0.35\columnwidth}|c|c|c|c|}
 \hline
-\multirow{2}{*}{\bf Service} & \multicolumn{2}{c|}{\bf iOS} &  \multicolumn{2}{c|}{\bf Android} \tabularnewline
+\multirow{2}{*}{\bf Service} & \multicolumn{2}{c|}{\bf \% of iOS Traffic} &  \multicolumn{2}{c|}{\bf \% of Android Traffic} \tabularnewline
 \cline{2-5}
   & {\bf Bytes}  & {\bf Flows} & {\bf Bytes} & {\bf Flows} \tabularnewline
 \hline
@@ -355,7 +361,7 @@ Instant Messages     & 0.982    & 7.089    & 1.411  & 3.109 \tabularnewline
 \hline
 Other Google Services & 58.665   & 13.32510 & 45.024 & 46.089 \tabularnewline
 \hline
-\emph{total}         & 87.564   & 92.728   & 84.776 & 73.151 \tabularnewline
+\emph{total (\%)}         & 87.564   & 92.728   & 84.776 & 73.151 \tabularnewline
 \hline
 \end{tabular} 
 \end{small}
