@@ -12,7 +12,7 @@ SORT = sort
 MAINDOC = main
 MAINPDF = ${MAINDOC}.pdf
 
-all:
+all: clean
 	${LATEX} ${MAINDOC}.tex
 	${BIBTEX} ${MAINDOC}.aux
 	${LATEX} ${MAINDOC}.tex

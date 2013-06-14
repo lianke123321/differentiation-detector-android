@@ -76,43 +76,65 @@ To identify flows from their dedicated mobile applications, Web-services are kno
 Indeed, \useragent based classification has been used to isolate mobile traffic, however, rather than identifying individual applications, these studies limited their classification granularity to the category of the application~\cite{erman2011http,xu:appusage,maier:mobtraffic}.
 We now use the results from our controlled experiments and the \mobWild dataset to argue that the \useragent can be used to identify flow from popular iOS and Android applications, for flows that do not contain a useful \useragent we fall back to classifying using the \httphost field.
 
-%Web-services rely on the \useragent field to distinguish HTTP flows from their mobile applications from the flows originating from Web-browsers.
+%\begin{table} 
+%    \begin{small}
+%    \begin{tabular}{|p{0.1\columnwidth}|p{0.18\columnwidth}|p{0.1\columnwidth}|p{0.13\columnwidth}|p{0.17\columnwidth}|}
+%       \hline
+%       {\bf OS}& {\bf Store} &{\bf \# Apps}&{\bf Generated HTTP}& {\bf Correct User-Agent} \tabularnewline
+%       \hline    
+%       iOS     & App Store   & 209 & 176 & 149 (84.6\%) \tabularnewline
+%       Android & Google Play & 100 & 92  & 21 (22.8\%)  \tabularnewline
+%       Android & Third party & 908 & 494 & 32 (6.4\%)   \tabularnewline
+%       \hline
+%    \end{tabular}
+%    \end{small}
+%    \caption{Classification of applications based on \useragent. \emph{We observe that we were table to classify \tbd{} of iOS and \tbd{} of Android applications that generated traffic during our experiments.}}
+%    \label{tab:classification-success}
+%\end{table}
+
 
 \begin{table}
 \begin{small}
-\begin{tabular}{|p{0.8\columnwidth}|}
+\begin{tabular}{|l|p{0.85\columnwidth}|}
 \hline
-{\bf User-Agent}\tabularnewline
+{\bf No. } & {\bf User-Agent}\tabularnewline
 \hline
-YahooMobileMail/1.0 (Android Mail; 1.4.6) (crespo;samsung;Nexus S;4.1.2/JZO54K)\tabularnewline
+1 & YahooMobileMail/1.0 (Android Mail; 1.4.6) (crespo;samsung;Nexus S;4.1.2/JZO54K)\tabularnewline
 \hline
-AppleCoreMedia/1.0.0.10A523 (iPad; U; CPU OS 6\_0\_1 like Mac OS X; en\_us) \tabularnewline
+2 & AppleCoreMedia/1.0.0.10A523 (iPad; U; CPU OS 6\_0\_1 like Mac OS X; en\_us) \tabularnewline
 \hline
-Dalvik/1.6.0 (Linux; U; Android 4.2.2; Nexus 4 Build/JDQ39) \tabularnewline
+3 & Dalvik/1.6.0 (Linux; U; Android 4.2.2; Nexus 4 Build/JDQ39) \tabularnewline
 \hline
 \end{tabular}
 \end{small}
-\caption{\useragent strings. \emph{The first string contains the application identifier, the second hides the application and describes the OS service/library used, while the third does not contain any useful signature.}}
+\caption{Sample \useragent strings. \emph{The first string contains the application identifier, the second hides the application and describes the OS service/library used, while the third does not contain any useful signature.}}
 \label{tab:user-agent}
 \end{table}
 
 
-\begin{table}
-    \centering
-    \begin{small}
-    \begin{tabular}{|p{0.1\columnwidth}|p{0.18\columnwidth}|p{0.1\columnwidth}|p{0.2\columnwidth}|p{0.17\columnwidth}|}
-       \hline
-       {\bf OS}&{\bf Store}&{\bf \# Apps}&{\bf Generated HTTP Traffic}& {\bf Correct User-Agent} \tabularnewline
-       \hline
-       iOS     & App Store   & 209 & 176 & 149 (84.6\%) \tabularnewline
-       Android & Google Play & 100 & 92  & 21 (22.8\%)  \tabularnewline
-       Android & Third party & 908 &     &  \tabularnewline
-       \hline
-    \end{tabular}
-    \end{small}
-    \caption{Classification of applications based on \useragent. \emph{We observe that we were table to classify \tbd{} of iOS and \tbd{} of Android applications that generated traffic during our experiments.}}
-    \label{tab:classification-success}
+\begin{table} 
+     \centering
+     \begin{small}
+     \begin{tabular}{|p{0.05\columnwidth}|p{0.08\columnwidth}|p{0.07\columnwidth}|p{0.08\columnwidth}|p{0.09\columnwidth}|p{0.09\columnwidth}|p{0.09\columnwidth}|p{0.09\columnwidth}|}
+        \hline
+        {\bf OS}&{\bf Store}&{\bf Apps}&{\bf Gen.}&\multicolumn{2}{|c|}{\bf Host} & {\bf User-}&{\bf Combi-} \tabularnewline
+        \cline{5-6}    
+             &        &     & {\bf HTTP} & {\bf App. } & {\bf Org.}& \bf{Agent}   & \bf{nation}  \tabularnewline                
+        \hline    
+        iOS  & Apple  & 209 & 176 & 83 (47.1\%)  &  119 (67.6\%)   &  149 (84.6\%)& 157 (89.2\%) \tabularnewline
+        \hline
+        And. & Google & 100 & 92  & 41 (44.5\%)  &  54 (58.6\%)    &  21 (22.8\%) &  59 (64.1\%)  \tabularnewline
+        \hline    
+        And. & Other  & 908 & 494 & 106 (21.4\%) & 139(28.1\%)     &  32 (6.4\%)  &  163(32.9\%)  \tabularnewline
+        \hline
+     \end{tabular}
+     \end{small}
+     \caption{Classification of applications based on \httphost and \useragent.}
+     \label{tab:classification-success}
 \end{table}
+
+At least one flow going to the web-service, then we identify the flow an belonging to the applications. 
+Indeed we observe that flows to the web-service contain the maximum data (more than 75\%) of the traffic volume when the application was active. 
 
 %%
 %% No HTTP Traffic from 209 - 38 = 171; 171 + 5 (OS possibly - confirm) = 176  ,
@@ -120,17 +142,28 @@ Dalvik/1.6.0 (Linux; U; Android 4.2.2; Nexus 4 Build/JDQ39) \tabularnewline
 %% 174 unique application signatures found
 %% 5 UA belonged to OS services, geoservices, applecoremedia, gamekit, securityd, mmsdk 
 %% Ads from 98 - 4 -> 94 labels
-%% 
+%% Rough estimate of HTTP for apps because mapping  -- 414 files without HTTP
 %%%
 
-In our controlled experiments we observed a non-empty \useragent string in more than \tbd{99.7}\% of the HTTP flows from iOS and \tbd{90.9}\%flows from Android. 
+In our controlled experiments we observed a non-empty \useragent string in more than 99.7\% of the HTTP flows from iOS and 90.9\%flows from Android. 
 A \useragent strings may contain an application identifier and other auxiliary information such as details of the OS, manufacturer, and compatibility with Web-browsers~\cite{mozilla:useragentdetection}. 
 For example, the first \useragent in \fref{tab:user-agent} contains the information of the application, YahooMobileMail, while the second \useragent hides the application and specifies the AppleCoreMedia service of iOS, and the third does not provide any useful information. 
-We use a set of regular expressions to filter out the auxiliary information and further cluster these extracted tokens using the edit distance between the tokens\footnote{We plan to release this code along with \platname package.}.
+To extract the application information, we use a set of regular expressions to filter out the auxiliary information in the \useragent and further cluster these extracted tokens using the edit distance between the tokens\footnote{We plan to release this code along with \platname package.}.
 
 We now use \fref{tab:classification-success} to summarize the usefulness of \useragent based classification for the traffic observed during our experiments. 
 While testing 209 iOS applications we observed HTTP traffic from 176 applications; 149 of these were correctly identified based on the signatures in their \useragent, which we verified by manual inspection.
-For the 27 applications which we failed to identify, we observed signatures for OS services and libraries, such as applecoremedia, gamekit, geoservices, etc. and signatures of third-party libraries and services such as \emph{Google Analytics} and \emph{Adobe Air}.
+In contrast, our \useragent based identification was able to correctly identify less than 23\% of the Android applications that generated HTTP traffic. 
+
+For the 27 iOS applications which we failed to identify, we observed signatures for OS services and libraries, such as applecoremedia, gamekit, geoservices, etc. and signatures of third-party libraries and services such as \emph{Google Analytics} and \emph{Adobe Air}.
+Similarly, the majority of Android HTTP traffic contained flows with the default \useragent (similar to the third \useragent in \fref{tab:user-agent}).
+Furthermore, for the applications from the third-party store, we observe that the \useragent for ads and analytics libraries such as \emph{Google Analytics} and \emph{Adsense for Mobile} were the most common \useragent after the default \useragent.
+
+%Indeed, we observe that \tbd{} number of Android applications from the third-party store and \tbd{} number of Android applications from the \emph{Google Play} store contacted ads and analytics sites.
+We identify 
+
+
+
+
 For example, while testing streaming media applications such as YouTube we observed a signature of \emph{applecoremedia}.
 
 
@@ -303,7 +336,7 @@ Similarly, we observe that 5.4\% of the traffic from iOS devices was from Apple 
 This low share is because google can use hosts matching the pattern \emph{client*.google.com} to serve for different Web-services.
 We observed a similar behavior in our controlled experiments, and we group such traffic as \emph{other google services}.
 Indeed, in \fref{tab:classify-ssl-traffic} we observe that traffic from Google is the largest source of SSL traffic for iOS and Android devices in our dataset. 
-\subsection{Case Study: Facebook Application in the Wild}
+%\subsection{Case Study: Facebook Application in the Wild}
 
 In summary, we use \platname to perform controlled experiments and in the wild measurements to characterize mobile Internet traffic. 
 We use Bro to analyze the data and build on the output of bro to further classify HTTP flows and SSL flows to identify the source of the traffic. 
