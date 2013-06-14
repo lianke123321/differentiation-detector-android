@@ -32,17 +32,35 @@ First we describe the implementation of a practical and scalable service for per
 Internet traffic from mobile devices.
 Then we report the results of  a measurement study using this approach both in the lab environment and with a 7-month IRB-approved study of human subjects in the wild. In particular, we use the unique view from \platname to study how to classify network flows to apps and how those apps are leaking privacy-sensitive data.
 
-Our key contributions are as follows:
-\begin{packeditemize}
-\item We demonstrate the feasibility of proxy-based measurement for characterizing mobile Internet traffic for iOS and Android. 
+Our key contributions are as follows. We describe how we implemented a proxy-based measurement system for characterizing mobile Internet traffic for iOS and Android, 
+and we demonstrate that it is sufficiently transparent to avoid significantly impacting measurement results. 
 \platname captures all Internet traffic generally with less than 10\% power and packet overheads, and negligible additional latency. 
-We will make the \platname software and configuration details open source and publicly available by the time of publication.
-\item \platname also offers a plugin infrastructure that can be used to inspect and modify the packets in transit. We use this infrastructure to man-in-the-middle SSL connections when we manually tested 209 iOS and 100 Android applications, and performed automated tests on 908 Android applications from a third party store. 
-\item We used our experiments to come up with a classification technique to identify the mobile applications and the Web-services responsible for the traffic captured by \platname, and identify personally identifiable leaks by the applications. Our classification technique was able to correctly identify 89.2\% of iOS and 64.1\% of Android applications and Web-services accessed during these experiments. 
-\item During our experiments we observed that iOS and Android applications leak the device identifiers and other personally identifiable information such as email address in the clear. Specifically, we observe that one of the most popular iOS application used by US physicians sends the user's first-name, last-name, email, password, and zip-code in the clear. 
-\item \platname allows pervasive monitoring, and we used \platname for a 7-month IRB approved study on 26 devices. The key take home is that these measurements were did not require custom OSes, ISP support, or support from marketplaces, warranty voiding of devices. 
-\item During our measurement study, we observe that most traffic is either compressed, or encrypted, thus limiting the opportunities for additional traffic-volume optimization. Furthermore, we observe that popular ads and analytic sites were tracking our devices.
-\end{packeditemize}
+We will make the \platname software and configuration details open source and publicly available.
+
+Next, we present results from network activity recorded from controlled experiments for more than 1,200 apps (iOS and Android), 
+and from human subjects during a 7-month study, comprising 21 users and 26 devices. To the best of our knowledge, this is the first study to report a holistic 
+view of network traffic from real user devices running iOS and Android. These users interact with networks in 54 ASes, 9 of which as cellular; their traffic 
+strongly depends on OS and access technology.
+
+We develop new classification techniques to identify mobile apps and Web services responsible for traffic captured by \platname. Our approach correctly identifies 89.2\% of iOS and 64.1\% of Android apps and Web services. We also take a first look at classifying the traffic contained in SSL tunnels.
+
+Using the unique view from \platname, we study privacy-sensitive information leaked by mobile apps in controlled settings and in the wild. During our experiments we observed that iOS and Android applications leak the device identifiers and other personally identifiable information such as email address in the clear. Specifically, we observe that one of the most popular iOS application used by US physicians sends the user's first name, last name, e-mail, password, and zip code in the clear. We further use our in the wild 
+data to demonstrate the extent to which users are being tracked by mobile devices over time 
+and across access technologies. 
+
+Last, we designed and built a new visualization tool that allows users to track and control how 
+they are being tracked. \platname{}'s \emph{ConVis} tool borrows the Mozilla project's Collusion 
+interface, but applies it to all mobile device traffic. Further, it provides a visual interface that allows 
+ users to specify block lists for connections based on (app, 3rd party) tuples. A demo of our tool is 
+ located at \url{http://goo.gl/A17h9}.
+
+
+%\item \platname allows pervasive monitoring, and we used \platname for a 7-month IRB approved study on 26 devices. The key take home is that these measurements were did not require custom OSes, ISP support, or support from marketplaces, warranty voiding of devices. 
+%
+%\item During our measurement study, we observe that most traffic is either compressed, or encrypted, thus limiting the opportunities for additional traffic-volume optimization. Furthermore, we observe that popular ads and analytic sites were tracking our devices.
+
+
+
 % \item A measurement study of app behavior (both popular and otherwise) from Android and iOS. We observe \tbd{values come here}. 
 % \tbd{say something about how we can directly observe differences in the network behavior of identical apps designed for different OSes.}
 % \item An analysis of privacy leaks in the mobile environment. \tbd{Results based on Amy work}.
@@ -63,45 +81,45 @@ We will make the \platname software and configuration details open source and pu
 % }}
 
 The rest of the paper is organized as follows. 
-We present an overview of platname and argue its feasibility in \fref{sec:platform}, followed by the details of our experiments and measurement dataset is presented in \fref{sec:dataset}.
-In  \fref{sec:classification-methodology} we present our technique to classify the mobile applications and discuss the privacy invasive nature of these applications in \fref{sec:characterize-app}. 
-We discuss the related work in \fref{sec:related} and our conclusions in \fref{sec:conclusion}.
+We present an overview of \platname and describe its feasibility in \fref{sec:platform}, then describe our experiments and measurement dataset in \fref{sec:dataset}.
+In  \fref{sec:classification-methodology} we study how to classify observed network flows to the mobile apps that generated them. Last, we use the 
+unique view from \platname to characterize how apps leak private information in the clear and to third parties \fref{sec:characterize-app}. 
+We discuss related work in \fref{sec:related} and conclude in \fref{sec:conclusion}.
 
-\tbd{Make these into contributions, edit text}
-Controlled experiments for more than 1,200 apps for both iOS and Android
-In-the-wild data collection spanning 7 months, 21 users and 26 devices.
-
-Using 3 \platname{} servers, we observe traffic from 54 ASes, 9 of which are cellular. 
-First study to report a holistic view of network traffic from real user devices. We find that 
-traffic is split nearly evenly between WiFi and cellular (60/40), highlighting that focusing 
-on only one network type misses approximately half the network activity. Further, we 
-find significant differences in device usage over cell vs WiFi, indicating that studies focusing 
-on only one network type are missing a qualitatively different portion of network activity. 
-\tbd{What fraction of flows are SSL or gzip?}
-
-A previously proposed technique for classifying mobile network traffic fails to work for the 
-vast majority of apps we tested, particularly for Android apps. This is because the user-agent 
-field often is blank or contains the name of a popular third-party library. We show that combining 
-user-agent with Host fields significantly improves classification, particularly for data gathered 
-in the wild. High-precision classification of app-generated traffic, however, remains an open problem. 
-
-First characterization of SSL traffic that goes beyond using simple port numbers. We use 
-certificate information and DNS lookups to accurately identify which apps are generating HTTPS flows.
-While Google services, mail, social networks, app stores and instant messaging are the most 
-popular services, we see significant differences in the bytes consumed by each service across 
-OSes. This has significant implications for mobile service data plans.
-
-Study of PII leaked by mobile apps in controlled settings and in the wild. To the best of our knowledge, 
-we are the first to identify and disclose leakage of highly sensitive information such as usernames, 
-e-mails and passwords in plaintext for several popular iOS apps. We further use our in the wild 
-data to demonstrate the extent to which users are being tracked by mobile devices over time 
-and across access technologies. 
-
-We designed and built a new visualization tool that allows users to track and control how 
-they are being tracked. \platname{}'s \emph{ConVis} tool borrows the Mozilla project's Collusion 
-interface, but applies it to all mobile device traffic. Further, it provides a visual interface that allows 
- users to specify block lists for connections based on (app, 3rd party) tuples. A demo of our tool is 
- located at \url{http://goo.gl/A17h9}.
+%\tbd{Make these into contributions, edit text}
+%
+%
+%Using 3 \platname{} servers, we observe traffic from 54 ASes, 9 of which are cellular. 
+%First study to report a holistic view of network traffic from real user devices. We find that 
+%traffic is split nearly evenly between WiFi and cellular (60/40), highlighting that focusing 
+%on only one network type misses approximately half the network activity. Further, we 
+%find significant differences in device usage over cell vs WiFi, indicating that studies focusing 
+%on only one network type are missing a qualitatively different portion of network activity. 
+%\tbd{What fraction of flows are SSL or gzip?}
+%
+%A previously proposed technique for classifying mobile network traffic fails to work for the 
+%vast majority of apps we tested, particularly for Android apps. This is because the user-agent 
+%field often is blank or contains the name of a popular third-party library. We show that combining 
+%user-agent with Host fields significantly improves classification, particularly for data gathered 
+%in the wild. High-precision classification of app-generated traffic, however, remains an open problem. 
+%
+%First characterization of SSL traffic that goes beyond using simple port numbers. We use 
+%certificate information and DNS lookups to accurately identify which apps are generating HTTPS flows.
+%While Google services, mail, social networks, app stores and instant messaging are the most 
+%popular services, we see significant differences in the bytes consumed by each service across 
+%OSes. This has significant implications for mobile service data plans.
+%
+%Study of PII leaked by mobile apps in controlled settings and in the wild. To the best of our knowledge, 
+%we are the first to identify and disclose leakage of highly sensitive information such as usernames, 
+%e-mails and passwords in plaintext for several popular iOS apps. We further use our in the wild 
+%data to demonstrate the extent to which users are being tracked by mobile devices over time 
+%and across access technologies. 
+%
+%We designed and built a new visualization tool that allows users to track and control how 
+%they are being tracked. \platname{}'s \emph{ConVis} tool borrows the Mozilla project's Collusion 
+%interface, but applies it to all mobile device traffic. Further, it provides a visual interface that allows 
+% users to specify block lists for connections based on (app, 3rd party) tuples. A demo of our tool is 
+% located at \url{http://goo.gl/A17h9}.
  
 
 
