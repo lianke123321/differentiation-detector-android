@@ -202,53 +202,57 @@ Other                   &  0.036  & 1.1963 &  0.013 &  0.081 \tabularnewline
 \hline
 \end{tabular}
 \end{small}
-\caption{Classification of HTTP Traffic. \emph{While media services dominated the traffic volume, the applications were responsible for more than 80\% of iOS and 77\% of Android HTTP flows.}}
+\caption{Classification of HTTP Traffic. \emph{While popular media services such as Netflix and YouTube dominated the traffic volume, the applications were responsible for more than 80\% of iOS and 77\% of Android HTTP flows.}}
 \label{tab:classify-http}
 \end{table}
 
 In \fref{tab:classify-http}, we observe that with a combination of \useragent and \httphost field in HTTP headers, we were able to classify more than 98\% of the traffic in terms of flows and bytes from iOS and Android devices.
 We observe that media from popular hosts, including Netflix, YouTube, Pandora, Spotify, and Vimeo, contribute to more than 50\% of the traffic volume from iOS and Android devices.
 Similarly, we observe that applications identified based on the \useragent  were responsible for more than 77\% of flows from Android and iOS devices. 
-We also observe that media (identified based on the signatures such as \emph{applecoremedia} and \emph{stagefright}) served from CDNs and others hosts from which we could not identify the webservice from other fields in the HTTP header and the DNS responses before the HTTP flows to be 14.5\% of the traffic volume for the iOS devices in our dataset.
+We also observe that media (identified based on the signatures such as \emph{applecoremedia} and \emph{stagefright} served from CDNs and others hosts from which we could not identify the webservice from other fields in the HTTP header and the DNS responses before the HTTP flows to be 14.5\% of the traffic volume for the iOS devices in our dataset.
 
 \subsubsection{Classification of SSL Traffic.}
 
-Unlike HTTP flows, SSL flows provide limited information that can be used to identify the applications. 
-Our objective classifying SSL traffic was therefore focused towards identifying the Web-services responsible for the SSL flows. 
+Unlike HTTP flows, SSL flows provide limited information in the clear that can be used to identify the applications. 
+For the traces captured during our controlled experiments, we were able to observe HTTP requests and responses after decrypting the SSL flows bumped with SSL bumping. 
+However, because we did not perform SSL bumping for the devices in the \mobWild dataset, we do not observe these requests and responses.
+Our focus was therefore on identifying the Web-services responsible for the SSL flows. 
 We now show how we used the port number, the SSL certificate with server name identification, and DNS queries to identify the source of SSL traffic. 
 
-\begin{table}
-\centering
-\begin{small}
-\begin{tabular}{|p{0.25\columnwidth}|c|c|c|c|}
-\hline
-\multirow{2}{*}{\bf Service} & \multicolumn{2}{c|}{\bf iOS} &  \multicolumn{2}{c|}{\bf Android} \tabularnewline
-\cline{2-5}
-  & {\bf Bytes}  & {\bf Flows} & {\bf Bytes} & {\bf Flows} \tabularnewline
-\hline
-HTTPS                   & 91.287 & 81.960 & 97.852 & 97.168    \tabularnewline
-\hline
-Mail                    &  6.700 & 15.872 & 0.689  & 0.320  \tabularnewline
-\hline
-Notification            &  1.412 & 1.553  & 1.321  & 2.100  \tabularnewline
-\hline
-Other                   &  0.601 & 0.615  & 0.138  & 0.412 \tabularnewline
-\hline
-{\em total}             & 100 & 100 & 100 & 100 \tabularnewline
-\hline
-\end{tabular}
-\end{small}
-\caption{Classification of SSL Traffic based on port number. \emph{HTTPs is the most popular service that uses SSL in the \mobWild dataset.}}
-\label{tab:classify-ssl-port}
-\end{table}
+% \begin{table}
+% \centering
+% \begin{small}
+% \begin{tabular}{|p{0.25\columnwidth}|c|c|c|c|}
+% \hline
+% \multirow{2}{*}{\bf Service} & \multicolumn{2}{c|}{\bf iOS} &  \multicolumn{2}{c|}{\bf Android} \tabularnewline
+% \cline{2-5}
+%   & {\bf Bytes}  & {\bf Flows} & {\bf Bytes} & {\bf Flows} \tabularnewline
+% \hline
+% HTTPS                   & 91.287 & 81.960 & 97.852 & 97.168    \tabularnewline
+% \hline
+% Mail                    &  6.700 & 15.872 & 0.689  & 0.320  \tabularnewline
+% \hline
+% Notification            &  1.412 & 1.553  & 1.321  & 2.100  \tabularnewline
+% \hline
+% Other                   &  0.601 & 0.615  & 0.138  & 0.412 \tabularnewline
+% \hline
+% {\em total}             & 100 & 100 & 100 & 100 \tabularnewline
+% \hline
+% \end{tabular}
+% \end{small}
+% \caption{Classification of SSL Traffic based on port number. \emph{HTTPs is the most popular service that uses SSL in the \mobWild dataset.}}
+% \label{tab:classify-ssl-port}
+% \end{table}
 
 Mobile devices use SSL for various services including mail, notifications, instant messaging, and web browsing.
 Services such as mail, instant messaging, and notifications are documented to use dedicated port numbers of their traffic\footnote{We also use the AS for identifying the notification messages as detailed in \fref{sec:characterize-os}.}
-On using port numbers, we observe in \fref{tab:classify-ssl-port} that a majority of SSL traffic by volume and flows is HTTPS.
-We then focus our attention on indentifying the Web-services responsible for the HTTPs flows. 
+On using port numbers, we observe in that more than 99\% of the SSL flows observed in our controlled experiments were due to HTTPS, the rest of the flows were due to email, instant messaging, and OS notification services. 
+We therefore focus our attention on indentifying the Web-services responsible for the HTTPs flows. 
 
+\tbd{THE NUMBERS FOR THIS ARE FROM THE WILD MEASUREMENTS. ON SIMPLE GLANCING I WAS ABLE TO OBSERVE SIMILAR NUMBERS. I SHALL ADD THEM BY THE TIME OF THE CAMERA READY}
 We first use the common name (CN) field of certificates to identify the servers that exchanged data using HTTPS.
-We observe that less than 25\% of the HTTPS traffic from iOS and Android contains the fully qualified domain name (FQDN) in the subject of the certificate; the rest of the traffic either contains regular expressions such as *.google.com in the certificate or is a continuation of a previous SSL session. 
+We observe that less than 25\% of the HTTPS traffic from iOS and Android contains the fully qualified domain name (FQDN) in the subject of the certificate; the rest of the traffic either contains regular expressions such as *.google.com in the certificate.
+% or is a continuation of a previous SSL session. 
 To further resolve the hostnames, we rely on \emph{server name indication} used by SSL flows~\cite{rfc:servernametls}.
 Servers that host multiple services use the \emph{server name indication} to distinguish these services.   
 For example, we observe a \emph{server name indication} of \emph{plus.google.com} and \emph{s.youtube.com} in two flows that used a certificate with a CN \emph{*.google.com}.
@@ -257,7 +261,8 @@ However, we observe that by using either the certificate or the \emph{server nam
 For such flows we use DNS requests made by the mobile devices before starting the HTTPS flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
 DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices use the first entry in DNS response while resolving \emph{hostnames}.
 We therefore use the latest DNS response that contains the IP address of the webservice in the first position of the DNS response. 
-Indeed, for 97.8\% of the Android and 83.4\% of the iOS HTTPS traffic that we could not classify using other fields, we observe that the latest DNS response before the flow started contained the IP address of the webservice as the first entry in the DNS response\footnote{The share of SSL traffic where the latest DNS response contains the IP address of the web-service in the first position is 97.4\% for Android and 88.6\% of iOS}. 
+%FOR THE WILD: Indeed, for 97.8\% of the Android and 83.4\% of the iOS HTTPS traffic that we could not classify using other fields, we observe that the latest DNS response before the flow started contained the IP address of the webservice as the first entry in the DNS response\footnote{The share of SSL traffic where the latest DNS response contains the IP address of the web-service in the first position is 97.4\% for Android and 88.6\% of iOS}. 
+Indeed, for more than 99\% of the iOS and Android HTTPS traffic that we could not classify using other fields, we observe that the latest DNS response before the flow started contained the IP address of the webservice as the first entry in the DNS response.
 Despite the potential usefulness of DNS responses, we give a high priority to the server-name and the certificates because we observed that for flows that contained the server name did not contain the same name in the DNS response for 9.2\% of the iOS traffic and 5.6\% of Android traffic.
 
 \begin{table}
@@ -279,10 +284,10 @@ m.google.com & fbcdn-photos-a.akamaihd.net \tabularnewline
 \label{tab:sslclassify-popular-host}
 \end{table}
 
-In \fref{tab:sslclassify-popular-host} we present the top5 hostnames that were responsible for 66\% of iOS traffic and 54\% of Android by volume. 
-We observe that despite the hostname we cannot uniquely identify the application. 
+In \fref{tab:sslclassify-popular-host} we present the top5 hostnames that were responsible for 66\% of iOS traffic and 54\% of Android by volume in the \mobWild dataset. 
+We observe that despite the hostname we cannot uniquely identify the Web-service for some flows.
 For example, \emph{www.google-apis.com} and \emph{clients4.google.com} offer limited information on the application or web-service that is responsible for the content; one can only guess that these flows belong to some google service.
-However, hostname such as \emph{fbcdn-photos-a.akamaihd.net} gives an indication that the traffic is due to facebook.
+However, the  hostname \emph{fbcdn-photos-a.akamaihd.net} gives an indication that the traffic is due to Facebook.
 
 \begin{table}
 \centering
@@ -312,14 +317,13 @@ Other Google Services & 58.665   & 13.32510 & 45.024 & 46.089 \tabularnewline
 \end{table}
 
 In \fref{tab:classify-ssl-traffic} we show how we grouped SSL traffic based on names identified using the SSL fields and DNS queries and port numbers.
-We observe that the iOS devices in our dataset generated a significant number of flows to email sites.
+We observe that the iOS devices in our dataset generated a significant number of email flows.
 Similarly, we were able to group 12.49\% of iOS and 36.661\% of Android traffic with social network services that includes \emph{Google Plus, Facebook, and Twitter}.
 We speculate the increase in traffic share for Android devices is because Android devices offer services to backup photos on \emph{Google Plus}.
 Similarly, we observe that 5.4\% of the traffic from iOS devices was from Apple stores while we observe only 0.04\% of traffic to the \emph{Google Play} store. 
 This low share is because google can use hosts matching the pattern \emph{client*.google.com} to serve for different Web-services.
 We observed a similar behavior in our controlled experiments, and we group such traffic as \emph{other google services}.
 Indeed, in \fref{tab:classify-ssl-traffic} we observe that traffic from Google is the largest source of SSL traffic for iOS and Android devices in our dataset. 
-%\subsection{Case Study: Facebook Application in the Wild}
 
 In summary, we use \platname to perform controlled experiments and in the wild measurements to characterize mobile Internet traffic. 
 We use Bro to analyze the data and build on the output of bro to further classify HTTP flows and SSL flows to identify the source of the traffic. 
