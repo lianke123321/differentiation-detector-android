@@ -28,9 +28,7 @@
 %     experiments}
 % \end{packedenumerate}
 
-In this section, we present an overview of the \platname{} platform\footnote{At the
-  time of the camera ready version, we will make the \platname{}
-  software publicly available.}. The goal of \platname{} is straightforward: we 
+In this section, we present an overview of the \platname{} platform\footnote{Our platform is currently in private beta with deployments in the US, France and China. We will make the \platname{} software publicly available.}. The goal of \platname{} is straightforward: we 
  seek to enable passive monitoring of \emph{all
   the Internet traffic from and to mobile devices}. While previous work has accomplished 
   this for a limited set of devices or networks, we seek to avoid such limitations: 
@@ -506,17 +504,16 @@ To establish and maintain a VPN tunnel, the mobile devices need
 additional resources that translate into a larger battery drain during
 experiments. To evaluate this battery consumption due to the VPN, we
 used a power meter to measure the draw from a Galaxy Nexus running
-Android 4.2. We run 10 minutes experiments with and without the VPN
+Android 4.2. We run 10-minute experiments with and without the VPN
 enabled. For each experiment, we generated an intensive activity such
 as Web searches, map searches, Facebook interaction, e-mail and video
 streaming. We found that the VPN leads to a 10\% power overhead. 
 
 We used a power meter on an Android device only because power
 measurements require physical access to the battery for a device,
-which is not feasible for iOS devices. For iOS devices we made
-simpler experiments consisting in draining a fully charged battery with
-a video streaming with a without the VPN enabled. We found also around
-a 10\% power overhead. 
+which is not feasible for iOS devices. For iOS devices we conducted
+an experiment using video streaming to drain a fully charged battery with 
+and without the VPN enabled. We again found approximately 10\% power overhead. 
 
 In summary, the power overhead is low enough to run long experiments
 using mobile devices on \platname. To further reduce this overhead (which 
@@ -526,7 +523,7 @@ the additional privacy enabled by our VPN proxy.
 
 \end{itemize}
 
-We have developed a variety of user incentives that can offset the costs of 
+\noindent\textbf{Incentives.} We have developed a variety of user incentives that can offset the costs of 
 \platname{}; here, we name a few of the most interesting ones.\footnote{We have implemented most of these examples, 
 but their details are beyond the scope of this paper.} For example, 
 we can provide users with fine-grained views of privacy leaks from 
