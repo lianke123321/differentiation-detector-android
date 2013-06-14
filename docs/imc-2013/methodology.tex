@@ -25,10 +25,10 @@ an iPhone 3GS running iOS 6. We start each set of controlled experiments
 the experiment. 
 
 \noindent\textbf{Manual tests.} We manually test the
-100 most popular free Android apps in the \emph{Google Play} store and \tbd{}
-iOS applications from the iOS App store \tbd{give a date}. For each
+100 most popular free Android application in the \emph{Google Play} store and 209
+iOS applications from the iOS App store on April 4, 2013. For each
 application, we install it, enter user credentials for the account if
-it is relevant, interact with it for \tbd{} minutes, and uninstall
+it is relevant, interact with it for up to 10 minutes, and uninstall
 it. This allows us to characterize real user interactions with popular applications 
 in a perfectly controlled environment. Note that 
 because we enter a unique and distinguishable set of user credentials when 
@@ -37,17 +37,17 @@ network flows (if they are not obfuscated).
 
 \noindent\textbf{Automated tests.} The second set of controlled experiments consist of fully-automated
 experiments on the most popular 908 Android applications from a free,
-third-party Android market\tbd{which market, we must give the name}.
+third-party Android market, \emph{AppsApk.com}~\cite{appsapk}.
 We perform this test because Android devices can install
 \emph{Third-party applications} that are not available on the
 \emph{Google Play} store, without requiring the user to root the device. 
 
 Our goal is to understand how these apps differ from those in the standard \emph{Google Play} 
 store, as they do not have to follow the Android market publication
-process\tbd{Is there different constraints on this free market}. To
+process\tbd{Is there different constraints on this free market, AR: They do not have paid application. All apps must be free.}. To
 automate the experiment process we use the \emph{adb} Android command shell to
 install each app, connect the device to the \platname{} platform, and
-start the app. Then we use \emph{Monkey} \tbd{give a ref}, an app-scripting 
+start the app. Then we use \emph{Monkey}~\cite{adbmonkey}, an app-scripting 
 tool, to perform a series of 10,000 actions that include
 random swipes, touches, and text entries.  Finally, we use adb to
 uninstall the application and reboot the device to forcibly end any

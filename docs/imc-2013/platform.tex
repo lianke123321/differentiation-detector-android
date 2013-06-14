@@ -31,11 +31,11 @@
 In this section, we present an overview of the \platname{} platform\footnote{Our platform is currently in private beta with deployments in the US, France and China. We will make the \platname{} software publicly available.}. The goal of \platname{} is straightforward: we 
  seek to enable passive monitoring of \emph{all
   the Internet traffic from and to mobile devices}. While previous work has accomplished 
-  this for a limited set of devices or networks, we seek to avoid such limitations: 
+  this for a limited set of devices or networks, we seek to avoid such limitations. 
 \begin{packedenumerate}
 \item \emph{OS agnostic.} Monitor traffic independently of
   the OS run by the monitored device. In particular, we avoid the need to 
-  develop OS-specific applications, or to root or jailbreak the phone.
+  develop OS-specific applications, or to root or jailbreak the device.
 \item \emph{ISP agnostic.} Monitor traffic without any
   support from ISPs and cellular providers.
 \item \emph{Access technology agnostic.} Monitor traffic
@@ -44,6 +44,10 @@ In this section, we present an overview of the \platname{} platform\footnote{Our
 \item \emph{Continuous.} Monitor traffic continuously, even when devices switch 
 between networks or return from being idle.
 
+\tbd{There is not more reference to the flow modification (admittedly
+  a bad term) feature. Don't we want to put it as a design
+  goal. Section "Interposing on Traffic on Mobiscope" is just about
+  that. May be we can add the goal "Traffic interposition".}
 %\item \emph{Flow modification.} We want to not only monitor, but
  % also possibly modify data packets in order to experiment. This makes
  % \platname{} both a passive monitoring and an experimental
@@ -81,7 +85,7 @@ performance and measurement fidelity -- making \platname{} a practical
 approach for pervasive passive network monitoring.
 
 In the following sections, we describe how our measurement infrastructure 
-achieves the goals states in the previous section. We begin by describing 
+achieves the goals stated in the previous section. We begin by describing 
 how we addressed several challenges with implementing our VPN-based 
 proxy. 
 
@@ -160,7 +164,7 @@ network traffic from mobile devices is straightforward, the implementation
 is not. In particular, the interactions between IPSec, routing and NAT 
 complicate our ability to map bidirectional flows to individual devices. 
 The following paragraphs describe these challenges and how we 
-addressed them to provide a stand-alone (\ie single server) mobile-traffic monitoring 
+addressed them to provide a stand-alone (\ie, single server) mobile-traffic monitoring 
 proxy. We conclude by describing how our architecture facilitates 
 pluggable modules for performing custom monitoring.
 
@@ -182,19 +186,24 @@ through a \platname{} proxy.  At steps (1),
 (2), and (3) the encrypted datagram (in gray, $d \rightarrow m$) is passed to the IPSec 
 module to decrypt and process the encapsulated IP datagram ($v \rightarrow w$) sent from 
 the device. Because the \platname{} assigns private address space to 
-clients, it must use NAT in step (5) to convertthe private IP address \emph{v} to the public IP
+clients, it must use NAT in step (5) to convert the private IP address \emph{v} to the public IP
 address \emph{m}. Last, the packet is forwarded to the Internet. 
 
-We now describe how running tcpdump and tracking the NAT table are 
-sufficient for mapping flows in the forward direction. Running \emph{tcpdump} on the Ethernet device captures packets at 
-step (2), (4), and (7). The translation table provides a map between the public IP address \emph{d}
-of the device and its private IP address \emph{v} in the tunnel. To
-associate packets to a device and a Web service, we only need the
-packet captured at step (4) that associates the packet to the private
-address \emph{v} of the device in the VPN tunnel and the Web service
-(address \emph{w}), and the translation table that gives the
-mapping between the device in the VPN tunnel (address \emph{v}) and
-the public IP address \emph{d} of the mobile device.
+We now describe how running tcpdump and tracking the VPN assignment
+table\footnote{\platname{} maps a device identified by its public IP
+  address to a private IP address in the VPN. We call the mapping
+  between this device public and private IP addresses the \textit{VPN
+    assignment table}.} are sufficient for mapping flows in the
+forward direction. Running \emph{tcpdump} on the Ethernet device
+captures packets at step (2), (4), and (7). The assignment table
+provides a map between the public IP address \emph{d} of the device
+and its private IP address \emph{v} in the tunnel. To associate
+packets to a device and a Web service, we only need the packet
+captured at step (4) that associates the packet to the private address
+\emph{v} of the device in the VPN tunnel and the Web service (address
+\emph{w}), and the assignment table that gives the mapping between the
+device in the VPN tunnel (address \emph{v}) and the public IP address
+\emph{d} of the mobile device.
 
 \noindent \textbf{Reverse path.} In the reverse direction (when packets flow from the
 Internet to the mobile device), it is no longer possible to associate a
@@ -211,7 +220,7 @@ the packet at step (4), but we have no access to it via the standard Linux netwo
 \noindent \textbf{Bidirectional mappings.} A straightforward solution to 
 the reverse path mapping problem is to forward traffic to a separate NAT 
 device and dump traffic there. To avoid the need for additional hardware/VMs,
-we simply virtualize an additional network interface and route traffic through it. 
+we virtualize an additional network interface and route traffic through it. 
 
 Namely, we use a Linux TUN device, send packets from \emph{w} to \emph{v} through 
 it and run packet captures on that TUN device (Figure~\ref{fig:packet-monitor-d}). 
@@ -229,7 +238,7 @@ packets whose destination is \emph{v}, and facilitates forwarding
 all packet with a \emph{v'} destination address ($p$th bit set
 to 1) to the TUN device, step (5). Then, we implement a process at the
 TUN device that changes the destination address
-from \emph{v'} to \emph{v}, and to sends the packet to the IP
+from \emph{v'} to \emph{v} and sends the packet to the IP
 layer, step (6). Then the packet follows the path of a regular packet
 in a VPN tunnel. 
 
@@ -375,8 +384,8 @@ the \platname{} plugininfrastructure.
 First, we note that our VPN proxy implementation uses a self-generated 
 \platname{} root certificate that is used to sign all subsequent certificates 
 issued to participating mobile devices. This allows us to perform SSL 
-traffic decryption, using the Squid proxy's SSL bumping\tbd{AR: give a 
-reference} feature, which is essentially a man-in-the-middle operation 
+traffic decryption, using the Squid proxy's SSL bumping~\cite{sslbump}
+feature, which is essentially a man-in-the-middle operation 
 on the secure connection.\footnote{Note that for privacy reasons we do not 
 decrypt traffic generated by human subjects; rather, we use this for controlled 
 experiments in the lab setting.} Specifically, when the mobile device connects 
@@ -398,7 +407,7 @@ validating the root certificate, Google Chrome, Safari, the Facebook
 application, the Google+ application, the default mail clients, and
 advertisement services do not check the validity of the root
 certificate. This enables our approach to provide visibility into 
-secure channels established the a wide range of popular apps. We will discuss
+secure channels established with a wide range of popular apps. We will discuss
 further this issue in Section~\ref{sec:classification}. 
 
 % \begin{figure}
@@ -455,8 +464,9 @@ professional clients.
 \noindent\textbf{Limited ISP characterization.} \platname{} cannot detect traffic 
 differentiation or any other techniques that ISPs use to interpose on network 
 traffic using deep packet inspection (such as
-advertisement insertion \tbd{AR: give a reference}) or optimization
-(such as traffic compression \tbd{AR: give a reference}). This is because the traffic between mobile devices and \platname{}
+advertisement insertion~\cite{reis:tripwires}) or optimization (such as traffic compression). 
+\tbd{AR: Do we need to mention compression, I was not able to find a reference for compression}
+This is because the traffic between mobile devices and \platname{}
 is encrypted.
 
 \noindent\textbf{IPv6.} \platname{} cannot be currently used on networks using IPv6
@@ -469,13 +479,13 @@ looks like a very small contribution, and it does not bring much to
 the discussion. }
 
 \subsubsection{Deployability}
-\platname{} uses standard and often open-source software to 
-manage and record traffic from mobile devices, making it easy 
-to deploy to users and servers. However, a key question is whether 
-the system is sufficiently efficient to minimize impact on user behavior 
-for our studies in the wild. We show empirically the the overheads are 
-reasonable, and provide a brief discussion of incentives for users to 
-adopt our system.
+\platname{} uses standard and often open-source software to manage and
+record traffic from mobile devices, making it easy to deploy to users
+and servers. However, a key question is whether the system is
+sufficiently efficient to minimize its impact on both controlled and
+in-the-wild experiments. We show empirically that the overheads are
+reasonable, and provide a brief discussion of incentives for users to
+adopt our system for in-the-wild experiments.
 
 We identify the following key aspects of user-perceived inefficiency from 
 proxying their network traffic through \platname{}: 
@@ -488,7 +498,9 @@ and of 1.59 second on cellular. For iOS that uses the older IKEv1, the
 VPN establishment takes longer: we observe a maximum of 2 seconds on
 \wifi{} and 2.18 seconds on cellular.  In summary, for most long term
 traffic monitoring experiments, the VPN establishment delay is
-negligible. \drc{median?}
+negligible. \drc{median? AL: I removed the median to reduce too many
+  references to numbers. In that case, the max is enough to support
+our argument.}
 \item \textbf{Encapsulation overhead -- data consumption.} \platname{} uses IPsec for datagram encryption, thus there is
 an encapsulation overhead for each packet exchanged between the mobile
 device and the \platname{} box. To evaluate this overhead, we logged
@@ -523,14 +535,19 @@ the additional privacy enabled by our VPN proxy.
 
 \end{itemize}
 
-\noindent\textbf{Incentives.} We have developed a variety of user incentives that can offset the costs of 
-\platname{}; here, we name a few of the most interesting ones.\footnote{We have implemented most of these examples, 
-but their details are beyond the scope of this paper.} For example, 
-we can provide users with fine-grained views of privacy leaks from 
-their applications, and allow them to enable a \platname{} plugin that 
-blocks PII. In addition, we are investigating the opportunities for page 
-speed optimization. Last, we have implemented opt-in device-wide ad-blocking, 
-which can reduce the volume of costly cellular traffic transferred by a device. 
+\noindent\textbf{Incentives.} \platname{} is a fantastic platform for
+controlled experiments. However, it is also important to measure
+traffic from real users, so we must provide an incentive for them to
+use the platform. We have developed a variety of user incentives that
+can offset the costs of \platname{}; here, we name a few of the most
+interesting ones.\footnote{We have implemented most of these examples,
+  but their details are beyond the scope of this paper.} For example,
+we can provide users with fine-grained views of privacy leaks from
+their applications, and allow them to enable a \platname{} plugin that
+blocks Personally Identifiable Information (PII). In addition, we are
+investigating the opportunities for page speed optimization. Last, we
+have implemented opt-in device-wide ad-blocking, which can reduce the
+volume of costly cellular traffic transferred by a device.
 
 
 %
