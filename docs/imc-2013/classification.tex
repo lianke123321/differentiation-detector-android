@@ -73,7 +73,7 @@ on middlebox technologies that interpose of plaintext traffic (\eg page rewritin
 \hline
 \multicolumn{2}{|c|}{\emph{total (\%)}} & 100.00 & 100.00 & 100.00 & 100.00 \tabularnewline
 \hline
-\multicolumn{2}{|c|}{\emph{Volume (GB)}}& 9.467 & 18.79 & 14.89  & 89.54 \tabularnewline
+\multicolumn{2}{|c|}{\emph{Traffic Volume (GB)}}& 9.467 & 18.79 & 14.89  & 89.54 \tabularnewline
 \hline
 \multicolumn{2}{|c|}{\emph{\# Flows}}   & 851074 & 658331 & 661736 & 2167448 \tabularnewline
 \hline
@@ -110,7 +110,7 @@ Previous work uses this to classify traffic, but only at the granularity of the 
 Below we describe the limitations of this approach for a large fraction of apps, and how we improve classification using only header information (\ie HTTP and lower layers). 
 %use the results from our controlled experiments and the \mobWild dataset to argue that the \useragent can be used to identify flow from popular iOS and Android applications, for flows that do not contain a useful \useragent we fall back to classifying identifying the web-service using the \httphost field.
 
-To motivate why this is a difficult problem, consider the following scenario. When using the \httphost field in the HTTP header, a flow contacting the Facebook service, uses \emph{static.ak.fbcdn.net}, implying that this HTTP flow contacted one of the Facebook servers; however, the \httphost does not tell us whether Facebook is accessed via a Web browser or through the native Facebook app. Similarly, the \useragent field can specify an app name, but it is not required to do so. Below, we show the effectiveness of combining these approaches. 
+To motivate why this is a difficult problem, consider the following scenario. When using the \httphost field in the HTTP header, a flow with \emph{static.ak.fbcdn.net} in the \httphost field implies that it contacted one of the Facebook servers; however, the \httphost field does not tell us whether Facebook is accessed via a Web browser or through the native Facebook app. Similarly, the \useragent field can specify an app name, but it is not required to do so. Below, we show the effectiveness of combining these approaches. 
 
 
 %\begin{table} 
@@ -168,18 +168,18 @@ effectiveness of app classification using only header data.
 
 \emph{iOS:}
 First, we note that 176 of the 209 iOS applications we manually tested generated HTTP traffic.
-We observe that \httphost uniquely identified the corresponding app for 47\% of the iOS apps we tested (column 5).
+We observe that the \httphost field uniquely identified the corresponding app for 47\% of the iOS apps we tested (column 5).
 %; the flows containing the application signature was responsible from 15\% to 98\% of the traffic volume from the application. 
 %\tbd{TODO: This was done only for a sample of applications -- I shall perform this test in detail after deadline}
-The \httphost also can identify the provider that released an app.
+The \httphost field also can identify the provider that released an app.
 For example Zynga offers multiple games with dedicated apps that contact Zynga properties.
 When classifying apps according to their provider, we observe in \fref{tab:classification-success} (column 6) that our classification success increases to 67\% of iOS applications. 
 
 
 \emph{Android:} We observe a similar results for flows from apps released through Google Play.
-However, for the applications from the Third-party store we observe that \httphost is less effective. 
+However, for the applications from the Third-party store we observe that the \httphost field is less effective. 
 Primarily this is due to the fact that a majority of the applications we tested (about 77\%) were stand-alone services such as games where the provider did not use its own Web services. Instead, these applications either contacted some advertisement sites or sites hosted by CDNs. 
-While we can use \httphost to identify these 3rd-party sites contacted by an app, we cannot determine which app generated the traffic. 
+While we can use the \httphost field to identify these 3rd-party sites contacted by an app, we cannot determine which app generated the traffic. 
 
 \begin{table}
 \begin{small}
@@ -199,15 +199,15 @@ While we can use \httphost to identify these 3rd-party sites contacted by an app
 \label{tab:user-agent}
 \end{table}
 
-\emph{Augmenting with \useragent: } We now show that by augmenting the information in the \useragent to the information gained by \httphost, we can classify a majority of iOS and Android applications. 
+\emph{Augmenting with \useragent: } We now show that by augmenting the information in the \useragent to the information gained by the \httphost field, we can classify a majority of iOS and Android applications. 
 In our controlled experiments we observed a non-empty \useragent string in more than 99.7\% of the HTTP flows from iOS and 90.9\%flows from Android. 
-A \useragent strings may contain an application identifier and other auxiliary information such as details of the OS, manufacturer, and compatibility with Web-browsers~\cite{mozilla:useragentdetection}. 
-For example, the first \useragent in \fref{tab:user-agent} contains the information of the application, YahooMobileMail, while the second \useragent hides the application and specifies the AppleCoreMedia service of iOS, and the third does not provide any useful information. 
+A \useragent string may contain an application identifier and other auxiliary information such as details of the OS, manufacturer, and compatibility with Web-browsers~\cite{mozilla:useragentdetection}. 
+For example, the first \useragent in \fref{tab:user-agent} contains the information of the application, YahooMobileMail, while the second \useragent hides the application and specifies the \emph{AppleCoreMedia} service of iOS, and the third does not provide any useful information. 
 To extract the application information, we use a set of regular expressions to filter out the auxiliary information in the \useragent and further cluster these extracted tokens using the edit distance between the tokens.\footnote{We plan to release this code along with \platname package.}
 
 In \fref{tab:classification-success} we observe that 176 of the 209 iOS applications generated HTTP traffic, 149 of these were correctly identified based on the signatures in their \useragent, which we verified by manual inspection.
 In contrast, our \useragent based identification was able to correctly identify less than 23\% of the Android applications that generated HTTP traffic. 
-For the 27 iOS applications which we failed to identify, we observed signatures for OS services and libraries, such as applecoremedia, gamekit, geoservices, etc. and signatures of third-party libraries and services such as \emph{Google Analytics} and \emph{Adobe Air}.
+For the 27 iOS applications which we failed to identify, we observed signatures for OS services and libraries, such as \emph{Apple Core Media}, \emph{Game Kit}, \emph{Geo Services}, etc. and signatures of third-party libraries and services such as \emph{Google Analytics} and \emph{Adobe Air}.
 Similarly, the majority of Android HTTP traffic contained flows with the default \useragent (similar to the third \useragent in \fref{tab:user-agent}).
 Further, for the applications from the third-party store, we observe that the \useragent for ads and analytics libraries such as \emph{Google Analytics} and \emph{Adsense for Mobile} were the most common \useragent after the default \useragent.
 
@@ -226,12 +226,12 @@ ad/analytics servers in the payload.
 We now describe the results of our classification on data gathered from our user study.
 Using only the \useragent on the \mobWild dataset we were able to map flows to 243 iOS and 84 Android apps, OS libraries, and services. 
 The \emph{word cloud} in \fref{fig:http-wordcloud} contains the summary of our results; the font size of a signature is proportional to the number of users for which the signature was observed.
-Along with signatures of applications such as iTunes and YouTube, we also observe signatures of the \emph{applecoremedia} and \emph{stagefright} services that are responsible to download media content on iOS and Android devices respectively.
+Along with signatures of applications such as iTunes and YouTube, we also observe signatures of the \emph{Apple Core Media} and \emph{Stagefright} services that are responsible to download media content on iOS and Android devices respectively.
 %Across the iOS and Android devices, we observe a total of \tbd{1435} unique \useragent strings that produce \tbd{361} unique signatures which we cluster to \tbd{} different applications and services. 
-For the iOS devices in the \mobWild dataset, we observe a signature of \emph{applecoremedia} in more than 98.45\% of the content downloaded from the YouTube servers.
+For the iOS devices in the \mobWild dataset, we observe a signature of \emph{Apple Core Media} in more than 98.45\% of the content downloaded from the YouTube servers.
 Similarly, depending the Android version we observe either the signature for Stagefright\cite{android:stagefright} or no application or OS service signature for YouTube traffic to Android devices depending on the OS version. 
 We observe a similar signatures for other popular media services such as Netflix, YouTube, Vimeo, Pandora, etc.
-Because we cannot identify the application used to access these services, we fall back to the \httphost to identify these Web-services.
+Because we cannot identify the application used to access these services, we fall back to the \httphost field to identify these Web-services.
 
 \begin{table}
 \centering
@@ -261,7 +261,7 @@ Other                   &  0.036  & 1.1963 &  0.013 &  0.081 \tabularnewline
 In \fref{tab:classify-http}, we observe that with a combination of \useragent and \httphost field in HTTP headers, we were able to classify more than 98\% of the traffic in terms of flows and bytes from iOS and Android devices.
 We observe that media from popular hosts in our \mobWild dataset, including Netflix, YouTube, Pandora, Spotify, and Vimeo, contribute to more than 50\% of the traffic volume from iOS and Android devices.
 Similarly, we observe that applications identified based on the \useragent  were responsible for more than 77\% of flows from Android and iOS devices. 
-We also observe that media (identified based on the signatures such as \emph{applecoremedia} and \emph{stagefright} served from CDNs and others hosts from which we could not identify the webservice from other fields in the HTTP header and the DNS responses before the HTTP flows to be 14.5\% of the traffic volume for the iOS devices in our dataset.
+We also observe that media (identified based on the signatures such as \emph{Apple Core Media} and \emph{Stagefright} served from CDNs and others hosts from which we could not identify the webservice from other fields in the HTTP header and the DNS responses before the HTTP flows to be 14.5\% of the traffic volume for the iOS devices in our dataset.
 
 \subsubsection{Classification of SSL Traffic.}
 
