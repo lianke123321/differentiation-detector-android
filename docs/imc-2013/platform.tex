@@ -44,11 +44,11 @@ In this section, we present an overview of the \platname{} platform\footnote{Our
 \item \emph{Continuous.} Monitor traffic continuously, even when devices switch 
 between networks or return from being idle.
 
-\tbd{There is not more reference to the flow modification (admittedly
-  a bad term) feature. Don't we want to put it as a design
-  goal. Section "Interposing on Traffic on Mobiscope" is just about
-  that. May be we can add the goal "Traffic interposition".}
-\drc{We don't use the feature in this paper so I removed it. It's out of scope.}
+%\tbd{There is not more reference to the flow modification (admittedly
+%  a bad term) feature. Don't we want to put it as a design
+%  goal. Section "Interposing on Traffic on Mobiscope" is just about
+%  that. May be we can add the goal "Traffic interposition".}
+%\drc{We don't use the feature in this paper so I removed it. It's out of scope.}
 %\item \emph{Flow modification.} We want to not only monitor, but
  % also possibly modify data packets in order to experiment. This makes
  % \platname{} both a passive monitoring and an experimental
@@ -78,15 +78,14 @@ then we discuss the limitations of the platform.
 
 To meet the above goals, we exploit the observation that nearly all 
 devices support network traffic indirection via virtual private networks (VPNs). 
-In particular, instead of using the VPN server to access a private network, 
-we use it as a proxy for all of a device's mobile Internet traffic. This enables passive monitoring 
-of Internet traffic regardless of device OS, carrier/ISP or access technology. 
-Further, we show that this approach has minimal impact on 
-performance and measurement fidelity -- making \platname{} a practical 
-approach for pervasive passive network monitoring.
+Instead of using a VPN server to access a private network, 
+we use it as a proxy for all of a device's Internet traffic. This enables passive network monitoring 
+regardless of OS, carrier/ISP or access technology. 
+Further, we show that this approach is practical in that it has minimal impact on 
+performance and measurement fidelity.
 
 In the following sections, we describe how our measurement infrastructure 
-achieves the goals stated in the previous section. We begin by describing 
+achieves the goals stated above. We begin by describing 
 how we addressed several challenges with implementing our VPN-based 
 proxy. 
 
@@ -101,42 +100,36 @@ proxy.
 
 \subsubsection{VPNs for Mobile Devices}
 \label{sec:vpn-tech-mobile-device}
-In this section, we provide a detailed description of how VPNs allow 
-us to achieve many of our \platname{} design goals.  
-Our first goal is to provide a measurement system that works regardless 
-of device OS. To achieve this goal, we note that VPNs are widely supported 
-on the most popular mobile OSes. Indeed, Android, BlackBerry, Bada, and iOS all support VPNs,
-primarily to satisfy their enterprise clients. In this work, we focus on 
-the two most popular OSes: iOS and Android. 
+We now provide a detailed description of how our design achieves 
+many of the \platname{} design goals.  
+Our first goal is a measurement system that works regardless 
+of device OS. To achieve this goal, we note that VPNs are widely supported: 
+Android, BlackBerry, Bada, and iOS all support VPNs (primarily to satisfy 
+their enterprise clients). In this work, we focus on 
+the two most popular: iOS and Android. 
 
 Our second and third goals are 
 to enable measurements regardless of ISP or access technology. 
-Fortunately, iOS and Android support VPN connectivity regardless of  
-ISP or access technology -- so long as the network supports the Internet Protocol. 
-
-We note that both iOS and Android support VPN connections 
-using the IPSec standard, meaning we can implement our VPN proxy 
-server using robust, open-source code from Strongswan~\cite{strongswan}. 
-\platname{} thus supports IPSec tunnels using either IKEv1 or
-IKEv2~\cite{rfc5996} for authentication and key negotiation.
-
+iOS and Android support VPN connectivity regardless of  
+ISP or access technology -- so long as the network supports IPv4. 
 
 To meet our goal of continuous network monitoring,
-a VPN must always be enabled. Currently, all iOS devices (version 3.0
-and above) support a feature called \textit{VPN On-Demand}.  VPN
-On-Demand forces the iOS device to use VPN tunnels when connecting to
-a specified set of domains. To ensure all possible addresses match this list, 
-we observed that iOS uses suffix matching to determine which connections 
+a VPN must always be enabled on a device. Currently, all iOS devices (version 3.0
+and above) support \textit{VPN On-Demand}, which forces traffic for a specified 
+set of domains to use VPN tunnels. To ensure all possible destinations match this list, 
+we exploit the fact that iOS uses suffix matching to determine which connections 
 should be tunneled; accordingly, we specified the domain list as the set of 
 alphanumeric characters (a-z, 0-9, one character per domain). 
-Android version 4.2 and above support an
-\textit{Always On VPN} connection that is always enabled for all data
-traffic, and Android version 4.0 and above provide an API that allows
-applications to manage VPN tunnels. We support both options: we have distributed Always On VPN 
-configurations and implemented an application that
-uses the VPN API to provide equivalent functionality for
-Android 4.0 and 4.1.
+Android version 4.2 and above supports an
+\textit{Always On VPN} connection that provides the same functionality;
+for Android version 4.0 and above there is an app API that allows
+apps to manage VPN tunnels. We support both options.
 
+Last, to support a deployment at scale we note that both iOS and Android support VPN connections 
+using the IPSec standard. This means we can implement our VPN proxy 
+server using free, robust, open-source code from Strongswan~\cite{strongswan}. 
+%\platname{} thus supports IPSec tunnels using either IKEv1 or
+%IKEv2~\cite{rfc5996} for authentication and key negotiation.
 
 % The use IPsec by mobile devices for pervasive VPN tunnels limited our
 % choice of VPN daemons to manage VPN tunnels on our proxying server.
@@ -160,61 +153,68 @@ Android 4.0 and 4.1.
 
 Having shown that VPNs support many of \platname{}'s goals, 
 we now describe how we implement passive network monitoring 
-using VPN proxying. While the high-level design for capturing 
+using VPN proxying on a single machine (supporting our goal of scalability). 
+While the high-level design for capturing 
 network traffic from mobile devices is straightforward, the implementation 
 is not. In particular, the interactions between IPSec, routing and NAT 
 complicate our ability to map bidirectional flows to individual devices. 
 The following paragraphs describe these challenges and how we 
 addressed them to provide a stand-alone (\ie, single server) mobile-traffic monitoring 
-proxy. We conclude by describing how our architecture facilitates 
-pluggable modules for performing custom monitoring.
+proxy. 
+%We conclude by describing how our architecture facilitates 
+%pluggable modules for performing custom monitoring.
 
 At first glance, capturing all traffic traversing a VPN server should be 
 as simple as running a tap on the network interface, \eg using \textit{tcpdump}. 
-While this indeed captures all traffic, it does not capture sufficient information 
-to distinguish bidirectional flows and map them to individual devices. We now 
-describe how to provide this mapping.
+%
+%While this captures all traffic, it does not capture sufficient information 
+%to distinguish bidirectional flows and map them to individual devices. We now 
+%describe how to provide this mapping.
 
-First, we describe how the Linux network stack interacts with IPSec. 
+To explain why this is insufficient, we first describe how the Linux network stack interacts with IPSec. 
 We assume the \platname{} server is assigned 
 IP address $m$ and the mobile device's public IP address is $d$. When 
 the VPN connection is established, the proxy assigns the device a private address 
 $v$. Last, the device is attempting to access a service located at address $w$. 
 We denote a packet from source $s$ to destination $d$ as $s \rightarrow d$.
 
-\noindent \textbf{Forward path.} The first step is to map flows in the forward direction. Figure~\ref{fig:packet-monitor-a} shows the path that packets take 
-through a \platname{} proxy.  At steps (1),
+\noindent \textbf{Forward path.} We being with mapping flows in the forward direction. 
+Figure~\ref{fig:packet-monitor-a} shows the path that packets take 
+through \platname{}.  At steps (1),
 (2), and (3) the encrypted datagram (in gray, $d \rightarrow m$) is passed to the IPSec 
-module to decrypt and process the encapsulated IP datagram ($v \rightarrow w$) sent from 
-the device. Because the \platname{} assigns private address space to 
+module to decrypt and process the encapsulated IP datagram ($v \rightarrow w$).
+Because the \platname{} assigns private address space to 
 clients, it must use NAT in step (5) to convert the private IP address \emph{v} to the public IP
 address \emph{m}. Last, the packet is forwarded to the Internet. 
 
-We now describe how running tcpdump and tracking the VPN assignment
-table\footnote{\platname{} maps a device identified by its public IP
-  address to a private IP address in the VPN. We call the mapping
-  between this device public and private IP addresses the \textit{VPN
-    assignment table}.} are sufficient for mapping flows in the
+We now describe how running \textit{tcpdump} and tracking the network address 
+translation (NAT) 
+table
+%\footnote{\platname{} maps a device identified by its public IP
+%  address to a private IP address in the VPN. We call the mapping
+%  between this device public and private IP addresses the \textit{VPN
+%    assignment table}.} 
+are sufficient for mapping flows in the
 forward direction. Running \emph{tcpdump} on the Ethernet device
-captures packets at step (2), (4), and (7). The assignment table
+captures packets at step (2), (4), and (7). The NAT table
 provides a map between the public IP address \emph{d} of the device
 and its private IP address \emph{v} in the tunnel. To associate
-packets to a device and a Web service, we only need the packet
-captured at step (4) that associates the packet to the private address
-\emph{v} of the device in the VPN tunnel and the Web service (address
-\emph{w}), and the assignment table that gives the mapping between the
+packets with a device and a destination, we only need the packet
+captured at step (4) that associates the packet with the private address
+\emph{v} of the device in the VPN tunnel and the destination (\emph{w}), and 
+the NAT table that gives the mapping between the
 device in the VPN tunnel (address \emph{v}) and the public IP address
 \emph{d} of the mobile device.
 
 \noindent \textbf{Reverse path.} In the reverse direction (when packets flow from the
-Internet to the mobile device), it is no longer possible to associate a
-mobile device to the packets. We refer to 
-Figure~\ref{fig:packet-monitor-b}, where we continue to dump packets from 
+Internet to the mobile device), it is no longer possible in general to associate a
+mobile device with its§ packets. We refer to 
+Fig.~\ref{fig:packet-monitor-b}, where we continue to dump packets from 
 the Ethernet device. From
-steps (2) and (7), we know that a packet in sent by the service at address $w$ to
+steps (2) and (7), we know that a packet is sent by the destination at address $w$ to
 the \platname{} box (step (2)), but then this packet is encapsulated
 at the IPsec layer -- address resolution is performed by the NAT
-without passing through tcpdump. So, when we see the datagram at step (7), we have no
+without passing through \textit{tcpdump}. So, at step (7) we have no
 way to know which encrypted packet is encapsulated. We need to dump
 the packet at step (4), but we have no access to it via the standard Linux networking stack. 
 
@@ -352,20 +352,19 @@ to the TUN device. \tabularnewline
 \label{fig:packet-monitoring-solution}
 \end{figure}
 
-A key limitation of previous approaches to measuring mobile 
-network traffic is that the contents of encrypted (SSL) traffic 
-are unavailable for analysis. Of course, SSL rightfully provides 
-authentication and protects user privacy from eavesdroppers; 
-however, as increasing amounts of Web traffic flow over HTTPS, 
-we lose the ability to understand how to optimize such traffic. 
+A key limitation of previous approaches to measuring traffic from mobile 
+devices is that the payloads of encrypted (SSL) traffic 
+are unavailable for analysis. As increasing amounts of Web traffic flow over HTTPS, 
+we lose the ability to understand how to optimize such traffic or to evaluate what 
+information is exfiltrated over such tunnels. 
 This has implications both for performance (page speed optimizations) 
 and privacy (PII leakage over secure channels). In this section, 
 we describe how \platname{} allows us to analyze the contents 
 of SSL flows generated by mobile devices. 
 
-\noindent\textbf{Plugin infrastructure.} Figure~\ref{fig:packet-monitoring-solution} shows how we use 
-our virtual network interface (TUN) to support a plugin
-infrastructure for \platname. Each plugin takes as input a 
+\noindent\textbf{Plugin infrastructure.} Figure~\ref{fig:packet-monitoring-solution} shows how 
+\platname{} supports a plugin
+infrastructure for custom flow processing. Each plugin takes as input a 
 network flow and outputs a network flow (potentially empty). 
 When a packet is received at the TUN
 device, it is sent to a software-defined switch~\cite{Openvswitch} that 
@@ -375,7 +374,7 @@ the set of plugins that should operate on each flow. After the last
 plugin is traversed, the network flow is sent out through the TUN device 
 to the Internet. 
 
-Plugins can be used for many different purposes such as ad blocking, 
+Plugins support a variety of features such as ad blocking, 
 analyzing PII leakage or page speed optimization. In the following, we 
 describe how we use a plugin to enable SSL traffic decryption using 
 the \platname{} plugin infrastructure. 
@@ -385,11 +384,11 @@ the \platname{} plugin infrastructure.
 First, we note that our VPN proxy implementation uses a self-generated 
 \platname{} root certificate that is used to sign all subsequent certificates 
 issued to participating mobile devices. This allows us to perform SSL 
-traffic decryption, using the Squid proxy's SSL bumping~\cite{sslbump}
+traffic decryption using the Squid proxy's SSL bumping~\cite{sslbump}
 feature, which is essentially a man-in-the-middle operation 
 on the secure connection.\footnote{Note that for privacy reasons we do not 
 decrypt traffic generated by human subjects; rather, we use this for controlled 
-experiments in the lab setting.} Specifically, when the mobile device connects 
+experiments in the lab setting.} When the mobile device connects 
 to a service supporting SSL, the proxy impersonates the service using a forged certificate signed
 with the root certificate of the \platname{} platform. Then the proxy
 establishes an SSL connection with the intended target, impersonating a mobile
@@ -495,9 +494,7 @@ and of 1.59 second on cellular. For iOS that uses the older IKEv1, the
 VPN establishment takes longer: we observe a maximum of 2 seconds on
 \wifi{} and 2.18 seconds on cellular.  In summary, for most long term
 traffic monitoring experiments, the VPN establishment delay is
-negligible. \drc{median? AL: I removed the median to reduce too many
-  references to numbers. In that case, the max is enough to support
-our argument.}
+negligible. 
 \item \textbf{Encapsulation overhead -- data consumption.} \platname{} uses IPsec for datagram encryption, thus there is
 an encapsulation overhead for each packet exchanged between the mobile
 device and the \platname{} box. To evaluate this overhead, we logged
@@ -524,13 +521,14 @@ which is not feasible for iOS devices. For iOS devices we conducted
 an experiment using video streaming to drain a fully charged battery with 
 and without the VPN enabled. We again found approximately 10\% power overhead. 
 
-In summary, the power overhead is low enough to run long experiments
-using mobile devices on \platname. To further reduce this overhead (which 
+\end{packeditemize}
+
+In summary, the overheads are low enough to avoid significant interference 
+with user activity. To further reduce this overhead (which 
 is primarily for cryptographic operations), we are investigating using NULL 
 encryption (\ie no encryption) for users that do not need 
-the additional privacy enabled by our VPN proxy.
+the additional privacy enabled by \platname{}.
 
-\end{packeditemize}
 
 \noindent\textbf{Incentives.} \platname{} is a fantastic platform for
 controlled experiments. However, it is also important to measure
