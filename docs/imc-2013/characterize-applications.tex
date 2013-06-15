@@ -45,12 +45,12 @@ across the network over HTTP or HTTPS (using the SSL bumping plugin).
 Some of this information is required for normal app operation, however; we strongly believe that such information should
 never travel across the network in plaintext (HTTP). 
 
-In \fref{tab:pii}, we present the different PII leaked for both Android and iPhone apps.  We observe that
+In Table~\ref{tab:pii}, we present the different PII leaked for both Android and iPhone apps.  We observe that
 the IMEI, a unique identifier tied to a phone, is the most commonly
 leaked PII for Android applications.  This IMEI can be used to track
 and correlate a user's behavior across Web services.  Similarly, we
 observe that Android applications leak the Android ID, a unique
-identifier tied to an Android device.  In \fref{tab:pii}, we also
+identifier tied to an Android device.  In Table~\ref{tab:pii}, we also
 observe that other information like contacts, emails, and passwords
 are leaked in the clear.  The email address, the address used to sign
 up for the services, was leaked in the clear by 13 iOS and 3 Android
@@ -96,7 +96,7 @@ user credentials (which are often used for multiple services).
 
 During our experiments, we observed that PII information is also sent over HTTPS.  In the following, we
 focus on device identifiers such as the IMEI and the Android device
-ID.  In \fref{tab:pii-leakage-https-sites}, we present the top 10
+ID.  In Table~\ref{tab:pii-leakage-https-sites}, we present the top 10
 sites ordered by the number of flows that sent the IMEI over HTTPS.  We
 observe that four of the top 10 sites that receive this information
 are ads and analytics (A\&A) sites.
