@@ -24,7 +24,7 @@ obtain a comprehensive view of Internet traffic from mobile devices.
 of networks that our users connected to. 
 We infer the access technology (WiFi or cellular) using the AS description from \emph{WHOIS} data for each IP address used by a mobile device.
 Based on this classification, the \mobWild dataset consists of traffic from 54 distinct ASes, of which 9 are cellular ASes.
-During the measurement study, each device connected our \platname server from at most two distinct cellular ASes. 
+During the measurement study, each device connected to our \platname server from at most two distinct cellular ASes. 
 In contrast, a median of 4 \wifi ASes were observed per device and for one device we observed traffic from 25 different \wifi ASes spread across 5 countries.
 In terms of traffic volumes, collectively our users' devices transferred 24-56\% of their traffic over cellular (iOS and Andriod, respectively), and the 
 remainder over WiFi. 
@@ -176,7 +176,7 @@ For example Zynga offers multiple games with dedicated apps that contact Zynga p
 When classifying apps according to their provider, we observe in Table~\ref{tab:classification-success} (column 6) that our classification success increases to 67\% of iOS apps. 
 
 
-\emph{Android:} We observe a similar results for flows from apps released through Google Play.
+\emph{Android:} We observe similar results for flows from apps released through Google Play.
 However, for the apps from the Third-party store we observe that the \httphost field is less effective. 
 Primarily this is due to the fact that a majority of the apps we tested (about 77\%) were stand-alone services such as games where the provider did not use its own Web service. Instead, these apps either contacted some advertisement sites or sites hosted by CDNs. 
 While we can use the \httphost field to identify these 3rd-party sites contacted by an app, we cannot determine which app generated the traffic. 
@@ -202,7 +202,7 @@ While we can use the \httphost field to identify these 3rd-party sites contacted
 \emph{Augmenting with \useragent: } We now show that by augmenting the information in the \useragent to the information gained by the \httphost field, we can classify a majority of iOS and Android apps. 
 In our controlled experiments we observed a non-empty \useragent string in more than 99.7\% of the HTTP flows from iOS and 90.9\%flows from Android. 
 
-A \useragent string may contain an app identifier and other auxiliary information such as details of the OS, manufacturer, and compatibility with Web-browsers~\cite{mozilla:useragentdetection}. 
+A \useragent string may contain an app identifier and other auxiliary information such as details of the OS, manufacturer, and compatibility with Web browsers~\cite{mozilla:useragentdetection}. 
 For example, the first \useragent in Table~\ref{tab:user-agent} contains the information of the app, YahooMobileMail, while the second \useragent hides the app and specifies the \emph{AppleCoreMedia} service of iOS, and the third does not provide any useful information. 
 To extract the app information, we use a set of regular expressions to filter out the auxiliary information in the \useragent and further cluster these extracted tokens using the edit distance between the tokens.\footnote{We plan to release this code along with \platname package.}
 
@@ -233,7 +233,7 @@ Along with signatures of apps such as iTunes and YouTube, we also observe signat
 For the iOS devices in the \mobWild dataset, we observe a signature of \emph{Apple Core Media} in more than 98.45\% of the content downloaded from the YouTube servers.
 Similarly, depending the Android version we observe either the signature for Stagefright\cite{android:stagefright} or no app or OS service signature for YouTube traffic to Android devices depending on the OS version. 
 We observe a similar signatures for other popular media services such as Netflix, YouTube, Vimeo, Pandora, etc.
-Because we cannot identify the app used to access these services, we fall back to the \httphost field to identify these Web-services.
+Because we cannot identify the app used to access these services, we fall back to the \httphost field to identify these Web services.
 
 \begin{table}
 \centering
@@ -264,7 +264,7 @@ Other                   &  0.036  & 1.1963 &  0.013 &  0.081 \tabularnewline
 In Table~\ref{tab:classify-http}, we observe that with a combination of \useragent and \httphost field in HTTP headers, we were able to classify more than 98\% of the traffic in terms of flows and bytes from iOS and Android devices.
 We observe that media from popular hosts in our \mobWild dataset, including Netflix, YouTube, Pandora, Spotify, and Vimeo, contribute to more than 50\% of the traffic volume from iOS and Android devices.
 Similarly, we observe that apps identified based on the \useragent  were responsible for more than 77\% of flows from Android and iOS devices. 
-We also observe that media (identified based on the signatures such as \emph{Apple Core Media} and \emph{Stagefright} served from CDNs and others hosts from which we could not identify the webservice from other fields in the HTTP header and the DNS responses before the HTTP flows to be 14.5\% of the traffic volume for the iOS devices in our dataset.
+We also observe that media (identified based on the signatures such as \emph{Apple Core Media} and \emph{Stagefright} served from CDNs and others hosts from which we could not identify the Web service from other fields in the HTTP header and the DNS responses before the HTTP flows to be 14.5\% of the traffic volume for the iOS devices in our dataset.
 
 \subsubsection{Classification of SSL Traffic.}
 
@@ -300,11 +300,11 @@ name identification, and DNS queries to identify the source of SSL traffic.
 % \label{tab:classify-ssl-port}
 % \end{table}
 
-Mobile devices use SSL for various services including mail, notifications, instant messaging, and web browsing.
+Mobile devices use SSL for various services including mail, notifications, instant messaging, and Web browsing.
 Services such as mail, instant messaging, and notifications are documented to use dedicated port numbers of their traffic.
 %\footnote{We also use the AS for identifying push notification messages as detailed in \fref{sec:characterize-os}.}
 On using port numbers, we observe in that more than 99\% of the SSL flows observed in our controlled experiments were due to HTTPS, the rest of the flows were due to email, instant messaging, and OS notification services. 
-We therefore focus our attention on identifying the Web-services responsible for the HTTPs flows. 
+We therefore focus our attention on identifying the Web services responsible for the HTTPs flows. 
 
 %\tbd{THE NUMBERS FOR THIS ARE FROM THE WILD MEASUREMENTS. ON SIMPLE GLANCING I WAS ABLE TO OBSERVE SIMILAR NUMBERS. I SHALL ADD THEM BY THE TIME OF THE CAMERA READY}
 
@@ -314,13 +314,13 @@ We observe that less than 25\% of the HTTPS traffic from iOS and Android contain
 To further resolve the hostnames, we rely on \emph{server name indication} used by SSL flows~\cite{rfc:servernametls}.
 Servers that host multiple services use the \emph{server name indication} to distinguish these services.   
 For example, we observe a \emph{server name indication} of \emph{plus.google.com} and \emph{s.youtube.com} in two flows that used a certificate with a CN \emph{*.google.com}.
-However, we observe that by using either the certificate or the \emph{server name} we were able to identify the name of the Web-service in less than 40\% of iOS and Android HTTPS traffic.
+However, we observe that by using either the certificate or the \emph{server name} we were able to identify the name of the Web service in less than 40\% of iOS and Android HTTPS traffic.
 
 \noindent\textbf{DNS mapping.} For such flows we use DNS requests made by the mobile devices before starting the HTTPS flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
 DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices use the first entry in DNS response while resolving \emph{hostnames}.
-We therefore use the latest DNS response that contains the IP address of the webservice in the first position of the DNS response. 
+We therefore use the latest DNS response that contains the IP address of the Web service in the first position of the DNS response. 
 %FOR THE WILD: Indeed, for 97.8\% of the Android and 83.4\% of the iOS HTTPS traffic that we could not classify using other fields, we observe that the latest DNS response before the flow started contained the IP address of the webservice as the first entry in the DNS response\footnote{The share of SSL traffic where the latest DNS response contains the IP address of the web-service in the first position is 97.4\% for Android and 88.6\% of iOS}. 
-Indeed, for more than 99\% of the iOS and Android HTTPS traffic that we could not classify using other fields, we observe that the latest DNS response before the flow started contained the IP address of the webservice as the first entry in the DNS response.
+Indeed, for more than 99\% of the iOS and Android HTTPS traffic that we could not classify using other fields, we observe that the latest DNS response before the flow started contained the IP address of the Web service as the first entry in the DNS response.
 Despite the potential usefulness of DNS responses, we give a high priority to the server-name and the certificates because we observed that for flows that contained the server name did not contain the same name in the DNS response for 9.2\% of the iOS traffic and 5.6\% of Android traffic.
 
 \begin{table}
@@ -338,7 +338,7 @@ m.google.com & fbcdn-photos-a.akamaihd.net \tabularnewline
 \hline
 \end{tabular}
 \end{small}
-\caption{Popular hostnames in observed in SSL flows from iOS and Android based on traffic volume. \emph{Hostnames such as www.googleapis.com hide the underlying app and Web-service.}}
+\caption{Popular hostnames in observed in SSL flows from iOS and Android based on traffic volume. \emph{Hostnames such as www.googleapis.com hide the underlying app and Web service.}}
 \label{tab:sslclassify-popular-host}
 \end{table}
 
