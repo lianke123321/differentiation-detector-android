@@ -42,17 +42,17 @@ We perform this test because Android devices can install
 \emph{Google Play} store, without requiring the user to root the device. 
 
 Our goal is to understand how these apps differ from those in the standard \emph{Google Play} 
-store, as they do not have to follow the Android market publication
-process\tbd{Is there different constraints on this free market, AR: They do not have paid application. All apps must be free.}. To
-automate the experiment process we use the \emph{adb} Android command shell to
+store, as they are not subject to Google Play restrictions.
+%\tbd{Is there different constraints on this free market, AR: They do not have paid application. All apps must be free.}
+We automate experiments using \emph{adb} to
 install each app, connect the device to the \platname{} platform, and
 start the app. Then we use \emph{Monkey}~\cite{adbmonkey}, an app-scripting 
 tool, to perform a series of 10,000 actions that include
 random swipes, touches, and text entries.  Finally, we use adb to
 uninstall the application and reboot the device to forcibly end any
-lingering connections. This second set of experiments is limited to
-Android devices because iOS does not provide an equivalent to adb to
-manage apps installation. 
+lingering connections. This set of experiments is limited to
+Android devices because iOS does not provide equivalent 
+scripting functionality. 
 
 % The results of our controlled experiments can be found in
 % \fref{sec:manual-testing}.
@@ -64,8 +64,8 @@ The controlled experiments in the previous section provide us with
 ground-truth information for a large number of apps running in a controlled 
 setting for a short period of time. To understand the network behavior of 
 devices with real users "in the wild" over longer time periods, we conducted 
-an IRB-approved measurement study with a small set of subjects during seven months, from 
-October 20, 2012 to May 20, 2013.\footnote{The measurement study is ongoing, we report the most recent subset of results.}
+an IRB-approved measurement study with a small set of subjects, from 
+Oct. 20, 2012 to May 20, 2013.\footnote{The measurement study is ongoing, we report the most recent subset of results.}
 
 We deployed two \platname servers, one in the USA and one in France
 that were used by 26 devices: 10 iPhones, 4 iPads, 1 iPodTouch, and 11
@@ -73,10 +73,9 @@ Android phones.  The Android devices in this dataset include the
 Nexus, Sony, Samsung, and Gsmart brands while the iPhone devices
 include one iPhone~3GS, four iPhone~5, and five iPhone~4S.  These
 devices belongs to 21 different users, volunteers for our IRB approved
-study.  This dataset, called \mobWild, consists of 208 days of data
-monitored on the \platname{} servers; the number of days for each user
-varies from 5 to 205 with a median of 35 days.  For privacy reasons, the
-SSL-Bumping plugin is \emph{disabled} for all experiments involving
+study.  This dataset, called \mobWild, consists of 208 days with data; the number of 
+days for each user varies from 5 to 205 with a median of 35 days.  For privacy reasons, the
+SSL-Bumping plugin is \emph{disabled} for all measurements involving
 real users.
 
 Capturing all of a subject's Internet traffic raises significant
@@ -85,10 +84,10 @@ from subjects who are interviewed in our lab, where the risks and
 benefits of our study are clearly explained.  The incentive to use
 VPNs is Amazon.com gift certificates awarded by lottery. To protect the
 identity of information leaked in the data, we use public key
-cryptography to encrypt all the tcpdump outputs before storing them 
+cryptography to encrypt all data before storing them 
 on disk; the private key is
 maintained on separate secure severs and with access limited to
-approved researchers.  Further, users are free to delete their
+approved researchers.  Further, subjects are free to delete their
 data and disable monitoring at any time.  Per the terms of our IRB, we cannot 
 make this data publicly available due to privacy concerns. We are investigating 
 alternative data-collection techniques that provide user anonymity sufficient 

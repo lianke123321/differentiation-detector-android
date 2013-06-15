@@ -1,6 +1,6 @@
 \section{Privacy Invasive Services}
 \label{sec:characterize-app}
-\tbd{to revise}
+
 Privacy has rapidly become a critical issue for networked services, as large numbers of organizations develop 
 extensive tracking infrastructure to gather information from users for ads and analytics. While the problem 
 is well known and has been extensively studied in previous work~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}, in this section we explore the potential to 
@@ -91,6 +91,7 @@ user credentials (which are often used for multiple services).
     \end{small}
     \caption{Top 10 hosts that receive the IMEI or Device ID over HTTPS. \emph{Hosts are ordered by the number of flows that send the IMEI number, followed by the number of flows that send the device ID over HTTPS. Four of the top 10 hosts that receive this information are ads and analytics sites.}}
     \label{tab:pii-leakage-https-sites}
+    \vspace{\postfigspace}
 \end{table}
 
 During our experiments, we observed that PII information is also sent over HTTPS.  In the following, we
@@ -143,6 +144,7 @@ for privacy reasons. Instead, we focus on information is leaked in the clear.
 \subfloat[Frequency of leaks by Springboard.]{\label{fig:springboard-wild} \includegraphics[width=0.9\columnwidth]{plots/piileaks_locclearspringboard.pdf}}
 \caption{Applications that send the location information in the clear. \emph{The font size in the cloud represent the number of flows that sent the location information in the clear. We observe location leaks across different version of SpringBoard and from all the iPhones and the iPodtouch devices in the \mobWild. dataset.}}
 \label{fig:location-wordcloud}
+\vspace{\postfigspace}
 \end{figure}
 
 In \fref{fig:location-wordcloud}, we present a \emph{word cloud} of
