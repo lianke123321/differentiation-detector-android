@@ -264,7 +264,7 @@ Other                   &  0.036  & 1.1963 &  0.013 &  0.081 \tabularnewline
 In Table~\ref{tab:classify-http}, we observe that with a combination of \useragent and \httphost field in HTTP headers, we were able to classify more than 98\% of the traffic in terms of flows and bytes from iOS and Android devices.
 We observe that media from popular hosts in our \mobWild dataset, including Netflix, YouTube, Pandora, Spotify, and Vimeo, contribute to more than 50\% of the traffic volume from iOS and Android devices.
 Similarly, we observe that apps identified based on the \useragent  were responsible for more than 77\% of flows from Android and iOS devices. 
-We also observe that media (identified based on the signatures such as \emph{Apple Core Media} and \emph{Stagefright} served from CDNs and others hosts from which we could not identify the Web service from other fields in the HTTP header and the DNS responses before the HTTP flows to be 14.5\% of the traffic volume for the iOS devices in our dataset.
+We also observe that media (identified based on the signatures such as \emph{Apple Core Media} and \emph{Stagefright}) served from CDNs and others hosts from which we could not identify the Web service from other fields in the HTTP header, and also the DNS responses before the HTTP flows, to be 14.5\% of the traffic volume for the iOS devices in our dataset.
 
 \subsubsection{Classification of SSL Traffic.}
 
@@ -296,7 +296,7 @@ name identification, and DNS queries to identify the source of SSL traffic.
 % \hline
 % \end{tabular}
 % \end{small}
-% \caption{Classification of SSL Traffic based on port number. \emph{HTTPs is the most popular service that uses SSL in the \mobWild dataset.}}
+% \caption{Classification of SSL Traffic based on port number. \emph{HTTPS is the most popular service that uses SSL in the \mobWild dataset.}}
 % \label{tab:classify-ssl-port}
 % \end{table}
 
@@ -304,7 +304,7 @@ Mobile devices use SSL for various services including mail, notifications, insta
 Services such as mail, instant messaging, and notifications are documented to use dedicated port numbers of their traffic.
 %\footnote{We also use the AS for identifying push notification messages as detailed in \fref{sec:characterize-os}.}
 On using port numbers, we observe in that more than 99\% of the SSL flows observed in our controlled experiments were due to HTTPS, the rest of the flows were due to email, instant messaging, and OS notification services. 
-We therefore focus our attention on identifying the Web services responsible for the HTTPs flows. 
+We therefore focus our attention on identifying the Web services responsible for the HTTPS flows. 
 
 %\tbd{THE NUMBERS FOR THIS ARE FROM THE WILD MEASUREMENTS. ON SIMPLE GLANCING I WAS ABLE TO OBSERVE SIMILAR NUMBERS. I SHALL ADD THEM BY THE TIME OF THE CAMERA READY}
 
@@ -316,7 +316,7 @@ Servers that host multiple services use the \emph{server name indication} to dis
 For example, we observe a \emph{server name indication} of \emph{plus.google.com} and \emph{s.youtube.com} in two flows that used a certificate with a CN \emph{*.google.com}.
 However, we observe that by using either the certificate or the \emph{server name} we were able to identify the name of the Web service in less than 40\% of iOS and Android HTTPS traffic.
 
-\noindent\textbf{DNS mapping.} For such flows we use DNS requests made by the mobile devices before starting the HTTPS flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
+\noindent\textbf{DNS mapping.} For the remaining flows we use DNS requests made by the mobile devices before starting the HTTPS flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
 DN-Hunter relies on the most recent FQDN that corresponds to the IP address, however in our controlled experiments we observe Android and iOS devices use the first entry in DNS response while resolving \emph{hostnames}.
 We therefore use the latest DNS response that contains the IP address of the Web service in the first position of the DNS response. 
 %FOR THE WILD: Indeed, for 97.8\% of the Android and 83.4\% of the iOS HTTPS traffic that we could not classify using other fields, we observe that the latest DNS response before the flow started contained the IP address of the webservice as the first entry in the DNS response\footnote{The share of SSL traffic where the latest DNS response contains the IP address of the web-service in the first position is 97.4\% for Android and 88.6\% of iOS}. 
