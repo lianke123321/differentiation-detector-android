@@ -231,13 +231,10 @@ received from the Internet and arrives at NAT at step
 \platname{} box \emph{m} to the address of the device in the VPN
 tunnel \emph{v}. We assign to each client an 
 address from a space of prefix length $p-1$. The $p$th bit has a
-specific role. By default it is set to 0, but for an address \emph{v}, a process running on the TUN device changes it
-to address \emph{v'} that only differ from \emph{v} by the $p$th bit that is
-set to 1. This facilitates routing traffic to the TUN device for all
-packets whose destination is \emph{v}, and facilitates forwarding  
-all packet with a \emph{v'} destination address ($p$th bit set
-to 1) to the TUN device, step (5). Then, we implement a process at the
-TUN device that changes the destination address
+specific role. By default it is set to 0 and for an addresses that match the prefixes assigned to the mobile devices, a process running on the TUN device changes \emph{v} to \emph{v'} (and also \emph{v'} to \emph{v}) by flipping the value of the $p$th bit. This facilitates routing to the TUN device all
+packets whose final destination is \emph{v}, and forwarding 
+all packets with a destination address \emph{v'} ($p$th bit set
+to 1) to the TUN device, step (5). On the TUN device, our process changes the destination address
 from \emph{v'} to \emph{v} and sends the packet to the IP
 layer, step (6). Then the packet follows the path of a regular packet
 in a VPN tunnel. 
