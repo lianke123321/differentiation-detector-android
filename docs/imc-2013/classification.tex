@@ -161,7 +161,7 @@ To motivate why this is a difficult problem, consider the following scenario. Wh
 %%%
 
 \noindent\textbf{Controlled experiments.}
-In \fref{tab:classification-success} we present results from our classification study using controlled experiments. To 
+In Table~\ref{tab:classification-success} we present results from our classification study using controlled experiments. To 
 the best of our knowledge, we are the first to attempt to use ground-truth information to evaluate the 
 effectiveness of app classification using only header data.
  
@@ -173,7 +173,7 @@ We observe that the \httphost field uniquely identified the corresponding app fo
 %\tbd{TODO: This was done only for a sample of applications -- I shall perform this test in detail after deadline}
 The \httphost field also can identify the provider that released an app.
 For example Zynga offers multiple games with dedicated apps that contact Zynga properties.
-When classifying apps according to their provider, we observe in \fref{tab:classification-success} (column 6) that our classification success increases to 67\% of iOS applications. 
+When classifying apps according to their provider, we observe in Table~\ref{tab:classification-success} (column 6) that our classification success increases to 67\% of iOS applications. 
 
 
 \emph{Android:} We observe a similar results for flows from apps released through Google Play.
@@ -202,13 +202,13 @@ While we can use the \httphost field to identify these 3rd-party sites contacted
 \emph{Augmenting with \useragent: } We now show that by augmenting the information in the \useragent to the information gained by the \httphost field, we can classify a majority of iOS and Android applications. 
 In our controlled experiments we observed a non-empty \useragent string in more than 99.7\% of the HTTP flows from iOS and 90.9\%flows from Android. 
 A \useragent string may contain an application identifier and other auxiliary information such as details of the OS, manufacturer, and compatibility with Web-browsers~\cite{mozilla:useragentdetection}. 
-For example, the first \useragent in \fref{tab:user-agent} contains the information of the application, YahooMobileMail, while the second \useragent hides the application and specifies the \emph{AppleCoreMedia} service of iOS, and the third does not provide any useful information. 
+For example, the first \useragent in Table~\ref{tab:user-agent} contains the information of the application, YahooMobileMail, while the second \useragent hides the application and specifies the \emph{AppleCoreMedia} service of iOS, and the third does not provide any useful information. 
 To extract the application information, we use a set of regular expressions to filter out the auxiliary information in the \useragent and further cluster these extracted tokens using the edit distance between the tokens.\footnote{We plan to release this code along with \platname package.}
 
 In Table~\ref{tab:classification-success} we observe that 176 of the 209 iOS applications generated HTTP traffic, 149 of these were correctly identified based on the signatures in their \useragent, which we verified by manual inspection.
 In contrast, our \useragent based identification was able to correctly identify less than 23\% of the Android applications that generated HTTP traffic. 
 For the 27 iOS applications which we failed to identify, we observed signatures for OS services and libraries, such as \emph{Apple Core Media}, \emph{Game Kit}, \emph{Geo Services}, etc. and signatures of third-party libraries and services such as \emph{Google Analytics} and \emph{Adobe Air}.
-Similarly, the majority of Android HTTP traffic contained flows with the default \useragent (similar to the third \useragent in \fref{tab:user-agent}).
+Similarly, the majority of Android HTTP traffic contained flows with the default \useragent (similar to the third \useragent in Table~\ref{tab:user-agent}).
 Further, for the applications from the third-party store, we observe that the \useragent for ads and analytics libraries such as \emph{Google Analytics} and \emph{Adsense for Mobile} were the most common \useragent after the default \useragent.
 
 To wrap up, \useragent is more effective for classifying iOS apps and \httphost is more effective for Android apps; however, neither alone is a complete 
@@ -260,7 +260,7 @@ Other                   &  0.036  & 1.1963 &  0.013 &  0.081 \tabularnewline
 \vspace{\postfigspace}
 \end{table}
 
-In \fref{tab:classify-http}, we observe that with a combination of \useragent and \httphost field in HTTP headers, we were able to classify more than 98\% of the traffic in terms of flows and bytes from iOS and Android devices.
+In Table~\ref{tab:classify-http}, we observe that with a combination of \useragent and \httphost field in HTTP headers, we were able to classify more than 98\% of the traffic in terms of flows and bytes from iOS and Android devices.
 We observe that media from popular hosts in our \mobWild dataset, including Netflix, YouTube, Pandora, Spotify, and Vimeo, contribute to more than 50\% of the traffic volume from iOS and Android devices.
 Similarly, we observe that applications identified based on the \useragent  were responsible for more than 77\% of flows from Android and iOS devices. 
 We also observe that media (identified based on the signatures such as \emph{Apple Core Media} and \emph{Stagefright} served from CDNs and others hosts from which we could not identify the webservice from other fields in the HTTP header and the DNS responses before the HTTP flows to be 14.5\% of the traffic volume for the iOS devices in our dataset.
@@ -341,7 +341,7 @@ m.google.com & fbcdn-photos-a.akamaihd.net \tabularnewline
 \label{tab:sslclassify-popular-host}
 \end{table}
 
-\noindent\textbf{Classification results.} In \fref{tab:sslclassify-popular-host} we present the top five hostnames according to traffic volume -- responsible for 66\% of iOS and 54\% of Android traffic by volume in the \mobWild dataset. 
+\noindent\textbf{Classification results.} In Table~\ref{tab:sslclassify-popular-host} we present the top five hostnames according to traffic volume -- responsible for 66\% of iOS and 54\% of Android traffic by volume in the \mobWild dataset. 
 We observe that even when a hostname is specified we cannot uniquely uniquely identify the Web service for some flows.
 For example, \emph{www.google-apis.com} and \emph{clients4.google.com} offer limited information on the application or Web service that is responsible for the content; at best we can infer these flows belong to some Google service.
 In contrast, the  hostname \emph{fbcdn-photos-a.akamaihd.net} is a strong indication that the traffic is due to Facebook (due to ``fbcdn'').
@@ -373,14 +373,14 @@ Other Google Services & 58.665   & 13.32510 & 45.024 & 46.089 \tabularnewline
 \label{tab:classify-ssl-traffic}
 \end{table}
 
-In \fref{tab:classify-ssl-traffic} we present our SSL classification results.
+In Table~\ref{tab:classify-ssl-traffic} we present our SSL classification results.
 We observe that the iOS devices in our dataset generated a significant number of e-mail flows.
 Similarly, we were able to group 12.5\% of iOS and 36.7\% of Android traffic with social network services that includes \emph{Google Plus, Facebook, and Twitter}.
 We speculate the increase in traffic share for Android devices is because Android devices offer services to backup photos on \emph{Google Plus}.
 Similarly, we observe that 5.4\% of the traffic from iOS devices was from Apple stores while we observe only 0.04\% of traffic to the \emph{Google Play} store. 
 This low share is because Google can use hosts matching the pattern \emph{client*.google.com} to serve different Web services.
 We observed a similar behavior in our controlled experiments, and we group such traffic as \emph{other Google services}.
-Indeed, in \fref{tab:classify-ssl-traffic} we observe that Google is the largest target of SSL traffic for iOS and Android devices in our dataset. 
+Indeed, in Table~\ref{tab:classify-ssl-traffic} we observe that Google is the largest target of SSL traffic for iOS and Android devices in our dataset. 
 The next most popular target for SSL traffic is social networking sites.
 
 Having developed techniques to map application flows to apps, we use this classification to study the apps responsible for 
