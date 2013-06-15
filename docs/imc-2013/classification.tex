@@ -227,11 +227,11 @@ ad/analytics servers in the payload.
 \textbf{In the wild data.}
 We now describe the results of our classification on data gathered from our user study.
 Using only the \useragent on the \mobWild dataset we were able to map flows to 243 iOS and 84 Android apps, OS libraries, and services. 
-The \emph{word cloud} in Table {fig:http-wordcloud} contains the summary of our results; the font size of a signature is proportional to the number of users for which the signature was observed.
+The \emph{word cloud} in Figure \ref{fig:http-wordcloud} contains the summary of our results; the font size of a signature is proportional to the number of users for which the signature was observed.
 Along with signatures of apps such as iTunes and YouTube, we also observe signatures of the \emph{Apple Core Media} and \emph{Stagefright} services that are responsible to download media content on iOS and Android devices respectively.
 %Across the iOS and Android devices, we observe a total of \tbd{1435} unique \useragent strings that produce \tbd{361} unique signatures which we cluster to \tbd{} different apps and services. 
 For the iOS devices in the \mobWild dataset, we observe a signature of \emph{Apple Core Media} in more than 98.45\% of the content downloaded from the YouTube servers.
-Similarly, depending the Android version we observe either the signature for Stagefright\cite{android:stagefright} or no app or OS service signature for YouTube traffic to Android devices depending on the OS version. 
+Similarly, depending the Android version we observe either the signature for Stagefright or no app or OS service signature for YouTube traffic to Android devices depending on the OS version. 
 We observe a similar signatures for other popular media services such as Netflix, YouTube, Vimeo, Pandora, etc.
 Because we cannot identify the app used to access these services, we fall back to the \httphost field to identify these Web services.
 
