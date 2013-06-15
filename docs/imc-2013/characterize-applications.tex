@@ -31,7 +31,7 @@ over time.
        \hline
     \end{tabular}
     \end{small}
-    \caption{Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone applications. \emph{The popular iOS applications tend to leak the location information in the clear while Android applications leak the IMEI number and Android ID in the clear.}}
+    \caption{Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone apps. \emph{The popular iOS apps tend to leak the location information in the clear while Android apps leak the IMEI number and Android ID in the clear.}}
     \label{tab:pii}
 \end{table*}
 
@@ -45,16 +45,16 @@ across the network over HTTP or HTTPS (using the SSL bumping plugin).
 Some of this information is required for normal app operation, however; we strongly believe that such information should
 never travel across the network in plaintext (HTTP). 
 
-In Table~\ref{tab:pii}, we present the different PII leaked for both Android and iPhone apps.  We observe that
+In Table~\ref{tab:pii}, we present the different PII leaked by both Android and iPhone apps.  We observe that
 the IMEI, a unique identifier tied to a phone, is the most commonly
-leaked PII for Android applications.  This IMEI can be used to track
+leaked PII by Android apps.  This IMEI can be used to track
 and correlate a user's behavior across Web services.  Similarly, we
-observe that Android applications leak the Android ID, a unique
+observe that Android apps leak the Android ID, a unique
 identifier tied to an Android device.  In Table~\ref{tab:pii}, we also
 observe that other information like contacts, emails, and passwords
 are leaked in the clear.  The email address, the address used to sign
 up for the services, was leaked in the clear by 13 iOS and 3 Android
-applications from our set of popular applications.
+apps from our set of popular apps.
 
 While only one Android app (belonging to the \emph{Photography} category) leaked a password in the clear, 
 we were surprised to learn that six of the most popular iOS apps send user 
@@ -148,10 +148,10 @@ for privacy reasons. Instead, we focus on information is leaked in the clear.
 \end{figure}
 
 In Figure~\ref{fig:location-wordcloud}, we present a \emph{word cloud} of
-the applications that send the location information of the devices.
-We observe that a bus service application (\emph{One Bus Away}), the
-application that manages the iOS homescreen (\emph{SpringBoard}), and
-weather applications (\emph{TWC}, \emph{Weather}, \emph{Hurricane})
+the apps that send the location information of the devices.
+We observe that a bus service app (\emph{One Bus Away}), the
+app that manages the iOS homescreen (\emph{SpringBoard}), and
+weather apps (\emph{TWC}, \emph{Weather}, and \emph{Hurricane})
 were responsible for more 78\% of the flows that sent the location
 information in the clear. 
 Further, SpringBoard (the app responsible for managing the home screen of iOS devices) sends location information in the clear to fetch weather information from Yahoo servers. 
@@ -200,9 +200,9 @@ In Table~\ref{tab:top-trackers}, we present the number of devices in the \mobWil
 We observe that all the devices in the \mobWild dataset contacted doubleclick.com, an ad site, and google-analytics.com, a tracking site. 
 Further, 66.12\% of the ads and analytics traffic volume in the \mobWild dataset was from browsers, 6.46\% of the
 traffic contained a blank user-agent field, and 4.8\% of the traffic contained a signature of \emph{Google-Analytics} library.
-The rest of the traffic contained signatures of other applications such as Facebook, Pandora, and YouTube.
+The rest of the traffic contained signatures of other apps such as Facebook, Pandora, and YouTube.
 
-Given the extensive nature of tracking over mobile devices, we developed a tool, \emph{ConVis} that allows users to visualize their devices' tracking, and the applications that facilitate this tracking, with the help of a web-based interfaces similar to that of Mozilla Collusion~\cite{collusion}. \emph{ConVis} provides a visual interface that allows 
+Given the extensive nature of tracking over mobile devices, we developed a tool, \emph{ConVis} that allows users to visualize their devices' tracking, and the apps that facilitate this tracking, with the help of a web-based interfaces similar to that of Mozilla Collusion~\cite{collusion}. \emph{ConVis} provides a visual interface that allows 
  users to specify block lists for connections based on (app, 3rd party) tuples. A demo of our tool is 
  located at \url{http://goo.gl/A17h9}. 
 %\tbd{A demo of this can be found at ...}
