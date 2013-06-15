@@ -205,7 +205,7 @@ A \useragent string may contain an application identifier and other auxiliary in
 For example, the first \useragent in \fref{tab:user-agent} contains the information of the application, YahooMobileMail, while the second \useragent hides the application and specifies the \emph{AppleCoreMedia} service of iOS, and the third does not provide any useful information. 
 To extract the application information, we use a set of regular expressions to filter out the auxiliary information in the \useragent and further cluster these extracted tokens using the edit distance between the tokens.\footnote{We plan to release this code along with \platname package.}
 
-In \fref{tab:classification-success} we observe that 176 of the 209 iOS applications generated HTTP traffic, 149 of these were correctly identified based on the signatures in their \useragent, which we verified by manual inspection.
+In Table~\ref{tab:classification-success} we observe that 176 of the 209 iOS applications generated HTTP traffic, 149 of these were correctly identified based on the signatures in their \useragent, which we verified by manual inspection.
 In contrast, our \useragent based identification was able to correctly identify less than 23\% of the Android applications that generated HTTP traffic. 
 For the 27 iOS applications which we failed to identify, we observed signatures for OS services and libraries, such as \emph{Apple Core Media}, \emph{Game Kit}, \emph{Geo Services}, etc. and signatures of third-party libraries and services such as \emph{Google Analytics} and \emph{Adobe Air}.
 Similarly, the majority of Android HTTP traffic contained flows with the default \useragent (similar to the third \useragent in \fref{tab:user-agent}).
