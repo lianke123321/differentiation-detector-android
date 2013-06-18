@@ -24,6 +24,7 @@ import org.strongswan.android.data.TrustedCertificateEntry;
 import org.strongswan.android.data.VpnProfile;
 import org.strongswan.android.data.VpnProfileDataSource;
 import org.strongswan.android.data.VpnType;
+import org.strongswan.android.logic.CharonVpnService;
 import org.strongswan.android.logic.TrustedCertificateManager;
 
 import android.app.Activity;
@@ -66,6 +67,7 @@ public class VpnProfileDetailActivity extends Activity
 	private EditText mName;
 	private EditText mGateway;
 	private Spinner mSelectVpnType;
+	private Spinner mSelectLoc;
 	private ViewGroup mUsernamePassword;
 	private EditText mUsername;
 	private EditText mPassword;
@@ -100,8 +102,12 @@ public class VpnProfileDetailActivity extends Activity
 		mSelectUserCert = (TwoLineListItem)findViewById(R.id.select_user_certificate);
 
 		mAutoReconnect = (CheckBox)findViewById(R.id.reconnect_auto);
+		
 		mCheckAuto = (CheckBox)findViewById(R.id.ca_auto);
 		mSelectCert = (TwoLineListItem)findViewById(R.id.select_certificate);
+		
+		mSelectLoc = (Spinner)findViewById(R.id.url_loc);
+		
 
 		mSelectVpnType.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
@@ -133,6 +139,9 @@ public class VpnProfileDetailActivity extends Activity
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{
+				//*****************************************************************
+				// need to check if user is uncheck this
+				//*****************************************************************
 				updateCertificateSelector();
 			}
 		});
@@ -152,6 +161,8 @@ public class VpnProfileDetailActivity extends Activity
 			Bundle extras = getIntent().getExtras();
 			mId = extras == null ? null : extras.getLong(VpnProfileDataSource.KEY_ID);
 		}
+		
+		
 
 		loadProfileData(savedInstanceState);
 
@@ -325,6 +336,13 @@ public class VpnProfileDetailActivity extends Activity
 				mDataSource.insertProfile(mProfile);
 			}
 			setResult(RESULT_OK, new Intent().putExtra(VpnProfileDataSource.KEY_ID, mProfile.getId()));
+			// get the singleton object.
+			CharonVpnService cvc = CharonVpnService.getInstance();
+			// TODO: right now it will force to refresh even the profile didn't changed.
+			if (cvc.isConnect()){
+				// force to restart the profile if is connected
+				cvc.setNextProfile(mProfile);
+			}
 			finish();
 		}
 	}
@@ -367,12 +385,14 @@ public class VpnProfileDetailActivity extends Activity
 	 */
 	private void updateProfileData()
 	{
+		mProfile.setAutoReconnect(mAutoReconnect.isChecked());
 		/* the name is optional, we default to the gateway if none is given */
 		String name = mName.getText().toString().trim();
 		String gateway = mGateway.getText().toString().trim();
 		mProfile.setName(name.isEmpty() ? gateway : name);
 		mProfile.setGateway(gateway);
 		mProfile.setVpnType(mVpnType);
+		mProfile.setURLAddressPosition(mSelectLoc.getSelectedItemPosition());
 		if (mVpnType.getRequiresUsernamePassword())
 		{
 			mProfile.setUsername(mUsername.getText().toString().trim());
@@ -384,9 +404,11 @@ public class VpnProfileDetailActivity extends Activity
 		{
 			mProfile.setUserCertificateAlias(mUserCertEntry.getAlias());
 		}
+		
 		String certAlias = mCheckAuto.isChecked() ? null : mCertEntry.getAlias();
 		mProfile.setCertificateAlias(certAlias);
-		mProfile.setAutoReconnect(mAutoReconnect.isChecked());
+		
+		
 	}
 
 	/**
@@ -409,7 +431,8 @@ public class VpnProfileDetailActivity extends Activity
 				mVpnType = mProfile.getVpnType();
 				mUsername.setText(mProfile.getUsername());
 				mPassword.setText(mProfile.getPassword());
-				mAutoReconnect.setChecked(mProfile.getAutoReconnect()=="true");
+				mSelectLoc.setSelection(mProfile.getURLAddressPosition());
+				mAutoReconnect.setChecked(mProfile.getAutoReconnect().equals("true"));
 				useralias = mProfile.getUserCertificateAlias();
 				alias = mProfile.getCertificateAlias();
 				getActionBar().setTitle(mProfile.getName());

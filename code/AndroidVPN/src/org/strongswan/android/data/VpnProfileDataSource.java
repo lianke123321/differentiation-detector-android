@@ -41,6 +41,8 @@ public class VpnProfileDataSource
 	public static final String KEY_RECONNECT = "auto_reconnect";
 	public static final String KEY_CERTIFICATE = "certificate";
 	public static final String KEY_USER_CERTIFICATE = "user_certificate";
+	// this should store the url address e.g. www.google.com
+	public static final String KEY_URL_LOC = "url_location";
 
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDatabase;
@@ -49,7 +51,8 @@ public class VpnProfileDataSource
 	private static final String DATABASE_NAME = "strongswan.db";
 	private static final String TABLE_VPNPROFILE = "vpnprofile";
 
-	private static final int DATABASE_VERSION = 5;
+	/* update version 6 which the url_location is added */
+	private static final int DATABASE_VERSION = 6;
 
 	public static final String DATABASE_CREATE =
 							"CREATE TABLE " + TABLE_VPNPROFILE + " (" +
@@ -61,7 +64,8 @@ public class VpnProfileDataSource
 								KEY_PASSWORD + " TEXT," +
 								KEY_CERTIFICATE + " TEXT," +
 								KEY_USER_CERTIFICATE + " TEXT," +
-								KEY_RECONNECT + " TEXT" +
+								KEY_RECONNECT + " TEXT," +
+								KEY_URL_LOC + " TEXT" +
 							");";
 	private static final String[] ALL_COLUMNS = new String[] {
 								KEY_ID,
@@ -73,6 +77,7 @@ public class VpnProfileDataSource
 								KEY_CERTIFICATE,
 								KEY_USER_CERTIFICATE,
 								KEY_RECONNECT,
+								KEY_URL_LOC
 							};
 
 	private static class DatabaseHelper extends SQLiteOpenHelper
@@ -111,6 +116,11 @@ public class VpnProfileDataSource
 			{
 				db.execSQL("ALTER TABLE " + TABLE_VPNPROFILE + " ADD " + KEY_RECONNECT +
 						   " TEXT DEFAULT '';");
+			}
+			if (oldVersion < 6)
+			{	// add the key url locale into the database
+				db.execSQL("ALTER TABLE " + TABLE_VPNPROFILE + " ADD " + KEY_URL_LOC + 
+						" TEXT DEFAULT '';");
 			}
 		}
 
@@ -261,9 +271,10 @@ public class VpnProfileDataSource
 		profile.setVpnType(VpnType.fromIdentifier(cursor.getString(cursor.getColumnIndex(KEY_VPN_TYPE))));
 		profile.setUsername(cursor.getString(cursor.getColumnIndex(KEY_USERNAME)));
 		profile.setPassword(cursor.getString(cursor.getColumnIndex(KEY_PASSWORD)));
-		profile.setAutoReconnect(cursor.getString(cursor.getColumnIndex(KEY_RECONNECT))=="true");
+		profile.setAutoReconnect(cursor.getString(cursor.getColumnIndex(KEY_RECONNECT)).equals("true"));
 		profile.setCertificateAlias(cursor.getString(cursor.getColumnIndex(KEY_CERTIFICATE)));
 		profile.setUserCertificateAlias(cursor.getString(cursor.getColumnIndex(KEY_USER_CERTIFICATE)));
+		profile.setURLAddress(cursor.getString(cursor.getColumnIndex(KEY_URL_LOC)));
 		return profile;
 	}
 
@@ -278,6 +289,7 @@ public class VpnProfileDataSource
 		values.put(KEY_CERTIFICATE, profile.getCertificateAlias());
 		values.put(KEY_USER_CERTIFICATE, profile.getUserCertificateAlias());
 		values.put(KEY_RECONNECT, profile.getAutoReconnect());
+		values.put(KEY_URL_LOC, profile.getURLAddress());
 		return values;
 	}
 }

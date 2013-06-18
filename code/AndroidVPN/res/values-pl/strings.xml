@@ -65,7 +65,8 @@
     <string name="profile_ca_select_certificate">Wybierz określony certyfikat CA</string>
     <string name="profile_auto_reconnect">Reconnect automatically</string>
     <string name="profile_auto_reconnect_label">Persistence</string>
-    
+    <string name="profile_url_location">Location</string>
+    <string name="profile_url_prompt">Select Location</string>
     <!-- Warnings/Notifications in the details view -->
     <string name="alert_text_no_input_gateway">Wprowadź adres bramki</string>
     <string name="alert_text_no_input_username">Wprowadź swoją nazwę użytkownika</string>

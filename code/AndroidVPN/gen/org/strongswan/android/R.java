@@ -9,6 +9,7 @@ package org.strongswan.android;
 
 public final class R {
     public static final class array {
+        public static final int url_locations=0x7f040001;
         /**  the order here must match the enum entries in VpnType.java 
  the order here must match the enum entries in VpnType.java 
  the order here must match the enum entries in VpnType.java 
@@ -26,40 +27,41 @@ public final class R {
         public static final int vpn_state_background=0x7f020001;
     }
     public static final class id {
-        public static final int action=0x7f09001b;
-        public static final int add_profile=0x7f090021;
+        public static final int action=0x7f09001c;
+        public static final int add_profile=0x7f090022;
         public static final int ca_auto=0x7f09000d;
-        public static final int delete_profile=0x7f090023;
-        public static final int edit_profile=0x7f090022;
+        public static final int delete_profile=0x7f090024;
+        public static final int edit_profile=0x7f090023;
         public static final int gateway=0x7f090008;
         public static final int log_frag=0x7f090000;
         public static final int log_view=0x7f090002;
-        public static final int menu_accept=0x7f09001f;
-        public static final int menu_cancel=0x7f090020;
-        public static final int menu_reload_certs=0x7f09001d;
-        public static final int menu_send_log=0x7f09001c;
-        public static final int menu_show_log=0x7f09001e;
+        public static final int menu_accept=0x7f090020;
+        public static final int menu_cancel=0x7f090021;
+        public static final int menu_reload_certs=0x7f09001e;
+        public static final int menu_send_log=0x7f09001d;
+        public static final int menu_show_log=0x7f09001f;
         public static final int name=0x7f090007;
         public static final int password=0x7f090004;
-        public static final int profile_item_certificate=0x7f090015;
-        public static final int profile_item_gateway=0x7f090013;
-        public static final int profile_item_name=0x7f090012;
-        public static final int profile_item_username=0x7f090014;
-        public static final int profile_list=0x7f090010;
-        public static final int profile_list_empty=0x7f090011;
+        public static final int profile_item_certificate=0x7f090016;
+        public static final int profile_item_gateway=0x7f090014;
+        public static final int profile_item_name=0x7f090013;
+        public static final int profile_item_username=0x7f090015;
+        public static final int profile_list=0x7f090011;
+        public static final int profile_list_empty=0x7f090012;
         public static final int profile_list_frag=0x7f090006;
         public static final int reconnect_auto=0x7f09000e;
         public static final int scroll_view=0x7f090001;
-        public static final int select_certificate=0x7f09000f;
+        public static final int select_certificate=0x7f090010;
         public static final int select_user_certificate=0x7f09000c;
-        public static final int subject_primary=0x7f090016;
-        public static final int subject_secondary=0x7f090017;
+        public static final int subject_primary=0x7f090017;
+        public static final int subject_secondary=0x7f090018;
+        public static final int url_loc=0x7f09000f;
         public static final int user_certificate_group=0x7f09000b;
         public static final int username=0x7f090003;
         public static final int username_password_group=0x7f09000a;
-        public static final int vpn_profile_label=0x7f090019;
-        public static final int vpn_profile_name=0x7f09001a;
-        public static final int vpn_state=0x7f090018;
+        public static final int vpn_profile_label=0x7f09001a;
+        public static final int vpn_profile_name=0x7f09001b;
+        public static final int vpn_state=0x7f090019;
         public static final int vpn_state_frag=0x7f090005;
         public static final int vpn_type=0x7f090009;
     }
@@ -89,27 +91,27 @@ public final class R {
  Warnings/Notifications in the details view 
  Warnings/Notifications in the details view 
          */
-        public static final int alert_text_no_input_gateway=0x7f060027;
-        public static final int alert_text_no_input_username=0x7f060028;
-        public static final int alert_text_nocertfound=0x7f06002a;
-        public static final int alert_text_nocertfound_title=0x7f060029;
+        public static final int alert_text_no_input_gateway=0x7f060029;
+        public static final int alert_text_no_input_username=0x7f06002a;
+        public static final int alert_text_nocertfound=0x7f06002c;
+        public static final int alert_text_nocertfound_title=0x7f06002b;
         /**  Application 
  Application 
  Application 
          */
         public static final int app_name=0x7f060000;
-        public static final int connecting_message=0x7f060040;
-        public static final int connecting_title=0x7f06003f;
+        public static final int connecting_message=0x7f060042;
+        public static final int connecting_title=0x7f060041;
         public static final int delete_profile=0x7f06000f;
-        public static final int disconnect=0x7f060031;
+        public static final int disconnect=0x7f060033;
         public static final int edit_profile=0x7f06000e;
         public static final int empty_log=0x7f06000a;
-        public static final int error_auth_failed=0x7f06003d;
-        public static final int error_generic=0x7f06003e;
-        public static final int error_introduction=0x7f060039;
-        public static final int error_lookup_failed=0x7f06003a;
-        public static final int error_peer_auth_failed=0x7f06003c;
-        public static final int error_unreachable=0x7f06003b;
+        public static final int error_auth_failed=0x7f06003f;
+        public static final int error_generic=0x7f060040;
+        public static final int error_introduction=0x7f06003b;
+        public static final int error_lookup_failed=0x7f06003c;
+        public static final int error_peer_auth_failed=0x7f06003e;
+        public static final int error_unreachable=0x7f06003d;
         public static final int loading=0x7f060007;
         public static final int log_mail_subject=0x7f06000b;
         /**  Log view 
@@ -117,14 +119,14 @@ public final class R {
  Log view 
          */
         public static final int log_title=0x7f060008;
-        public static final int login_confirm=0x7f060038;
+        public static final int login_confirm=0x7f06003a;
         /**  Dialogs 
  Dialogs 
  Dialogs 
          */
-        public static final int login_title=0x7f060037;
+        public static final int login_title=0x7f060039;
         public static final int main_activity_name=0x7f060001;
-        public static final int no_certificates=0x7f06002c;
+        public static final int no_certificates=0x7f06002e;
         public static final int no_profile_selected=0x7f060012;
         /**  VPN profile list 
  VPN profile list 
@@ -145,11 +147,13 @@ public final class R {
          */
         public static final int profile_edit_save=0x7f060015;
         public static final int profile_gateway_label=0x7f060019;
-        public static final int profile_label=0x7f060030;
+        public static final int profile_label=0x7f060032;
         public static final int profile_name_hint=0x7f060018;
         public static final int profile_name_label=0x7f060017;
         public static final int profile_password_hint=0x7f06001d;
         public static final int profile_password_label=0x7f06001c;
+        public static final int profile_url_location=0x7f060027;
+        public static final int profile_url_prompt=0x7f060028;
         public static final int profile_user_certificate_label=0x7f06001e;
         public static final int profile_user_select_certificate=0x7f060020;
         public static final int profile_user_select_certificate_label=0x7f06001f;
@@ -161,23 +165,23 @@ public final class R {
         public static final int select_profiles=0x7f060010;
         public static final int send_log=0x7f060009;
         public static final int show_log=0x7f060003;
-        public static final int state_connected=0x7f060033;
-        public static final int state_connecting=0x7f060032;
-        public static final int state_disabled=0x7f060035;
-        public static final int state_disconnecting=0x7f060034;
-        public static final int state_error=0x7f060036;
+        public static final int state_connected=0x7f060035;
+        public static final int state_connecting=0x7f060034;
+        public static final int state_disabled=0x7f060037;
+        public static final int state_disconnecting=0x7f060036;
+        public static final int state_error=0x7f060038;
         /**  VPN state fragment 
  VPN state fragment 
  VPN state fragment 
          */
-        public static final int state_label=0x7f06002f;
-        public static final int system_tab=0x7f06002d;
+        public static final int state_label=0x7f060031;
+        public static final int system_tab=0x7f06002f;
         /**  Trusted certificate selection 
  Trusted certificate selection 
  Trusted certificate selection 
          */
-        public static final int trusted_certs_title=0x7f06002b;
-        public static final int user_tab=0x7f06002e;
+        public static final int trusted_certs_title=0x7f06002d;
+        public static final int user_tab=0x7f060030;
         public static final int vpn_not_supported=0x7f060006;
         public static final int vpn_not_supported_title=0x7f060005;
         public static final int x_profiles_selected=0x7f060014;
