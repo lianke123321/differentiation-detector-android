@@ -222,10 +222,8 @@ public class MainActivity extends Activity implements
 
 		@Override
 		protected TrustedCertificateManager doInBackground(Boolean... params) {
-			if (params.length > 0 && params[0]) { /*
-												 * force a reload of the
-												 * certificates
-												 */
+			if (params.length > 0 && params[0]) { 
+				/* force a reload of the certificates */
 				return TrustedCertificateManager.getInstance().reload();
 			}
 			return TrustedCertificateManager.getInstance().load();
@@ -317,8 +315,8 @@ public class MainActivity extends Activity implements
 		super.onDestroy();
 		// get the "singleton" object from the CharonVpnService
 		CharonVpnService service = CharonVpnService.getInstance();
-		// check it is connected right now
-		if (!service.isAutoReconnected()) {
+		// if it's not null, check it is connected right now
+		if (service != null && !service.isAutoReconnected()) {
 			// cancel the timer and exit the app
 			service.timer.cancel();
 			System.exit(0);

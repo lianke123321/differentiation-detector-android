@@ -284,7 +284,6 @@ public class CharonVpnService extends VpnService implements Runnable
 	 * The timer to double check the current network connection
 	 */
 	private void runTimer() {
-//		final Thread thisThread = Thread.currentThread();
 		timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask(){
 
@@ -295,16 +294,6 @@ public class CharonVpnService extends VpnService implements Runnable
 					Log.i(TAG, "periodic restart check");
 					if (checkState()) return;
 					connectToDefaultProfile();
-//					if ((mConnectStartTime != -1 && 
-//							mConnectStartTime < System.currentTimeMillis()-30*1000) || 
-//							mLastError != ErrorState.NO_ERROR || mService.getState()!=State.CONNECTED){
-//						Log.i(TAG, "restarting connection due to 30 seconds of no connection");
-//						//					TrustedCertificateManager.getInstance().reload();
-//						//					if (getLocalIPv4Address()!=null)
-//						//						deinitializeCharon();
-//						restartConnection();
-//						thisThread.interrupt();
-//					}
 				}
 				// delay and timer rate are all one minute
 			}}, ONE_MINUTE, ONE_MINUTE); 
