@@ -26,7 +26,7 @@ apps, and access technologies.
 
 This paper explores the opportunities for mobile traffic measurement through indirection. 
 Specifically, we exploit the fact that most mobile OSes support proxying via virtual private networks (VPNs). 
-By sending mobile Internet traffic through a proxy server (an approach we call \platname), we monitor all flows regardless of device, OS or access technology. 
+By sending mobile Internet traffic through a proxy server (a system we call \platname), we monitor all flows regardless of device, OS or access technology. 
 Importantly, installing a VPN configuration does not require installing apps or rooting phones, thus facilitating large-scale deployment on unmodified OSes.
 
 
@@ -34,7 +34,7 @@ Importantly, installing a VPN configuration does not require installing apps or 
 %Internet traffic from mobile devices.
 %Then we report the results of  a measurement study using this approach both in the lab environment and with a 7-month IRB-approved study of human subjects in the wild. In particular, we use the unique view from \platname to study how to classify network flows to apps and how those apps are leaking privacy-sensitive data.
 
-Our key contributions are as follows. We describe how we implemented a proxy-based measurement system for characterizing mobile Internet traffic for iOS and Android, 
+Our key contributions are as follows. First, we describe how we implemented a proxy-based measurement system for characterizing mobile Internet traffic for iOS and Android, 
 and we demonstrate that it is sufficiently transparent to avoid significantly impacting measurement results. 
 \platname captures all Internet traffic with approximately 10\% power and packet overheads, and negligible additional latency. 
 We will make the \platname software and configuration details open source and publicly available.
@@ -44,11 +44,11 @@ and from human subjects during a 7-month study, comprising 21 users and 26 devic
 view of network traffic from real user devices running iOS and Android. These users interact with networks in 54 ASes, 9 of which as cellular; their traffic 
 strongly depends on OS and network type.
 
-We develop new classification techniques to mapping observed network flows to mobile apps. Our approach correctly identifies 89.2\% of iOS and 64.1\% of Android apps and Web services. We also take a first look at classifying the traffic contained in SSL tunnels.
+We develop new classification techniques for mapping observed network flows to mobile apps. Our approach correctly identifies 89.2\% of iOS and 64.1\% of Android apps and Web services. We also take a first look at classifying the traffic contained in SSL tunnels.
 
 Using \platname, we study privacy-sensitive information leaked by mobile apps. During our experiments we observed that iOS and Android apps leak device identifiers and other sensitive information such as e-mail addresses in the clear. Specifically, we observe that one of the most popular iOS app used by US physicians sends the user's first name, last name, e-mail, password, and zip code without encryption. We further demonstrate the extent to which users in our study are tracked by mobile devices over time and across access technologies. 
 
-Last, we make available a new visualization tool for user to track and control how 
+Last, we make available a new visualization tool for users to track and control how 
 they are being tracked. \platname{}'s \emph{ConVis} tool borrows the Mozilla project's Collusion 
 interface, but applies it to all of a mobile device's traffic. It also facilitates specifying block lists for connections
  based on (app, third party) tuples. A demo of our tool is located at \url{http://goo.gl/A17h9}.
