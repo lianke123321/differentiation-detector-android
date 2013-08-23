@@ -1,33 +1,23 @@
 \section{Dataset Description}
 \label{sec:dataset}
 
-In this section, we describe the three datasets: \moball, \mobcomp, and \mobexpt. 
-We use these datasets in our studies that we present in the subsequent sections.
+In this section, we describe the datasets we used in the subsequent sections.
+
 
 \tbd{Run genDataSetDescription.R to get these numbers} 
 The \moball dataset consists of mobile data traffic traces from \tbdv{25} devices that belong to \tbdv{19} users who are volunteers of an IRB approved study. 
-This dataset consists of \tbdv{9} iPhones, \tbdv{4} iPads, \tbdv{1} iPodTouch, \tbdv{10} of Android phones, and \tbdv{1} of Android tablet.
-Though \emph{tablets} can access the Internet via a cellular data connections, we consider tablets to be devices that only use \wifi to access the Internet. 
+This dataset consists of \tbdv{9} iPhones, \tbdv{4} iPads, \tbdv{1} iPodTouch, and \tbdv{11} of Android phones.
 The Android devices in this dataset include the Nexus, Sony, Samsung, and Gsmart brands. 
 The users of the 25 devices are spread across France and USA. 
 This dataset consists of \tbdv{176} days of data that flowed through our VPN servers; the number days for each user varies from \tbdv{5} to \tbdv{176} with a median of \tbdv{32} days.  
 
 \tbd{we need some wording and consitency for the usage of ISP -- for example ATT can provide cellular and DSL. Also mobile data cannot be used and we need some word for cellular data and wifi data and this must be defined in the dataset description.}
-The \moball dataset consists of data traffic from \tbdv{54} distinct ISPs, of which \tbdv{10} provided cellular services.  
+The \moball dataset consists of data traffic from \tbdv{} distinct ASes, of which \tbdv{} served cellular services (\fref{sec:abc} for details of AS classification).
 Of the 19 devices that used cellular data, we observed that 16 devices restricted their cellular data traffic to one ISP each; the other three users used four, two, and two ISPs respectively. 
 The number of \wifi ISPs per device was larger, the median number of ISPs observed was 4 with a maximum of 24 for one user. 
 The user who contributed 24 distinct ISPs used \platname when traveling across 6 different countries. 
 This implies \platname was able to capture traffic of users ``on the move.''
 Campus wide studies such as \tbd{}, studies on DSL networks \cite{maier:mobtraffic}, and studies limited to traces from one specific ISP~\cite{vallina-rod:ads} are not able to capture this behavior.
-
-The \mobcomp dataset consists of data from two users who had three and two devices respectively. 
-The three devices that belong to one of the two users consists of a two smart phones and a tablet, while one smartphone and a tablet belong to the second user. 
-We use this dataset to compare the behavior of popular apps and to detail the behavior of devices when the device is kept idle. 
-The data set consists of \tbdv{number} of days of data from each device and \tbd{number} of days for which data traffic was seen for all the 24 hours. 
-
-The \mobexpt dataset contains the traffic traces from an Android device and an iOS device that were used to perform a controlled experiment on popular application. 
-We tested \tbdv{number} of Android applications and \tbdv{number} of iOS application for this study. 
-\tbd{How we decided this list}. \tbd{How we performed the test} \tbd{other attributes of this dataset}.
 
 %%% Local Variables: 
 %%% mode: latex

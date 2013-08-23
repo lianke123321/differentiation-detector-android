@@ -3,13 +3,17 @@
 \usepackage{url}
 %\usepackage{epsfig}
 \usepackage{graphicx}
-\usepackage{subfigure}
+%\usepackage{subfigure}
 \usepackage{ifpdf}
 \usepackage{epstopdf}
 \usepackage[usenames,dvipsnames]{color}
 \newcommand{\ie}{{\it i.e.}}
 \newcommand{\eg}{{\it e.g.}}
 \newcommand{\etc}{{\it etc.}}
+\newcommand{\useragent}{{\it User-Agent}\xspace}
+\newcommand{\httphost}{{\it Host}\xspace}
+\newcommand{\httpget}{{\it HTTP GET}\xspace}
+\newcommand{\sslservername}{{\it Server-Name}\xspace}
 \newcommand{\eat}[1]{}
 \usepackage[english,plain]{fancyref}
 \usepackage{times}
@@ -34,9 +38,7 @@
 \newcommand{\wifi}{Wi-Fi\xspace}
 \newcommand{\postfigspace}{-1em}
 \newcommand{\figcapspace}{0em}
-\newcommand{\moball}{{\emph{mobAll}}\xspace}
-\newcommand{\mobcomp}{{\emph{mobCompare}}\xspace}
-\newcommand{\mobexpt}{{\emph{mobileExpt}}\xspace}
+\newcommand{\mobWild}{{\emph{mobWild}}\xspace}
 
 \newenvironment{packedenumerate}{\begin{list}{\thepackednmbr.}{\usecounter{packednmbr}\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
 \newenvironment{packeditemize}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
@@ -81,7 +83,7 @@ Arvind Krishnamurthy\\
 \and
 \alignauthor
 David Choffnes\\
-\affaddr{University of Washington}
+\affaddr{Northeastern University}
 }
 % Remove additional authors section
 \def\addauthorsection{}
@@ -93,23 +95,30 @@ David Choffnes\\
 
 \input{introduction}
 
-\input{motivation}
-
 \input{platform}
 
 \input{methodology}
 
-\input{measurements}
+\input{classification}
+
+%\input{characterize-os}
+
+\input{characterize-applications}
+
+\input{characterize-networks}
 
 \input{related}
 
 \input{conclusion}
 
-%\input{placeholder-tex/placeholder}
-
+%\input{placeholder-tex/classification}
+%\input{placeholder-tex/characterize-applications}
 \bibliographystyle{abbrv}
 \bibliography{biblio}
 
 \end{document}
-
+%%% Local Variables: ***
+%%% mode:latex ***
+%%% TeX-master: "main.tex"  ***
+%%% End: ***
 
