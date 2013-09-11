@@ -80,6 +80,7 @@ class ConfigHandler:
                    MCFG_MSG_SRVIP,
                    MCFG_MSG_SIGPATH,
                    MCFG_TUN_IPPREFIX,
+                   MCFG_IRB_URL,
                    MCFG_DB_HOST,
                    MCFG_DB_USER,
                    MCFG_DB_PASSWD,

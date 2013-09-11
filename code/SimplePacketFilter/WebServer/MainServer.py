@@ -164,12 +164,16 @@ class DefaultHandler(CommonHandler):
 class SignUpHandler(CommonHandler):
     def __getThanksPage(self):
         global configParams
-        page = TEMPLATE_PAGE_HEADER
-        page += "<p>Thank you for your interest.</p>"
-        page += "<p><a href=\"http://"+configParams.getParam(MCFG_WEBSRV_HOST)+"/index.html\">Click here to return to home page</a></p> "
-        page += TEMPLATE_PAGE_FOOTER
-        page = page.replace(SERVER_HOST_FILLER, configParams.getParam(MCFG_WEBSRV_HOST))
-        page = page.replace(SERVER_PORT_FILLER, configParams.getParam(MCFG_WEBSRV_PORT))
+        #page = TEMPLATE_PAGE_HEADER
+        #page += "<p>Thank you for your interest.</p>"
+        #page += "<p><a href=\"http://"+configParams.getParam(MCFG_WEBSRV_HOST)+"/index.html\">Click here to return to home page</a></p> "
+        #page += TEMPLATE_PAGE_FOOTER
+        #page = page.replace(SERVER_HOST_FILLER, configParams.getParam(MCFG_WEBSRV_HOST))
+        #page = page.replace(SERVER_PORT_FILLER, configParams.getParam(MCFG_WEBSRV_PORT))
+        page = """<html><head><meta http-equiv="refresh" content="0; url= """+str(configParams.getParam(MCFG_IRB_URL))+"""">"""
+        page += """</head><body> <p> Thank you for your interest.</p> If you are not taken to the form please click on this URL: """
+        page += """<a href=\""""+str(configParams.getParam(MCFG_IRB_URL))+"""\">"""+str(configParams.getParam(MCFG_IRB_URL))+"""</a>"""
+        page += """</body></html>"""
         return page
         
     def __verifyInput(self):
@@ -184,12 +188,12 @@ class SignUpHandler(CommonHandler):
             self.mainErr = ERR_CAPTCHA
             return False
 
-        logging.warning("Got a valid response")
-        emailAddress = self.get_argument('interestEmail', 'None')
-        if self.__validateEmail(emailAddress) is False:
-            logging.warning("Error in entered email address:"+str(emailAddress));
-            self.mainErr = ERR_EMAIL
-            return False 
+        #logging.warning("Got a valid response")
+        #emailAddress = self.get_argument('interestEmail', 'None')
+        #if self.__validateEmail(emailAddress) is False:
+        #    logging.warning("Error in entered email address:"+str(emailAddress));
+        #    self.mainErr = ERR_EMAIL
+        #    return False 
         return True
      
     def __validateEmail(self, emailAddr):
@@ -217,7 +221,7 @@ class SignUpHandler(CommonHandler):
         retVal = self.__verifyInput()
         if retVal == False:
             return self.getERRPage()
-        self.__serveNewInterest()
+        #self.__serveNewInterest()
         return self.__getThanksPage()
     
     def post(self):
