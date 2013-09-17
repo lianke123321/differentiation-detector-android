@@ -1,0 +1,130 @@
+\section{Platform Description}
+
+We take an approach of traffic redirection.
+Proxying internet traffic meets above goals. 
+Issues with network perspective of traffic
+
+\subsection{Architecture}
+
+
+\begin{figure}
+\caption{Figure showing traffic redirection and flow of traffic through VPN and HTTP proxy}
+\label{fig:architecture}
+\end{figure}
+
+Architecture as shown in Figure~\ref{fig:architecture}.
+
+Explain two Proxies, one VPN and other HTTP.
+
+Explain how each goal is met and why we need two proxies. 
+
+The role of the VPNs Proxy.
+VPNs allow tunnel everything (all IPv4 traffic). 
+All IPv4 traffic can be monitored and controlled on the middlebox. 
+
+The role of HTTP Proxy.
+Check ISP interference.
+What 
+How tripwires are implemented. 
+
+Configuration requirements.
+All iOS devices (version 3.0 and above) support \textit{VPN On-Demand}, which forces traffic for a specified set of domains to use VPN tunnels. 
+To ensure all possible destinations match this list, we exploit the fact that iOS uses suffix matching to determine which connections should be tunneled; accordingly, we specified the domain list as the set of alphanumeric characters (a-z, 0-9, one character per domain). 
+Android version 4.2 and above supports an \textit{Always On VPN} connection that provides the same functionality; for Android version 4.0 and above there is an app API that allows apps to manage VPN tunnels. 
+We support both options.
+
+\subsection{Existing Deployment}
+
+Where is this currently deployed?
+
+What is the objective of this deployment?
+
+Who are the ones signed up?
+
+What was the incentive given?
+
+\subsection{Overheads}
+
+\begin{enumerate}
+
+\item \textbf{Increase in Network Latency.}
+
+\begin{figure}
+\artbd{}
+x axis contains 
+Android iOS | Android iOS | Android iOS | Android iOS  \newline
+ Location 1 |  Location 2 |  Location 1 | Location 2 \newline
+           Wi-fi          |         Cellular         
+With error bars for min and max.
+\caption{Latency Overheads. Tests performed by Adrian and Sam}
+\label{fig:latency}
+\end{figure}
+
+Figure \ref{fig:latency}.
+Cite results from latency to home gateways based on DSL results in PAM and IMC. 
+
+\item \textbf{Increase in Power Consumption.}
+Results from battery tests performed by Dave for Android
+battery monitoring tests performed by Ashwin for Android and iPhone. 
+
+\item \textbf{Increase in Traffic Volume.}
+\end{enumerate}
+
+\subsection{Limitations}
+
+\begin{enumerate}
+
+\item \textbf{At most one tunnel.}
+\tbd{Not true for http proxy}
+Currently iOS and Android support exactly one VPN connection at a time. 
+This allows \platname{} to measure traffic over either WiFi or cellular interfaces, but not both at once.
+The vast majority of traffic uses only one of these interfaces, and that interface uses the VPN
+
+\item \textbf{Proxy location.} 
+When traffic traverses the \platname{} box, destinations will see the \platname{} box address, not the device IP, as the source. 
+This might impact services  that customize (or block access to) content according to IP address (e.g., in case of localization). 
+A solution to this problem is to use a \platname{} instance with an appropriate IP address
+
+\item \textbf{ISP support.}
+Some ISPs block VPN traffic, which prevents access to our current \platname implementation. 
+We note that few ISPs block VPN traffic, and there is an incentive not to block VPN traffic to support enterprise clients.
+
+\item \textbf{IPv6.}
+\platname{} cannot be currently used on networks using IPv6 because IPv6 is not fully supported by mobile devices. 
+Indeed, we observe that though iOS and Android support IPv6 they currently do not support IPv6 traffic through VPN tunnels
+
+%\item \textbf{Wi-Fi Gateways powered by Cellular Modems.}
+
+
+\end{enumerate}
+
+\subsection{Costs}
+
+\begin{enumerate}
+
+\item \textbf{Deployment and Running Costs}
+
+\item \textbf{Trust Provider}
+
+\end{enumerate}
+
+\subsection{Incentive for End-user Deployment}
+
+\begin{enumerate}
+
+\item \textbf{Deploy on Home Gateway.}
+This is why we need the single machine constraint. 
+
+\item \textbf{Packet Filtering.}
+Custom ad blocks. Protect against data leaks. 
+
+\item \textbf{Security from untrusted Wi-Fi APs.}
+
+\item \textbf{Modular Architecture for Offloading Activities.}
+
+\end{enumerate}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "meddle-main"
+%%% End: 

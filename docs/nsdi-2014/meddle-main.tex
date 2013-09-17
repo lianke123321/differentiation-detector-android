@@ -1,10 +1,44 @@
 \documentclass[letterpaper,twocolumn,10pt]{article}
+
+%%%%%%%%%%%% LIST OF PACKAGES
 \usepackage{usenix,epsfig,endnotes}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage[english,plain]{fancyref}
+\usepackage{times}
+\usepackage{rotating}
+\usepackage[labelformat=simple]{subfig}
+\usepackage{multirow}
+\usepackage{amsfonts,xspace}
+\usepackage{url}
+\usepackage{graphicx}
+
+
+%%%%%%%%%% LIST OF COMMANDS
+\newcommand{\ie}{{\it i.e.}\xspace}
+\newcommand{\eg}{{\it e.g.}\xspace}
+\newcommand{\etc}{{\it etc.}}
+\newcommand{\useragent}{{\it User-Agent}\xspace}
+\newcommand{\httphost}{{\it Host}\xspace}
+\newcommand{\httpget}{{\it HTTP GET}\xspace}
+\newcommand{\sslservername}{{\it Server-Name}\xspace}
+\newcommand{\eat}[1]{}
+%% tbd
+\newcommand{\tbd}[1]{[{\color{red}{\bf{TBD: #1}}}]}
+\newcommand{\artbd}[1]{[{\color{blue}{\bf{AR:TBD: #1}}}]}
+\newcommand{\dtbd}[1]{[{\color{blue}{\bf{Dave:TBD: #1}}}]}
+% platform
+\newcommand{\platname}{{\emph{Meddle}}\xspace}
+
+\newcounter{packednmbr}
+\newenvironment{packedenumerate}{\begin{list}{\thepackednmbr.}{\usecounter{packednmbr}\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+\newenvironment{packeditemize}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+
+
 \begin{document}
 
 \date{}
 
-\title{\Large \bf Meddle}
+\title{\Large \bf Meddle: Practical Mobile Diagnosis Through Traffic Monitoring}
 
 \author{
 {\rm First}\\
@@ -35,6 +69,18 @@ Sixth Institution
 \input{abstract}
 
 \input{introduction}
+
+\input{motivation}
+
+\input{goals}
+
+\input{platform}
+
+\input{evaluation}
+
+%\input{related}
+
+\input{conclusion}
 
 {\footnotesize \bibliographystyle{acm}
 \bibliography{biblio}}
