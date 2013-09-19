@@ -77,20 +77,20 @@ battery monitoring tests performed by Ashwin for Android and iPhone.
 \item \textbf{At most one tunnel.}
 \tbd{Not true for http proxy}
 Currently iOS and Android support exactly one VPN connection at a time. 
-This allows \platname{} to measure traffic over either WiFi or cellular interfaces, but not both at once.
+This allows \meddle{} to measure traffic over either WiFi or cellular interfaces, but not both at once.
 The vast majority of traffic uses only one of these interfaces, and that interface uses the VPN
 
 \item \textbf{Proxy location.} 
-When traffic traverses the \platname{} box, destinations will see the \platname{} box address, not the device IP, as the source. 
+When traffic traverses the \meddle{} box, destinations will see the \meddle{} box address, not the device IP, as the source. 
 This might impact services  that customize (or block access to) content according to IP address (e.g., in case of localization). 
-A solution to this problem is to use a \platname{} instance with an appropriate IP address
+A solution to this problem is to use a \meddle{} instance with an appropriate IP address
 
 \item \textbf{ISP support.}
-Some ISPs block VPN traffic, which prevents access to our current \platname implementation. 
+Some ISPs block VPN traffic, which prevents access to our current \meddle implementation. 
 We note that few ISPs block VPN traffic, and there is an incentive not to block VPN traffic to support enterprise clients.
 
 \item \textbf{IPv6.}
-\platname{} cannot be currently used on networks using IPv6 because IPv6 is not fully supported by mobile devices. 
+\meddle{} cannot be currently used on networks using IPv6 because IPv6 is not fully supported by mobile devices. 
 Indeed, we observe that though iOS and Android support IPv6 they currently do not support IPv6 traffic through VPN tunnels
 
 %\item \textbf{Wi-Fi Gateways powered by Cellular Modems.}
