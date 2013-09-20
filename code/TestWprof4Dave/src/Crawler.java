@@ -10,6 +10,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 
 
+
 //import org.openqa.selenium.remote.RemoteWebDriver;
 import java.util.concurrent.*;
 import java.io.*;
@@ -129,6 +130,7 @@ public class Crawler {
 			i++;
 			String next = sc.next();
 			if (i < s) continue;
+			if (i > e) break;
 			System.out.println(s + " " + e + " " + i);
 			//next = sc.next();
 			System.out.println("Next is "+next);
@@ -176,10 +178,25 @@ public class Crawler {
 		// /usr/local/bin/wget -P " + page 
 		try {
 			String line;
-			String command = "/usr/local/bin/wget -P /Users/choffnes/workspace/meddle/data/trip/ http://" + page + "/ --no-check-certificate -U "
-					+ "\"Mozilla/5.0 (iPhone; CPU iPhone OS 5_0_1 like Mac OS X) AppleWebKit/534.46 "
-					+ "(KHTML, like Gecko) Version/5.1 Mobile/9A405 Safari/7534.48.3\" -b -E -H -k -K -p ";
+			String userAgent = "";
+			if (Defaults.getString("Main.osType").equals("ios")){
+				userAgent = "\"Mozilla/5.0 (iPhone; CPU iPhone OS 5_0_1 like Mac OS X) AppleWebKit/534.46 "
+						+ "(KHTML, like Gecko) Version/5.1 Mobile/9A405 Safari/7534.48.3\"";
+			} else if (Defaults.getString("Main.osType").equals("android")){
+				userAgent = "\"Mozilla/5.0 (Linux; U; Android 4.1.1; en-US; Nexus S Build/GRJ22) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1\"";
+			} else {
+				System.err.println("Invalid user agent!");
+				userAgent = "SomeUserAgent/1.0";
+			}
+			
+			String wgetPath = Defaults.getString("Main.wgetPath");
+			String outputDir = Defaults.getString("Main.wgetOutputDir") +
+					Defaults.getString("Main.carrier")+"-"+Defaults.getString("Main.osType")+"/";
+			
+			String command = wgetPath+" -P "+outputDir+" http://" + page + "/ --no-check-certificate -U "
+					+ userAgent + " -b -E -H -k -K -p ";
 			System.out.println("Command: "+command);
+			
 			Process p = Runtime.getRuntime().exec
 					(command);
 			BufferedReader input =

@@ -7,7 +7,7 @@ import java.lang.Runtime;
 import java.io.*;
 
 public class Main {
-	private static String fileTopsites = "./src/webpages_top500.txt";
+	private static String fileTopsites = Defaults.getString("Main.URLs"); //$NON-NLS-1$
 //	private static String fileTopsites = "./src/randorder-10k.csv";
 
 	//	private static String fileTopsites = "./src/top-1m.csv";
@@ -15,16 +15,18 @@ public class Main {
 	//private static String fileTopsites = "./src/random_pages.txt";
 	
 	public static void main(String[] args) throws Exception {
-		int s = Integer.parseInt(args[0]);
-		int e = Integer.parseInt(args[1]);
+		int s = Integer.parseInt(Defaults.getString("Main.start"));
+		int e = Integer.parseInt(Defaults.getString("Main.end"));
+		fileTopsites = Defaults.getString("Main.URLs");
+		
 		if (args.length>2){
 			fileTopsites = args[2];
 		}
-		String driverPath = null;
+		String driverPath = Defaults.getString("Main.driverPath");
 		if (args.length>3){
 			driverPath = args[3];
 		}
-		String chromiumPath = null;
+		String chromiumPath = Defaults.getString("Main.chromePath");
 		if (args.length>4){
 			chromiumPath = args[4];
 		}
@@ -34,6 +36,7 @@ public class Main {
 		Crawler crawler = new Crawler(fileTopsites, s, e, driverPath, chromiumPath, true);
 		crawler.call();
 		
+		crawler.close();
 		
 		/*
 		
@@ -74,12 +77,12 @@ public class Main {
 			}
 			++i;
 		}*/
-		System.out.println("Done!");
+		System.out.println("Done!"); //$NON-NLS-1$
 	}
 	
 	private static void killProcess() throws Exception {
 		Runtime rt = Runtime.getRuntime();
-		Process proc = rt.exec("ps");
+		Process proc = rt.exec("ps"); //$NON-NLS-1$
 		BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 		String line;
 		while ((line = stdInput.readLine()) != null) {
