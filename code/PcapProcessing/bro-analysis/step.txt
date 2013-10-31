@@ -1,0 +1,9 @@
+* Perform rsync
+* ./decrypt-pcap.sh to crypt the pcap files
+* ./run-bro.sh to get the basic log files for each user
+* ./getAllGlobalIPs.sh to get the IP address from which clients connect along with the information about the ip
+* R CMD BATCH annotateConnInfoToBro.R to annotate the bro logs of each user with the ip and user info. http.log.info and other .info logs are created for each user.
+* ./genAggregate.sh to aggregate all the user info in the bro-aggregate results folder. This merges all the .log* files in each users folder to creates large tables that has the info of all users
+* R CMD BATCH assignAppLabels.R to assign the app signatures based on the user agent to the http.log file
+
+

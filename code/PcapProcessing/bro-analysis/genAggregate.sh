@@ -1,9 +1,11 @@
-baseDir="/Users/ashwin/proj-work/meddle/meddle-data/bro-results/"
-aggDir="${baseDir}/../bro-aggregate-data"
+baseDir="/home/arao/meddle_data/"
+broDir="${baseDir}/bro-results/"
+broHeadDir="${baseDir}/bro-headers/"
+aggDir="${baseDir}/bro-aggregate-data/"
 rm -f ${aggDir}/*.log*
 mkdir -p ${aggDir}
-cp -vRf ${baseDir}/../bro-headers/* ${aggDir}/
-for uDir in ${baseDir}/* ;
+cp -vRf ${broHeadDir}/* ${aggDir}/
+for uDir in ${broDir}/* ;
 do   
    uBase=`basename ${uDir}`
    aggBase=`basename ${aggDir}`
@@ -12,7 +14,6 @@ do
    then 
       continue
    fi
-
    for fName in ${uDir}/* ;
    do  
        echo ${fName}
