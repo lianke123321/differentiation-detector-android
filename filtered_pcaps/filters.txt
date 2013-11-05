@@ -1,0 +1,29 @@
+Hulu:
+(ip.addr==72.246.64.171) or
+(ip.addr== 65.121.208.122) or
+(ip.addr==216.156.199.139) or
+(ip.addr==204.2.187.104) or
+(ip.addr==209.48.37.16)
+
+
+Dropbox:
+(tcp.stream==6) or (tcp.stream==5)
+
+Dropbox (upload):
+(tcp.stream==7) or (tcp.stream==8)
+
+Pandora:
+ip.addr==208.85.0.0/16
+
+Skype:
+udp.port==7416
+
+Viber:
+ip.addr==103.10.233.30
+
+YouTube (upload):
+ip.addr==173.194.76.117
+
+YouTube:
+ip.addr==74.125.0.0/16 or 
+ip.addr==173.194.0.0/16
