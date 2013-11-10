@@ -18,7 +18,7 @@ def map_follows(follows_dir, client_ip):
     file_list = python_lib.dir_list(follows_dir, True)
     follow_files = {}
     for file in file_list:
-        if ('pcap' in file):
+        if ('follow-stream-' not in file):
             continue
         if linecache.getline(file, 7)[0] == '=':
             print 'empty file:', file
@@ -27,7 +27,7 @@ def map_follows(follows_dir, client_ip):
         node1 = convert_ip(((linecache.getline(file, 6)).split()[2]).replace(':', '.'))
         c_s_pair = '-'.join([node0, node1])
         if node0.rpartition('.')[0] != client_ip:
-            print 'Whaaaaat????'
+            print 'Whaaaaat????', file
         follow_files[c_s_pair] = file 
         outfile = file.rpartition('/')[0] + '/' + c_s_pair + '.' + file.partition('.')[2]
         if os.path.isfile(outfile) is False:
@@ -162,7 +162,7 @@ def pcap_to_seq(pcap_file, client_ip, All_Hash, follow_files):
         '''Check if c_s_pair is new'''
         if c_s_pair not in all_pairs:
             all_pairs.append(c_s_pair)
-            where_in_file[c_s_pair] = 7
+            where_in_file[c_s_pair] = 7 #the first 6 lines are meta data
             if client_ip == src_ip:
                 talking[c_s_pair] = 's'
             elif client_ip == dst_ip:
@@ -229,6 +229,38 @@ def main():
         follows_dir = '../../data/follows_techcrunch'
         client_ip = '10.10.108.147'
         
+        pcap_file   = '../../data/dropbox/dropbox.pcap'
+        follows_dir = '../../data/dropbox/'
+        client_ip = '10.11.3.3'
+        
+        pcap_file   = '../../data/dropbox_replay/dropbox_replay.pcap'
+        follows_dir = '../../data/dropbox_replay/'
+        client_ip = '10.10.108.158'
+        
+        pcap_file   = '../../data/dropbox_up/dropbox_up.pcap'
+        follows_dir = '../../data/dropbox_up/'
+        client_ip = '10.11.3.3'
+        
+        pcap_file   = '../../data/dropbox_up_replay/dropbox_up_replay.pcap'
+        follows_dir = '../../data/dropbox_up_replay/'
+        client_ip = '10.10.108.158'
+        
+        pcap_file   = '../../data/youtube/youtube.pcap'
+        follows_dir = '../../data/youtube/'
+        client_ip = '10.11.3.3'
+        
+        pcap_file   = '../../data/youtube_replay/youtube_replay.pcap'
+        follows_dir = '../../data/youtube_replay/'
+        client_ip = '10.10.108.158'
+        
+        pcap_file   = '../../data/youtube_up/youtube_up.pcap'
+        follows_dir = '../../data/youtube_up/'
+        client_ip = '10.11.3.3'
+        
+        pcap_file   = '../../data/youtube_up_replay/youtube_up_replay.pcap'
+        follows_dir = '../../data/youtube_up_replay/'
+        client_ip = '10.10.108.158'
+        
 #        pcap_file = '../../data/replay.pcap'
 #        follows_dir = '../../data/follows_replay'
 #        client_ip = '10.10.108.158'
@@ -237,7 +269,10 @@ def main():
 #        follows_dir = '../../data/follows_tech100'
 #        client_ip = '10.10.108.147'
 
-        
+    print 'pcap_file:', pcap_file
+    print 'follows_dir:', follows_dir
+    print 'client_ip:', client_ip
+    
     follow_files = map_follows(follows_dir, client_ip)   
     [queue, table, all_pairs] = pcap_to_seq(pcap_file, client_ip, All_Hash, follow_files)
     
