@@ -3,16 +3,23 @@
 # Just clean the results.
 if [ $# -eq 1 ]; then
     if [ $1 = "clean" ]; then
-	rm -rf ../data/generated_plots/*
-	rm -rf ../data/text_pcaps/*
+	rm -rf ../data/generated_plots
+	rm -rf ../data/text_pcaps
 	exit
     fi
 fi
 
 
 # Clean the results.
-rm -rf ../data/generated_plots/*
-rm -rf ../data/text_pcaps/*
+rm -rf ../data/generated_plots
+rm -rf ../data/text_pcaps
+
+mkdir ../data/generated_plots
+mkdir ../data/text_pcaps
+
+cd filterer
+make
+cd ..
 
 # For every pcap you find in data/pcaps
 for f in `cd ../data/pcaps;ls *.pcap;cd ../../plot`
