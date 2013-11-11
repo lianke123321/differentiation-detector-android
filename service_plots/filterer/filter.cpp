@@ -18,6 +18,18 @@ void eatspaces(ifstream &inp)
     while(inp.peek() == ' ' || inp.peek() == '\n') inp.get();
 }
 
+char nextIndex()
+{
+    static char in = 'A' - 1;
+    if (in >= 'A' - 1 && in < 'Z') in++;
+    else if (in == 'Z') in = 'a';
+    else if (in >= 'a' && in < 'z') in++;
+    else if (in == 'z') in = '0';
+    else if (in >= '0') in++;
+
+    return in;
+}
+
 enum type_e {TCP, UDP};
 
 void skipline(ifstream &inp)
@@ -69,8 +81,9 @@ int main(int argc, char ** argv)
     system("mkdir connections");
     long connection_count = 0;
     bool plot_only = false;
-    map<string,long> plot_index;
+    map<string,char> plot_index;
     map<string,long> max_len;
+    map<string,string> reverse;
     map<string,type_e> connection_type; // false = UDP, true = TCP
     map<string,ofstream*> file_map;
     map<string,ofstream*>::iterator it;
@@ -109,8 +122,9 @@ int main(int argc, char ** argv)
         if(flag)
         {
             file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2).c_str());
-            plot_index[(p1 + "-" + p2)] = connection_count++;
-            max_len[(p1 + "-" + p2)] = seq2;
+            reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
+            connection_count++;
+            max_len[(p1 + "-" + p2)] = 0;
             connection_type[(p1 + "-" + p2)] = TCP;
             (*(file_map[p1+ "-" + p2])) << "0.000000 0" << endl;
             flag = false;
@@ -122,9 +136,10 @@ int main(int argc, char ** argv)
         inp >> len;
 
         file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2 + "_UDP").c_str());
-        plot_index[(p1 + "-" + p2)] = connection_count++;
-        udp_offset[(p1 + "-" + p2)] = len;
-        max_len[(p1 + "-" + p2)] = len;
+        reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
+        connection_count++;
+        udp_offset[(p1 + "-" + p2)] = 0;
+        max_len[(p1 + "-" + p2)] = 0;
         connection_type[(p1 + "-" + p2)] = UDP;
         (*(file_map[p1+ "-" + p2])) << "0.000000" << len << endl;
         flag = false;
@@ -162,8 +177,9 @@ int main(int argc, char ** argv)
                 if(file_map.count(p1 + "-" + p2) == 0)
                 {
                     file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2).c_str());
-                    plot_index[(p1 + "-" + p2)] = connection_count++;
-                    connection_type[(p1 + "-" + p2)] = TCP;
+                    reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
+                    connection_count++;
+                    max_len[(p1 + "-" + p2)] = 0;
                     flag = false;
                     (*(file_map[p1+ "-" + p2])) << "0.000000 0" << endl;
                     continue;
@@ -182,14 +198,16 @@ int main(int argc, char ** argv)
             if(file_map.count(p1 + "-" + p2) == 0)
             {
                 file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2 + "_UDP").c_str());
-                plot_index[(p1 + "-" + p2)] = connection_count++;
-                udp_offset[(p1 + "-" + p2)] = len;
+                reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
+                connection_count++;
+                udp_offset[(p1 + "-" + p2)] = 0;
+                max_len[(p1 + "-" + p2)] = 0;
                 connection_type[(p1 + "-" + p2)] = UDP;
                 first = true;
             }
 
             udp_offset[(p1 + "-" + p2)] += len;
-            max_len[(p1 + "-" + p2)] = len;
+            max_len[(p1 + "-" + p2)] = udp_offset[(p1 + "-" + p2)];
             (*(file_map[p1+ "-" + p2])) << setprecision(14) << ttime << " " << udp_offset[(p1 + "-" + p2)] << endl;
         }
         skipline(inp);
@@ -204,7 +222,7 @@ int main(int argc, char ** argv)
             << (no_key ? "set key off\n" : "")
             << "set xlabel \"Time (seconds)\"" << endl
             << "set ylabel \"Cumulative Transfer (MB)\"" << endl
-            << "set term postscript color eps enhanced \"Helvetica\" 8" << endl
+            << "set term postscript color eps enhanced \"Helvetica\" 16" << endl
             << "set size ratio 0.5" << endl
             << "# Line style for axes" << endl
             << "set style line 80 lt 0" << endl
@@ -216,25 +234,44 @@ int main(int argc, char ** argv)
 
     first = false;
     long MAX = 0;
+    string MAXs;
     for(map<string,long>::iterator it = max_len.begin(); it != max_len.end(); it++)
     {
         MAX = (MAX > it->second ? MAX : it->second);
+        MAXs = (MAX > it->second ? MAXs : it->first);
     }
 
     for(map<string,long>::iterator it = max_len.begin(); it != max_len.end(); it++)
     {
-        index_file << plot_index[it->first] << "\t -> \t" << (it->first + (connection_type[it->first] == UDP ? "_UDP" : "")) << endl;
         if(it->second * length_thr < MAX) continue;
+
+        if(plot_index.count(reverse[it->first]) == 0)
+        {
+            plot_index[it->first] = nextIndex();
+        }
+        else
+        {
+            plot_index[it->first] = '*';
+        }
+
+        index_file  << (plot_index[it->first] == '*' ? plot_index[reverse[it->first]] : plot_index[it->first])
+                    << (plot_index[it->first] == '*' ? "*" : "")
+                    << "\t -> \t" << (it->first + (connection_type[it->first] == UDP ? "_UDP" : "")) << endl;
         if(connection_type[it->first] == TCP)
         {
             if(first) { plot << ", \\\n";}
-            plot << "\"connections/" << it->first << "\" using 1:($2/1e6) with lines title \"" << plot_index[it->first] << "\"";
+            plot    << "\"connections/" << it->first << "\" using 1:($2/1e6) with lines lw 3 title \""
+                    << (plot_index[it->first] == '*' ? plot_index[reverse[it->first]] : plot_index[it->first])
+                    << (plot_index[it->first] == '*' ? "*" : "") << "\"";
             if(!first) first = true;
         }
         else
         {
             if(first) { plot << ", \\\n";}
-            plot << "\"connections/" << it->first << "_UDP\" using 1:($2/1e6) with lines title \"" << plot_index[it->first] << "(UDP)\"";
+            plot    << "\"connections/" << it->first << "_UDP\" using 1:($2/1e6) with lines lw 3 title \""
+                    << (plot_index[it->first] == '*' ? plot_index[reverse[it->first]] : plot_index[it->first])
+                    << (plot_index[it->first] == '*' ? "*" : "")
+                    << "(UDP)\"";
             if(!first) first = true;
         }
 

@@ -1,1 +1,1 @@
-../../filterer/filter ../../text_pcaps/youtube_u.txt 100000 "YouTube (upload)"
+../../filterer/filter ../../text_pcaps/youtube_u.txt 1000 "YouTube (upload)"

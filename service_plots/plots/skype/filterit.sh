@@ -1,1 +1,1 @@
-../../filterer/filter ../../text_pcaps/skype.txt 1000 "Skype"
+../../filterer/filter ../../text_pcaps/skype.txt 10 "Skype"

@@ -1,1 +1,1 @@
-../../filterer/filter ../../text_pcaps/spotify.txt 1000 "Spotify"
+../../filterer/filter ../../text_pcaps/spotify.txt 100 "Spotify"

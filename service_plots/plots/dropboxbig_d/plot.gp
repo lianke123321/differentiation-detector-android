@@ -1,9 +1,9 @@
 set style data lines
-set title "Drobpox Download (26.1 MB file) (cutoff threshold = 100000)"
+set title "Drobpox Download (26.1 MB file) (cutoff threshold = 10000)"
 set key out right
 set xlabel "Time (seconds)"
 set ylabel "Cumulative Transfer (MB)"
-set term postscript color eps enhanced "Helvetica" 8
+set term postscript color eps enhanced "Helvetica" 16
 set size ratio 0.5
 # Line style for axes
 set style line 80 lt 0
@@ -12,6 +12,5 @@ set border 3 back linestyle 80
 set xtics nomirror
 set ytics nomirror
 set out 'p.ps'
-plot "connections/108.160.166.14.443-10.11.3.3.60613" using 1:($2/1e6) with lines title "0", \
-"connections/184.72.240.186.443-10.11.3.3.38394" using 1:($2/1e6) with lines title "3", \
-"connections/184.72.240.186.443-10.11.3.3.47173" using 1:($2/1e6) with lines title "2"
+plot "connections/184.72.240.186.443-10.11.3.3.38394" using 1:($2/1e6) with lines lw 3 title "A", \
+"connections/184.72.240.186.443-10.11.3.3.47173" using 1:($2/1e6) with lines lw 3 title "B"
