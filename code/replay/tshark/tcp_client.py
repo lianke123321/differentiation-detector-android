@@ -22,7 +22,7 @@ def send_single_request(req_set, sock, All_Hash, status):
     
     status[c_s_pair] = False
     
-    buff_size = 2048
+    buff_size = 4096
     
     pld = str(req_set[0])
     svr = req_set[1]
