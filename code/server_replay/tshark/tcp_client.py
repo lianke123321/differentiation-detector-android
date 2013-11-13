@@ -14,40 +14,41 @@ def socket_connect(host, port):
     sock.connect(server_address)
     return sock        
 def send_single_request(req_set, sock, All_Hash, status):
-    
-    c_s_pair = req_set[1]
-    
-    while status[c_s_pair] is False:
-        continue
-    
-    status[c_s_pair] = False
-    
     buff_size = 4096
     
-    pld = str(req_set[0])
-    svr = req_set[1]
-    if req_set[2] is None:
-        res = None
-    else:
-        res = hash(req_set[2])
+    pld      = str(req_set[0])
+    c_s_pair = req_set[1]
+    res      = hash(req_set[2])
+    res_len  = req_set[3]
     
-    print '\nSent\t', svr, len(pld), hash(pld), '\n'
+#    if req_set[2] is None:
+#        res = None
+#    else:
+#        res = hash(req_set[2])
+
+    while status[c_s_pair] is False:
+        continue
+    status[c_s_pair] = False
+    
+    print '\nSending:\t %s %d %d \n' % (c_s_pair, len(pld), hash(pld))
     sock.sendall(pld)
-    print '\twaiting for response...'
-    if res is None:
+    
+    if res_len == 0:
         print '\tNo response required'
         return
     
+    print '\tWaiting for response...'
     buffer = ''
     while True:
         buffer += sock.recv(buff_size)
-#        print len(buffer)        
-        if All_Hash:
-            buffer = int(buffer)
-        if hash(buffer) == res:
+#        if All_Hash:
+#            buffer = int(buffer)
+        if len(buffer) == res_len:
             break
+#        if hash(buffer) == res:
+#            break
     status[c_s_pair] = True
-    print '\nRcvd\t', svr, len(buffer), hash(pld), '\n'
+    print '\nRcieved:\t %s %d %d \n' % (c_s_pair, len(buffer), hash(buffer))
 def main():
     DEBUG = False
     
@@ -72,16 +73,7 @@ def main():
     
     ''' queue = [ [pl, c-s-pair, hash(response)] ]'''
             
-#     queue = [['c1' , 's1'],
-#              ['c2' , 's1'],
-#              ['c3' , 's1'],
-#              ['c10', 's2'],
-#              ['c4' , 's1'],
-#              ['c5' , 's1'],
-#              ['c6' , 's1'],
-#              ['c7' , 's1'],
-#              ['c8' , 's1'],
-#              ['c9' , 's1']]
+
 #     queue = [['c1' , 's1' , 's1'],
 #              ['c2' , 's1' , 's2'],
 #              ['c3' , 's1' , 's3'],
@@ -113,6 +105,7 @@ def main():
             sock  = conns[q[1]]
         t = threading.Thread(target=send_single_request, args=[q, sock, All_Hash, status])
         t.start()
+        print 'kir:', threading.activeCount()
 #        send_single_request(q, sock, All_Hash)
 
     

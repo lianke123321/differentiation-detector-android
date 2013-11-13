@@ -179,9 +179,9 @@ def pcap_to_seq(pcap_file, client_ip, All_Hash, follow_files):
                 continue
             
             if res is None:
-                queue.append([req, c_s_pair, res])
+                queue.append([req, c_s_pair, res, 0])
             else:
-                queue.append([req, c_s_pair, hash(res)])
+                queue.append([req, c_s_pair, hash(res), len(res)])
                 total_server_pl += len(res)
 
             req_hash = hash(req)
@@ -207,27 +207,30 @@ def pcap_to_seq(pcap_file, client_ip, All_Hash, follow_files):
 def sanity_check(queue, table):
     print '\nDoing sanity check...'
     for q in queue:
-        pl  = q[0]
-        pair= q[1]
-        res = q[2]
+        pl       = q[0]
+        c_s_pair = q[1]
+        res_hash = q[2]
+        res_len  = q[3]
         table_res = table[hash(pl)].pop(0)
-        if (res == None) and (table_res == None):
+        
+        if (res_len == 0) and (table_res == None):
             continue 
-        elif res != hash(table_res):
+        
+        elif res_hash != hash(table_res):
             print 'Inconsistency:'
             print pl
             print '===='
             print hash(pl)
             print '===='
-            print pair
+            print c_s_pair
             print '===='
-            print res
+            print res_hash
             print '===='
             print table[hash(pl)]
             print '===='
             print hash(table[hash(pl)])
             return
-    print 'passed sanity check :)\n'
+    print '\tPassed sanity check! Hoooooray!!! :)\n'
 def main():
     
     All_Hash = True
@@ -237,25 +240,25 @@ def main():
         pcap_file = sys.argv[1]
         client_ip = sys.argv[2]
     except:
-        pcap_file = '../../data/wget.pcap'
-        follows_dir = '../../data/follows_wget'
-        client_ip = '10.10.108.119'
-        
-        pcap_file = '../../data/techcrunch.pcap'
-        follows_dir = '../../data/follows_techcrunch'
-        client_ip = '10.10.108.147'
-        
-        pcap_file   = '../../data/dropbox/dropbox.pcap'
-        follows_dir = '../../data/dropbox/'
-        client_ip = '10.11.3.3'
-        
+#        pcap_file = '../../data/wget.pcap'
+#        follows_dir = '../../data/follows_wget'
+#        client_ip = '10.10.108.119'
+#        
+#        pcap_file = '../../data/techcrunch.pcap'
+#        follows_dir = '../../data/follows_techcrunch'
+#        client_ip = '10.10.108.147'
+#        
+#        pcap_file   = '../../data/dropbox/dropbox.pcap'
+#        follows_dir = '../../data/dropbox/'
+#        client_ip = '10.11.3.3'
+#        
 #        pcap_file   = '../../data/dropbox_replay/dropbox_replay.pcap'
 #        follows_dir = '../../data/dropbox_replay/'
 #        client_ip = '10.10.108.158'
 #        
-#        pcap_file   = '../../data/dropbox_up/dropbox_up.pcap'
-#        follows_dir = '../../data/dropbox_up/'
-#        client_ip = '10.11.3.3'
+        pcap_file   = '../../data/dropbox_up/dropbox_up.pcap'
+        follows_dir = '../../data/dropbox_up/'
+        client_ip = '10.11.3.3'
 #        
 #        pcap_file   = '../../data/hulu/hulu.pcap'
 #        follows_dir = '../../data/hulu/'
@@ -273,9 +276,9 @@ def main():
 #        follows_dir = '../../data/youtube_replay/'
 #        client_ip = '10.10.108.158'
 #        
-        pcap_file   = '../../data/youtube_up/youtube_u.pcap'
-        follows_dir = '../../data/youtube_up/'
-        client_ip = '10.11.3.3'
+#        pcap_file   = '../../data/youtube_up/youtube_u.pcap'
+#        follows_dir = '../../data/youtube_up/'
+#        client_ip = '10.11.3.3'
 #        
 #        pcap_file   = '../../data/youtube_up_replay/youtube_up_replay.pcap'
 #        follows_dir = '../../data/youtube_up_replay/'
@@ -316,7 +319,7 @@ def main():
 #    for t in table:
 #        print t, table[t]
     
-    sanity_check(copy.deepcopy(queue), copy.deepcopy(table))
+    sanity_check(queue, copy.deepcopy(table))
 
     comm_file = pcap_file + '_communication.txt'
     f = open(comm_file, 'w')
