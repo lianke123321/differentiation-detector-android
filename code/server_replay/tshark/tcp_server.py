@@ -5,11 +5,12 @@ def find_response(buffer, table, All_Hash):
     if All_Hash is True:
         buffer = int(buffer)
     try:
-        return table[hash(buffer)]
+        return table[hash(buffer)].pop(0)
+#        return table[hash(buffer)]
     except:
         return False
 def socket_server_create(host, p, table, All_Hash):
-    buff_size = 2048
+    buff_size = 4096
     port = 7600
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
@@ -34,14 +35,14 @@ def socket_server_create(host, p, table, All_Hash):
             response = find_response(buffer, table, All_Hash)
 #             print buffer, response
             if response is not False:
-                print 'Rcvd\t', connection, client_address 
+                print '\nRcvd\t', connection, client_address, len(buffer), hash(buffer), '\n' 
                 buffer = ''
                 i += 1
                 if response is None:
                     'No need to send back anything!', connection, client_address
                 else:
+                    print '\nSent\t', connection, client_address, len(response), hash(response), '\n'
                     connection.sendall(str(response))
-                    print 'Sent\t', connection, client_address
 #                     print "sent:", response
 #                     print 'got req for s[', i, ']'
 #                     print 'sent: s[', i, ']'
@@ -87,7 +88,9 @@ def main():
 #              hash('c10') : 's10' }
 
     p = []
+    
     table = pickle.load(open(pickle_dump, 'rb'))
+    
     
     threads = [] 
     for i in range(number_of_servers):

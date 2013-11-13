@@ -22,7 +22,7 @@ def send_single_request(req_set, sock, All_Hash, status):
     
     status[c_s_pair] = False
     
-    buff_size = 2048
+    buff_size = 4096
     
     pld = str(req_set[0])
     svr = req_set[1]
@@ -31,8 +31,8 @@ def send_single_request(req_set, sock, All_Hash, status):
     else:
         res = hash(req_set[2])
     
+    print '\nSent\t', svr, len(pld), hash(pld), '\n'
     sock.sendall(pld)
-    print 'Sent\t', svr
     print '\twaiting for response...'
     if res is None:
         print '\tNo response required'
@@ -40,13 +40,14 @@ def send_single_request(req_set, sock, All_Hash, status):
     
     buffer = ''
     while True:
-        buffer += sock.recv(buff_size)        
+        buffer += sock.recv(buff_size)
+#        print len(buffer)        
         if All_Hash:
             buffer = int(buffer)
         if hash(buffer) == res:
             break
     status[c_s_pair] = True
-    print 'Rcvd\t', svr
+    print '\nRcvd\t', svr, len(buffer), hash(pld), '\n'
 def main():
     DEBUG = False
     
@@ -101,7 +102,10 @@ def main():
             status[q[1]] = True
     
     conns = {}  #conns[c-s-pair] = socket
-    for q in queue:
+    for i in range(len(queue)):
+#    for q in queue:
+        print 'doing:', i, '/', len(queue)
+        q = queue[i]
         try:
             sock = conns[q[1]]
         except:
