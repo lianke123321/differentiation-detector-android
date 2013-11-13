@@ -49,6 +49,44 @@ performance at the cost of additional, synthetic traffic for probing. In contras
 passive measurements to characterize the traffic that devices
 naturally generate.
 
+%From DJW @ CCS:
+%more privacy leakage shown from zero-permission Android APIs
+%(Identity, Location, Disease and more ...). there are API calls
+%needing no permissions to find out the identity of running  apps, the
+%amount of data they send over the network, the BSSID (through ARP
+%data), when an app is using the speaker, etc. combined with external
+%data this can lead to user identification. example: a local app can
+%see when you tweet given the characteristic lengths of tweeting, and
+%can correlate that with public twitter data to identify who you are.
+%to complete attacks they also send data with zero permission by using
+%the browser and encoding the data to be sent as part of the request.
+%SPARTA folk: maybe more APIs to add to the suspicious list, or other
+%attacks to consider?
+
+% AppIntent, a tool to relate the GUI context to data transmission,
+%based on the assumption that transmissions resulting from a GUI
+%interaction are intended/authorized by the user. this is on my reading
+%list, and likely relevant to SPARTA folk and Ravi.
+
+%nice study by Wagner folks on how android apps misuse crypto, i.e.,
+%use it but don't get the security they wanted. many apps encrypt data
+%with the standard APIs, but in dumb ways: the default engine is ECB
+%mode, which wasn't what you wanted, and IVs are often set to
+%constants, etc. they do a program analysis to find this stuff and
+%observe that close to 90% of apps get it wrong. yikes! this sort of
+%stuff should just go away with decent tools. SPARTA folk: most of
+%these analyses look amenable to information flow. plus another
+%analysis would be to assure that all data that is sent went via the
+%encryption APIs.
+
+%
+%-"format-transforming encryption", a twist on format preserving
+%encryption, neatly mapped one protocol to look like it had the format
+%of another. the motivation was to get new protocols through
+%middleboxes by making them look like HTTPS (say). techniques like this
+%plus the rise of TLS will surely complicate DPI. i wonder how much
+%longer DPI has or how it will evolve?
+
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "main.tex"
