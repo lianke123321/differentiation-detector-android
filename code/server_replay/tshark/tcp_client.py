@@ -1,10 +1,22 @@
+'''
+by: Arash Molavi Kakhki (arash@ccs.neu.edu)
+    Northeastern University
+    
+Goal: this is the client side script for our replay system.
+
+Input: a config_file
+
+queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
+
+'''
+
 import os, sys, socket, pickle, threading, time
 from python_lib import * 
 
-def read_ports(path):
-    if path == None:
-        path = 'achtung.ccs.neu.edu:/home/arash/public_html/free_ports'
-    os.system(('scp ' + path + ' .'))
+def read_ports(ports_pickle_dump):
+    if ports_pickle_dump == None:
+        ports_pickle_dump = 'achtung.ccs.neu.edu:/home/arash/public_html/free_ports'
+    os.system(('scp ' + ports_pickle_dump + ' .'))
     return pickle.load(open('free_ports', 'rb'))
 def socket_connect(host, port):
     print 'Connecting to:', host, port
@@ -52,40 +64,30 @@ def send_single_request(req_set, sock, All_Hash, status):
 def main():
     DEBUG = False
     
-    [All_Hash, pcap_file, number_of_servers] = read_config_file('config_file')
-    print All_Hash, pcap_file, number_of_servers
+    try:
+        config_file = sys.argv[1]
+    except:
+        print 'USAGE: python tcp_client.py [config_file]'   
+        sys.exit(-1)
+    
+    [All_Hash, pcap_file, number_of_servers] = read_config_file(config_file)
+    print 'All_Hash         :', All_Hash
+    print 'pcap_file        :', pcap_file
+    print 'number_of_servers:', number_of_servers
     
     '''Defaults'''
-    ports = read_ports(None)
+    port_file = None
     host = '129.10.115.141'
-
-    pickle_dump = pcap_file +'_client_pickle'
     
     for arg in sys.argv:
         a = (arg.strip()).partition('=')
-        if a[0] == 'port':
-            port = a[2]
+        if a[0] == 'port_file':
+            port_file = a[2]
         if a[0] == 'host':
             host = a[2]
-        if a[0] == 'pcap_file':
-            pcap_file = a[2]
-            pickle_dump = pcap_file +'_client_pickle'
     
-    ''' queue = [ [pl, c-s-pair, hash(response)] ]'''
-            
-
-#     queue = [['c1' , 's1' , 's1'],
-#              ['c2' , 's1' , 's2'],
-#              ['c3' , 's1' , 's3'],
-#              ['c10', 's2' , 's10'],
-#              ['c4' , 's1' , 's4'],
-#              ['c5' , 's1' , 's5'],
-#              ['c6' , 's1' , 's6'],
-#              ['c7' , 's1' , 's7'],
-#              ['c8' , 's1' , 's8'],
-#              ['c9' , 's1' , 's9']] 
-    
-    queue = pickle.load(open(pickle_dump, 'rb'))
+    ports = read_ports(port_file)
+    queue = pickle.load(open(pcap_file +'_client_pickle', 'rb'))
     
     status = {} #status[c-s-pair] = True if the corresponding connection is ready to send a new request
                 #                   False if the corresponding connection is still waiting for the response to previous request
@@ -95,7 +97,6 @@ def main():
     
     conns = {}  #conns[c-s-pair] = socket
     for i in range(len(queue)):
-#    for q in queue:
         print 'doing:', i, '/', len(queue)
         q = queue[i]
         try:
@@ -105,9 +106,6 @@ def main():
             sock  = conns[q[1]]
         t = threading.Thread(target=send_single_request, args=[q, sock, All_Hash, status])
         t.start()
-        print 'kir:', threading.activeCount()
-#        send_single_request(q, sock, All_Hash)
-
     
 if __name__=="__main__":
     main()

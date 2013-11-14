@@ -231,97 +231,76 @@ def sanity_check(queue, table):
             print hash(table[hash(pl)])
             return
     print '\tPassed sanity check! Hoooooray!!! :)\n'
+def do_tshark_follows(pcap_file, follow_folder):
+    command = ("PCAP_FILE='" + pcap_file + "'\n" +
+               "follow_folder='" + follow_folder + "'\n" +
+               "END=$(tshark -r $PCAP_FILE -T fields -e tcp.stream | sort -n | tail -1)\n" +
+               "echo $END+1\n" +
+               "for ((i=0;i<=END;i++))\n" +
+               "do\n" +
+                "\techo $i\n" +
+                "\ttshark -r $PCAP_FILE -qz follow,tcp,hex,$i > $follow_folder/follow-stream-$i.txt\n" +
+               "done"
+              )
+    os.system(command)
+def read_client_ip(client_ip_file):
+    f = open(client_ip_file, 'r')
+    return (f.readline()).strip()
 def main():
     
     All_Hash = True
     All_Hash = False
     
     try:
-        pcap_file = sys.argv[1]
-        client_ip = sys.argv[2]
+        pcap_folder = sys.argv[1]
     except:
-#        pcap_file = '../../data/wget.pcap'
-#        follows_dir = '../../data/follows_wget'
-#        client_ip = '10.10.108.119'
-#        
-#        pcap_file = '../../data/techcrunch.pcap'
-#        follows_dir = '../../data/follows_techcrunch'
-#        client_ip = '10.10.108.147'
-#        
-#        pcap_file   = '../../data/dropbox/dropbox.pcap'
-#        follows_dir = '../../data/dropbox/'
-#        client_ip = '10.11.3.3'
-#        
-#        pcap_file   = '../../data/dropbox_replay/dropbox_replay.pcap'
-#        follows_dir = '../../data/dropbox_replay/'
-#        client_ip = '10.10.108.158'
-#        
-        pcap_file   = '../../data/dropbox_up/dropbox_up.pcap'
-        follows_dir = '../../data/dropbox_up/'
+        pcap_folder = '../data/dropbox_d/'
         client_ip = '10.11.3.3'
-#        
-#        pcap_file   = '../../data/hulu/hulu.pcap'
-#        follows_dir = '../../data/hulu/'
-#        client_ip = '10.11.3.3'
-#        
-#        pcap_file   = '../../data/dropbox_up_replay/dropbox_up_replay.pcap'
-#        follows_dir = '../../data/dropbox_up_replay/'
-#        client_ip = '10.10.108.158'
-#        
-#        pcap_file   = '../../data/youtube/youtube_d.pcap'
-#        follows_dir = '../../data/youtube/'
-#        client_ip = '10.11.3.3'
-#        
-#        pcap_file   = '../../data/youtube_replay/youtube_replay.pcap'
-#        follows_dir = '../../data/youtube_replay/'
-#        client_ip = '10.10.108.158'
-#        
-#        pcap_file   = '../../data/youtube_up/youtube_u.pcap'
-#        follows_dir = '../../data/youtube_up/'
-#        client_ip = '10.11.3.3'
-#        
-#        pcap_file   = '../../data/youtube_up_replay/youtube_up_replay.pcap'
-#        follows_dir = '../../data/youtube_up_replay/'
-#        client_ip = '10.10.108.158'
-#        
-#        pcap_file = '../../data/replay.pcap'
-#        follows_dir = '../../data/follows_replay'
-#        client_ip = '10.10.108.158'
-#        
-#        pcap_file = '../../data/tech100.pcap'
-#        follows_dir = '../../data/follows_tech100'
-#        client_ip = '10.10.108.147'
 
-    print 'pcap_file:', pcap_file
-    print 'follows_dir:', follows_dir
-    print 'client_ip:', client_ip
+    pcap_folder    = os.path.abspath(pcap_folder)
+    pcap_file      = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap'
+    client_ip_file = pcap_folder + '/' + 'client_ip.txt'
+    follow_folder  = pcap_folder + '/' + os.path.basename(pcap_folder) + '_follows'
     
-    follow_files = map_follows(follows_dir, client_ip)   
+    if not os.path.isfile(pcap_file):
+        print 'The folder is missing the pcap file! Exiting with error!'
+        sys.exit(-1)
+    if not os.path.isfile(pcap_file):
+        print 'The folder is missing the client_ip_file! Exiting with error!'
+        sys.exit(-1)
+    if not os.path.isdir(follow_folder):
+        print 'Follows folder doesnt exist. Creating the follows folder...'
+        os.makedirs(follow_folder)
+        do_tshark_follows(pcap_file, follow_folder)
+    
+    client_ip = read_client_ip(client_ip_file)
+    
+    print 'pcap_folder:', pcap_folder
+    print 'client_ip:  ', client_ip
+
+    comm_file   = pcap_file + '_communication.txt'
+    config_file = pcap_file + '_config'
+
+    
+    follow_files = map_follows(follow_folder, client_ip)   
     [queue, table, all_pairs] = pcap_to_seq(pcap_file, client_ip, All_Hash, follow_files)
     
+    sanity_check(queue, copy.deepcopy(table))
+
     pickle.dump(queue, open((pcap_file+'_client_pickle'), "wb" ))
     pickle.dump(table, open((pcap_file+'_server_pickle'), "wb" ))
     pickle.dump(all_pairs, open((pcap_file+'_all_pairs'), "wb" ))
     
-    f = open('config_file', 'w')
+    
+    f = open(config_file, 'w')
     f.write(( 'All_Hash\t' + str(All_Hash) + '\n' ))
-    f.write(( 'pcap_file\t' + pcap_file + '\n' ))
+    f.write(( 'pcap_file\t' + os.path.relpath(pcap_file, os.getcwd()) + '\n' ))
     f.write(( 'number_of_servers\t' + str(len(all_pairs)) + '\n' ))
     f.close()
     
     print 'len(all_pairs):', len(all_pairs), '\n'
     
-#    print 'q:'
-#    for q in queue:
-#        print q
-#    print '\n'
-#    print 'table:'
-#    for t in table:
-#        print t, table[t]
-    
-    sanity_check(queue, copy.deepcopy(table))
 
-    comm_file = pcap_file + '_communication.txt'
     f = open(comm_file, 'w')
     for i in range(len(queue)):
         q = queue[i]
@@ -339,8 +318,6 @@ def main():
             
             to_write = to_write_req + to_write_res
         f.write(to_write)
-#         if i in [38, 41]:
-#             f.write(('\n' + q[0]+'\n'))
         f.write('\n')
     f.close()
     
