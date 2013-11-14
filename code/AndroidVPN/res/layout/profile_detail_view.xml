@@ -142,7 +142,23 @@
             android:id="@+id/reconnect_auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/profile_auto_reconnect" />    
+            android:text="@string/profile_auto_reconnect" />   
+           
+        <!-- add the url location option -->
+        
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/profile_url_location" />
+
+        <Spinner
+            android:id="@+id/url_loc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"
+            android:entries="@array/url_locations" 
+            android:prompt="@string/profile_url_prompt"/>
 
         <include
             android:id="@+id/select_certificate"

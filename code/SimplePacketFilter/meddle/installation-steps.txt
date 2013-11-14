@@ -101,6 +101,7 @@ guide you in installing Meddle in the MEDDLE_ROOT folder .
     On Ubuntu/debian you might also need to execute the following
     command.
       sudo aa-complain /usr/sbin/tcpdump
+  - Meddle also requires ksh to be installed
 
 9 Test gpg
   - Install gpg if gpg command fails. (I do not remember the name of the 

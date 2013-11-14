@@ -134,7 +134,11 @@ PATH="/sbin:/bin:/usr/sbin:/usr/bin:/home/arao/usr/sbin"
 export MEDDLE_CONFIG_FILE=MEDDLE_ROOT_PATH_FILLER/meddle.config
 set -a # Required to export all variables! http://www.unix.com/shell-programming-scripting/56430-how-run-new-shell-copy-current-shell-declarations.html
 # Note set -a must be called before the source! I do not know why
-source ${MEDDLE_CONFIG_FILE}
+
+#http://stackoverflow.com/questions/2975370/help-with-basic-shell-script-bin-sh-source-not-found
+# source ${MEDDLE_CONFIG_FILE}
+. "${MEDDLE_CONFIG_FILE}"
+
 export PATH
 
 # Note absolute paths are required because the current working directory may be different from the location of this script

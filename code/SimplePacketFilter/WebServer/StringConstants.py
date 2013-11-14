@@ -1,5 +1,5 @@
 
-STATICPATH="/data/webPages"
+STATICPATH="/opt/meddle/WebPages"
 PAGE_DYNPATH="/dyn/"
 PAGE_UPDATECONFIGS=PAGE_DYNPATH+"updateConfigs"
 PAGE_VIEWCONFIGS=PAGE_DYNPATH+"viewConfigs"
@@ -34,11 +34,14 @@ MCFG_TUN_IPPREFIX = "tunClientIpNetPrefix"
 MCFG_WEBPAGES_PATH = "webPagesStaticPath"
 MCFG_WEBSRV_PORT = "webServerPort"
 MCFG_WEBSRV_HOST = "webServerHost"
+MCFG_IRB_URL = "webIrbUrl"
 
 SERVER_HOST_FILLER = 'SERVER_HOST_FILLER'
 SERVER_PORT_FILLER = 'SERVER_PORT_FILLER'
 # TODO: Note I have not modified the strings SERVER_HOST/PORT_FILLER in TEMPLATES
-TEMPLATE_PAGE_HEADER = """<head>
+TEMPLATE_PAGE_HEADER = """<!DOCTYPE html>
+<html lang="en">
+  <head>
   <meta charset="utf-8" />
 
   <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
@@ -111,4 +114,4 @@ TEMPLATE_PAGE_FOOTER="""<footer>
     </footer>
   </div>
   <script src="http://code.jquery.com/jquery-latest.js"></script>
-  <script src="js/bootstrap.min.js"></script><br/></body>"""
+  <script src="js/bootstrap.min.js"></script><br/></body></html>"""

@@ -1,0 +1,37 @@
+\section{Diagnosing Misbehaving Applications}
+\label{sec:diagnose-apps}
+
+The closed nature of mobile OSes hides the network behavior of mobile applications from the users of mobile devices. 
+The results from previous studies on misbehaving apps is also not available on the stores from which applications are bought.
+Thus users have to make their decisions based on the publicly available information on an apps behavior, \eg via reading reviews.
+Furthermore, once an app is installed, users have limited options to diagnose the behavior of mobile applications and filter out misbehaving components~\cite{hornyack:appfence}. 
+
+\begin{table*}[t]
+    \centering
+    \begin{small}
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+       \hline
+       {\bf Store}&{\bf Platform}&{\bf \# Apps}&{\bf Email}& {\bf Location}& {\bf Name} &{\bf Password}& {\bf Device ID}& {\bf Contacts}& {\bf IMEI}\\
+       \hline
+       App Store&iPhone&209&13 (6.2\%) &20 (9.5\%)&4 (1.9\%)&6 (2.87\%)&4 (1.9\%)&0 (0\%)&0 (0\%)\\
+       \hline
+       Google Play&Android&100&3 (3\%)&10 (10\%)&2 (2\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
+       \hline
+%       Third Party&Android&908&1 (0.1\%)&32 (3.5\%)&2 (0.2\%)&0 (0\%)&95 (10.4\%)&4 (0.4\%)&48 (5.3\%)\\
+%       \hline
+    \end{tabular}
+    \end{small}
+    \caption{Summary of personally identifiable information leaked in plaintext (HTTP) by Android and iPhone apps. \emph{The popular iOS apps tend to leak the location information in the clear while Android apps leak the IMEI number and Android ID in the clear.}}
+    \label{tab:pii}
+\end{table*}
+
+\tbd{We need to say nothing is novel in the results, but novelty lies on the ease of reproducing it even by end-users}. 
+
+With the help of controlled experiments we now show how we used \meddle to identify misbehavior and to block traffic causing this misbehavior. 
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "meddle-main"
+%%% End: 

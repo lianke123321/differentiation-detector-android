@@ -7,8 +7,8 @@
 \usepackage{ifpdf}
 \usepackage{epstopdf}
 \usepackage[usenames,dvipsnames]{color}
-\newcommand{\ie}{{\it i.e.}}
-\newcommand{\eg}{{\it e.g.}}
+\newcommand{\ie}{{\it i.e.}\xspace}
+\newcommand{\eg}{{\it e.g.}\xspace}
 \newcommand{\etc}{{\it etc.}}
 \newcommand{\useragent}{{\it User-Agent}\xspace}
 \newcommand{\httphost}{{\it Host}\xspace}
@@ -44,10 +44,10 @@
 \newenvironment{packeditemize}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
 \newenvironment{packedtrivlist}{\begin{list}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
 
-\renewcommand{\fref}{\Fref}
+%\renewcommand{\fref}{\S\ref}
 \renewcommand\thesubfigure{~(\alph{subfigure})}
 
-\title{MobiScope: Pervasive Mobile Internet Traffic Monitoring Made Practical}
+\title{MobiScope: Pervasive Internet Traffic Monitoring for Mobile Devices}
 
 \numberofauthors{7}
 \author{
@@ -58,29 +58,25 @@ Ashwin Rao\\
 Amy Tang\\
 \affaddr{UC Berkeley}
 \alignauthor        
-Adrian Sham\\
+Shen Wang\\
 \affaddr{University of Washington}
 \and
 \alignauthor
-Sam Wilson\\
-\affaddr{University of Washington}
-\alignauthor
-Shen Wang\\
+Nick Martindell\\
 \affaddr{University of Washington}
 \alignauthor
 Justine Sherry\\
 \affaddr{UC Berkeley}
-\and
-\alignauthor
-Arnaud Legout\\
-\affaddr{INRIA}
 \alignauthor
 Walid Dabbous\\
 \affaddr{INRIA}
-\alignauthor 
+\and
+\alignauthor
 Arvind Krishnamurthy\\
 \affaddr{University of Washington}
-\and
+\alignauthor 
+Arnaud Legout\\
+\affaddr{INRIA}
 \alignauthor
 David Choffnes\\
 \affaddr{Northeastern University}
@@ -113,9 +109,10 @@ David Choffnes\\
 
 %\input{placeholder-tex/classification}
 %\input{placeholder-tex/characterize-applications}
+{\footnotesize
 \bibliographystyle{abbrv}
 \bibliography{biblio}
-
+}
 \end{document}
 %%% Local Variables: ***
 %%% mode:latex ***
