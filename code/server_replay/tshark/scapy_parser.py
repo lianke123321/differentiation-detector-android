@@ -246,7 +246,7 @@ def do_tshark_follows(pcap_file, follow_folder):
                "for ((i=0;i<=END;i++))\n" +
                "do\n" +
                 "\techo $i\n" +
-                "\ttshark -r $PCAP_FILE -qz follow,tcp,hex,$i > $follow_folder/follow-stream-$i.txt\n" +
+                "\ttshark -r $PCAP_FILE -qz follow,tcp,raw,$i > $follow_folder/follow-stream-$i.txt\n" +
                "done"
               )
     os.system(command)
