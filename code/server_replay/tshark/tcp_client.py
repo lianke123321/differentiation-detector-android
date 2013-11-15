@@ -19,37 +19,32 @@ def read_ports(ports_pickle_dump):
     os.system(('scp ' + ports_pickle_dump + ' .'))
     return pickle.load(open('free_ports', 'rb'))
 def socket_connect(host, port):
-    print 'Connecting to:', host, port
+#    print 'Connecting to:', host, port
     server_address = (host, port)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
     sock.connect(server_address)
     return sock        
-def send_single_request(req_set, sock, All_Hash, status):
+def send_single_request(req_set, sock, All_Hash, status, send_status):
+
     buff_size = 4096
-    
+
     pld      = str(req_set[0])
     c_s_pair = req_set[1]
-    res      = hash(req_set[2])
     res_len  = req_set[3]
     
-#    if req_set[2] is None:
-#        res = None
-#    else:
-#        res = hash(req_set[2])
-
     while status[c_s_pair] is False:
         continue
     status[c_s_pair] = False
-    
-    print '\nSending:\t %s %d %d \n' % (c_s_pair, len(pld), hash(pld))
+#    print 'Sending:\t', c_s_pair, len(pld), pld, '\n'
+    print 'Sending:', c_s_pair, len(pld), '\n'
     sock.sendall(pld)
+
+    send_status[0]   = True
     
     if res_len == 0:
-        print '\tNo response required'
         return
     
-    print '\tWaiting for response...'
     buffer = ''
     while True:
         buffer += sock.recv(buff_size)
@@ -60,7 +55,9 @@ def send_single_request(req_set, sock, All_Hash, status):
 #        if hash(buffer) == res:
 #            break
     status[c_s_pair] = True
-    print '\nRcieved:\t %s %d %d \n' % (c_s_pair, len(buffer), hash(buffer))
+    
+#    print 'Rcieved:\t', c_s_pair, len(buffer), buffer, '\n'
+    print 'Rcieved:', c_s_pair, len(buffer), '\n'
 def main():
     DEBUG = False
     
@@ -87,25 +84,46 @@ def main():
             host = a[2]
     
     ports = read_ports(port_file)
-    queue = pickle.load(open(pcap_file +'_client_pickle', 'rb'))
     
+    queue = [['c11', 'cs1', hash('s11'), len('s11')],
+             ['c12', 'cs1', hash('s12'), len('s12')],
+             ['c13', 'cs1', hash('s13'), len('s13')],
+             ['c21', 'cs2', hash('s21'), len('s21')],
+             ['c14', 'cs1', hash('s14'), len('s14')],
+             ['c22', 'cs2', hash('s22'), len('s22')],
+             ['c15', 'cs1', hash('s15'), len('s15')],
+             ['c16', 'cs1', None, 0]]
+    
+    queue = pickle.load(open(pcap_file +'_client_pickle', 'rb'))
+
     status = {} #status[c-s-pair] = True if the corresponding connection is ready to send a new request
                 #                   False if the corresponding connection is still waiting for the response to previous request
+    send_status = [True]
+    
     for q in queue:
-        if q[1] not in status:
-            status[q[1]] = True
+        c_s_pair = q[1]
+        if c_s_pair not in status:
+            status[c_s_pair] = True
     
     conns = {}  #conns[c-s-pair] = socket
     for i in range(len(queue)):
-        print 'doing:', i, '/', len(queue)
+        print 't count:', threading.activeCount()
         q = queue[i]
+        c_s_pair = q[1]
+        
+        while not send_status[0]:
+            continue
+        send_status[0] = False
+            
+        print 'Doing:', i+1, '/', len(queue), c_s_pair, len(q[0]), q[3]
         try:
-            sock = conns[q[1]]
+            sock = conns[c_s_pair]
         except:
-            conns[q[1]] = socket_connect(host, ports.pop(0))
-            sock  = conns[q[1]]
-        t = threading.Thread(target=send_single_request, args=[q, sock, All_Hash, status])
+            conns[c_s_pair] = socket_connect(host, ports[c_s_pair])
+            sock  = conns[c_s_pair]
+        t = threading.Thread(target=send_single_request, args=[q, sock, All_Hash, status, send_status])
         t.start()
+        
     
 if __name__=="__main__":
     main()

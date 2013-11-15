@@ -164,6 +164,7 @@ def pcap_to_seq(pcap_file, client_ip, All_Hash, follow_files):
         '''Check if c_s_pair is new'''
         if c_s_pair not in all_pairs:
             all_pairs.append(c_s_pair)
+            table[c_s_pair] = []
             where_in_file[c_s_pair] = 7 #the first 6 lines are meta data
             if client_ip == src_ip:
                 talking[c_s_pair] = 's'
@@ -185,10 +186,15 @@ def pcap_to_seq(pcap_file, client_ip, All_Hash, follow_files):
                 total_server_pl += len(res)
 
             req_hash = hash(req)
-            if req_hash not in table:
-                table[req_hash] = [res]
-            else:
-                table[req_hash].append(res)
+            req_len  = len(req)
+            
+#            if req_hash not in table:
+#                table[req_hash] = [res]
+#            else:
+#                table[req_hash].append(res)
+            
+            table[c_s_pair].append([req_len, req_hash, res])
+            
             total_client_pl += len(req)
 
         elif (client_ip == dst_ip):
@@ -211,7 +217,8 @@ def sanity_check(queue, table):
         c_s_pair = q[1]
         res_hash = q[2]
         res_len  = q[3]
-        table_res = table[hash(pl)].pop(0)
+#        table_res = table[hash(pl)].pop(0)
+        table_res = (table[c_s_pair].pop(0))[2]
         
         if (res_len == 0) and (table_res == None):
             continue 
@@ -248,12 +255,13 @@ def read_client_ip(client_ip_file):
     return (f.readline()).strip()
 def main():
     
-    All_Hash = True
     All_Hash = False
     
     try:
         pcap_folder = sys.argv[1]
     except:
+        print 'Usage: python scapy_parser.py [pcap_folder]'
+        sys.exit(-1)
         pcap_folder = '../data/dropbox_d/'
         client_ip = '10.11.3.3'
 
@@ -265,7 +273,7 @@ def main():
     if not os.path.isfile(pcap_file):
         print 'The folder is missing the pcap file! Exiting with error!'
         sys.exit(-1)
-    if not os.path.isfile(pcap_file):
+    if not os.path.isfile(client_ip_file):
         print 'The folder is missing the client_ip_file! Exiting with error!'
         sys.exit(-1)
     if not os.path.isdir(follow_folder):
@@ -304,13 +312,15 @@ def main():
     f = open(comm_file, 'w')
     for i in range(len(queue)):
         q = queue[i]
+        c_s_pair = q[1]
         if All_Hash is True:
             to_write_req = str(i) + '\tc\t' + str(q[0]) + '\t' + str(q[1]) + '\t' + str(q[2]) + '\n'
             to_write_res = str(i) + '\ts\t' + str(table[q[0]]) + '\t' + str(table[q[0]]) + '\n'
             to_write = to_write_req + to_write_res
         else:
             to_write_req = str(i) + '\tc\t' + str(len(q[0])) + '\t' + str(q[1]) + '\t' + str(hash(q[0])) + '\n'
-            res = table[ hash(q[0]) ].pop(0)
+#            res = table[ hash(q[0]) ].pop(0)
+            res = (table[c_s_pair].pop(0))[2]
             if res is not None:
                 to_write_res = str(i) + '\ts\t' + str( len(res) ) + '\t' + str(q[1]) + '\t'  + str(hash(res)) + '\n'
             else:
