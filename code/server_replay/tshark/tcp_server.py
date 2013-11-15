@@ -127,8 +127,7 @@ def main():
     print 'Dumping ports files'
     pickle.dump(ports, open(port_file, "wb"))
     print ports
-    print min(ports.items(), key=lambda x: x[1]), max(ports.items(), key=lambda x: x[1]) 
-#    print min(ports), max(ports)
+    print min(ports.items(), key=lambda x: x[1])[1], max(ports.items(), key=lambda x: x[1])[1] 
     
     print 'You can now run client side'
     
