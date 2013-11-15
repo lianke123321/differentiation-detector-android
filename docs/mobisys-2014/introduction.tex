@@ -3,58 +3,91 @@
 
 %what is the problem area you are working in and why is it important? It is important to set the larger context here. Why is the problem of interest and importance to the larger community?
 
-Middleboxes pervade today's Internet ecosystem. Enterprise networks contain appliances to 
-ensure privacy and security, service provider networks use middleboxes to enforce policies 
-and traffic engineering, and public-access networks use them for NAT and firewalling services. In all 
-of these cases, middleboxes primarily serve as general-purpose devices with little customization 
-for individual users or personal devices. 
+Middleboxes pervade today’s networks. They are typically deployed to protect devices, optimize 
+performance and/or implement new services in a single network domain.
+The middleboxes tend to be tuned to the needs of a single network, offering few options for 
+dynamic, custom behavior on flows traversing the network. 
+ For devices that are 
+permanently connected such networks, the solution is perfectly reasonable. 
 
-As mobile devices become the primary mode for user interaction with the Internet, this 
-per-network middlebox model is increasingly at odds with the needs of individual users. 
-A device may interact with several different 
-networks per day, from home WiFi to cell networks, business WiFi, and public access points. 
-Each network contains its own set of middleboxes, each with different policies, and with important 
-and often detrimental implications for the individual device or user. 
-For example, different access points provide different levels of encryption (or none at all), 
-exposing the user's private information to eavesdroppers. Some networks deploy transparent 
-caches and proxies, potentially changing how and when content is delivered in ways that 
-do not universally improve the user experience. In some cases, middleboxes enforce 
-content manipulation, blocking or traffic shaping to the detriment of users.
+However, we increasingly access the Internet from mobile devices that connect to multiple network 
+domains as we move about. These networks implement different middlebox features, and can frustrate 
+users by applying policies that do not match with individual device and app needs. In this mobile 
+environment, we currently have no way to understand what these policies are, to experiment with 
+alternative policies to improve the user experience, or to deploy custom policies/features that are 
+enforced regardless of which network the device is connected to.
 
-In this work, we explore an alternative to the per-network middlebox approach: we provide each 
+% PG: I think this can be framed as a more radical paradigm shift from network-serving to user-serving middle boxes. 
+% + the fact that this is for mobile + it is portable across networks.
+
+%Middleboxes pervade today's Internet ecosystem. Enterprise networks contain appliances to 
+%ensure privacy and security, service provider networks use middleboxes to enforce policies 
+%and traffic engineering, and public-access networks use them for NAT and firewalling services. In all 
+%of these cases, middleboxes primarily serve as general-purpose devices with little customization 
+%for individual users or personal devices. 
+%
+%As mobile devices become the primary mode for user interaction with the Internet, this 
+%per-network middlebox model is increasingly at odds with the needs of individual users. 
+%A device may interact with several different 
+%networks per day, from home WiFi to cell networks, business WiFi, and public access points. 
+%Each network contains its own set of middleboxes, each with different policies, and with important 
+%and often detrimental implications for the individual device or user. 
+%For example, different access points provide different levels of encryption (or none at all), 
+%exposing the user's private information to eavesdroppers. Some networks deploy transparent 
+%caches and proxies, potentially changing how and when content is delivered in ways that 
+%do not universally improve the user experience. In some cases, middleboxes enforce 
+%content manipulation, blocking or traffic shaping to the detriment of users.
+
+To address this problem, we propose an alternative to the per-network middlebox approach: we provide each 
 mobile device with a single, personalizable middlebox that is present regardless of where and 
 how it connects to the Internet. We rely on two key observations that enable our approach. First, 
-software middleboxes and cloud computing services offer the opportunity to deploy large numbers 
+software middleboxes and cloud computing services offer the opportunity to deploy and distribute large numbers 
 of middlebox services quickly, easily and at scale~\cite{sherry:middleboxes} without 
 the need to deploy hardware in homes~\cite{bismarck} or ISPs~\cite{morleysmiddleboxpaper}. Second, 
 the vast majority of Interent-enabled mobile devices provide the ability to connect to a remote host over a virtual private 
-network (VPN). By using a VPN-based proxy as an entry point to a device's software middlebox, we can 
+network (VPN). By using a nearby VPN-based proxy in the cloud as an entry point to a device's software middlebox, we can 
 establish a tunnel that is secure and that prevents other in-network middleboxes from interfering with 
 device traffic (with the exception of wholesale blocking). 
 
 Exploiting these two observations, we use VPNs to ensure that all of a mobile device's traffic is 
 securely tunneled out of the access network (\wifi or cell) to a software middlebox running 
 in the cloud. Once the traffic arrives at the software middlebox, we 
-can record, block, shape and modify it according to user-specific policies before forwarding it 
-to the destination. 
+can enforce custom user- and device-specific policies. 
+
+%record, block, shape and modify it according to user-specific policies before forwarding it 
+%to the destination. 
 
 This work 
-makes XXX contributions. First, we build \meddle, a system that the above approach  
-to provide users with transparency and control over \emph{all} network traffic generated by their 
-mobile devices. Second, we use \meddle as a vantage point to conduct measurement studies that inform a 
-wide range of user-centric goals: identifying privacy leaks in mobile apps, detecting content 
+makes XXX contributions. First, we build \meddle, a system that provides users with transparency 
+and control % PG: Make these words more general
+over all network traffic generated by their 
+mobile devices. Second, we use \meddle as a vantage point to conduct measurement studies that inform 
+middlebox applications that can meet a wide range of users' goals: identifying privacy leaks in mobile apps, detecting content 
 manipulation and service differentiation in ISPs, and studying malicious mobile network activity. 
 Third, we go beyond simple measurements to implement systems atop \meddle that improve 
-privacy, block unwanted traffic, notify users of ISP interference and block malware. \meddle has been running since 
+privacy, block unwanted traffic, notify users of ISP interference and block malware. 
+% PG: Flip 2&3 or merge
+\meddle has been running since 
 MONTH, 2012 and currently has XXX users participating in an IRB-approved study. 
+
+One of the key advantages of \meddle is that it gives researchers the ability to experiment 
+with new middlebox approaches on real user network flows. To convince users to adopt our 
+system, we designed \meddle with a low barrier for deployment and strong incentives for 
+user adoption. The system uses only existing device, app and network support without requiring 
+any special privileges or custom mobile OSes. It is as simple to install as three taps 
+on a mobile device. To encourage users to install \meddle, we current provide custom 
+network filters (\eg device-wide ad blocking) and visualization/blocking of services leaking 
+personally identifiable information (PII). We are developing additional services as incentives 
+for users, including caching, device-wide SPDY connections and malware blocking.
 
 As a software-based implementation with a low barrier for deployment and strong incentives for 
 user adoption, \meddle provides researchers with a new, powerful platform for \emph{in situ} 
 mobile-network research and experimentation. Currently researchers with new  
-middlebox approaches must test them in a lab environment or rely on ISPs or users to deploy 
-new hardware -- a risky and costly proposition for most carriers. With \meddle, researchers 
+middlebox approaches to improve the user experience must test them in a lab environment or 
+rely on ISPs or users to deploy new hardware/software -- a risky and costly proposition for 
+most carriers. With \meddle, researchers 
 can immediately deploy new meddleboxes (software middlebox modules) that interact with 
-real user traffic in cloud data centers often located just outside each device's access network. 
+real users' mobile traffic. %in cloud data centers often located just outside each device's access network. 
 This paper demonstrates the feasibility of this approach and explores several new opportunities 
 for implementing network control.
 
