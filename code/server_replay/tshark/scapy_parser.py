@@ -484,19 +484,19 @@ def main():
     queue = []
     table = {}
     
-    file_list = python_lib.dir_list(follow_folder, True)
-    for file in file_list:
-        if ('follow-stream-' not in file):
-            continue
-        print file
-        [q, t, c_s_pair] = stream_to_queue(file, packet_dic)
-        queue += q
-        table[c_s_pair] = t
+#    file_list = python_lib.dir_list(follow_folder, True)
+#    for file in file_list:
+#        if ('follow-stream-' not in file):
+#            continue
+#        print file
+#        [q, t, c_s_pair] = stream_to_queue(file, packet_dic)
+#        queue += q
+#        table[c_s_pair] = t
     
     
     
 #    [q0, t0, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-0.txt', packet_dic)
-#    [q1, t1, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-1.txt', packet_dic)
+    [q1, t1, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-1.txt', packet_dic)
 #    [q2, t2, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-2.txt', packet_dic)
 #    [q3, t3, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-3.txt', packet_dic)
 #    [q4, t4, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-4.txt', packet_dic)
@@ -504,8 +504,8 @@ def main():
 #    stream_to_queue(follow_folder + '/follow-stream-4.txt', packet_dic)
     
 #    queue = q0 + q1 + q2 + q3 + q4
-#    queue = q1
-#    table[c_s_pair] = t1
+    queue = q1
+    table[c_s_pair] = t1
     
     queue.sort(key=lambda tup: tup[4])
 
@@ -522,9 +522,9 @@ def main():
 #            for res in res_array:
 #                res[1] -= base_time
     
-#    print 'QUEUE:'
-#    for q in queue:
-#        print q[1], '\t', q[4], '\t', len(q[0]), '\t', q[3]
+    print 'QUEUE:'
+    for q in queue:
+        print q[1], '\t', q[4], '\t', len(q[0]), '\t', q[3]
     
 
     comm_file   = pcap_file + '_communication.txt'

@@ -43,6 +43,7 @@ def send_single_request(req_set, sock, All_Hash, status, send_status):
     send_status[0]   = True
     
     if res_len == 0:
+        status[c_s_pair] = True
         return
     
     buffer = ''
@@ -56,8 +57,8 @@ def send_single_request(req_set, sock, All_Hash, status, send_status):
 #            break
     status[c_s_pair] = True
     
-#    print 'Rcieved:\t', c_s_pair, len(buffer), buffer, '\n'
-    print 'Rcieved:', c_s_pair, len(buffer), '\n'
+#    print 'Recieved:\t', c_s_pair, len(buffer), buffer, '\n'
+    print 'Recieved:', c_s_pair, len(buffer), '\n'
 def main():
     DEBUG = False
     
@@ -123,8 +124,11 @@ def main():
         c_s_pair  = q[1]
         timestamp = q[4]
         
+        print timestamp
+        
         while not send_status[0]:
             continue
+        
         send_status[0] = False
         
         while not time.time() > time_origin + timestamp:
