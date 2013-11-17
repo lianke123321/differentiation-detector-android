@@ -496,16 +496,18 @@ def main():
     
     
 #    [q0, t0, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-0.txt', packet_dic)
-    [q1, t1, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-1.txt', packet_dic)
+#    [q1, t1, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-1.txt', packet_dic)
 #    [q2, t2, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-2.txt', packet_dic)
 #    [q3, t3, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-3.txt', packet_dic)
 #    [q4, t4, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-4.txt', packet_dic)
+#    [q5, t5, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-5.txt', packet_dic)
+    [q6, t6, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-6.txt', packet_dic)
 #    stream_to_queue(follow_folder + '/follow-stream-3.txt', packet_dic)
 #    stream_to_queue(follow_folder + '/follow-stream-4.txt', packet_dic)
     
 #    queue = q0 + q1 + q2 + q3 + q4
-    queue = q1
-    table[c_s_pair] = t1
+    queue = q6
+    table[c_s_pair] = t6
     
     queue.sort(key=lambda tup: tup[4])
 
