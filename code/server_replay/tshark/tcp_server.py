@@ -39,7 +39,7 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
     table_set = table.pop(0)
     req_len   = table_set[0]
     req_hash  = table_set[1]
-    res       = table_set[2]
+    res_array = table_set[2]
     
     while True:
         print '\nServer waiting for connection...'
@@ -54,17 +54,26 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
 #                print '\nRcvd\t', connection, client_address, len(buffer), buffer, '\n'
                 print '\nRcvd\t', connection, client_address, len(buffer), '\n' 
                 buffer = ''
-                if res is None:
+                if len(res_array) == 0:
                     'No need to send back anything!', connection, client_address
                 else:
 #                    print '\nSent\t', connection, client_address, len(res), res, '\n'
-                    print '\nSent\t', connection, client_address, len(res), '\n'
-                    connection.sendall(str(res))
+                    print '\nSent\t', connection, client_address, len(res_array), '\n'
+                    
+                    time_base   = res_array[0][1]
+                    time_origin = time.time()
+                    
+                    for i in range(len(res_array)):
+                        res       = res_array[i][0]
+                        timestamp = res_array[i][1]
+                        while timestamp - time_base + time_origin > time.time():
+                            continue 
+                        connection.sendall(str(res))
                 if len(table) > 0:
                     table_set = table.pop(0)
                     req_len   = table_set[0]
                     req_hash  = table_set[1]
-                    res       = table_set[2]
+                    res_array = table_set[2]
         print 'Done sending...'
         time.sleep(2)
         connection.shutdown(socket.SHUT_RDWR)
