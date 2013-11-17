@@ -94,27 +94,42 @@ def main():
              ['c15', 'cs1', hash('s15'), len('s15')],
              ['c16', 'cs1', None, 0]]
     
+    queue = [['c11', 'cs1', hash('s11'), len('s11')],
+             ['c12', 'cs1', hash('s12'), len('s12')],
+             ['c13', 'cs1', hash('s13'), len('s13')],
+             ['c21', 'cs2', hash('s21'), len('s21')],
+             ['c14', 'cs1', hash('s14'), len('s14')],
+             ['c22', 'cs2', hash('s22'), len('s22')],
+             ['c15', 'cs1', hash('s15'), len('s15')],
+             ['c16', 'cs1', None, 0]]
+    
     queue = pickle.load(open(pcap_file +'_client_pickle', 'rb'))
 
     status = {} #status[c-s-pair] = True if the corresponding connection is ready to send a new request
                 #                   False if the corresponding connection is still waiting for the response to previous request
     send_status = [True]
     
+    
     for q in queue:
         c_s_pair = q[1]
         if c_s_pair not in status:
             status[c_s_pair] = True
     
+    time_origin = time.time()
     conns = {}  #conns[c-s-pair] = socket
     for i in range(len(queue)):
         print 't count:', threading.activeCount()
         q = queue[i]
-        c_s_pair = q[1]
+        c_s_pair  = q[1]
+        timestamp = q[4]
         
         while not send_status[0]:
             continue
         send_status[0] = False
-            
+        
+        while not time.time() > time_origin + timestamp:
+            continue
+        
         print 'Doing:', i+1, '/', len(queue), c_s_pair, len(q[0]), q[3]
         try:
             sock = conns[c_s_pair]
