@@ -45,20 +45,20 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
         print '\nServer waiting for connection...'
         buffer = ''
         connection, client_address = sock.accept()
-        print connection, client_address 
         while True:
+            print 'waiting for:\t', c_s_pair, req_len
             buffer += connection.recv(buff_size)
 #            response = find_response(buffer, table, All_Hash)
 #            if response is not False:
             if len(buffer) == req_len:
 #                print '\nRcvd\t', connection, client_address, len(buffer), buffer, '\n'
-                print '\nRcvd\t', connection, client_address, len(buffer), '\n' 
+                print '\nReceived\t', c_s_pair, len(buffer), '\n' 
                 buffer = ''
                 if len(res_array) == 0:
                     'No need to send back anything!', connection, client_address
                 else:
 #                    print '\nSent\t', connection, client_address, len(res), res, '\n'
-                    print '\nSent\t', connection, client_address, len(res_array), '\n'
+                    print '\nSending\t', c_s_pair, len(res_array), '\n'
                     
                     time_base   = res_array[0][1]
                     time_origin = time.time()
@@ -69,6 +69,7 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
                         while timestamp - time_base + time_origin > time.time():
                             continue 
                         connection.sendall(str(res))
+                        print '\tSent\t', i+1, '\t', len(res) 
                 if len(table) > 0:
                     table_set = table.pop(0)
                     req_len   = table_set[0]
