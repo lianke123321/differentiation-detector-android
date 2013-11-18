@@ -33,8 +33,8 @@ def read_packet_file(packet_file):
     
     return packet_dic
 def stream_to_queue(stream_file, packet_dic):
-    print 'Doing stream_to_queue:'
-    print '\t', stream_file
+#    print 'Doing stream_to_queue:'
+#    print '\t', stream_file
     client = convert_ip(((linecache.getline(stream_file, 5)).split()[2]).replace(':', '.'))
     server = convert_ip(((linecache.getline(stream_file, 6)).split()[2]).replace(':', '.'))
     c_s_pair = client + '-' + server
