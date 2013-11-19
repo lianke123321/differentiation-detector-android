@@ -1,3 +1,11 @@
+'''
+Queue:
+    queue = [ [req, c_s_pair, hash(res), len(res), timestamp], ...]
+
+Table:
+    table[c_s_pair] = [ [len(req), hash(rea), [[res, timestamp], ...] ], ...]
+'''
+
 import pickle, copy, os, sys, linecache
 import python_lib
 from scapy.all import *
@@ -137,15 +145,6 @@ def stream_to_queue(stream_file, packet_dic):
     else:
         queue.append([pl1.decode("hex"), c_s_pair, hash(res.decode("hex")), len(res.decode("hex")), info_timestamp1])
         table.append([len(pl1.decode("hex")), hash(pl1.decode("hex")), res_array])
-    
-#    print len(queue)
-#    print 'QUEUE:'
-#    for q in queue:
-#        print q
-#    print 'TABLE:'
-#    for t in table:
-#        print t
-#    print queue
     
     return queue, table, c_s_pair
 def map_follows(follows_dir, client_ip):
@@ -519,17 +518,17 @@ def main():
     queue.sort(key=lambda tup: tup[4])
 
     time_origin = queue[0][4]
-    print time_origin
     for q in queue:
         q[4] -= time_origin
     
-    
-#    for c_s_pair in table:
-#        for res_set in table[c_s_pair]:
-#            res_array = res_set[2]
-#            base_time = res_array[0][1]
-#            for res in res_array:
-#                res[1] -= base_time
+    for c_s_pair in table:
+        for i in range(len(table[c_s_pair])):
+            if len(table[c_s_pair][i][2]) == 0:
+                continue 
+            time_offset = table[c_s_pair][i][2][0][1]
+            for j in range(len(table[c_s_pair][i][2])):
+                table[c_s_pair][i][2][j][1] -= time_offset
+                
     
     print 'QUEUE:'
     for q in queue:
