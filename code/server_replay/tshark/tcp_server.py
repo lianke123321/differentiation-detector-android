@@ -116,13 +116,14 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
                 else:
 #                    print '\nSending\t', c_s_pair, len(res_array), '\n'
                     
-                    time_base   = res_array[0][1]
+#                    time_base   = res_array[0][1]
                     time_origin = time.time()
                     
                     for i in range(len(res_array)):
                         res       = res_array[i][0]
                         timestamp = res_array[i][1]
-                        while timestamp - time_base + time_origin > time.time():
+#                        while timestamp - time_base + time_origin > time.time():
+                        while timestamp + time_origin > time.time():
                             continue 
                         connection.sendall(str(res))
 #                        print '\tSent\t', i+1, '\t', len(res) 
@@ -135,7 +136,7 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
                     break
             else:
                 buffer += connection.recv(buff_size)
-        print 'Done sending...'
+        print 'Done with this connection:', c_s_pair
         time.sleep(2)
         connection.shutdown(socket.SHUT_RDWR)
         connection.close()
