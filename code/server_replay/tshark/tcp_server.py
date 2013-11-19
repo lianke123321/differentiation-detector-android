@@ -10,7 +10,7 @@ queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
 
 '''
 
-import sys, socket, pickle, threading, time
+import os, sys, socket, pickle, threading, time
 import python_lib
 
 def find_response(buffer, table, All_Hash):
@@ -105,19 +105,16 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
         buffer = ''
         connection, client_address = sock.accept()
         while True:
-            print 'waiting for:\t', c_s_pair, req_len
-#            response = find_response(buffer, table, All_Hash)
-#            if response is not False:
+#            print 'waiting for:\t', c_s_pair, req_len
             if len(buffer) >= req_len:
-#                print '\nRcvd\t', connection, client_address, len(buffer), buffer, '\n'
-                print '\nReceived\t', c_s_pair, len(buffer), req_len, '\n' 
+#                print '\nReceived\t', c_s_pair, len(buffer), req_len, '\n' 
 #                buffer = ''
                 buffer = buffer[req_len:]
                 if len(res_array) == 0:
-                    print 'No need to send back anything!', c_s_pair
+                    pass
+#                    print 'No need to send back anything!', c_s_pair
                 else:
-#                    print '\nSent\t', connection, client_address, len(res), res, '\n'
-                    print '\nSending\t', c_s_pair, len(res_array), '\n'
+#                    print '\nSending\t', c_s_pair, len(res_array), '\n'
                     
                     time_base   = res_array[0][1]
                     time_origin = time.time()
@@ -128,12 +125,14 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
                         while timestamp - time_base + time_origin > time.time():
                             continue 
                         connection.sendall(str(res))
-                        print '\tSent\t', i+1, '\t', len(res) 
+#                        print '\tSent\t', i+1, '\t', len(res) 
                 if len(table) > 0:
                     table_set = table.pop(0)
                     req_len   = table_set[0]
                     req_hash  = table_set[1]
                     res_array = table_set[2]
+                else:
+                    break
             else:
                 buffer += connection.recv(buff_size)
         print 'Done sending...'
@@ -145,11 +144,14 @@ def main():
     DEBUG = False
     
     try:
-        config_file = sys.argv[1]
+        pcap_folder = sys.argv[1]
     except:
-        print 'USAGE: python tcp_server.py [config_file]'
+        print 'USAGE: python tcp_server.py [pcap_folder]'
         sys.exit(-1)
 
+    pcap_folder = os.path.abspath(pcap_folder)
+    config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
+    
     [All_Hash, pcap_file, number_of_servers] = python_lib.read_config_file(config_file)
     print All_Hash, pcap_file, number_of_servers
     
