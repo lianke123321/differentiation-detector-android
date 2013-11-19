@@ -478,6 +478,8 @@ def main():
         print 'The packets_file is missing. Creating it right now...'
         create_packets_file(pcap_file, client_ip, packets_file)
         
+    comm_file   = pcap_file + '_communication.txt'
+    config_file = pcap_file + '_config'
     
     print 'pcap_folder:', pcap_folder
     print 'client_ip:  ', client_ip
@@ -534,8 +536,6 @@ def main():
         print q[1], '\t', q[4], '\t', len(q[0]), '\t', q[3]
     
 
-    comm_file   = pcap_file + '_communication.txt'
-    config_file = pcap_file + '_config'
     
 #    follow_files = map_follows(follow_folder, client_ip)
 #    [queue, table, all_pairs] = pcap_to_seq(pcap_file, client_ip, All_Hash, follow_files)   

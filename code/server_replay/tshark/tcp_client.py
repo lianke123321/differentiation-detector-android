@@ -36,8 +36,7 @@ def send_single_request(req_set, sock, All_Hash, status, send_status):
     while status[c_s_pair] is False:
         continue
     status[c_s_pair] = False
-#    print 'Sending:\t', c_s_pair, len(pld), pld, '\n'
-    print 'Sending:', c_s_pair, len(pld), '\n'
+#    print 'Sending:', c_s_pair, len(pld), '\n'
     sock.sendall(pld)
 
     send_status[0]   = True
@@ -57,16 +56,18 @@ def send_single_request(req_set, sock, All_Hash, status, send_status):
 #            break
     status[c_s_pair] = True
     
-#    print 'Recieved:\t', c_s_pair, len(buffer), buffer, '\n'
-    print 'Recieved:', c_s_pair, len(buffer), '\n'
+#    print 'Recieved:', c_s_pair, len(buffer), '\n'
 def main():
     DEBUG = False
     
     try:
-        config_file = sys.argv[1]
+        pcap_folder = sys.argv[1]
     except:
-        print 'USAGE: python tcp_client.py [config_file]'   
+        print 'USAGE: python tcp_client.py [pcap_folder]'   
         sys.exit(-1)
+    
+    pcap_folder = os.path.abspath(pcap_folder)
+    config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
     
     [All_Hash, pcap_file, number_of_servers] = read_config_file(config_file)
     print 'All_Hash         :', All_Hash
@@ -119,12 +120,12 @@ def main():
     time_origin = time.time()
     conns = {}  #conns[c-s-pair] = socket
     for i in range(len(queue)):
-        print 't count:', threading.activeCount()
+#        print 't count:', threading.activeCount()
         q = queue[i]
         c_s_pair  = q[1]
         timestamp = q[4]
         
-        print timestamp
+#        print timestamp
         
         while not send_status[0]:
             continue
@@ -134,7 +135,7 @@ def main():
         while not time.time() > time_origin + timestamp:
             continue
         
-        print 'Doing:', i+1, '/', len(queue), c_s_pair, len(q[0]), q[3]
+#        print 'Doing:', i+1, '/', len(queue), c_s_pair, len(q[0]), q[3]
         try:
             sock = conns[c_s_pair]
         except:
