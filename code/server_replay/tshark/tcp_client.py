@@ -45,12 +45,15 @@ def send_single_request(req_set, sock, All_Hash, status, send_status):
         status[c_s_pair] = True
         return
     
-    buffer = ''
+#    buffer = ''
+    buffer_len = 0
     while True:
-        buffer += sock.recv(buff_size)
+#        buffer += sock.recv(buff_size)
+        buffer_len += len(sock.recv(buff_size))
 #        if All_Hash:
 #            buffer = int(buffer)
-        if len(buffer) == res_len:
+#        if len(buffer) == res_len:
+        if buffer_len == res_len:
             break
 #        if hash(buffer) == res:
 #            break
@@ -120,12 +123,12 @@ def main():
     time_origin = time.time()
     conns = {}  #conns[c-s-pair] = socket
     for i in range(len(queue)):
-#        print 't count:', threading.activeCount()
+        print 't count:', threading.activeCount()
         q = queue[i]
         c_s_pair  = q[1]
         timestamp = q[4]
         
-#        print timestamp
+        print timestamp
         
         while not send_status[0]:
             continue
@@ -135,7 +138,7 @@ def main():
         while not time.time() > time_origin + timestamp:
             continue
         
-#        print 'Doing:', i+1, '/', len(queue), c_s_pair, len(q[0]), q[3]
+        print 'Doing:', i+1, '/', len(queue), c_s_pair, len(q[0]), q[3]
         try:
             sock = conns[c_s_pair]
         except:

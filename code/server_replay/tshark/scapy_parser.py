@@ -4,6 +4,9 @@ Queue:
 
 Table:
     table[c_s_pair] = [ [len(req), hash(rea), [[res, timestamp], ...] ], ...]
+
+packet_dic:
+    packet_dic[c_s_pair][pl_hash] = [[timestamp, talking]]
 '''
 
 import pickle, copy, os, sys, linecache
@@ -40,7 +43,7 @@ def read_packet_file(packet_file):
         l = f.readline()
     
     return packet_dic
-def stream_to_queue(stream_file, packet_dic):
+def stream_to_queue2(stream_file, packet_dic):
 #    print 'Doing stream_to_queue:'
 #    print '\t', stream_file
     client = convert_ip(((linecache.getline(stream_file, 5)).split()[2]).replace(':', '.'))
@@ -58,94 +61,191 @@ def stream_to_queue(stream_file, packet_dic):
     res = ''
     
     pl1 = (f.readline()).strip()
-    pl_hash1 = hash(pl1)
+    pl1_hash = hash(pl1)
     
     if pl1[0] == '=':
         print 'Empty stream file!', stream_file 
         return queue, table, c_s_pair
     try:
-        info1 = packet_dic[c_s_pair][pl_hash1].pop(0)
+        info1 = packet_dic[c_s_pair][pl1_hash].pop(0)
     except KeyError:
         print 'Broken stream file!', stream_file
         print '\tLook into it' 
         return queue, table, c_s_pair
     
-    info_timestamp1 = info1[0]
-    info_talking1   = info1[1]
+    pl1_timestamp = info1[0]
+    pl1_talking   = info1[1]
     
-    assert(info_talking1 == 'c')
+    assert(pl1_talking == 'c')
     
     pl2 = f.readline()
     while pl2 and pl2[0] != '=':
         pl2      = pl2.strip()
-        pl_hash2 = hash(pl2)
+        pl2_hash = hash(pl2)
         try:
-            info2           = packet_dic[c_s_pair][pl_hash2].pop(0)
+            info2 = packet_dic[c_s_pair][pl2_hash].pop(0)
         except KeyError:
             print 'Payload not in packet dic:'
             print pl2
             pl2 = f.readline()
             continue
-        info_timestamp2 = info2[0]
-        info_talking2   = info2[1]
-        if info_talking2 == 'c':
-#            queue.append([pl1, c_s_pair, None, 0, info_timestamp1])
-            queue.append([pl1.decode("hex"), c_s_pair, None, 0, info_timestamp1])
+        pl2_timestamp = info2[0]
+        pl2_talking   = info2[1]
+        if pl2_talking == 'c':
+#            queue.append([pl1, c_s_pair, None, 0, pl1_timestamp])
+            queue.append([pl1.decode("hex"), c_s_pair, None, 0, pl1_timestamp])
             assert(res_array == [])
             table.append([len(pl1.decode("hex")), hash(pl1.decode("hex")), []])
             
             pl1             = pl2
-            pl_hash1        = pl_hash2
-            info_timestamp1 = info_timestamp2
-            info_talking1   = info_talking2
+            pl1_hash        = pl2_hash
+            pl1_timestamp = pl2_timestamp
+            pl1_talking   = pl2_talking
             
             assert(res_array == [])
             pl2 = f.readline()
         
-        elif info_talking2 == 's':
-            res_array.append([pl2.decode("hex"), info_timestamp2])
+        elif pl2_talking == 's':
+            res_array.append([pl2.decode("hex"), pl2_timestamp])
             res += pl2
             pl2  = f.readline()
             while pl2 and pl2[0] != '=':
                 pl2      = pl2.strip()
-                pl_hash2 = hash(pl2)
+                pl2_hash = hash(pl2)
 #                print 'inner'
 #                print pl2
-#                print pl_hash2
+#                print pl2_hash
                 try:
-                    info2           = packet_dic[c_s_pair][pl_hash2].pop(0)
+                    info2           = packet_dic[c_s_pair][pl2_hash].pop(0)
                 except KeyError:
                     print 'Payload not in packet dic:'
                     print pl2
                     pl2 = f.readline()
                     continue
-                info_timestamp2 = info2[0]
-                info_talking2   = info2[1]
+                pl2_timestamp = info2[0]
+                pl2_talking   = info2[1]
                 
-                if info_talking2 == 's':
-                    res_array.append([pl2.decode("hex"), info_timestamp2])
+                if pl2_talking == 's':
+                    res_array.append([pl2.decode("hex"), pl2_timestamp])
                     res += pl2
                     pl2 = f.readline()
-                elif info_talking2 == 'c':
-                    queue.append([pl1.decode("hex"), c_s_pair, hash(res.decode("hex")), len(res.decode("hex")), info_timestamp1])
+                elif pl2_talking == 'c':
+                    queue.append([pl1.decode("hex"), c_s_pair, hash(res.decode("hex")), len(res.decode("hex")), pl1_timestamp])
                     table.append([len(pl1.decode("hex")), hash(pl1.decode("hex")), res_array])
                     res_array = []
                     res       = ''
                     pl1             = pl2
-                    pl_hash1        = pl_hash2
-                    info_timestamp1 = info_timestamp2
-                    info_talking1   = info_talking2
+                    pl1_hash        = pl2_hash
+                    pl1_timestamp = pl2_timestamp
+                    pl1_talking   = pl2_talking
                     pl2             = f.readline()
                     break
     
     if res_array == []:
-        queue.append([pl1.decode("hex"), c_s_pair, None, 0, info_timestamp1])
+        queue.append([pl1.decode("hex"), c_s_pair, None, 0, pl1_timestamp])
         assert(res_array == [])
         table.append([len(pl1.decode("hex")), hash(pl1.decode("hex")), []])
     else:
-        queue.append([pl1.decode("hex"), c_s_pair, hash(res.decode("hex")), len(res.decode("hex")), info_timestamp1])
+        queue.append([pl1.decode("hex"), c_s_pair, hash(res.decode("hex")), len(res.decode("hex")), pl1_timestamp])
         table.append([len(pl1.decode("hex")), hash(pl1.decode("hex")), res_array])
     
+    return queue, table, c_s_pair
+def stream_to_queue(stream_file, packet_dic):
+    print stream_file
+    client = convert_ip(((linecache.getline(stream_file, 5)).split()[2]).replace(':', '.'))
+    server = convert_ip(((linecache.getline(stream_file, 6)).split()[2]).replace(':', '.'))
+    c_s_pair = client + '-' + server
+
+    f = open(stream_file, 'r')
+    
+    for i in range(6):
+        f.readline()
+    
+    queue     = []
+    table     = []
+
+    pl1 = (f.readline()).strip()
+    pl1_hash      = hash(pl1)
+#        info1         = packet_dic[c_s_pair][pl1_hash].pop(0)
+    try:
+        info1 = packet_dic[c_s_pair][pl1_hash].pop(0)
+    except KeyError:
+        print 'Broken stream file!', stream_file
+        print '\tLook into it' 
+        return queue, table, c_s_pair
+    pl1_timestamp = info1[0]
+    pl1_talking   = info1[1]
+    
+    while pl1 and pl1[0] != '=':
+        req_list = []
+        res_list = []
+        req  = ''
+        res  = ''
+        
+        assert(pl1_talking == 'c')
+    
+#        req_list.append((pl, pl_timestamp))
+#        req += pl
+#        pl2 = f.readline()
+        pl2 = (f.readline()).strip()    
+        while pl2 and pl2[0] != '=':
+            pl2_hash      = hash(pl2)
+#            info2         = packet_dic[c_s_pair][pl2_hash].pop(0)
+            try:
+                info2 = packet_dic[c_s_pair][pl2_hash].pop(0)
+            except KeyError:
+                print 'Payload not in packet dic:'
+                print pl2
+                pl2 = (f.readline()).strip()
+                continue
+            pl2_timestamp = info2[0]
+            pl2_talking   = info2[1]
+            
+            if pl2_talking == 'c':
+                queue.append([pl1.decode("hex"), c_s_pair, None, 0, pl1_timestamp])
+                req          += pl1
+                
+                pl1           = pl2
+                pl1_hash      = pl2_hash
+                pl1_timestamp = pl2_timestamp
+                pl1_talking   = pl2_talking
+                
+                pl2 = (f.readline()).strip()
+            
+            if pl2_talking == 's':
+                first = True
+                break
+       
+        while pl2 and pl2[0] != '=':
+            pl2_hash      = hash(pl2)
+#            print pl2
+            if not first:
+    #            info2         = packet_dic[c_s_pair][pl2_hash].pop(0)
+                try:
+                    info2 = packet_dic[c_s_pair][pl2_hash].pop(0)
+                except KeyError:
+                    print 'Payload not in packet dic:'
+                    print pl2
+                    pl2 = (f.readline()).strip()
+                    continue
+                pl2_timestamp = info2[0]
+                pl2_talking   = info2[1]
+            first = False
+            if pl2_talking == 's':
+                res_list.append([pl2, pl2_timestamp])
+                res += pl2
+                pl2 = (f.readline()).strip()
+            
+            if pl2_talking == 'c':
+                break
+        
+        queue.append([pl1.decode("hex"), c_s_pair, hash(res), len(res), pl1_timestamp])
+        table.append([len(req.decode("hex")), hash(req.decode("hex")), res_list])
+        pl1           = pl2
+        pl1_hash      = pl2_hash
+        pl1_timestamp = pl2_timestamp
+        pl1_talking   = pl2_talking
+
     return queue, table, c_s_pair
 def map_follows(follows_dir, client_ip):
     '''
@@ -381,7 +481,7 @@ def create_packets_file(pcap_file, client_ip, packets_file):
     print '\tNumber of TCP packets w/ payload:', tcp_p
     print '\tNumber of irrelevant TCP packets:', tcp_irrelevant
     print '\n'
-def sanity_check(queue, table):
+def sanity_check2(queue, table):
     print '\nDoing sanity check...'
     for q in queue:
         pl        = q[0]
@@ -415,6 +515,46 @@ def sanity_check(queue, table):
             print '===='
             print hash(table[hash(pl)])
             return
+    print '\tPassed sanity check! Hoooooray!!! :)\n'
+def sanity_check(queue, table):
+    print '\nDoing sanity check...'
+    req = ''
+    for q in queue:
+        pl        = q[0]
+        c_s_pair  = q[1]
+        res_hash  = q[2]
+        res_len   = q[3]
+        timestamp = q[4]
+#        table_res = table[hash(pl)].pop(0)
+#        assert (len(queue) == len(table[c_s_pair]))
+
+        
+        if (res_len == 0):
+            req += pl
+            continue
+        res       = table[c_s_pair].pop(0)
+        res_array = res[2]
+        table_res     = ''.join(map(lambda x: x[0], res_array))
+        table_req_len = res[0]
+        
+        if (res_len != len(table_res)) or (res_hash != hash(table_res)):
+#        if (res_hash != hash(table_res)) or (len(req) != table_req_len):
+            print 'Inconsistency:'
+            print pl
+            print '===='
+            print len(pl)
+            print '===='
+            print c_s_pair
+            print '===='
+            print hash(pl)
+            print '===='
+            print res_hash
+            print '===='
+            print table[hash(pl)]
+            print '===='
+            print hash(table[hash(pl)])
+            return
+        req = ''
     print '\tPassed sanity check! Hoooooray!!! :)\n'
 def do_tshark_follows2(pcap_file, follow_folder):
     command = ("PCAP_FILE='" + pcap_file + "'\n" +
@@ -521,6 +661,13 @@ def main():
     for q in queue:
         q[4] -= time_origin
     
+#    table[c_s_pair] = [ [len(req), hash(rea), [[res, timestamp], ...] ], ...]
+#    
+#    table2 = copy.deepcopy(table)
+#    for c_s_pair in table:
+#        for i in range(len(table[c_s_pair])):
+#            if len(table[c_s_pair][i][2]) == 0
+            
     for c_s_pair in table:
         for i in range(len(table[c_s_pair])):
             if len(table[c_s_pair][i][2]) == 0:
