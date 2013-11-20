@@ -151,7 +151,6 @@ def stream_to_queue2(stream_file, packet_dic):
     
     return queue, table, c_s_pair
 def stream_to_queue(stream_file, packet_dic):
-    print stream_file
     client = convert_ip(((linecache.getline(stream_file, 5)).split()[2]).replace(':', '.'))
     server = convert_ip(((linecache.getline(stream_file, 6)).split()[2]).replace(':', '.'))
     c_s_pair = client + '-' + server
@@ -177,7 +176,6 @@ def stream_to_queue(stream_file, packet_dic):
     pl1_talking   = info1[1]
     
     while pl1 and pl1[0] != '=':
-        
         assert(pl1_talking == 'c')
         
         res_list = []
@@ -237,6 +235,9 @@ def stream_to_queue(stream_file, packet_dic):
         
         queue.append([pl1.decode("hex"), c_s_pair, hash(res), len(res), pl1_timestamp])
         table.append([len(req.decode("hex")), hash(req.decode("hex")), res_list])
+
+        if pl2[0] == '=':
+            break
         pl1           = pl2
         pl1_hash      = pl2_hash
         pl1_timestamp = pl2_timestamp
@@ -627,18 +628,18 @@ def main():
     queue = []
     table = {}
     
-#    file_list = python_lib.dir_list(follow_folder, True)
-#    for file in file_list:
-#        if ('follow-stream-' not in file):
-#            continue
-#        [q, t, c_s_pair] = stream_to_queue(file, packet_dic)
-#        queue += q
-#        table[c_s_pair] = t
+    file_list = python_lib.dir_list(follow_folder, True)
+    for file in file_list:
+        if ('follow-stream-' not in file):
+            continue
+        [q, t, c_s_pair] = stream_to_queue(file, packet_dic)
+        queue += q
+        table[c_s_pair] = t
     
     
     
 #    [q0, t0, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-0.txt', packet_dic)
-    [q1, t1, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-1.txt', packet_dic)
+#    [q1, t1, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-1.txt', packet_dic)
 #    [q2, t2, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-2.txt', packet_dic)
 #    [q3, t3, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-3.txt', packet_dic)
 #    [q4, t4, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-4.txt', packet_dic)
@@ -651,8 +652,8 @@ def main():
 #    queue = q6
 #    table[c_s_pair] = t6
     
-    queue = q1
-    table[c_s_pair] = t1
+#    queue = q1
+#    table[c_s_pair] = t1
     
     queue.sort(key=lambda tup: tup[4])
 
