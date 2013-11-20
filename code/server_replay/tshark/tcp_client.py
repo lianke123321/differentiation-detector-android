@@ -123,12 +123,12 @@ def main():
     time_origin = time.time()
     conns = {}  #conns[c-s-pair] = socket
     for i in range(len(queue)):
-        print 't count:', threading.activeCount()
+#        print 't count:', threading.activeCount()
         q = queue[i]
         c_s_pair  = q[1]
         timestamp = q[4]
         
-        print timestamp
+#        print timestamp
         
         while not send_status[0]:
             continue
@@ -138,7 +138,7 @@ def main():
         while not time.time() > time_origin + timestamp:
             continue
         
-        print 'Doing:', i+1, '/', len(queue), c_s_pair, len(q[0]), q[3]
+#        print 'Doing:', i+1, '/', len(queue), c_s_pair, len(q[0]), q[3]
         try:
             sock = conns[c_s_pair]
         except:
