@@ -102,14 +102,17 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
     
     while True:
         print '\nServer waiting for connection...'
-        buffer = ''
+#        buffer = ''
+        buffer_len = 0
         connection, client_address = sock.accept()
         while True:
 #            print 'waiting for:\t', c_s_pair, req_len
-            if len(buffer) >= req_len:
+#            if len(buffer) >= req_len:
+            if buffer_len >= req_len:
 #                print '\nReceived\t', c_s_pair, len(buffer), req_len, '\n' 
 #                buffer = ''
-                buffer = buffer[req_len:]
+                buffer_len -= req_len
+#                buffer = buffer[req_len:]
                 if len(res_array) == 0:
                     pass
 #                    print 'No need to send back anything!', c_s_pair
@@ -135,7 +138,8 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
                 else:
                     break
             else:
-                buffer += connection.recv(buff_size)
+#                buffer += connection.recv(buff_size)
+                buffer_len += len(connection.recv(buff_size))
         print 'Done with this connection:', c_s_pair
         time.sleep(2)
         connection.shutdown(socket.SHUT_RDWR)

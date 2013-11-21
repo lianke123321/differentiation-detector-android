@@ -151,8 +151,8 @@ def stream_to_queue2(stream_file, packet_dic):
     
     return queue, table, c_s_pair
 def stream_to_queue(stream_file, packet_dic):
-    client = convert_ip(((linecache.getline(stream_file, 5)).split()[2]).replace(':', '.'))
-    server = convert_ip(((linecache.getline(stream_file, 6)).split()[2]).replace(':', '.'))
+    client   = convert_ip(((linecache.getline(stream_file, 5)).split()[2]).replace(':', '.'))
+    server   = convert_ip(((linecache.getline(stream_file, 6)).split()[2]).replace(':', '.'))
     c_s_pair = client + '-' + server
 
     f = open(stream_file, 'r')
@@ -163,9 +163,8 @@ def stream_to_queue(stream_file, packet_dic):
     queue     = []
     table     = []
 
-    pl1 = (f.readline()).strip()
-    pl1_hash      = hash(pl1)
-#        info1         = packet_dic[c_s_pair][pl1_hash].pop(0)
+    pl1      = (f.readline()).strip()
+    pl1_hash = hash(pl1)
     try:
         info1 = packet_dic[c_s_pair][pl1_hash].pop(0)
     except KeyError:
@@ -179,8 +178,8 @@ def stream_to_queue(stream_file, packet_dic):
         assert(pl1_talking == 'c')
         
         res_list = []
-        req  = pl1
-        res  = ''
+        req = pl1.decode("hex")
+        res = ''
     
         pl2 = (f.readline()).strip()    
         while pl2 and pl2[0] != '=':
@@ -198,7 +197,7 @@ def stream_to_queue(stream_file, packet_dic):
             
             if pl2_talking == 'c':
                 queue.append([pl1.decode("hex"), c_s_pair, None, 0, pl1_timestamp])
-                req          += pl2
+                req          += pl2.decode("hex")
                 pl1           = pl2
                 pl1_hash      = pl2_hash
                 pl1_timestamp = pl2_timestamp
@@ -226,15 +225,15 @@ def stream_to_queue(stream_file, packet_dic):
                 pl2_talking   = info2[1]
             first = False
             if pl2_talking == 's':
-                res_list.append([pl2, pl2_timestamp])
-                res += pl2
+                res_list.append([pl2.decode("hex"), pl2_timestamp])
+                res += pl2.decode("hex")
                 pl2 = (f.readline()).strip()
             
             if pl2_talking == 'c':
                 break
         
         queue.append([pl1.decode("hex"), c_s_pair, hash(res), len(res), pl1_timestamp])
-        table.append([len(req.decode("hex")), hash(req.decode("hex")), res_list])
+        table.append([len(req), hash(req), res_list])
 
         if pl2[0] == '=':
             break
@@ -515,24 +514,29 @@ def sanity_check2(queue, table):
     print '\tPassed sanity check! Hoooooray!!! :)\n'
 def sanity_check(queue, table):
     print '\nDoing sanity check...'
-    req = ''
+#    req = ''
+    req = {}
     for q in queue:
         pl        = q[0]
         c_s_pair  = q[1]
         res_hash  = q[2]
         res_len   = q[3]
         timestamp = q[4]
-#        table_res = table[hash(pl)].pop(0)
-#        assert (len(queue) == len(table[c_s_pair]))
-
+        
+        if c_s_pair not in req:
+            req[c_s_pair] = ''
+            req[c_s_pair] = 0
+        req[c_s_pair] += len(pl)
         
         if (res_len == 0):
-            req += pl
             continue
-        res       = table[c_s_pair].pop(0)
-        res_array = res[2]
-        table_res     = ''.join(map(lambda x: x[0], res_array))
+        res           = table[c_s_pair].pop(0)
         table_req_len = res[0]
+        res_array     = res[2]
+        table_res     = ''.join(map(lambda x: x[0], res_array))
+#        print table_req_len
+#        print len(req[c_s_pair])
+        assert(table_req_len == req[c_s_pair])
         
         if (res_len != len(table_res)) or (res_hash != hash(table_res)):
 #        if (res_hash != hash(table_res)) or (len(req) != table_req_len):
@@ -551,7 +555,8 @@ def sanity_check(queue, table):
             print '===='
             print hash(table[hash(pl)])
             return
-        req = ''
+        print c_s_pair, req[c_s_pair], len(table_res)
+        req[c_s_pair] = 0
     print '\tPassed sanity check! Hoooooray!!! :)\n'
 def do_tshark_follows2(pcap_file, follow_folder):
     command = ("PCAP_FILE='" + pcap_file + "'\n" +
@@ -652,9 +657,6 @@ def main():
 #    queue = q6
 #    table[c_s_pair] = t6
     
-#    queue = q1
-#    table[c_s_pair] = t1
-    
     queue.sort(key=lambda tup: tup[4])
 
     time_origin = queue[0][4]
@@ -683,6 +685,7 @@ def main():
     
     print 'TABLE:'
     for c_s_pair in table:
+        print '\n---', c_s_pair, '---'
         for t in table[c_s_pair]:
             print c_s_pair, '\t', t[0], len(''.join(map(lambda x: x[0], t[2])))
     
