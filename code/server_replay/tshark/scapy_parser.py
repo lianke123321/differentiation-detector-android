@@ -680,8 +680,10 @@ def main():
                 
     
     print 'QUEUE:'
+    i = 0
     for q in queue:
-        print q[1], '\t', q[4], '\t', len(q[0]), '\t', q[3]
+        i += 1
+        print i, q[1], '\t', q[4], '\t', len(q[0]), '\t', q[3]
     
     print 'TABLE:'
     for c_s_pair in table:

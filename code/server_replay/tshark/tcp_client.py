@@ -18,49 +18,120 @@ def read_ports(ports_pickle_dump):
         ports_pickle_dump = 'achtung.ccs.neu.edu:/home/arash/public_html/free_ports'
     os.system(('scp ' + ports_pickle_dump + ' .'))
     return pickle.load(open('free_ports', 'rb'))
-def socket_connect(host, port):
-#    print 'Connecting to:', host, port
-    server_address = (host, port)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    sock.connect(server_address)
-    return sock        
-def send_single_request(req_set, sock, All_Hash, status, send_status):
-
-    buff_size = 4096
-
-    pld      = str(req_set[0])
-    c_s_pair = req_set[1]
-    res_len  = req_set[3]
+class Connections(object):
+    _instance = None
+    _host     = None
+    _ports    = None
+    connections = {}
+#    def __new__(cls, *args, **kwargs):
+#        if not cls._instance:
+#            cls._instance = super(Connections, cls).__new__(cls, *args, **kwargs)
+#        return cls._instance
+#    
+#    def __init__(self):
+#        self.connections = {}
     
-    while status[c_s_pair] is False:
-        continue
-    status[c_s_pair] = False
-#    print 'Sending:', c_s_pair, len(pld), '\n'
-    sock.sendall(pld)
-
-    send_status[0]   = True
+    @staticmethod
+    def get_sock(c_s_pair):
+        try:
+            return Connections.connections[c_s_pair]
+        except:
+#            print 'get_sock', c_s_pair, Connections._ports[c_s_pair]
+            server_address = (Connections._host, Connections._ports[c_s_pair])
+            
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            sock.connect(server_address)
+            
+            Connections.set_sock(c_s_pair, sock)
+            return Connections.connections[c_s_pair]
     
-    if res_len == 0:
-        status[c_s_pair] = True
-        return
+    @staticmethod
+    def set_sock( c_s_pair, socket):
+        Connections.connections[c_s_pair] = socket
     
-#    buffer = ''
-    buffer_len = 0
-    while True:
-#        buffer += sock.recv(buff_size)
-        buffer_len += len(sock.recv(buff_size))
-#        if All_Hash:
-#            buffer = int(buffer)
-#        if len(buffer) == res_len:
-        if buffer_len == res_len:
-            break
-#        if hash(buffer) == res:
-#            break
-    status[c_s_pair] = True
+    @staticmethod
+    def remove_connection(c_s_pair):
+        del Connections.connections[c_s_pair]
     
-#    print 'Recieved:', c_s_pair, len(buffer), '\n'
+    @staticmethod
+    def set_host(host):
+        Connections._host = host
+    @staticmethod
+    def set_ports(ports):
+        Connections._ports = ports
+        
+class SendRecv(object):
+    def __init__(self, q):
+        self.payload   = q[0]
+        self.c_s_pair  = q[1]
+        self.res_hash  = q[2]
+        self.res_len   = q[3]
+        self.timestamp = q[4]
+        
+    def send_single_request(self, waitlist, sendlist, event):
+        sock = Connections.get_sock(self.c_s_pair)
+#        print 'Sending:', self.c_s_pair, '\t', sock, '\t', len(self.payload) 
+        sock.sendall(self.payload)
+        
+        sendlist.pop()
+        if self.res_len == 0:
+#            print '\tNoResponse', self.c_s_pair, '\t', len(self.payload)
+            waitlist.remove(self.c_s_pair)
+            event.set()
+        else:
+#            print '\tWaiting for responce', self.c_s_pair, self.res_len
+            event.set()
+            buffer_len = 0
+            while True:
+                buffer_len += len(sock.recv(4096))
+                if buffer_len == self.res_len:
+                    break
+#            print '\tReceived', self.c_s_pair, '\t', buffer_len
+            waitlist.remove(self.c_s_pair)
+            event.set()
+        
+class Queue(object):
+    i = 1
+    def __init__(self, queue):
+        self.Q           = queue
+        self.event       = threading.Event()
+        self.waitlist    = []
+        self.sendlist    = []
+        self.time_origin = 0
+    def next(self):
+        #print 'sendlist:', self.sendlist
+        if (len(self.sendlist) == 0):
+            #print 'Ready to send...'
+            q           = self.Q[0]
+            q_payload   = q[0]
+            q_c_s_pair  = q[1]
+            q_res_hash  = q[2]
+            q_res_len   = q[3]
+            q_timestamp = q[4]
+            
+            if (q_c_s_pair not in self.waitlist):
+                if time.time() > self.time_origin + q_timestamp:
+#                    print time.time() - (self.time_origin + q_timestamp) 
+                    time.sleep(time.time()-self.time_origin + q_timestamp)
+                self.Q.pop(0)
+                self.waitlist.append(q_c_s_pair)
+                self.sendlist.append(q_c_s_pair)
+                t = threading.Thread(target=SendRecv(q).send_single_request, args=[self.waitlist, self.sendlist, self.event])
+                self.i += 1
+                t.start()
+    def run(self):
+        self.time_origin = time.time()
+        while self.Q:
+            #print 'Doing:', self.i
+            self.next()
+            #print 'Sleeping!'
+            self.event.wait()
+            #print 'Woke up!'
+            self.event.clear()
+            
 def main():
+    
     DEBUG = False
     
     try:
@@ -72,6 +143,9 @@ def main():
     pcap_folder = os.path.abspath(pcap_folder)
     config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
     
+#    configs.Configs.set('pcap_folder', os.path.abspath(pcap_folder))
+#    configs.Configs.set('config_file', os.path.abspath(pcap_folder))
+    
     [All_Hash, pcap_file, number_of_servers] = read_config_file(config_file)
     print 'All_Hash         :', All_Hash
     print 'pcap_file        :', pcap_file
@@ -81,6 +155,7 @@ def main():
     port_file = None
     host = '129.10.115.141'
     
+    
     for arg in sys.argv:
         a = (arg.strip()).partition('=')
         if a[0] == 'port_file':
@@ -88,64 +163,15 @@ def main():
         if a[0] == 'host':
             host = a[2]
     
-    ports = read_ports(port_file)
-    
-    queue = [['c11', 'cs1', hash('s11'), len('s11')],
-             ['c12', 'cs1', hash('s12'), len('s12')],
-             ['c13', 'cs1', hash('s13'), len('s13')],
-             ['c21', 'cs2', hash('s21'), len('s21')],
-             ['c14', 'cs1', hash('s14'), len('s14')],
-             ['c22', 'cs2', hash('s22'), len('s22')],
-             ['c15', 'cs1', hash('s15'), len('s15')],
-             ['c16', 'cs1', None, 0]]
-    
-    queue = [['c11', 'cs1', hash('s11'), len('s11')],
-             ['c12', 'cs1', hash('s12'), len('s12')],
-             ['c13', 'cs1', hash('s13'), len('s13')],
-             ['c21', 'cs2', hash('s21'), len('s21')],
-             ['c14', 'cs1', hash('s14'), len('s14')],
-             ['c22', 'cs2', hash('s22'), len('s22')],
-             ['c15', 'cs1', hash('s15'), len('s15')],
-             ['c16', 'cs1', None, 0]]
-    
+    ports = read_ports(port_file)    
     queue = pickle.load(open(pcap_file +'_client_pickle', 'rb'))
 
-    status = {} #status[c-s-pair] = True if the corresponding connection is ready to send a new request
-                #                   False if the corresponding connection is still waiting for the response to previous request
-    send_status = [True]
-    
-    
-    for q in queue:
-        c_s_pair = q[1]
-        if c_s_pair not in status:
-            status[c_s_pair] = True
-    
-    time_origin = time.time()
-    conns = {}  #conns[c-s-pair] = socket
-    for i in range(len(queue)):
-#        print 't count:', threading.activeCount()
-        q = queue[i]
-        c_s_pair  = q[1]
-        timestamp = q[4]
-        
-#        print timestamp
-        
-        while not send_status[0]:
-            continue
-        
-        send_status[0] = False
-        
-        while not time.time() > time_origin + timestamp:
-            continue
-        
-#        print 'Doing:', i+1, '/', len(queue), c_s_pair, len(q[0]), q[3]
-        try:
-            sock = conns[c_s_pair]
-        except:
-            conns[c_s_pair] = socket_connect(host, ports[c_s_pair])
-            sock  = conns[c_s_pair]
-        t = threading.Thread(target=send_single_request, args=[q, sock, All_Hash, status, send_status])
-        t.start()
+
+    Connections.set_host(host)
+    Connections.set_ports(ports)
+
+
+    Queue(queue).run()
         
     
 if __name__=="__main__":
