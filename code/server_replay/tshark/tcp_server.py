@@ -20,65 +20,6 @@ def find_response(buffer, table, All_Hash):
         return table[hash(buffer)].pop(0)
     except:
         return False
-#def socket_server_create2(host, ports, table, c_s_pair, All_Hash):
-#    buff_size = 4096
-#    port = 7600
-#    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-#    while True:
-#        try:
-#            sock.bind((host, port))
-##            ports.append(port)
-#            ports[c_s_pair] = port
-#            break
-#        except:
-#            port += 1
-#    sock.listen(1)
-#    print 'Created socket server:', (host, port)
-#    
-#    table_set = table.pop(0)
-#    req_len   = table_set[0]
-#    req_hash  = table_set[1]
-#    res_array = table_set[2]
-#    
-#    while True:
-#        print '\nServer waiting for connection...'
-#        buffer = ''
-#        connection, client_address = sock.accept()
-#        while True:
-#            print 'waiting for:\t', c_s_pair, req_len
-#            buffer += connection.recv(buff_size)
-##            response = find_response(buffer, table, All_Hash)
-##            if response is not False:
-#            if len(buffer) == req_len:
-##                print '\nRcvd\t', connection, client_address, len(buffer), buffer, '\n'
-#                print '\nReceived\t', c_s_pair, len(buffer), '\n' 
-#                buffer = ''
-#                if len(res_array) == 0:
-#                    print 'No need to send back anything!', c_s_pair
-#                else:
-##                    print '\nSent\t', connection, client_address, len(res), res, '\n'
-#                    print '\nSending\t', c_s_pair, len(res_array), '\n'
-#                    
-#                    time_base   = res_array[0][1]
-#                    time_origin = time.time()
-#                    
-#                    for i in range(len(res_array)):
-#                        res       = res_array[i][0]
-#                        timestamp = res_array[i][1]
-#                        while timestamp - time_base + time_origin > time.time():
-#                            continue 
-#                        connection.sendall(str(res))
-#                        print '\tSent\t', i+1, '\t', len(res) 
-#                if len(table) > 0:
-#                    table_set = table.pop(0)
-#                    req_len   = table_set[0]
-#                    req_hash  = table_set[1]
-#                    res_array = table_set[2]
-#        print 'Done sending...'
-#        time.sleep(2)
-#        connection.shutdown(socket.SHUT_RDWR)
-#        connection.close()
 def socket_server_create(host, ports, table, c_s_pair, All_Hash):
     buff_size = 4096
     port = 7600
@@ -96,45 +37,40 @@ def socket_server_create(host, ports, table, c_s_pair, All_Hash):
     print 'Created socket server:', (host, port)
     
     table_set = table.pop(0)
-    req_len   = table_set[0]
-    req_hash  = table_set[1]
-    res_array = table_set[2]
+    req_len   = table_set.request_len
+    req_hash  = table_set.request_hash
+    res_array = table_set.response_list
     
     while True:
         print '\nServer waiting for connection...'
-#        buffer = ''
         buffer_len = 0
         connection, client_address = sock.accept()
         while True:
 #            print 'waiting for:\t', c_s_pair, req_len
-#            if len(buffer) >= req_len:
             if buffer_len >= req_len:
 #                print '\nReceived\t', c_s_pair, len(buffer), req_len, '\n' 
-#                buffer = ''
                 buffer_len -= req_len
-#                buffer = buffer[req_len:]
                 if len(res_array) == 0:
                     pass
 #                    print 'No need to send back anything!', c_s_pair
                 else:
 #                    print '\nSending\t', c_s_pair, len(res_array), '\n'
-                    
-#                    time_base   = res_array[0][1]
                     time_origin = time.time()
                     
                     for i in range(len(res_array)):
-                        res       = res_array[i][0]
-                        timestamp = res_array[i][1]
-#                        while timestamp - time_base + time_origin > time.time():
-                        while timestamp + time_origin > time.time():
-                            continue 
+                        res       = res_array[i].payload
+                        timestamp = res_array[i].timestamp
+#                        while timestamp + time_origin > time.time():
+#                            continue
+                        if time.time() < time_origin + timestamp:
+                            time.sleep((time_origin + timestamp) - time.time())
                         connection.sendall(str(res))
 #                        print '\tSent\t', i+1, '\t', len(res) 
                 if len(table) > 0:
                     table_set = table.pop(0)
-                    req_len   = table_set[0]
-                    req_hash  = table_set[1]
-                    res_array = table_set[2]
+                    req_len   = table_set.request_len
+                    req_hash  = table_set.request_hash
+                    res_array = table_set.response_list
                 else:
                     break
             else:
