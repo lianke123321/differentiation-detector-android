@@ -85,3 +85,25 @@ def dir_list(dir_name, subdir, *args):
             # print "Accessing directory:", dirfile
             fileList += dir_list(dirfile, subdir, *args)
     return fileList
+class RequestSet(object):
+    def __init__(self, payload, c_s_pair, response, timestamp):
+        self.payload  = payload
+        self.c_s_pair = c_s_pair
+        if response is None:
+            self.response_hash = None
+            self.response_len  = 0
+        else:    
+            self.response_hash = hash(response)
+            self.response_len  = len(response)
+        self.timestamp = timestamp
+class ResponseSet(object):
+    def __init__(self, request, response_list):
+        self.request_len   = len(request)
+        self.request_hash  = hash(request)
+        self.response_list = response_list
+class OneResponse(object):
+    def __init__(self, payload, timestamp):
+        self.payload   = payload
+        self.timestamp = timestamp
+        
+#        table[c_s_pair] = [ [len(req), hash(rea), [[res, timestamp], ...] ], ...]

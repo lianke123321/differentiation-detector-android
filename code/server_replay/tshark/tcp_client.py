@@ -61,38 +61,30 @@ class Connections(object):
     def set_ports(ports):
         Connections._ports = ports
         
-class SendRecv(object):
-    def __init__(self, q):
-        self.payload   = q[0]
-        self.c_s_pair  = q[1]
-        self.res_hash  = q[2]
-        self.res_len   = q[3]
-        self.timestamp = q[4]
-        
-    def send_single_request(self, waitlist, sendlist, event):
-        sock = Connections.get_sock(self.c_s_pair)
-#        print 'Sending:', self.c_s_pair, '\t', sock, '\t', len(self.payload) 
-        sock.sendall(self.payload)
+class SendRecv(object):        
+    def send_single_request(self, q, waitlist, sendlist, event):
+        sock = Connections.get_sock(q.c_s_pair)
+#        print 'Sending:', q.c_s_pair, '\t', sock, '\t', len(q.payload) 
+        sock.sendall(q.payload)
         
         sendlist.pop()
-        if self.res_len == 0:
-#            print '\tNoResponse', self.c_s_pair, '\t', len(self.payload)
-            waitlist.remove(self.c_s_pair)
+        if q.response_len == 0:
+#            print '\tNoResponse', q.c_s_pair, '\t', len(q.payload)
+            waitlist.remove(q.c_s_pair)
             event.set()
         else:
-#            print '\tWaiting for responce', self.c_s_pair, self.res_len
+#            print '\tWaiting for responce', q.c_s_pair, q.response_len
             event.set()
             buffer_len = 0
             while True:
                 buffer_len += len(sock.recv(4096))
-                if buffer_len == self.res_len:
+                if buffer_len == q.response_len:
                     break
-#            print '\tReceived', self.c_s_pair, '\t', buffer_len
-            waitlist.remove(self.c_s_pair)
+#            print '\tReceived', q.c_s_pair, '\t', buffer_len
+            waitlist.remove(q.c_s_pair)
             event.set()
         
 class Queue(object):
-    i = 1
     def __init__(self, queue):
         self.Q           = queue
         self.event       = threading.Event()
@@ -100,34 +92,21 @@ class Queue(object):
         self.sendlist    = []
         self.time_origin = 0
     def next(self):
-        #print 'sendlist:', self.sendlist
         if (len(self.sendlist) == 0):
-            #print 'Ready to send...'
-            q           = self.Q[0]
-            q_payload   = q[0]
-            q_c_s_pair  = q[1]
-            q_res_hash  = q[2]
-            q_res_len   = q[3]
-            q_timestamp = q[4]
-            
-            if (q_c_s_pair not in self.waitlist):
-                if time.time() > self.time_origin + q_timestamp:
-#                    print time.time() - (self.time_origin + q_timestamp) 
-                    time.sleep(time.time()-self.time_origin + q_timestamp)
+            q = self.Q[0]
+            if (q.c_s_pair not in self.waitlist):
+                if time.time() < self.time_origin + q.timestamp:
+                    time.sleep((self.time_origin + q.timestamp) - time.time())
                 self.Q.pop(0)
-                self.waitlist.append(q_c_s_pair)
-                self.sendlist.append(q_c_s_pair)
-                t = threading.Thread(target=SendRecv(q).send_single_request, args=[self.waitlist, self.sendlist, self.event])
-                self.i += 1
+                self.waitlist.append(q.c_s_pair)
+                self.sendlist.append(q.c_s_pair)
+                t = threading.Thread(target=SendRecv().send_single_request, args=[q, self.waitlist, self.sendlist, self.event])
                 t.start()
     def run(self):
         self.time_origin = time.time()
         while self.Q:
-            #print 'Doing:', self.i
             self.next()
-            #print 'Sleeping!'
             self.event.wait()
-            #print 'Woke up!'
             self.event.clear()
             
 def main():
@@ -155,7 +134,9 @@ def main():
     port_file = None
     host = '129.10.115.141'
     
-    
+#    ports_pickle_dump = '-i /Users/arash/.ssh/ancsaaa-keypair_ec2.pem ubuntu@72.44.56.209:/home/ubuntu/public_html/free_ports'
+#    host = '72.44.56.209'
+
     for arg in sys.argv:
         a = (arg.strip()).partition('=')
         if a[0] == 'port_file':
@@ -176,6 +157,4 @@ def main():
     
 if __name__=="__main__":
     main()
-    
-    
     
