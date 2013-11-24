@@ -1,7 +1,7 @@
 import socket, sys, subprocess, commands, os, ConfigParser
 
 def read_args(args, configs):
-    for arg in sys.argv:
+    for arg in args:
         a = (arg.strip()).partition('=')
         configs.set(a[0], a[2])
 def append_to_file(line, filename):

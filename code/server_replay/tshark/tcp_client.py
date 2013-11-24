@@ -109,7 +109,7 @@ def main():
     configs.set('host', host)
     configs.set('ports', read_ports(port_file))
 
-    python_lib.read_args(args, configs)
+    python_lib.read_args(sys.argv, configs)
 
     configs.show_all()
     
