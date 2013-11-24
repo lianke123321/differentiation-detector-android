@@ -10,8 +10,11 @@ queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
 
 '''
 
-import os, sys, socket, pickle, threading, time
-from python_lib import * 
+import os, sys, socket, pickle, threading, time, ConfigParser
+import python_lib 
+from python_lib import Configs
+
+DEBUG0 = False
 
 def read_ports(ports_pickle_dump):
     if ports_pickle_dump == None:
@@ -19,71 +22,48 @@ def read_ports(ports_pickle_dump):
     os.system(('scp ' + ports_pickle_dump + ' .'))
     return pickle.load(open('free_ports', 'rb'))
 class Connections(object):
-    _instance = None
-    _host     = None
-    _ports    = None
-    connections = {}
-#    def __new__(cls, *args, **kwargs):
-#        if not cls._instance:
-#            cls._instance = super(Connections, cls).__new__(cls, *args, **kwargs)
-#        return cls._instance
-#    
-#    def __init__(self):
-#        self.connections = {}
-    
-    @staticmethod
-    def get_sock(c_s_pair):
+    __metaclass__ = python_lib.Singleton
+    _connections = {}
+    def get_sock(self, c_s_pair):
         try:
-            return Connections.connections[c_s_pair]
+            return self._connections[c_s_pair]
         except:
-#            print 'get_sock', c_s_pair, Connections._ports[c_s_pair]
-            server_address = (Connections._host, Connections._ports[c_s_pair])
+            server_address = (Configs().get('host'), Configs().get('ports')[c_s_pair])
             
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             sock.connect(server_address)
             
-            Connections.set_sock(c_s_pair, sock)
-            return Connections.connections[c_s_pair]
+            self.set_sock(c_s_pair, sock)
+            return self._connections[c_s_pair]
     
-    @staticmethod
-    def set_sock( c_s_pair, socket):
-        Connections.connections[c_s_pair] = socket
+    def set_sock(self, c_s_pair, socket):
+        self._connections[c_s_pair] = socket
     
-    @staticmethod
-    def remove_connection(c_s_pair):
-        del Connections.connections[c_s_pair]
-    
-    @staticmethod
-    def set_host(host):
-        Connections._host = host
-    @staticmethod
-    def set_ports(ports):
-        Connections._ports = ports
-        
+    def remove_socket(self, c_s_pair):
+        del self._connections[c_s_pair]
 class SendRecv(object):        
     def send_single_request(self, q, waitlist, sendlist, event):
-        sock = Connections.get_sock(q.c_s_pair)
-#        print 'Sending:', q.c_s_pair, '\t', sock, '\t', len(q.payload) 
+        sock = Connections().get_sock(q.c_s_pair)
+        if DEBUG0: print 'Sending:', q.c_s_pair, '\t', sock, '\t', len(q.payload) 
         sock.sendall(q.payload)
         
         sendlist.pop()
         if q.response_len == 0:
-#            print '\tNoResponse', q.c_s_pair, '\t', len(q.payload)
+            if DEBUG0: print '\tNoResponse', q.c_s_pair, '\t', len(q.payload)
             waitlist.remove(q.c_s_pair)
             event.set()
         else:
-#            print '\tWaiting for responce', q.c_s_pair, q.response_len
+            if DEBUG0: print '\tWaiting for responce', q.c_s_pair, q.response_len
             event.set()
             buffer_len = 0
             while True:
                 buffer_len += len(sock.recv(4096))
                 if buffer_len == q.response_len:
                     break
-#            print '\tReceived', q.c_s_pair, '\t', buffer_len
+            if DEBUG0: print '\tReceived', q.c_s_pair, '\t', buffer_len
             waitlist.remove(q.c_s_pair)
-            event.set()
-        
+            event.set()        
 class Queue(object):
     def __init__(self, queue):
         self.Q           = queue
@@ -110,25 +90,17 @@ class Queue(object):
             self.event.clear()
             
 def main():
-    
-    DEBUG = False
-    
     try:
         pcap_folder = sys.argv[1]
     except:
-        print 'USAGE: python tcp_client.py [pcap_folder]'   
+        print 'USAGE: python tcp_client.py [pcap_folder]'
+        print '\tpcap_folder should contain the following files:'
+        print '\tconfig_file, client_pickle_dump, server_pickle_dump'
         sys.exit(-1)
     
     pcap_folder = os.path.abspath(pcap_folder)
     config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
     
-#    configs.Configs.set('pcap_folder', os.path.abspath(pcap_folder))
-#    configs.Configs.set('config_file', os.path.abspath(pcap_folder))
-    
-    [All_Hash, pcap_file, number_of_servers] = read_config_file(config_file)
-    print 'All_Hash         :', All_Hash
-    print 'pcap_file        :', pcap_file
-    print 'number_of_servers:', number_of_servers
     
     '''Defaults'''
     port_file = None
@@ -143,15 +115,13 @@ def main():
             port_file = a[2]
         if a[0] == 'host':
             host = a[2]
+
+    configs = Configs(config_file)
+    configs.set('host', host)
+    configs.set('ports', read_ports(port_file))
+    configs.show_all()
     
-    ports = read_ports(port_file)    
-    queue = pickle.load(open(pcap_file +'_client_pickle', 'rb'))
-
-
-    Connections.set_host(host)
-    Connections.set_ports(ports)
-
-
+    queue = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
     Queue(queue).run()
         
     

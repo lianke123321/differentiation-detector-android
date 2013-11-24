@@ -1,11 +1,34 @@
-queue = [['c11', 'cs1', hash('s11'), len('s11')],
-         ['c12', 'cs1', hash('s12'), len('s12')],
-         ['c13', 'cs1', hash('s13'), len('s13')],
-         ['c21', 'cs2', hash('s21'), len('s21')],
-         ['c14', 'cs1', hash('s14'), len('s14')],
-         ['c22', 'cs2', hash('s22'), len('s22')],
-         ['c15', 'cs1', hash('s15'), len('s15')],
-         ['c16', 'cs1', None, 0]]
+def read_config_file(config_file):
+    f = open(config_file, 'r')
+    l = f.readline()
+    while l:
+        a = l.split()
+        if a[0] == 'All_Hash':
+            if a[1] == 'False':
+                All_Hash = False
+            elif a[1] == 'True':
+                All_Hash = True
+        if a[0] == 'pcap_file':
+            pcap_file = a[1]
+        if a[0] == 'number_of_servers':
+            number_of_servers = int(a[1])
+        l = f.readline()
+    return All_Hash, pcap_file, number_of_servers
+
+
+[q0, t0, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-0.txt', packet_dic)
+[q1, t1, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-1.txt', packet_dic)
+[q2, t2, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-2.txt', packet_dic)
+[q3, t3, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-3.txt', packet_dic)
+[q4, t4, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-4.txt', packet_dic)
+[q5, t5, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-5.txt', packet_dic)
+[q6, t6, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-6.txt', packet_dic)
+stream_to_queue(follow_folder + '/follow-stream-3.txt', packet_dic)
+stream_to_queue(follow_folder + '/follow-stream-4.txt', packet_dic)
+
+queue = q0 + q1 + q2 + q3 + q4
+queue = q6
+table[c_s_pair] = t6
 
 queue = [['c11', 'cs1', hash('s11'), len('s11')],
          ['c12', 'cs1', hash('s12'), len('s12')],
@@ -16,6 +39,28 @@ queue = [['c11', 'cs1', hash('s11'), len('s11')],
          ['c15', 'cs1', hash('s15'), len('s15')],
          ['c16', 'cs1', None, 0]]
 
+queue = [['c11', 'cs1', hash('s11'), len('s11')],
+         ['c12', 'cs1', hash('s12'), len('s12')],
+         ['c13', 'cs1', hash('s13'), len('s13')],
+         ['c21', 'cs2', hash('s21'), len('s21')],
+         ['c14', 'cs1', hash('s14'), len('s14')],
+         ['c22', 'cs2', hash('s22'), len('s22')],
+         ['c15', 'cs1', hash('s15'), len('s15')],
+         ['c16', 'cs1', None, 0]]
+
+table = {'cs1': [
+                     [len('c11'), hash('c11'), 's11'],
+                     [len('c12'), hash('c12'), 's12'],
+                     [len('c13'), hash('c13'), 's13'],
+                     [len('c14'), hash('c14'), 's14'],
+                     [len('c15'), hash('c15'), 's15'],
+                     [len('c16'), hash('c16'),  None]
+                     ],
+             'cs2': [
+                     [len('c21'), hash('c21'), 's21'],
+                     [len('c22'), hash('c22'), 's22']
+                     ]
+             }
 def stream_to_queue2(stream_file, packet_dic):
 #    print 'Doing stream_to_queue:'
 #    print '\t', stream_file

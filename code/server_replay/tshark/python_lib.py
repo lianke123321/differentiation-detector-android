@@ -1,4 +1,4 @@
-import socket, sys, subprocess, commands, os
+import socket, sys, subprocess, commands, os, ConfigParser
 
 def socket_disconnect(sock):
     print 'Closing socket:', sock
@@ -48,22 +48,6 @@ def append_to_file(line, filename):
     f = open(filename, 'a')
     f.write((line + '\n'))
     f.close()
-def read_config_file(config_file):
-    f = open(config_file, 'r')
-    l = f.readline()
-    while l:
-        a = l.split()
-        if a[0] == 'All_Hash':
-            if a[1] == 'False':
-                All_Hash = False
-            elif a[1] == 'True':
-                All_Hash = True
-        if a[0] == 'pcap_file':
-            pcap_file = a[1]
-        if a[0] == 'number_of_servers':
-            number_of_servers = int(a[1])
-        l = f.readline()
-    return All_Hash, pcap_file, number_of_servers
 def dir_list(dir_name, subdir, *args):
     '''
     Return a list of file names in directory 'dir_name'
@@ -105,5 +89,27 @@ class OneResponse(object):
     def __init__(self, payload, timestamp):
         self.payload   = payload
         self.timestamp = timestamp
-        
-#        table[c_s_pair] = [ [len(req), hash(rea), [[res, timestamp], ...] ], ...]
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+class Configs(object):
+    __metaclass__ = Singleton
+    _configs      = {}
+    def __init__(self, config_file):
+        Config = ConfigParser.ConfigParser()
+        Config.read(config_file)
+        for section in Config.sections():
+            for option in Config.options(section):
+                self._configs[option] = Config.get(section, option)
+    def get(self, key):
+        return self._configs[key]
+    def set(self, key, value):
+        self._configs[key] = value
+    def show(self, key):
+        print key , ':\t', value
+    def show_all(self):
+        for key in self._configs:
+            print key , ':\t', self._configs[key]

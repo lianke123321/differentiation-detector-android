@@ -9,7 +9,7 @@ packet_dic:
     packet_dic[c_s_pair][pl_hash] = [[timestamp, talking]]
 '''
 
-import pickle, copy, os, sys, linecache
+import pickle, copy, os, sys, linecache, ConfigParser
 import python_lib
 from python_lib import RequestSet, ResponseSet, OneResponse
 from scapy.all import *
@@ -277,7 +277,6 @@ def create_packets_file(pcap_file, client_ip, packets_file):
     print '\n'
 def sanity_check(queue, table):
     print '\nDoing sanity check...'
-#    req = ''
     req = {}
     for q in queue:
         pl        = q.payload
@@ -297,12 +296,9 @@ def sanity_check(queue, table):
         table_req_len = res.request_len
         res_array     = res.response_list
         table_res     = ''.join(map(lambda x: x.payload, res_array))
-#        print table_req_len
-#        print len(req[c_s_pair])
         assert(table_req_len == req[c_s_pair])
         
         if (res_len != len(table_res)) or (res_hash != hash(table_res)):
-#        if (res_hash != hash(table_res)) or (len(req) != table_req_len):
             print 'Inconsistency:'
             print pl
             print '===='
@@ -378,9 +374,6 @@ def main():
 
     packet_dic = read_packet_file(packets_file)
     
-    
-#    follow_files = {}
-    
     queue = []
     table = {}
     
@@ -392,34 +385,11 @@ def main():
         queue += q
         table[c_s_pair] = t
     
-    
-    
-#    [q0, t0, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-0.txt', packet_dic)
-#    [q1, t1, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-1.txt', packet_dic)
-#    [q2, t2, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-2.txt', packet_dic)
-#    [q3, t3, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-3.txt', packet_dic)
-#    [q4, t4, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-4.txt', packet_dic)
-#    [q5, t5, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-5.txt', packet_dic)
-#    [q6, t6, c_s_pair] = stream_to_queue(follow_folder + '/follow-stream-6.txt', packet_dic)
-#    stream_to_queue(follow_folder + '/follow-stream-3.txt', packet_dic)
-#    stream_to_queue(follow_folder + '/follow-stream-4.txt', packet_dic)
-    
-#    queue = q0 + q1 + q2 + q3 + q4
-#    queue = q6
-#    table[c_s_pair] = t6
-    
     queue.sort(key=lambda q: q.timestamp)
 
     time_origin = queue[0].timestamp
     for q in queue:
         setattr(q, 'timestamp',  q.timestamp - time_origin)
-    
-#    table[c_s_pair] = [ [len(req), hash(rea), [[res, timestamp], ...] ], ...]
-#    
-#    table2 = copy.deepcopy(table)
-#    for c_s_pair in table:
-#        for i in range(len(table[c_s_pair])):
-#            if len(table[c_s_pair][i][2]) == 0
             
     for c_s_pair in table:
         for i in range(len(table[c_s_pair])):
@@ -443,23 +413,19 @@ def main():
         for t in table[c_s_pair]:
             print c_s_pair, '\t', t.request_len, len(''.join(map(lambda x: x.payload, t.response_list)))
     
-    
-#    follow_files = map_follows(follow_folder, client_ip)
-#    [queue, table, all_pairs] = pcap_to_seq(pcap_file, client_ip, All_Hash, follow_files)   
-    
-    
+
     sanity_check(queue, copy.deepcopy(table))
 
     pickle.dump(queue, open((pcap_file+'_client_pickle'), "wb" ))
     pickle.dump(table, open((pcap_file+'_server_pickle'), "wb" ))
-#    pickle.dump(all_pairs, open((pcap_file+'_all_pairs'), "wb" ))
     
+    Config = ConfigParser.ConfigParser()
+    Config.add_section('Section1')
+    Config.set('Section1', 'All_Hash',False)
+    Config.set('Section1', 'pcap_file', os.path.relpath(pcap_file, os.getcwd()))
+    Config.set('Section1', 'number_of_servers', len(table))
     
-    f = open(config_file, 'w')
-    f.write(( 'All_Hash\t' + str(All_Hash) + '\n' ))
-    f.write(( 'pcap_file\t' + os.path.relpath(pcap_file, os.getcwd()) + '\n' ))
-    f.write(( 'number_of_servers\t' + str(len(table)) + '\n' ))
-    f.close()
+    Config.write(open(config_file, 'w'))
     
 #    print 'len(all_pairs):', len(all_pairs), '\n'
     

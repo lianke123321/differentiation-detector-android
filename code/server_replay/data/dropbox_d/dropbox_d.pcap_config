@@ -1,3 +1,5 @@
-All_Hash	False
-pcap_file	../data/dropbox_d/dropbox_d.pcap
-number_of_servers	14
+[Section1]
+all_hash = False
+pcap_file = ../data/dropbox_d/dropbox_d.pcap
+number_of_servers = 14
+
