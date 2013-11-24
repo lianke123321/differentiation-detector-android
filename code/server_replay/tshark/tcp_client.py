@@ -17,9 +17,8 @@ from python_lib import Configs
 DEBUG0 = False
 
 def read_ports(ports_pickle_dump):
-    if ports_pickle_dump == None:
-        ports_pickle_dump = 'achtung.ccs.neu.edu:/home/arash/public_html/free_ports'
-    os.system(('scp ' + ports_pickle_dump + ' .'))
+    command = 'scp ' + ports_pickle_dump + ' .'
+    os.system(command)
     return pickle.load(open('free_ports', 'rb'))
 class Connections(object):
     __metaclass__ = python_lib.Singleton
@@ -91,8 +90,8 @@ class Queue(object):
             
 def main():
     '''Defaults'''
-    port_file = None
-    host = '129.10.115.141'
+    host       = '129.10.115.141'
+    ports_file = 'achtung.ccs.neu.edu:/home/arash/public_html/free_ports'
     
     try:
         pcap_folder = sys.argv[1]
@@ -108,9 +107,11 @@ def main():
     
     configs = Configs(config_file)
     configs.set('host', host)
-    configs.set('ports', read_ports(port_file))
-
+    configs.set('ports_file', ports_file)
+    
     python_lib.read_args(sys.argv, configs)
+    
+    configs.set('ports', read_ports(configs.get('ports_file')))
     configs.show_all()
     
     print '[1]Firing off ...'

@@ -83,8 +83,8 @@ class Server(object):
 
 def main():
     '''Defaults'''
-    port_file = '/home/arash/public_html/free_ports'
-    host = '129.10.115.141'
+    host       = '129.10.115.141'
+    ports_file = '/home/arash/public_html/free_ports'
 
     try:
         pcap_folder = sys.argv[1]
@@ -100,7 +100,7 @@ def main():
     print '[0]Creating configs (reading configs file and args)'
     configs = Configs(config_file)
     configs.set('host', host)
-    configs.set('port_file', port_file)
+    configs.set('ports_file', ports_file)
     
     python_lib.read_args(sys.argv, configs)
     configs.show_all()
@@ -115,7 +115,7 @@ def main():
         ports[c_s_pair]   = threads[c_s_pair].get_port()
 
     print '[2]Serializing port mapping to file'
-    pickle.dump(ports, open(configs.get('port_file'), "wb"))
+    pickle.dump(ports, open(configs.get('ports_files'), "wb"))
     
     print '[3]Running servers'    
     for c_s_pair in table:
