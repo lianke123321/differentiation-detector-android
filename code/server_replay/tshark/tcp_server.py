@@ -115,7 +115,7 @@ def main():
         ports[c_s_pair]   = threads[c_s_pair].get_port()
 
     print '[2]Serializing port mapping to file'
-    pickle.dump(ports, open(configs.get('ports_files'), "wb"))
+    pickle.dump(ports, open(configs.get('ports_file'), "wb"))
     
     print '[3]Running servers'    
     for c_s_pair in table:
