@@ -1,49 +1,9 @@
 import socket, sys, subprocess, commands, os, ConfigParser
 
-def socket_disconnect(sock):
-    print 'Closing socket:', sock
-    sock.shutdown(socket.SHUT_RDWR)
-    sock.close()
-    print 'Done'
-def update_state(who, payload, state, snd_rcv):
-    if who not in state:
-        state[who] = {'sent' : None, 'rcvd' : None}
-    state[who][snd_rcv] = hash(payload)
-def check_events(event_list, state):
-    if event_list is None:
-        return True
-    try:
-        for e in event_list:
-            if e is None:
-                continue
-            if (state[e[1]][e[2]] == e[0]) is False: 
-                return False
-        return True 
-    except:
-        return False
-def get_all_tcp_servers(pcap_file, client_ip):
-    ips = [client_ip]
-    tcp_c = 0
-    a = rdpcap(pcap_file)
-    for i in range(len(a)):
-        p = a[i]
-        try:
-            tcp = p['IP']['TCP']
-            tcp_c += 1
-            try:
-                raw = p['Raw'].load
-                if p['IP'].src not in ips:
-                    ips.append(p['IP'].src)
-                if p['IP'].dst not in ips:
-                    ips.append(p['IP'].dst)
-            except:
-                pass
-        except:
-            pass
-    print 'Number of packets:', len(a)
-    print 'Number of TCP packets:', tcp_c
-    for ip in ips:
-        print ip
+def read_args(args, configs):
+    for arg in sys.argv:
+        a = (arg.strip()).partition('=')
+        configs.set(a[0], a[2])
 def append_to_file(line, filename):
     f = open(filename, 'a')
     f.write((line + '\n'))

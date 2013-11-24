@@ -1,3 +1,5 @@
+#    ports_pickle_dump = '-i /Users/arash/.ssh/ancsaaa-keypair_ec2.pem ubuntu@72.44.56.209:/home/ubuntu/public_html/free_ports'
+#    host = '72.44.56.209'
 def read_config_file(config_file):
     f = open(config_file, 'r')
     l = f.readline()

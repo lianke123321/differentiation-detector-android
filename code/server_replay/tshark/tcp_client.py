@@ -90,6 +90,10 @@ class Queue(object):
             self.event.clear()
             
 def main():
+    '''Defaults'''
+    port_file = None
+    host = '129.10.115.141'
+    
     try:
         pcap_folder = sys.argv[1]
     except:
@@ -101,24 +105,12 @@ def main():
     pcap_folder = os.path.abspath(pcap_folder)
     config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
     
-    
-    '''Defaults'''
-    port_file = None
-    host = '129.10.115.141'
-    
-#    ports_pickle_dump = '-i /Users/arash/.ssh/ancsaaa-keypair_ec2.pem ubuntu@72.44.56.209:/home/ubuntu/public_html/free_ports'
-#    host = '72.44.56.209'
-
-    for arg in sys.argv:
-        a = (arg.strip()).partition('=')
-        if a[0] == 'port_file':
-            port_file = a[2]
-        if a[0] == 'host':
-            host = a[2]
-
     configs = Configs(config_file)
     configs.set('host', host)
     configs.set('ports', read_ports(port_file))
+
+    python_lib.read_args(args, configs)
+
     configs.show_all()
     
     queue = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
