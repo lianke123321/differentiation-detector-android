@@ -15,6 +15,8 @@ from python_lib import RequestSet, ResponseSet, OneResponse
 from scapy.all import *
 from scapy.error import Scapy_Exception
 
+DEBUG0 = False
+
 def read_packet_file(packet_file):
     packet_dic = {}
     
@@ -314,7 +316,7 @@ def sanity_check(queue, table):
             print '===='
             print hash(table[hash(pl)])
             return
-        print c_s_pair, req[c_s_pair], len(table_res)
+        if DEBUG0: print c_s_pair, req[c_s_pair], len(table_res)
         req[c_s_pair] = 0
     print '\tPassed sanity check! Hoooooray!!! :)\n'
 def do_tshark_follows(pcap_file, follow_folder):
@@ -401,17 +403,18 @@ def main():
                 table[c_s_pair][i].response_list[j].timestamp -= time_offset
                 
     
-    print 'QUEUE:'
-    i = 0
-    for q in queue:
-        i += 1
-        print i, q.c_s_pair, '\t', q.timestamp, '\t', len(q.payload), '\t', q.response_len
-    
-    print 'TABLE:'
-    for c_s_pair in table:
-        print '\n---', c_s_pair, '---'
-        for t in table[c_s_pair]:
-            print c_s_pair, '\t', t.request_len, len(''.join(map(lambda x: x.payload, t.response_list)))
+    if DEBUG0:
+        print 'QUEUE:'
+        i = 0
+        for q in queue:
+            i += 1
+            print i, q.c_s_pair, '\t', q.timestamp, '\t', len(q.payload), '\t', q.response_len
+        
+        print 'TABLE:'
+        for c_s_pair in table:
+            print '\n---', c_s_pair, '---'
+            for t in table[c_s_pair]:
+                print c_s_pair, '\t', t.request_len, len(''.join(map(lambda x: x.payload, t.response_list)))
     
 
     sanity_check(queue, copy.deepcopy(table))

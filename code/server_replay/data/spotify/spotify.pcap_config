@@ -1,3 +1,5 @@
-All_Hash	False
-pcap_file	../data/spotify/spotify.pcap
-number_of_servers	5
+[Section1]
+all_hash = False
+pcap_file = ../data/spotify/spotify.pcap
+number_of_servers = 5
+
