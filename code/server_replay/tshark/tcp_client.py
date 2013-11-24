@@ -102,6 +102,7 @@ def main():
         print '\tconfig_file, client_pickle_dump, server_pickle_dump'
         sys.exit(-1)
     
+    print '[0]Creating configs (reading configs file and args)'
     pcap_folder = os.path.abspath(pcap_folder)
     config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
     
@@ -110,9 +111,9 @@ def main():
     configs.set('ports', read_ports(port_file))
 
     python_lib.read_args(sys.argv, configs)
-
     configs.show_all()
     
+    print '[1]Firing off ...'
     queue = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
     Queue(queue).run()
         
