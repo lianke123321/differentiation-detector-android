@@ -27,7 +27,8 @@ getDBConn <- function(meddleConfigName) {
   dbServer <- configData[configData$variable=="dbServer",]$value
   dbUser   <- configData[configData$variable=="dbUserName",]$value
   dbPasswd <- configData[configData$variable=="dbPassword",]$value  
-  dbConn <- dbConnect(MySQL(), user=dbUser, password=dbPasswd, dbname=dbName, host=dbServer)  
+  dbConn <- dbConnect(MySQL(), user=dbUser, password=dbPasswd, dbname=dbName, host=dbServer,
+                      client.flag=CLIENT_MULTI_STATEMENTS)  
   dbSendQuery(dbConn, "SET NAMES 'utf8'");
   dbSendQuery(dbConn, "SET CHARACTER SET 'utf8'");
   return (dbConn)
@@ -38,9 +39,13 @@ getDBConn <- function(meddleConfigName) {
 # There were less than 10k unique user agents in the two datasets 
 # so the memory footprint should be small 
 readUserAgentSignatureTable <- function(dbConn) {  
-  dbAgentSignatureTable <- dbReadTable(dbConn, "UserAgentSignatures")
-  userAgentSignatureTable <- data.frame(agent_id = dbAgentSignatureTable$agentID, 
-                                        app_id = dbAgentSignatureTable$appID, 
+  dbSendQuery(dbConn, "SET NAMES 'utf8'");
+  dbSendQuery(dbConn, "SET CHARACTER SET 'utf8'");  
+  x <- dbSendQuery(dbConn, "SELECT * FROM UserAgentSignatures;");
+  dbAgentSignatureTable <- fetch(x, n=-1);   
+  #dbAgentSignatureTable <- dbReadTable(dbConn, "UserAgentSignatures")
+  userAgentSignatureTable <- data.frame(agent_id = as.numeric(dbAgentSignatureTable$agentID), 
+                                        app_id = as.numeric(dbAgentSignatureTable$appID), 
                                         user_agent = dbAgentSignatureTable$userAgent,
                                         agent_signature = dbAgentSignatureTable$agentSignature,
                                         stringsAsFactors = FALSE)                               
@@ -48,8 +53,12 @@ readUserAgentSignatureTable <- function(dbConn) {
 }
 
 readAppMetaDataTable <- function(dbConn) {  
-  dbAppDataTable <- dbReadTable(dbConn, "AppMetaData")
-  appDataTable <- data.frame(app_id = dbAppDataTable$appID,
+  # Not using dbReadTable for UTF issues -- this seems to work
+  dbSendQuery(dbConn, "SET NAMES 'utf8'");
+  dbSendQuery(dbConn, "SET CHARACTER SET 'utf8'");    
+  x <- dbSendQuery(dbConn, "SELECT * FROM AppMetaData;");
+  dbAppDataTable <- fetch(x, n=-1);    
+  appDataTable <- data.frame(app_id = as.numeric(dbAppDataTable$appID),
                              agent_signature = tolower(dbAppDataTable$appName),  
                              stringsAsFactors = FALSE)                               
   return (appDataTable)
@@ -58,8 +67,7 @@ readAppMetaDataTable <- function(dbConn) {
 readUserIpMap <- function(dbConn, startTime, stopTime) {
   # Get the last time the IP address was used to create the tunnel before the start time
   # This is done to ensure that we have the user ID if the tunnel was created before 
-  # the current log file was created.   
-  
+  # the current log file was created.  
   query <- paste("SELECT a.userID, UNIX_TIMESTAMP(a.timestamp) as timestamp, a.clientTunnelIpAddress from UserTunnelInfo a JOIN (select max(rowID) as maxRowID from UserTunnelInfo WHERE startStopFlag = 1 AND timeStamp < FROM_UNIXTIME(", startTime, ") GROUP BY clientTunnelIpAddress) b ON a.rowID = b.maxRowID;", sep="");  
   lastTimeTable <- dbGetQuery(dbConn, query);    
   print(query);
@@ -295,9 +303,13 @@ assignUserId <- function (httpData, UserIpMap) {
   i<-1;
   ipAddresses <- c(unique(httpData$orig_h), unique(httpData$resp_h))
   UserIpMap <- UserIpMap[UserIpMap$tunnel_ip %in% ipAddresses, ]
+  if (nrow(UserIpMap) < 1) {
+    print("No IP addresses found in DB");
+    return(httpData);
+  }
   for(i in 1:nrow(httpData)) {        
     currTs <- httpData[i,]$ts    
-    if (i %% 100 == 0) {
+    if (i %% 500 == 0) {
       print(paste("Done", i, "rows of http"))
     }
     while (UserIpMap[j, ]$timestamp < currTs ) {      
@@ -309,7 +321,7 @@ assignUserId <- function (httpData, UserIpMap) {
       # Add the new ip for this user
       CurrentIpMapTable[CurrentIpMapTable$ip_address == UserIpMap[j,]$tunnel_ip, ]$user_id <- UserIpMap[j,]$user_id;
       j <- j+1;
-      if (j %% 100 == 0) {
+      if (j %% 500 == 0) {
         print(paste("Done", j, "rows of ipmap"))
       }      
     }    
@@ -326,6 +338,14 @@ assignUserId <- function (httpData, UserIpMap) {
   print("Assigned Device Id");
   return (httpData)
 }
+
+getNewAgents <- function (logAgents, dbAgents) {
+  # The Database screws up the hex encoded strings so we need to be carful
+  dbAgents <- gsub("\\\\", "", dbAgents, perl=TRUE)  
+  logAgents <- gsub("\\\\", "", dbAgents, perl=TRUE)
+  return(setdiff(logAgents, dbAgents))
+}
+
 
 assignAgentSignature <- function(httpData, userAgentTable) {
   print(paste("Number of rows in http log", nrow(httpData), "before merge"));
@@ -376,17 +396,66 @@ appendDatabaseHttpData <- function (dbConn, httpData)  {
   dbWriteTable(dbConn, "HttpFlowData", dbData, append=TRUE, row.names=FALSE);   
 }
 
-getAppFromHost <- function (host, appTable)  { 
-  strTokens <- unlist(strsplit(host, "\\."))
-  if (length(intersect(c("netflix", "nflix", "nflximg", "nflx", "nflxvideo"), strTokens)) > 0) {
-    
-  } 
+
+readPackageDetails <- function(dbConn) {
+  dbSendQuery(dbConn, "SET NAMES 'utf8'");
+  dbSendQuery(dbConn, "SET CHARACTER SET 'utf8'");  
+  x <- dbSendQuery(dbConn, "SELECT * from PackageDetails;");
+  currPackageDetails <- fetch(x, n=-1)
+  return(currPackageDetails)
 }
 
+readCDNMap <- function(dbConn) {
+  dbSendQuery(dbConn, "SET NAMES 'utf8'");
+  dbSendQuery(dbConn, "SET CHARACTER SET 'utf8'");  
+  x <- dbSendQuery(dbConn, "SELECT * from CDNAppMap;");
+  cdnMap <- fetch(x, n=-1)
+  return(cdnMap)
+}
+  
+assignHostSignature <- function(dbConn, httpData) { 
+  packageDetails <- readPackageDetails(dbConn)  
+  cdnMap <- readCDNMap(dbConn)
+  appIdHostMap <- data.frame(host_app_id = packageDetails$appID,
+                             host = packageDetails$pkgAppDomain,
+                             stringsAsFactors=FALSE);
+  httpData <- merge(httpData, appIdHostMap, by="host", all.x=TRUE)  
+  print(paste("Searching for host in package names", (TRUE %in% is.na(httpData$host_app_id))));    
+  if (TRUE %in% is.na(httpData$host_app_id)) {
+    httpData[is.na(httpData$host_app_id),]$host_app_id <- 0;
+  }
+  httpData$cdn_app_id <- unlist(lapply(httpData$host, 
+                                       function(x) {
+                                           #print(x)
+                                           for (i in 1:nrow(cdnMap)) {
+                                             if (TRUE %in% grepl(cdnMap[i,]$cdnHostSignature, x, ignore.case=TRUE,perl=TRUE)) {
+                                                return(cdnMap[i,]$appID)  
+                                             }
+                                           }                                         
+                                           return(0);
+                                         }))
+  print(paste("Assigning Signatures based on package names", (TRUE %in% (httpData$app_id == 0))))
+  if (TRUE %in% (httpData$app_id == 0)) {
+    reqRows <- which(httpData$app_id == 0)
+    reqData <- httpData[reqRows,]$host_app_id
+    httpData[reqRows,]$app_id <- reqData ;
+  }
+  print(paste("Assigning Signatures based on cdn names", (TRUE %in% (httpData$app_id == 0))))
+  if (TRUE %in% (httpData$app_id == 0)) {
+    reqRows <- which(httpData$app_id == 0)
+    reqData <- httpData[reqRows,]$cdn_app_id
+    httpData[reqRows,]$app_id <- reqData;
+  }
+  httpData$host_app_id <- NULL
+  httpData$cdn_app_id <- NULL
+  return (httpData);
+}
+
+#meddleConfigName <- "/home/arao/proj-work/meddle/arao-meddle/meddle/code/SimplePacketFilter/PktFilterModule/meddle.config"
+#httpLogName <- "/home/arao/tmp/http.log"
 
 # First get the configuration 
 dbConn <- getDBConn(meddleConfigName)
-
 # Read the UserAgent and IP mapping tables present in the Database
 userAgentSignatureTable <- readUserAgentSignatureTable(dbConn)
 UserIpMap <- readUserIpMap (dbConn, startTime, stopTime);
@@ -394,8 +463,9 @@ AppMetaData <- readAppMetaDataTable(dbConn);
 # Read the http log generated by bro
 httpData <- readHttpLogSignatureElems(httpLogName)
 # Get the signatures for the User Agents not present in DB and save them to DB
-newUserAgents <- setdiff(unique(httpData$user_agent), userAgentSignatureTable$user_agent)
+newUserAgents <- getNewAgents(unique(httpData$user_agent),unique(userAgentSignatureTable$user_agent))
 if (length(newUserAgents) > 0) {
+  print(newUserAgents)
   appSigTable <- data.frame(agent_signature=userAgentSignatureTable$agent_signature, app_id = userAgentSignatureTable$app_id)  
   appSigTable <- appSigTable[!duplicated(appSigTable[c("agent_signature", "app_id")]), ];    
   handleNewUserAgents(dbConn, newUserAgents, max(userAgentSignatureTable$agent_id), appSigTable, AppMetaData)  
@@ -403,15 +473,12 @@ if (length(newUserAgents) > 0) {
 } else {
   print(paste("All", length(unique(httpData$user_agent)), "user agents found in DB"))
 }
-
 # Assign the device ID to the flows. 
-#httpData <- assignUserId(httpData, UserIpMap)
-httpData$user_id <- 0;
+httpData <- assignUserId(httpData, UserIpMap)
 httpData <- assignAgentSignature(httpData, userAgentSignatureTable)
-#httpData <- assignTrackerFlag(dbConn, httpData)
-httpData$tracker_flag <- FALSE;
+httpData <- assignTrackerFlag(dbConn, httpData)
 httpData <- assignPIIFlag(dbConn, httpData)
-#httpData <- assignHostSignature(httpData)
+httpData <- assignHostSignature(dbConn, httpData)
 # Save flow Logs
-#appendDatabaseHttpData(dbConn, httpData)
+appendDatabaseHttpData(dbConn, httpData)
 dbDisconnect(dbConn)

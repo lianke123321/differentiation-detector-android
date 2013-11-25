@@ -63,4 +63,31 @@ mysql> CREATE TABLE UserConfigChange(userID INT NOT NULL,  timestamp TIMESTAMP N
 # Table keeping the list of Interested Users
 mysql> CREATE TABLE InterestedUsers(rowID SERIAL PRIMARY KEY, timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, emailAddress VARCHAR (512), responded BOOLEAN NOT NULL DEFAULT 0) ENGINE="InnoDB";  
 
+# Table to maintain the signature for user agents
+# For libraries we assign an appID of 0 implying that either the library name (signature) can be used or 
+# The appID for the flow can be assigned using another technique. 
+mysql> CREATE TABLE UserAgentSignatures(agentID INT NOT NULL PRIMARY KEY, appID INT NOT NULL, userAgent VARCHAR(512) NOT NULL, agentSignature VARCHAR(512) NOT NULL, UNIQUE(userAgent)) ENGINE="InnoDB";  
+mysql> ALTER TABLE UserAgentSignatures ADD INDEX(userAgent);
+mysql> ALTER TABLE UserAgentSignatures ADD INDEX(appID);
+mysql> ALTER TABLE UserAgentSignatures ADD INDEX(agentSignature);
+mysql> INSERT INTO UserAgentSignatures VALUES (0, 0, "", "-");
+mysql> INSERT INTO UserAgentSignatures VALUES (1, 0, "-", "-");
+
+mysql> CREATE TABLE HttpFlowData (ts DOUBLE NOT NULL, broFlowID VARCHAR(15) NOT NULL, userID INT NOT NULL, agentID INT NOT NULL, appID INT NOT NULL, remoteHost VARCHAR (256), trackerFlag INT NOT NULL DEFAULT 0, piiFlag INT NOT NULL DEFAULT 0) Engine="InnoDB";
+mysql> ALTER TABLE HttpFlowData ADD INDEX(userID);
+mysql> ALTER TABLE HttpFlowData ADD INDEX(ts);
+mysql> ALTER TABLE HttpFlowData ADD INDEX(userID, ts)
+mysql> ALTER TABLE HttpFlowData ADD INDEX(agentID);
+mysql> ALTER TABLE HttpFlowData ADD INDEX(appID);
+
+mysql> CREATE TABLE AppData(appID INT NOT NULL PRIMARY KEY, appName VARCHAR(128) NOT NULL) ENGINE="InnoDB";
+mysql> INSERT INTO AppData VALUES (0, "Unknown");
+mysql> INSERT INTO AppData VALUES (1, "YouTube");
+mysql> INSERT INTO AppData VALUES (2, "NetFlix");
+mysql> INSERT INTO AppData VALUES (3, "Facebook");
+mysql> INSERT INTO AppData VALUES (4, "Twitter");
+
+mysql> CREATE TABLE TrackerTable (domain VARCHAR(256) NOT NULL PRIMARY KEY) Engine="InnoDB";
+
+
 # Hurray! Database is setup
