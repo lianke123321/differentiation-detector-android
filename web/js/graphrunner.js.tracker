@@ -101,8 +101,10 @@ var ConVis = (function(jQuery, d3) {
 			function getClassForSite(d) {
 				if (d.isApp == true)
 					return "app";
-				if (d.trackerInfo)
-					return "tracker";
+				//if (d.trackerInfo)
+				//	return "tracker";
+				if (d.tracker == "1")
+				    return "tracker"
 				return "host";
 			}
 
