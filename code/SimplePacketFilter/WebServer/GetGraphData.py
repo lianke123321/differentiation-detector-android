@@ -22,16 +22,22 @@ class UserActivityRange:
     def __fetchEntry(self, dbEntry):
         if dbEntry is not None:
             self.minTs = dbEntry.minTs
-            self.maxTs = dbEntry.maxTs
+            self.maxTs = dbEntry.maxTs         
         else:
             self.minTs = 0
             self.maxTs = time.time()
+        if self.maxTs is None or str(self.maxTs) == "NULL":
+            self.maxTs = 1325376000
+            self.minTs = 1325376000
+        if self.minTs is None or str(self.minTs) == "NULL":
+            self.minTs = 1325376000
         return True
 
     def fetchRange(self):
         global configParams
         #query = "SELECT min(timestamp) as minTs, max(timestamp) as maxTs FROM UserTunnelInfo WHERE userID = "+str(self.userID)+" ;"
-        query = "SELECT min(ts) as minTs, max(ts) as maxTs FROM HttpFlowData WHERE userID = "+str(self.userID)+" ;"
+        # The 1 jan 2012 ts is taken as lower limit
+        query = "SELECT min(ts) as minTs, max(ts) as maxTs FROM HttpFlowData WHERE userID = "+str(self.userID)+" AND ts > '1325376000';"
         logging.info(query)
         dbCon = tornado.database.Connection(host=configParams.getParam(MCFG_DB_HOST),
                                             database=configParams.getParam(MCFG_DB_NAME),
@@ -62,6 +68,8 @@ class HttpFlowData:
         agentRevMap = gAgentData.getRevMap()
         for elem in results:            
 #            logging.warning(elem)
+#            if str(elem.trackerFlag) == "0":
+#               continue
             entryID = elem.appID
             entryName = appMap.get(elem.appID, None)
             if entryID == 0 or entryName is None:
@@ -75,7 +83,7 @@ class HttpFlowData:
                         if entryName == "mozilla":
                             entryName = "default"
                         entryName = "*"+str(entryName)+"*"
-                if entryID is None or entryName is None:
+                if entryID is None or entryName is None or entryName =="*-*":
                     entryID = 0
                     entryName = "*-*"
             if entryName.find("/x") != -1:
@@ -87,8 +95,11 @@ class HttpFlowData:
             entry['name'] = entryName
             entry['uses'] = int(entry.get('uses', 0)) + 1 #elem.numFlows
             entry['uses'] = str(entry['uses'])
-            contacts = entry.get('contacts', {})
-            contacts[str(elem.remoteHost)] = {'hits': str(elem.numFlows), 'tracker': str(elem.trackerFlag)}
+            contacts = entry.get('contacts', dict())
+            orgEntry = contacts.get(str(elem.remoteOrg), dict())
+            orgEntry['hits'] = str(int(orgEntry.get('hits',0))+int(elem.numFlows))
+            orgEntry['tracker'] = str(elem.trackerFlag)            
+            contacts[str(elem.remoteOrg)] = orgEntry
             entry['contacts'] = contacts            
             entry['id'] = str(entryID)
             self.httpData[str(entryID)] = entry
@@ -99,7 +110,7 @@ class HttpFlowData:
         global configParams
         #query = "SELECT min(timestamp) as minTs, max(timestamp) as maxTs FROM UserTunnelInfo WHERE userID = "+str(self.userID)+" ;"
         #query = " SELECT * FROM (SELECT COUNT(*) as numFlows, agentID, remoteHost, trackerFlag FROM HttpFlowData WHERE ts > "+str(self.startTime) + " AND ts < " + str(self.stopTime) + " GROUP BY agentID, remoteHost) a JOIN (SELECT agentID, agentSignature FROM UserAgentSignatures) b ON a.agentID = b.agentID;"
-        query = "SELECT COUNT(*) as numFlows, appID, agentID, remoteHost, trackerFlag FROM HttpFlowData WHERE ts > "+str(self.startTime) + " AND ts < " + str(self.stopTime)+" AND userID = "+str(self.userID)+" GROUP by remoteHost" 
+        query = "SELECT COUNT(*) as numFlows, appID, agentID, remoteHost, remoteOrg, trackerFlag FROM HttpFlowData WHERE ts > "+str(self.startTime) + " AND ts < " + str(self.stopTime)+" AND userID = "+str(self.userID)+" AND trackerFlag = 1 GROUP by remoteOrg,agentID,appID" 
         logging.warning(query)
         dbCon = tornado.database.Connection(host=configParams.getParam(MCFG_DB_HOST),
                                             database=configParams.getParam(MCFG_DB_NAME),
