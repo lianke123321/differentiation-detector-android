@@ -211,9 +211,9 @@ var ConVis = (function(jQuery, d3) {
 						.attr("y1", function(d){ return d.source.y; })
 						.attr("x2", function(d){ return d.target.x; })
 						.attr("x2", function(d){ return d.target.y; })
-						.on("click", destroyLink)
 						.on("mouseover", highlight)
 						.on("mouseout", unhighlight);/*
+						.on("click", destroyLink)
 						.attr("onmouseover", "$(this).attr(\"class\", \"clickable\")")
 						.attr("onmouseout", "$(this).attr(\"class\", \"clickable no-stroke\")");*/
 		}
