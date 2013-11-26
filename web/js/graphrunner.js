@@ -46,17 +46,17 @@ var ConVis = (function(jQuery, d3) {
 		var SVG_WIDTH = options.width;
 		var SVG_HEIGHT = options.height;
 		var hideFavicons = options.hideFavicons;
-		var scale = d3.scale.log().clamp(true).range([8, 16]);
+		var scale = d3.scale.log().clamp(true).range([5, 16]);
 		var phone = null;		
 
 		function faviconURL(d) {
 			if(d.isApp) {
 				if(phone = "Android")
-					return "img/android.ico";
+					return "/img/android.ico";
 				else if(phone = "Apple")
-					return "img/apple.ico";
+					return "/img/apple.ico";
 				else
-					return "img/generic.ico";
+					return "/img/generic.ico";
 			} else {
 				return 'http://' + d.name + '/favicon.ico';
 			}
@@ -358,8 +358,8 @@ var ConVis = (function(jQuery, d3) {
 						// * Note that initializing them all exactly at center causes there to be zero distance,
 						// * which makes the repulsive force explode!! So add some random factor.
 						if(nodes[n].x == undefined){
-							nodes[n].x = nodes[n].px = SVG_WIDTH / 2 + Math.floor( Math.random() * 2) ;
-							nodes[n].y = nodes[n].py = SVG_HEIGHT / 2 + Math.floor( Math.random() * 2);
+							nodes[n].x = nodes[n].px = SVG_WIDTH / 2 + Math.floor( Math.random() * 5) ;
+							nodes[n].y = nodes[n].py = SVG_HEIGHT / 2 + Math.floor( Math.random() * 5);
 						}
 					}
 
