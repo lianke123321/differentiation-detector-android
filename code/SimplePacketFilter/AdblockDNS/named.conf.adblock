@@ -2732,7 +2732,7 @@ zone "zeus.developershed.com" { type master; notify no; file "/etc/bind/null.zon
 zone "zeusclicks.com" { type master; notify no; file "/etc/bind/null.zone.file"; };
 zone "zintext.com" { type master; notify no; file "/etc/bind/null.zone.file"; };
 zone "zmedia.com" { type master; notify no; file "/etc/bind/null.zone.file"; };
-// Added by arao
+//Added
 zone "appads.com" { type master; notify no; file "/etc/bind/null.zone.file"; };
 zone "news-asset.rovio.com" { type master; notify no; file "/etc/bind/null.zone.file"; };
 zone "cloud.rovio.com" { type master; notify no; file "/etc/bind/null.zone.file"; };
