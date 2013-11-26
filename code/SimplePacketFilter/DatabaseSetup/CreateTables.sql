@@ -61,6 +61,12 @@ CREATE TABLE `UserAgentSignatures` (
   KEY `agentSignature` (`agentSignature`(255))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE `UserAuthMap` (
+  `userID` int(11) NOT NULL,
+  `authToken` varchar(128) NOT NULL,
+  PRIMARY KEY (`userID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE `UserConfigChange` (
   `userID` int(11) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

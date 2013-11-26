@@ -28,7 +28,7 @@ class UserActivityRange:
             self.maxTs = time.time()
         if self.maxTs is None or str(self.maxTs) == "NULL":
             self.maxTs = 1325376000
-            self.minTs = 1325376000
+            self.minTs = 1325376000-1
         if self.minTs is None or str(self.minTs) == "NULL":
             self.minTs = 1325376000
         return True
@@ -80,12 +80,12 @@ class HttpFlowData:
                     entryID = agentRevMap.get(entryName, None)
                     if entryID is not None:
                         entryID = entryID[0]
-                        if entryName == "mozilla":
+                        if entryName == "mozilla" or entryName == "-" or entryName == "default":
                             entryName = "default"
                         entryName = "*"+str(entryName)+"*"
-                if entryID is None or entryName is None or entryName =="*-*":
+                if entryID is None or entryName is None or entryName =="*default*":
                     entryID = 0
-                    entryName = "*-*"
+                    entryName = "*default*"
             if entryName.find("/x") != -1:
                 logging.warning(entryName)
                 entryName = entryName.replace("/x","\\x")
@@ -179,6 +179,7 @@ class AgentData:
     def getMap(self):
         if self.agentReqCnt < 1:
             self.populateMap()
+        self.agentReqCnt = self.agentReqCnt - 1
         return self.agentMap
 
     def getRevMap(self):
@@ -216,6 +217,7 @@ class AppData:
     def getMap(self):
         if self.appReqCnt < 1:
             self.populateMap()
+        self.appReqCnt = self.appReqCnt - 1
         return self.appMap
 
 

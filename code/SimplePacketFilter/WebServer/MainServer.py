@@ -13,7 +13,6 @@ import httplib
 import sys
 from tornado.escape import json_encode
 
-
 # The python files to manage the meddle pages
 import MeddleCommunicator
 import UserConfigs
@@ -23,6 +22,8 @@ import ConfigHandler
 from StringConstants import *
 from ConfigHandler import configParams
 import GetGraphData
+import AuthTokenMap
+import ConvisTemplate
 
 #import smtplib
 # THE PROBLEM HERE IS THAT SOUNDER HAS AN OLDER VERSION OF DJANGO RUNNING 
@@ -104,12 +105,12 @@ class ViewConfigsHandler(CommonHandler):
         self.mainErr = -1
         self.dispPage(self.getIpInfo())
     
-    def dispPage(self, ipInfo):
+    def dispPage(self, ipInfo):       
         if ipInfo is None:
             self.write(self.getERRPage())
             return
         uConfig = UserConfigs.UserConfigs()  
-        if False == uConfig.fetchConfigs(ipInfo.userID):
+        if False == uConfig.fetchConfigs(ipInfo.userID):        
             self.write("Error getting the configurations for user at IP"+str(self.request.remote_ip))
             return
         page = uConfig.displayConfigs()
@@ -161,14 +162,24 @@ class ViewConfigsHandler(CommonHandler):
 
 class ViewGraphHandler(CommonHandler):
     def __get(self):
-        #ipInfo = self.getIpInfo()
-        #if ipInfo is None:
-        #    return self.getERRPage()
-        # ipInfo.userID
-        userID = 4
-        queryType = self.get_argument('qt', True)
-        logging.warning("Received a query of type"+str(queryType))
+        queryType = self.get_argument('qt', 0, True)
+        authToken = self.get_argument('auth', None, True)
+        userID = 0
+        logging.warning("Received a query of type"+str(queryType)+str(authToken))        
+        if queryType == VIEWGRAPH_QT_TEMPLATE:
+            ipInfo = self.getIpInfo()
+            if ipInfo is not None:
+                userID = ipInfo.userID
+                authToken = AuthTokenMap.gAuthTokenMap.getAuthToken(str(userID))
+            if authToken is not None:
+                strGraphPage = ConvisTemplate.CONVISTEMPLATE
+                strGraphPage = strGraphPage.replace(ConvisTemplate.authTokenPlaceholder, str(authToken))
+                self.write(strGraphPage)
+                self.finish()
+                return
         if queryType == VIEWGRAPH_QT_RANGE:
+            if authToken is not None:
+                userID = AuthTokenMap.gAuthTokenMap.getUserID(authToken)
             g = GetGraphData.GraphData(userID, 0, 0)
             retJson = g.getTimeRange()
             logging.warning(json_encode(retJson))
@@ -177,8 +188,10 @@ class ViewGraphHandler(CommonHandler):
             self.finish()            
             return
         if queryType == VIEWGRAPH_QT_GRAPH:
-            minTs = self.get_argument('min', True)
-            maxTs = self.get_argument('max', True)
+            minTs = self.get_argument('min', 0, True)
+            maxTs = self.get_argument('max', 0, True)
+            if authToken is not None:
+                userID = AuthTokenMap.gAuthTokenMap.getUserID(authToken)            
             logging.warning("Requesing for range:" + str(minTs) + "to" + str(maxTs))
             g = GetGraphData.GraphData(userID, minTs, maxTs)
             retJson = g.getHttpFlowData()

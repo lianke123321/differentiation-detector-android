@@ -7,6 +7,7 @@ PAGE_VIEWGRAPH=PAGE_DYNPATH+"viewGraph"
 
 VIEWGRAPH_QT_RANGE="1"
 VIEWGRAPH_QT_GRAPH="2"
+VIEWGRAPH_QT_TEMPLATE="3"
 
 PAGE_STATIC_EXPR="^(dyn.*)"
 STR_TITLE="Meddle"
@@ -56,7 +57,7 @@ TEMPLATE_PAGE_HEADER = """<!DOCTYPE html>
   <title>Meddle: Take Control of Your Mobile Traffic</title>
   <meta name="description" content="" />
   <meta name="author" content="choffnes" />
-  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
   <style>
         body {
         padding-top: 40px;
@@ -119,4 +120,4 @@ TEMPLATE_PAGE_FOOTER="""<footer>
     </footer>
   </div>
   <script src="http://code.jquery.com/jquery-latest.js"></script>
-  <script src="js/bootstrap.min.js"></script><br/></body></html>"""
+  <script src="/js/bootstrap.min.js"></script><br/></body></html>"""

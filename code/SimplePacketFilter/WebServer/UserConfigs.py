@@ -1,6 +1,8 @@
 import tornado.database
 from StringConstants import *
 from ConfigHandler import configParams
+import AuthTokenMap
+import ConvisTemplate
 
 class UserConfigs:
     userName = None
@@ -41,15 +43,27 @@ class UserConfigs:
         adStr += """ <option value = \""""+str(CFG_ADS_GRP_DISABLE_STR)+"""\""""+str(disabled)+""">allow ads</option>"""
         adStr += """</select>.</li><ul>"""
         return adStr
-    
+
+    def __linkGraph(self):
+        authToken = AuthTokenMap.gAuthTokenMap.getAuthToken(str(self.userID))
+        page = "<p><strong>Click the following URL to see which trackers are tracking your activities</strong><br/>"
+        page = page + "<a href="+str(ConvisTemplate.CONVISURLTEMPLATE)+">"+str(ConvisTemplate.CONVISURLTEMPLATE)+"</a><br/>" 
+        page = page + "<em>You can access the above URL from a desktop browser</em><br/>"       
+        page = page + """<a href="mailto:yourmailaddress?subject=Meddle Tracker Graph&body="""
+        page = page + str(ConvisTemplate.CONVISURLTEMPLATE)+"\">Click here to send this link by email</a></p>"
+        page = page.replace(ConvisTemplate.authTokenPlaceholder, str(authToken))
+        return str(page)
+        
+        
     def displayConfigs(self):
         page = ""
         page += self.__header()
         page += """<form name="input" action=\""""+str(PAGE_VIEWCONFIGS)+"""\" method="POST">"""
-        page += "Meddle Policy"
+        page += "<strong>Meddle Policy</strong>"
         page += self.__htmlAds()
         page += """<br/></form>"""
         #page += """<br/><input type="submit" id=\""""+str(CFG_SUBMIT_ID)+"""\" value=\""""+str(CFG_SUBMIT_STR)+"""\"></form>"""
+        page += self.__linkGraph()
         page += self.__footer()
         page = page.replace(SERVER_HOST_FILLER, configParams.getParam(MCFG_WEBSRV_HOST))
         page = page.replace(SERVER_PORT_FILLER, configParams.getParam(MCFG_WEBSRV_PORT))
