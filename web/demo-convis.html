@@ -109,18 +109,18 @@
 		      <thead bgcolor="lightgray">
 			<tr>
                           <th>App</th>
-                          <th class="sorttable_numeric"># Sites</th>
-                          <!-- <th class="sorttable_nosort"><input type="checkbox" id="checkAll" onclick="checkAll()"> All</input></th> -->
-			  <th class="sorttable_nosort">Select </th>
+                          <th class="sorttable_numeric"># Trackers</th>
+                          <th class="sorttable_nosort"><input type="checkbox" id="checkAll" onclick="checkAll()"> All</input></th>
+			  <!-- <th class="sorttable_nosort">Select </th> -->
 			</tr>
 		      </thead>
 		      <tbody>
 		      </tbody>
 		    </table>
                   </div>		    		  
-		  <!--<div id="chooserSubmit" class="stepBody">
+		  <div id="chooserSubmit" class="stepBody">
                     <button class="btn btn-large  btn-primary" onclick="hideChooser(); showGraph();">Show Graph</button>
-		  </div>-->
+		  </div>
 		</div>
 	      </div>
 	    </div>
@@ -280,7 +280,7 @@
                 var appList = $('#appList tbody');
                 appList.html('');
                 jQuery.each(obj['apps'], function(index, app){
-                    appList.append('<tr><td>'+app['name']+'</td><td>'+app['uses']+'</td><td><input class="appcheckbox" onclick="hideChooser(); showGraph();" type="checkbox" value="'+index+'"></input></td></tr>');
+                    appList.append('<tr><td>'+app['name']+'</td><td>'+app['uses']+'</td><td><input class="appcheckbox" type="checkbox" value="'+index+'"></input></td></tr>');
                 })
             });
         }
