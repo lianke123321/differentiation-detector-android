@@ -9,21 +9,28 @@ poor control over that network activity.
 This has serious negative implications for users: several previous studies~\cite{vallina-rod:ads,gerber:passivespeed,chen:wifi,enck:taintdroid,wang:middleboxes,sommers:cellwifi} 
 identified privacy, performance, policy and security issues in mobile systems. While instructive, each of these studies 
 has limitations that restrict its impact by sacrificing visibility or control. For example, passively gathered datasets from large 
-ISPs provide great visibility but no control over network flows. Likewise, custom Android extensions provide 
-great control over network flows but measurement visibility is limited to the devices running custom OSes. 
+ISPs provide broad visibility but no control over network flows. Likewise, custom Android extensions provide 
+strong control over network flows but measurement visibility is limited to the devices running these custom OSes. 
 To advance the state of the art in mobile systems, there is a need for a system that not only gives 
-broad visibility into mobile network traffic to identify problems, but also gives control over these flows 
+broad visibility into mobile network traffic to identify problems, but also gives strong control over these flows 
 to build systems to address those problems. 
 
-To address this problem, we designed \meddle:  a platform for measuring and interposing on mobile-device 
-traffic regardless of where and how the device connects to the Internet. We rely on two key observations that enable our system. First, 
-software middleboxes and cloud computing services offer the opportunity to deploy and distribute large numbers 
-of middlebox services quickly, easily and at scale~\cite{sherry:middleboxes} without 
-the need to deploy hardware in homes~\cite{bismarck} or ISPs~\cite{wang:middleboxes}. Second, 
+This paper presents \meddle:  a platform for measuring and interposing on mobile-device 
+traffic regardless of where and how the device connects to the Internet. We rely on two key observations 
+that enable our system to provide broad visibility and strong control over network flows from a mobile device. 
+First, we 
+ leverage the fact that 
 the vast majority of Internet-enabled mobile devices provide the ability to connect to a remote host over a virtual private 
-network (VPN). By using a nearby VPN-based proxy in the cloud as an entry point to a device's software middlebox, we can 
-establish a tunnel that is secure and that prevents other in-network middleboxes from interfering with 
-device traffic (with the exception of wholesale blocking). 
+network (VPN). This allows us to achieve broad visibility across a wide range of devices and networks by using indirection 
+to tunnel mobile-device Internet traffic to a proxy that serves as a monitoring vantage point.
+Second, we observe that  
+software middleboxes deployed on cloud computing services give us a practical way to achieve strong control over 
+network flows sent to such a proxy. This approach allows us to deploy and distribute large numbers 
+of middlebox services quickly, easily and at scale~\cite{sherry:middleboxes} without 
+the need to deploy hardware in homes~\cite{bismarck} or ISPs~\cite{wang:middleboxes}. 
+%By using a nearby VPN-based proxy in the cloud as an entry point to a software middlebox, we can 
+%establish a tunnel that is secure and that prevents other in-network middleboxes from interfering with 
+%device traffic (with the exception of wholesale blocking). 
 
 Exploiting these two observations, we use VPNs to ensure that all of a mobile device's traffic is 
 securely tunneled out of the access network (\wifi or cell) to a software middlebox running 
@@ -35,7 +42,7 @@ with new middlebox approaches on real user network flows. To convince users to a
 system, we designed \meddle with a low barrier for deployment and strong incentives for 
 user adoption. The system uses only existing device, app and network support without requiring 
 any special privileges or custom mobile OSes. It is as simple to install as three taps 
-on a mobile device. To encourage users to install \meddle, we current provide custom 
+on a mobile device. To encourage users to install \meddle, we currently provide custom 
 network filters (\eg device-wide ad blocking) and visualization/blocking of services leaking 
 personally identifiable information (PII). We are developing additional services as incentives 
 for users, including caching, device-wide SPDY connections and malware blocking.
@@ -44,16 +51,16 @@ As a software-based implementation with a low barrier for deployment and strong 
 user adoption, \meddle provides researchers with a new, powerful platform for \emph{in situ} 
 mobile-network research and experimentation. Currently researchers with new  
 middlebox approaches to improve the user experience must test them in a lab environment or 
-rely on ISPs or users to deploy new hardware/software -- a risky and costly proposition for 
-most carriers. With \meddle, researchers 
-can immediately deploy new meddleboxes (software middlebox modules) that interact with 
-real users' mobile traffic. %in cloud data centers often located just outside each device's access network. 
+rely on ISPs or users to deploy new hardware/software -- a potentially risky and costly 
+proposition. With \meddle, researchers 
+can immediately deploy new software middlebox services that interact with 
+real users' mobile traffic (with user opt in). %in cloud data centers often located just outside each device's access network. 
 This paper demonstrates the feasibility of this approach and explores several new opportunities 
 for implementing network control.
 
 Our key contributions are as follows. First, we build \meddle, a system that provides users with transparency 
 and control % PG: Make these words more general
-over all network traffic generated by their 
+over all Internet traffic generated by their 
 mobile devices. We demonstrate that it is sufficiently transparent to avoid significantly impacting measurement results. 
 \platname captures all Internet traffic with approximately 10\% power and packet overheads, and negligible additional latency. 
 We will make the \platname software and configuration details open source and publicly available.
@@ -69,8 +76,8 @@ strongly depends on OS and network type.
 Third, we implement systems atop \meddle that improve 
 privacy, block unwanted traffic, notify users of ISP interference and block malware. 
 In particular, we make available a new visualization tool for users to track and control how 
-they are being tracked. \platname{}'s \emph{ConVis} tool borrows the Mozilla project's Collusion 
-interface, but applies it to all of a mobile device's traffic. It also facilitates specifying block lists for connections
+they are being monitored by ad and analytics services. \platname{}'s \emph{ReCon} tool borrows the Mozilla project's Collusion 
+interface, but applies it to all of a mobile device's traffic. Further, it allows users to specify block lists for connections
  based on (app, third party) tuples. A demo of our tool is located at \url{http://goo.gl/A17h9}. 
  We also developed tools for detecting content manipulation by ISPs (Web Tripnets) and 
  service differentiation (Mobile Replay). 
