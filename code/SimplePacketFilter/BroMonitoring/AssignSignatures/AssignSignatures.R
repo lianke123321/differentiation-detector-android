@@ -377,18 +377,35 @@ assignPIIFlag <- function(dbConn, httpData) {
   return(httpData)  
 }
 
+getOrgFromHost <- function (hostList) {
+  orgList <- unlist(lapply(hostList, function(x) { y<-unlist(strsplit(x,"\\."));                 
+                                                   if (length(y)>1) {
+                                                     if ((nchar(tail(y,1))>2) | ((y[length(y)-1])!= "co")) {
+                                                       y<-tail(y,2);
+                                                       } else {
+                                                         #print(y)
+                                                         y<-tail(y,3);
+                                                       }
+                                                   }
+                                                   y <- paste(y,collapse=".", sep="");                                                                        
+                                                   return(y);
+                                                   }))  
+  return(orgList)
+}
 
 appendDatabaseHttpData <- function (dbConn, httpData)  {  
   # The database schema is 
   # ts, bro_flowid, device_id, agent_id, remote_host, tracker_flag, pii_flag  
   print(colnames(httpData)) 
+  httpData$org <- getOrgFromHost(httpData$host)
   dbData <- data.frame(ts = httpData$ts, broFlowID = httpData$uid, 
                        userID = httpData$user_id,                        
                        agentID = httpData$agent_id,                         
                        appID = httpData$app_id,
-                       remoteHost = httpData$host, 
                        trackerFlag = httpData$tracker_flag,
-                       piiFlag = httpData$pii_flag);
+                       piiFlag = httpData$pii_flag,
+                       remoteHost = httpData$host, 
+                       remoteOrg = httpData$org);
   print(paste("Number of rows in http log", nrow(dbData), "before removal of pipelining"));  
   # THIS REMOVAL IS REDUNDANT IF THE DUPLICATES ARE REMOVED WHILE READING THE FILE
   dbData <- dbData[!duplicated(dbData[c("broFlowID", "userID", "agentID", "remoteHost")]), ];
