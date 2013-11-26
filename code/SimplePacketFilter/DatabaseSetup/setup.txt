@@ -46,48 +46,9 @@ Enter password: <meddle_password_for_this_server>
 $> iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
 $> iptables -A INPUT -p tcp --dport 3306 -j REJECT
   
-# CREATE THE Tables required by Meddle
-# Table where the user configurations are present
-mysql> CREATE TABLE UserConfigs (userID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, userName VARCHAR(512), filterAdsAnalytics INT NOT NULL DEFAULT 0, UNIQUE(userName)) ENGINE="InnoDB";
+# Create the tables using the CreateTable.sql file
 
-# Table where the tunnel information is kept. This is used for book keeping and is currently not used. 
-mysql> CREATE TABLE UserTunnelInfo (rowID SERIAL PRIMARY KEY, userID INT NOT NULL, clientTunnelIpAddress VARCHAR(64) NOT NULL, clientRemoteIpAddress VARCHAR(64) NOT NULL, serverIpAddress VARCHAR(64) NOT NULL, timestamp TIMESTAMP NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, startStopFlag BOOLEAN NOT NULL DEFAULT 0) ENGINE="InnoDB"; 
-#mysql> ALTER TABLE UserTunnelInfo ADD INDEX (timestamp);
+mysql -u meddle -p MeddleDB < CreateTables.sql
 
-# For each user add this entry to he table while creating users. This step shall be performed by the scripts to manage users. 
-# mysql> INSERT INTO UserConfigs VALUES (0, 'arao-ipod', 0);
-
-# Table that logs the change in configuration parameters.
-mysql> CREATE TABLE UserConfigChange(userID INT NOT NULL,  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, configVariable VARCHAR (512), newValue VARCHAR (512)) ENGINE="InnoDB";
-
-# Table keeping the list of Interested Users
-mysql> CREATE TABLE InterestedUsers(rowID SERIAL PRIMARY KEY, timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, emailAddress VARCHAR (512), responded BOOLEAN NOT NULL DEFAULT 0) ENGINE="InnoDB";  
-
-# Table to maintain the signature for user agents
-# For libraries we assign an appID of 0 implying that either the library name (signature) can be used or 
-# The appID for the flow can be assigned using another technique. 
-mysql> CREATE TABLE UserAgentSignatures(agentID INT NOT NULL PRIMARY KEY, appID INT NOT NULL, userAgent VARCHAR(512) NOT NULL, agentSignature VARCHAR(512) NOT NULL, UNIQUE(userAgent)) ENGINE="InnoDB";  
-mysql> ALTER TABLE UserAgentSignatures ADD INDEX(userAgent);
-mysql> ALTER TABLE UserAgentSignatures ADD INDEX(appID);
-mysql> ALTER TABLE UserAgentSignatures ADD INDEX(agentSignature);
-mysql> INSERT INTO UserAgentSignatures VALUES (0, 0, "", "-");
-mysql> INSERT INTO UserAgentSignatures VALUES (1, 0, "-", "-");
-
-mysql> CREATE TABLE HttpFlowData (ts DOUBLE NOT NULL, broFlowID VARCHAR(15) NOT NULL, userID INT NOT NULL, agentID INT NOT NULL, appID INT NOT NULL, remoteHost VARCHAR (256), trackerFlag INT NOT NULL DEFAULT 0, piiFlag INT NOT NULL DEFAULT 0) Engine="InnoDB";
-mysql> ALTER TABLE HttpFlowData ADD INDEX(userID);
-mysql> ALTER TABLE HttpFlowData ADD INDEX(ts);
-mysql> ALTER TABLE HttpFlowData ADD INDEX(userID, ts)
-mysql> ALTER TABLE HttpFlowData ADD INDEX(agentID);
-mysql> ALTER TABLE HttpFlowData ADD INDEX(appID);
-
-mysql> CREATE TABLE AppData(appID INT NOT NULL PRIMARY KEY, appName VARCHAR(128) NOT NULL) ENGINE="InnoDB";
-mysql> INSERT INTO AppData VALUES (0, "Unknown");
-mysql> INSERT INTO AppData VALUES (1, "YouTube");
-mysql> INSERT INTO AppData VALUES (2, "NetFlix");
-mysql> INSERT INTO AppData VALUES (3, "Facebook");
-mysql> INSERT INTO AppData VALUES (4, "Twitter");
-
-mysql> CREATE TABLE TrackerTable (domain VARCHAR(256) NOT NULL PRIMARY KEY) Engine="InnoDB";
-
-
+# Repeat the steps for .sql files in the PopulateDB/ folder 
 # Hurray! Database is setup
