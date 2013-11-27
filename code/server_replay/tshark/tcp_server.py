@@ -111,24 +111,20 @@ def main():
     table   = pickle.load(open(configs.get('pcap_file') +'_server_pickle', 'rb'))
     
     PRINT_ACTION('Creating all socket servers', 0)
-#    print '[1]Creating all socket servers'
     for c_s_pair in table:
         threads[c_s_pair] = Server(Configs().get('host'))
         ports[c_s_pair]   = threads[c_s_pair].get_port()
 
     PRINT_ACTION('Serializing port mapping to file', 0)
-#    print '[2]Serializing port mapping to file'
     pickle.dump(ports, open(configs.get('ports_file'), "wb"))
     
     PRINT_ACTION('Running servers', 0)
-#    print '[3]Running servers'    
     for c_s_pair in table:
         t = threading.Thread(target=threads[c_s_pair].run_socket_server, args=[table[c_s_pair]])
         t.start()
     
     time.sleep(2)
     PRINT_ACTION('Done! You can now run your client script.', 0)
-#    print '[4]Done! You can now run your client script.'
     print '   Capture packets on server ports %d to %d' % ((min(ports.items(), key=lambda x: x[1])[1], max(ports.items(), key=lambda x: x[1])[1]))
     
 if __name__=="__main__":

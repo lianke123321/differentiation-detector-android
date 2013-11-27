@@ -18,12 +18,15 @@ from python_lib import Configs, PRINT_ACTION
 
 DEBUG0 = False
 
-def read_ports(host, key, ports_file):
+def read_ports(host, username, key, ports_file):
     if key is not None:
-        command = 'scp -i' + key + ' '
+        command = 'scp -i ' + key + ' '
+    if username is not None:
+        command += username + '@'
     else:
         command = 'scp '
     command += host + ':' + ports_file + ' .'
+    print command
     os.system(command)
     return pickle.load(open('free_ports', 'rb'))
 class Connections(object):
@@ -96,13 +99,13 @@ class Queue(object):
             self.event.clear()
             
 def main():
-    '''Defaults'''
+    
+    PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
     configs.set('host', '129.10.115.141')
     configs.set('ports_file', '/tmp/free_ports')
-    configs.set('ssh_key', None)
-    
-    PRINT_ACTION('Reading configs file and args)', 0)
+    configs.set('username', None)
+    configs.set('ssh_key', None)    
     python_lib.read_args(sys.argv, configs)
     
     try:
@@ -117,7 +120,10 @@ def main():
     configs.read_config_file(config_file)    
     
     PRINT_ACTION('Downloading ports file', 0)
-    configs.set('ports', read_ports(configs.get('host'), configs.get('ssh_key'), configs.get('ports_file')))
+    configs.set('ports', read_ports(configs.get('host'),
+                                    configs.get('username'),
+                                    configs.get('ssh_key'),
+                                    configs.get('ports_file')))
     configs.show_all()
     
     PRINT_ACTION('Firing off ...', 0)
