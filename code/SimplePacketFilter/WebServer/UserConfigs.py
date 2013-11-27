@@ -50,7 +50,9 @@ class UserConfigs:
         page = page + "<a href="+str(ConvisTemplate.CONVISURLTEMPLATE)+">"+str(ConvisTemplate.CONVISURLTEMPLATE)+"</a><br/>" 
         page = page + "<em>You can access the above URL from a desktop browser</em><br/>"       
         page = page + """<a href="mailto:yourmailaddress?subject=Meddle Tracker Graph&body="""
-        page = page + str(ConvisTemplate.CONVISURLTEMPLATE)+"\">Click here to send this link by email</a></p>"
+        x =  str(ConvisTemplate.CONVISURLTEMPLATE)
+        x = x.replace("&", "%26") 
+        page = page + x + "\">Click here to send this link by email</a></p>"
         page = page.replace(ConvisTemplate.authTokenPlaceholder, str(authToken))
         return str(page)
         

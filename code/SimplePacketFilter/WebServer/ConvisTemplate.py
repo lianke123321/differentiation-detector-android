@@ -112,7 +112,7 @@ CONVISTEMPLATE="""
 			<tr>
                           <th>App</th>
                           <th class="sorttable_numeric"># Trackers</th>
-                          <th class="sorttable_nosort"><input type="checkbox" id="checkAll" onclick="checkAll()"> All</input></th>
+                          <th class="sorttable_nosort"><input type="checkbox" id="checkAll" onclick="checkAll()" checked> All</input></th>
 			  <!-- <th class="sorttable_nosort">Select </th> -->
 			</tr>
 		      </thead>
@@ -236,7 +236,7 @@ CONVISTEMPLATE="""
 
                 $("#slider").dateRangeSlider({
                     bounds: {min: startDate, max: endDate},
-                    defaultValues: {min: lastWeek, max: endDate},
+                    defaultValues: {min: startDate, max: endDate},
                     formatter: function(val){
                         var days = val.getDate(),
                         month = val.getMonth(),
@@ -282,7 +282,7 @@ CONVISTEMPLATE="""
                 var appList = $('#appList tbody');
                 appList.html('');
                 jQuery.each(obj['apps'], function(index, app){
-                    appList.append('<tr><td>'+app['name']+'</td><td>'+app['uses']+'</td><td><input class="appcheckbox" type="checkbox" value="'+index+'"></input></td></tr>');
+                    appList.append('<tr><td>'+app['name']+'</td><td>'+app['uses']+'</td><td><input class="appcheckbox" type="checkbox" value="'+index+'" checked></input></td></tr>');
                 })
             });
         }
