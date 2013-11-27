@@ -72,4 +72,4 @@ class Configs(object):
         print key , ':\t', value
     def show_all(self):
         for key in self._configs:
-            print key , ':\t', self._configs[key]
+            print '\t', key , ':\t', self._configs[key]

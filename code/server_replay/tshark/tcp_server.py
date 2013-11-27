@@ -43,8 +43,11 @@ class Server(object):
         self._socket = sock
 
     def run_socket_server(self, table):
-    
-        response_set = table.pop(0)
+        try:
+            response_set = table.pop(0)
+        except IndexError:
+            print '\tEmpty connection:', self._host, ':', self._port
+            return
         
         while True:
             if DEBUG0: print '\nServer waiting for connection: ', self._host, ':', self._port
@@ -76,10 +79,11 @@ class Server(object):
                 else:
                     buffer_len += len(connection.recv(self.buffer_size))
     
-            print 'Done with:', self._host, ':', self._port
+            print '\tDone with:', self._host, ':', self._port
             time.sleep(2)
             connection.shutdown(socket.SHUT_RDWR)
             connection.close()
+            break
 
 def main():
     '''Defaults'''
