@@ -87,12 +87,9 @@ class Server(object):
 
 def main():
     '''Defaults'''
-    host       = '129.10.115.141'
-    ports_file = '/home/arash/public_html/free_ports'
-    
     configs = Configs()
-    configs.set('host', host)
-    configs.set('ports_file', ports_file)
+    configs.set('host', '129.10.115.141')
+    configs.set('ports_file', '/tmp/free_ports')
     
     PRINT_ACTION('Reading configs file and args)', 0)
     python_lib.read_args(sys.argv, configs)

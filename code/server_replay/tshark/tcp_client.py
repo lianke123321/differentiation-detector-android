@@ -18,8 +18,12 @@ from python_lib import Configs, PRINT_ACTION
 
 DEBUG0 = False
 
-def read_ports(ports_pickle_dump):
-    command = 'scp ' + ports_pickle_dump + ' .'
+def read_ports(host, key, ports_file):
+    if key is not None:
+        command = 'scp -i' + key + ' '
+    else:
+        command = 'scp '
+    command += host + ':' + ports_file + ' .'
     os.system(command)
     return pickle.load(open('free_ports', 'rb'))
 class Connections(object):
@@ -93,12 +97,10 @@ class Queue(object):
             
 def main():
     '''Defaults'''
-    host       = '129.10.115.141'
-    ports_file = 'achtung.ccs.neu.edu:/home/arash/public_html/free_ports'
-    
     configs = Configs()
-    configs.set('host', host)
-    configs.set('ports_file', ports_file)
+    configs.set('host', '129.10.115.141')
+    configs.set('ports_file', '/tmp/free_ports')
+    configs.set('ssh_key', None)
     
     PRINT_ACTION('Reading configs file and args)', 0)
     python_lib.read_args(sys.argv, configs)
@@ -115,7 +117,7 @@ def main():
     configs.read_config_file(config_file)    
     
     PRINT_ACTION('Downloading ports file', 0)
-    configs.set('ports', read_ports(configs.get('ports_file')))
+    configs.set('ports', read_ports(configs.get('host'), configs.get('ssh_key'), configs.get('ports_file')))
     configs.show_all()
     
     PRINT_ACTION('Firing off ...', 0)
