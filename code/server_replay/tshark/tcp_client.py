@@ -29,6 +29,7 @@ class Connections(object):
         try:
             return self._connections[c_s_pair]
         except:
+            print '\tStarting:', Configs().get('host'), Configs().get('ports')[c_s_pair]
             server_address = (Configs().get('host'), Configs().get('ports')[c_s_pair])
             
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
