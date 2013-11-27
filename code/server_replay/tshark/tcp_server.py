@@ -12,7 +12,7 @@ queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
 
 import os, sys, socket, pickle, threading, time
 import python_lib
-from python_lib import Configs
+from python_lib import Configs, PRINT_ACTION
 
 DEBUG0 = False
 
@@ -129,6 +129,7 @@ def main():
         t = threading.Thread(target=threads[c_s_pair].run_socket_server, args=[table[c_s_pair]])
         t.start()
     
+    time.sleep(2)
     PRINT_ACTION('Done! You can now run your client script.', 0)
 #    print '[4]Done! You can now run your client script.'
     print '   Capture packets on server ports %d to %d' % ((min(ports.items(), key=lambda x: x[1])[1], max(ports.items(), key=lambda x: x[1])[1]))
