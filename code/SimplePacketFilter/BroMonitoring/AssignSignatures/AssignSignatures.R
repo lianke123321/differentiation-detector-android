@@ -1,12 +1,13 @@
-# Issues with ODBC and R
-### First get the arguments 
+#!/usr/bin/R -f 
 library(RMySQL)
 
+# Required because bro might delete the direction from which this is called
+setwd("/tmp/")
 # First read the command line arguments
 cmdArgs <- commandArgs(trailingOnly=TRUE)
-if (length(cmdArgs) < 4) {
+if (length(cmdArgs) < 2) {
   print (paste("Insufficient args in ", cmdArgs))
-  print (paste("R -f AssignSignatures.R --args <meddle.config> <http.log> <startTime> <stopTime>", cmdArgs))
+  print (paste("R -f AssignSignatures.R --args <meddle.config> <http.log>", cmdArgs))
   quit(save="no")
 }
 
@@ -14,8 +15,8 @@ if (length(cmdArgs) < 4) {
 meddleConfigName <- cmdArgs[1]
 # while the second is the httpLogName
 httpLogName <- cmdArgs[2]
-startTime <- as.numeric(cmdArgs[3])
-stopTime <- as.numeric(cmdArgs[4])
+#startTime <- as.numeric(cmdArgs[3])
+#stopTime <- as.numeric(cmdArgs[4])
 
 #### All the helper functions used by this script
 # Get the credentials to contact the database server 
@@ -108,7 +109,9 @@ readHttpLogSignatureElems <- function(httpLogName) {
                          response_body_len=tmpHttpData$response_body_len,
                          stringsAsFactors=FALSE)
   httpData$ts <- as.numeric(httpData$ts)
+  httpData[is.na(httpData$ts),] <- 0
   print(paste("The current bro logs has ", nrow(httpData), " rows"))
+  httpData <- httpData[order(httpData$ts, decreasing=FALSE),] 
   httpData <- httpData[!duplicated(httpData[c("uid", "orig_h", "resp_h", "host")]), ];
   # REMOVE THE PREVIOUS LINE IS YOU NEED TO DO SOME SERIOUS PII ANALYSIS
   print(paste("The current bro logs has ", nrow(httpData), " unique rows - after removing pipeling"))
@@ -257,6 +260,7 @@ appendUserAgentTable <- function(dbConn, lastAgentId, signatureTable) {
                              appID = signatureTable$app_id,
                              userAgent = signatureTable$user_agent,                             
                              agentSignature=signatureTable$agent_signature)
+  #print (dbAgentTable)
   dbWriteTable(dbConn, "UserAgentSignatures", dbAgentTable, append=TRUE, row.names=FALSE);
   print("Writing new entries to database");
   return(TRUE);                             
@@ -302,17 +306,21 @@ assignUserId <- function (httpData, UserIpMap) {
   j<-1;
   i<-1;
   ipAddresses <- c(unique(httpData$orig_h), unique(httpData$resp_h))
+
   UserIpMap <- UserIpMap[UserIpMap$tunnel_ip %in% ipAddresses, ]
+  UserIpMap <- UserIpMap[order(UserIpMap$timestamp, decreasing=FALSE), ];  
+  httpData <- httpData[order(httpData$ts, decreasing=FALSE),] 
   if (nrow(UserIpMap) < 1) {
     print("No IP addresses found in DB");
     return(httpData);
   }
+  print("Filtered IP addresses - now assigning userID");
   for(i in 1:nrow(httpData)) {        
-    currTs <- httpData[i,]$ts    
+    currTs <- httpData[i,]$ts   
     if (i %% 500 == 0) {
-      print(paste("Done", i, "rows of http"))
+      print(paste("Done", i, "rows of http out of", nrow(httpData)))
     }
-    while (UserIpMap[j, ]$timestamp < currTs ) {      
+    while ((j <= nrow(UserIpMap)) & (UserIpMap[j, ]$timestamp < currTs )) {      
       # Update the Mapping Table
       # First invalidate the current entry if an entry exists
       if (UserIpMap[j,]$user_id %in% CurrentIpMapTable$user_id) {
@@ -322,7 +330,7 @@ assignUserId <- function (httpData, UserIpMap) {
       CurrentIpMapTable[CurrentIpMapTable$ip_address == UserIpMap[j,]$tunnel_ip, ]$user_id <- UserIpMap[j,]$user_id;
       j <- j+1;
       if (j %% 500 == 0) {
-        print(paste("Done", j, "rows of ipmap"))
+        print(paste("Done", j, "rows of ipmap out of", nrow(UserIpMap)))
       }      
     }    
     orig_h <- httpData[i,]$orig_h
@@ -342,7 +350,7 @@ assignUserId <- function (httpData, UserIpMap) {
 getNewAgents <- function (logAgents, dbAgents) {
   # The Database screws up the hex encoded strings so we need to be carful
   dbAgents <- gsub("\\\\", "", dbAgents, perl=TRUE)  
-  logAgents <- gsub("\\\\", "", dbAgents, perl=TRUE)
+  logAgents <- gsub("\\\\", "", logAgents, perl=TRUE)
   return(setdiff(logAgents, dbAgents))
 }
 
@@ -366,7 +374,9 @@ assignTrackerFlag <- function(dbConn, httpData) {
   # Assuming that number of http flows are larger than the tracker rows~3k
   trackerRows <- unique(unlist(lapply(trackerTable$domain,  function(x) {grep(x, httpData$host)})))  
   httpData$tracker_flag <- FALSE;
-  httpData[trackerRows, ]$tracker_flag <- TRUE;
+  if (length(trackerRows) > 0) { 
+     httpData[trackerRows, ]$tracker_flag <- TRUE;
+   }
   print("Completed Tracker Flags")
   return(httpData)  
 }
@@ -410,6 +420,7 @@ appendDatabaseHttpData <- function (dbConn, httpData)  {
   # THIS REMOVAL IS REDUNDANT IF THE DUPLICATES ARE REMOVED WHILE READING THE FILE
   dbData <- dbData[!duplicated(dbData[c("broFlowID", "userID", "agentID", "remoteHost")]), ];
   print(paste("Number of rows in http log", nrow(dbData), "after removal of pipelining"));    
+  #print(dbData)
   dbWriteTable(dbConn, "HttpFlowData", dbData, append=TRUE, row.names=FALSE);   
 }
 
@@ -475,7 +486,6 @@ assignHostSignature <- function(dbConn, httpData) {
 dbConn <- getDBConn(meddleConfigName)
 # Read the UserAgent and IP mapping tables present in the Database
 userAgentSignatureTable <- readUserAgentSignatureTable(dbConn)
-UserIpMap <- readUserIpMap (dbConn, startTime, stopTime);
 AppMetaData <- readAppMetaDataTable(dbConn);
 # Read the http log generated by bro
 httpData <- readHttpLogSignatureElems(httpLogName)
@@ -491,6 +501,11 @@ if (length(newUserAgents) > 0) {
   print(paste("All", length(unique(httpData$user_agent)), "user agents found in DB"))
 }
 # Assign the device ID to the flows. 
+startTime <- min(httpData[(httpData$ts) > 0, ]$ts)
+startTime <- startTime - 500;
+stopTime <-  max(httpData$ts)
+print(paste("Checking the Logins from", startTime, "to", stopTime))
+UserIpMap <- readUserIpMap (dbConn, startTime, stopTime);
 httpData <- assignUserId(httpData, UserIpMap)
 httpData <- assignAgentSignature(httpData, userAgentSignatureTable)
 httpData <- assignTrackerFlag(dbConn, httpData)
@@ -499,3 +514,6 @@ httpData <- assignHostSignature(dbConn, httpData)
 # Save flow Logs
 appendDatabaseHttpData(dbConn, httpData)
 dbDisconnect(dbConn)
+print(paste("Removing the temporary file", httpLogName))
+unlink(httpLogName)
+print("Done")
