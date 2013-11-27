@@ -89,44 +89,48 @@ def main():
     '''Defaults'''
     host       = '129.10.115.141'
     ports_file = '/home/arash/public_html/free_ports'
-
+    
+    configs = Configs()
+    configs.set('host', host)
+    configs.set('ports_file', ports_file)
+    
+    PRINT_ACTION('Reading configs file and args)', 0)
+    python_lib.read_args(sys.argv, configs)
+    
     try:
-        pcap_folder = sys.argv[1]
+        pcap_folder = os.path.abspath(configs.get('pcap_folder'))
     except:
-        print 'USAGE: python tcp_server.py [pcap_folder]'
+        print 'USAGE: python tcp_server.py pcap_folder=[]'
         print '\tpcap_folder should contain the following files:'
         print '\tconfig_file, client_pickle_dump, server_pickle_dump'
         sys.exit(-1)
 
-    pcap_folder = os.path.abspath(pcap_folder)
     config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
-    
-    print '[0]Creating configs (reading configs file and args)'
-    configs = Configs(config_file)
-    configs.set('host', host)
-    configs.set('ports_file', ports_file)
-    
-    python_lib.read_args(sys.argv, configs)
+    configs.read_config_file(config_file)   
     configs.show_all()
     
     ports   = {}
     threads = {} 
     table   = pickle.load(open(configs.get('pcap_file') +'_server_pickle', 'rb'))
     
-    print '[1]Creating all socket servers'
+    PRINT_ACTION('Creating all socket servers', 0)
+#    print '[1]Creating all socket servers'
     for c_s_pair in table:
         threads[c_s_pair] = Server(Configs().get('host'))
         ports[c_s_pair]   = threads[c_s_pair].get_port()
 
-    print '[2]Serializing port mapping to file'
+    PRINT_ACTION('Serializing port mapping to file', 0)
+#    print '[2]Serializing port mapping to file'
     pickle.dump(ports, open(configs.get('ports_file'), "wb"))
     
-    print '[3]Running servers'    
+    PRINT_ACTION('Running servers', 0)
+#    print '[3]Running servers'    
     for c_s_pair in table:
         t = threading.Thread(target=threads[c_s_pair].run_socket_server, args=[table[c_s_pair]])
         t.start()
     
-    print '[4]Done! You can now run your client script.'
+    PRINT_ACTION('Done! You can now run your client script.', 0)
+#    print '[4]Done! You can now run your client script.'
     print '   Capture packets on server ports %d to %d' % ((min(ports.items(), key=lambda x: x[1])[1], max(ports.items(), key=lambda x: x[1])[1]))
     
 if __name__=="__main__":

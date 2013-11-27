@@ -8,11 +8,13 @@ Input: a config_file
 
 queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
 
+python tcp_client.py ../data/youtube_d host=ec2-72-44-56-209.compute-1.amazonaws.com ports_file='-i /Users/arash/.ssh/ancsaaa-keypair_ec2.pem ubuntu@72.44.56.209:/home/ubuntu/public_html/free_ports'
+
 '''
 
 import os, sys, socket, pickle, threading, time, ConfigParser
 import python_lib 
-from python_lib import Configs
+from python_lib import Configs, PRINT_ACTION
 
 DEBUG0 = False
 
@@ -93,28 +95,29 @@ def main():
     host       = '129.10.115.141'
     ports_file = 'achtung.ccs.neu.edu:/home/arash/public_html/free_ports'
     
-    try:
-        pcap_folder = sys.argv[1]
-    except:
-        print 'USAGE: python tcp_client.py [pcap_folder]'
-        print '\tpcap_folder should contain the following files:'
-        print '\tconfig_file, client_pickle_dump, server_pickle_dump'
-        sys.exit(-1)
-    
-    print '[0]Creating configs (reading configs file and args)'
-    pcap_folder = os.path.abspath(pcap_folder)
-    config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
-    
-    configs = Configs(config_file)
+    configs = Configs()
     configs.set('host', host)
     configs.set('ports_file', ports_file)
     
+    PRINT_ACTION('Reading configs file and args)', 0)
     python_lib.read_args(sys.argv, configs)
     
+    try:
+        pcap_folder = os.path.abspath(configs.get('pcap_folder'))
+    except:
+        print 'USAGE: python tcp_client.py pcap_folder=[]'
+        print '\tpcap_folder should contain the following files:'
+        print '\tconfig_file, client_pickle_dump, server_pickle_dump'
+        sys.exit(-1)
+
+    config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
+    configs.read_config_file(config_file)    
+    
+    PRINT_ACTION('Downloading ports file', 0)
     configs.set('ports', read_ports(configs.get('ports_file')))
     configs.show_all()
     
-    print '[1]Firing off ...'
+    PRINT_ACTION('Firing off ...', 0)
     queue = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
     Queue(queue).run()
         

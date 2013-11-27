@@ -1,5 +1,8 @@
 import socket, sys, subprocess, commands, os, ConfigParser
 
+def PRINT_ACTION(string, indent):
+    print ''.join(['\t']*indent) + '[' + str(Configs().get('action_count')) + ']' + string
+    Configs().set('action_count', Configs().get('action_count') + 1)
 def read_args(args, configs):
     for arg in args:
         a = (arg.strip()).partition('=')
@@ -57,13 +60,18 @@ class Singleton(type):
         return cls._instances[cls]
 class Configs(object):
     __metaclass__ = Singleton
+    _Config       = None
     _configs      = {}
-    def __init__(self, config_file):
-        Config = ConfigParser.ConfigParser()
-        Config.read(config_file)
-        for section in Config.sections():
-            for option in Config.options(section):
-                self._configs[option] = Config.get(section, option)
+    def __init__(self, config_file = None):
+        self._Config = ConfigParser.ConfigParser()
+        self._configs['action_count'] = 0
+        if config_file != None:
+            read_config_file(config_file)
+    def read_config_file(self, config_file):
+        self._Config.read(config_file)
+        for section in self._Config.sections():
+            for option in self._Config.options(section):
+                self._configs[option] = self._Config.get(section, option)
     def get(self, key):
         return self._configs[key]
     def set(self, key, value):
