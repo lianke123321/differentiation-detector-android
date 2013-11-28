@@ -24,55 +24,114 @@ error.bar <- function(x, y, upper, lower=upper, length=0.1,...){
   arrows(x,upper, x, lower, angle=90, code=3, length=length, ...)
 }
 
+############################################################################################
+#### FILTER THE CONNECTIONS TO REMOVE THE CONNECTIONS COMING FROM THE SERVER NETWORKS ######
+############################################################################################
+
 serverISPs <- c(-1, 16, 46, 48, 54)
 filterConn <- connData[!(connData$isp_id %in% serverISPs),]
+
+############################################################################################
+#### PER PREFIX BASED ANALYSIS #############################################################
+############################################################################################
+
 aggregateLatency <- aggregate(filterConn[("serv_latency")],
-                           by=list(isp_id=filterConn$isp_id, technology=filterConn$technology),                            
+                           by=list(prefix_id=filterConn$prefix_id, technology=filterConn$technology),                            
                            FUN=quantile, probs=c(0.09, 0.25, 0.5, 0.75, 0.91))
 # note order median is at 3rd position
 # order by median
-
 aggregateLatency <- aggregateLatency[order(aggregateLatency$serv_latency[,3]),]
-numISPs <- nrow(aggregateLatency)
+numPrefixs <- nrow(aggregateLatency)
 cellLatency <- aggregateLatency[aggregateLatency$technology=="c",]
 wifiLatency <- aggregateLatency[aggregateLatency$technology=="w",]
 aggregateLatency <- rbind(cellLatency, wifiLatency)
 aggregateLatency$sort_order <- 1:nrow(aggregateLatency)
 
-### THIS IS WHERE WE KEEP THE ORDER OF ISPS
-isp_order <- data.frame(isp_id=aggregateLatency$isp_id, sort_order <- aggregateLatency$sort_order)
-########################################################
-
-pdf(paste(resultsDir, "/latency_isp_whisker.pdf", sep=""), height=9, width=16, pointsize=25)
+###############################################
+### THIS IS WHERE WE KEEP THE ORDER OF PREFIXes
+prefix_order <- data.frame(prefix_id=aggregateLatency$prefix_id, sort_order <- aggregateLatency$sort_order)
+###############################################
+# Now plot
+pdf(paste(resultsDir, "/latency_prefix_whisker.pdf", sep=""), height=9, width=16, pointsize=25)
 mar <- par()$mar
 mar[4] <- 0.5
 par(mar=mar)
-plot(1:numISPs, aggregateLatency$serv_latency[,3], log="y",
-     xlim=c(1, numISPs),
+plot(1:numPrefixs, aggregateLatency$serv_latency[,3], log="y",
+     xlim=c(1, numPrefixs),
      pch=1,
      yaxt="n",
      ylim=c(1, max(aggregateLatency$serv_latency[,5])),
      cex.lab=cexVal, cex.axis=cexVal, cex.main=cexVal, cex.sub=cexVal, cex=cexVal,
-     xlab="ISP ID (ordered by median latency and technology)",
+     xlab="Prefix ID (ordered by median latency and technology)",
      ylab="Latency (ms)")
 axis(2, at=c(1,10, 100, 1000), labels=c(1, 10, 100, 1000),
      cex.lab=cexVal, cex.axis=cexVal, cex.main=cexVal, cex.sub=cexVal, cex=cexVal)
 par(tcl=0.22)
 axis(1, at=seq(1,numISPs,1), labels=F)
 axis(2, at=c(seq(1,10,1), seq(20, 100, 10), seq(100, 1000, 100)), labels=F)
-error.bar(1:numISPs, aggregateLatency$serv_latency[,3],  
+error.bar(1:numPrefixs, aggregateLatency$serv_latency[,3],  
           aggregateLatency$serv_latency[,5], aggregateLatency$serv_latency[,1])
 abline(v=nrow(cellLatency)+0.5, h=NULL, lty=2,lwd=5, col="black")
 text(nrow(cellLatency)-1, 2, "Cellular", cex=cexVal, adj=1)
 text(nrow(cellLatency)+1, 2, "Wi-Fi", cex=cexVal, adj=0)
-legend(20, 10, c("Median Latency"), pch=c(1), cex=cexVal)
+legend(75, 10, c("Median Latency"), pch=c(1), cex=cexVal)
 dev.off()
+
+############################################################################################
+#### PER AS BASED ANALYSIS #################################################################
+############################################################################################
+aggregateLatency <- aggregate(filterConn[("serv_latency")],
+                              by=list(as=filterConn$as, technology=filterConn$technology),                            
+                              FUN=quantile, probs=c(0.09, 0.25, 0.5, 0.75, 0.91))
+# note order median is at 3rd position
+# order by median
+aggregateLatency <- aggregateLatency[order(aggregateLatency$serv_latency[,3]),]
+numASs <- nrow(aggregateLatency)
+cellLatency <- aggregateLatency[aggregateLatency$technology=="c",]
+wifiLatency <- aggregateLatency[aggregateLatency$technology=="w",]
+aggregateLatency <- rbind(cellLatency, wifiLatency)
+aggregateLatency$sort_order <- 1:nrow(aggregateLatency)
+
+### THIS IS WHERE WE KEEP THE ORDER OF PREFIXes
+as_order <- data.frame(as=aggregateLatency$as, sort_order <- aggregateLatency$sort_order)
+###############################################
+### THIS IS WHERE WE KEEP THE ORDER OF PREFIXes
+###############################################
+# Now plot
+pdf(paste(resultsDir, "/latency_as_whisker.pdf", sep=""), height=9, width=16, pointsize=25)
+mar <- par()$mar
+mar[4] <- 0.5
+par(mar=mar)
+plot(1:numASs, aggregateLatency$serv_latency[,3], log="y",
+     xlim=c(1, numASs),
+     pch=1,
+     yaxt="n",
+     ylim=c(1, max(aggregateLatency$serv_latency[,5])),
+     cex.lab=cexVal, cex.axis=cexVal, cex.main=cexVal, cex.sub=cexVal, cex=cexVal,
+     xlab="Prefix ID (ordered by median latency and technology)",
+     ylab="Latency (ms)")
+axis(2, at=c(1,10, 100, 1000), labels=c(1, 10, 100, 1000),
+     cex.lab=cexVal, cex.axis=cexVal, cex.main=cexVal, cex.sub=cexVal, cex=cexVal)
+par(tcl=0.22)
+axis(1, at=seq(1,numISPs,1), labels=F)
+axis(2, at=c(seq(1,10,1), seq(20, 100, 10), seq(100, 1000, 100)), labels=F)
+error.bar(1:numASs, aggregateLatency$serv_latency[,3],  
+          aggregateLatency$serv_latency[,5], aggregateLatency$serv_latency[,1])
+abline(v=nrow(cellLatency)+0.5, h=NULL, lty=2,lwd=5, col="black")
+text(nrow(cellLatency)-1, 2, "Cellular", cex=cexVal, adj=1)
+text(nrow(cellLatency)+1, 2, "Wi-Fi", cex=cexVal, adj=0)
+legend(75, 10, c("Median Latency"), pch=c(1), cex=cexVal)
+dev.off()
+
+
+
 
 ##### Cherry pick three ISPs and plot the latency observed with time of the day
 
 #### Get the time evolution of the serv_latency
 aggregateLatency <- aggregate(filterConn[c("serv_latency")],
                               by=list(isp_id=filterConn$isp_id, technology=filterConn$technology,
+                                      prefix_id=filterConn$prefix_id,as=filterConn$as, 
                                       user_id=filterConn$user_id, year=filterConn$year, mon=filterConn$mon, 
                                       day=filterConn$day),
                               FUN=median)
