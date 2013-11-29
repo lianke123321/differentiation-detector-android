@@ -10,7 +10,7 @@ def main():
     configs.set('username', 'ubuntu')
     configs.set('ssh_key', '~/.ssh/ancsaaa-keypair_ec2.pem')
     configs.set('user', 'arash')
-    
+
 #    answer = 'n'    
 #    while answer == 'n':
 #        username = raw_input('What is your meddle username?\t').lower()
@@ -30,10 +30,12 @@ def main():
 #        answer = raw_input('Are you done? [Y/n]\t').lower()
     
     PRINT_ACTION('Notifying the replay server', 0)
-    url = 'http://' + configs.get('host') + ':' + str(configs.get('port')) + '/dump_ready?user=' + configs.get('user')
+    url = ('http://' + configs.get('host') + ':' + str(configs.get('port')) 
+        + '/dump_ready?user=' + configs.get('user'))
+    
     response = urllib2.urlopen(url).read()
     print '\n', response
-
+    
 if __name__=="__main__":
     main()
 
