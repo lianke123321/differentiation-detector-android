@@ -59,8 +59,12 @@ TODO insert new figure
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\columnwidth]{figures/Meddle-Design.pdf}
-\caption{Traffic diagnosis using VPN and HTTP proxy based traffic redirection.}
+\includegraphics[width=0.8\columnwidth]{figures/meddle-diagram.pdf}
+\caption{Architecture for \meddle. Mobile devices (top) communicate with 
+a \meddle frontend, which includes services such as a VPN proxy, Web proxy and 
+traffic replay server. VPN proxy traffic is forwarded to a \meddlebox, which provides 
+software middlebox services that measure and/or interpose on network flows before 
+relaying the traffic to the public Internet.  }
 \label{fig:architecture}
 \end{figure}
 
@@ -146,7 +150,8 @@ will use SSL bumping to remove PII from user-generated traffic only when users o
 \begin{center}
 \includegraphics[width=\columnwidth]{figures/packet-monitoring-plugin.pdf}
 \end{center}
-\caption{Plugin Infrastructure on \platname.}
+\caption{Plugin infrastructure for \platname, which allows traffic to pass through 
+a series of middlebox services before being forwarded to the destination. }
 \label{fig:packet-monitoring-solution}
 \end{figure}
 
@@ -174,7 +179,7 @@ analyzing PII leakage or page speed optimization. We
 the \platname{} plugin infrastructure. Additionally, we have implemented 
 per-connection blocking, malware analysis and DNS-based packet filters. 
 
-\noindent\textbf{Proxy services.} As we describe in Section~\ref{}, we can use 
+\noindent\textbf{Frontend services.} As we describe in Section~\ref{}, we can use 
 \meddle to conduct active measurements. 
 Specifically, we currently inject JavaScript into Web pages to detect if the device's 
 access network is modifying Web content in flight, and we use a companion app to 
