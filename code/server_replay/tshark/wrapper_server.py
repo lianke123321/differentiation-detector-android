@@ -24,7 +24,8 @@ def main():
     command = ('ssh -i ' + configs.get('ssh_key') + ' ' + configs.get('username') + '@' + configs.get('host')
               +' \"cd ' + configs.get('pcap_folder') + configs.get('date_folder') + '/' + configs.get('user') + configs.get('phone')
               +'; ls -lrt | tail -1\"')
-    file = (commands.getoutput(command)).split(" ")[-1]    
+    file = (commands.getoutput(command)).split(" ")[-1]
+        
     dir = file.partition('.')[0]
     os.mkdir(dir)    
     command = ('scp -i ' + configs.get('ssh_key') + ' ' + configs.get('username') + '@' + configs.get('host') + ':'
