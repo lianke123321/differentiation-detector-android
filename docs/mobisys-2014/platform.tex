@@ -1,50 +1,52 @@
-\section{Meddle Overview}
+\section{Goals and Design}
 
-In this section, we present an overview of \meddle. We first describe the goals and non-goals of the 
-system, then present the \meddle architecture. We evaluate the performance of our system and discuss 
-the current deployment.
+In this section, we present an overview of \meddle. We first describe the goals of the 
+system, then discuss the \meddle architecture. 
+
+\tbd{PG: visibility => VPN which works on all iOSes and across all networks.
+control => Meddle box, with user-enabled SSL bumping, can interpose on all the device traffic.
+deployability => services that users want like device-wide adblock + no reliance on an installed app/the restricted permissions that come along with that. }
 
 \subsection{Goals}
 
 The goals of our system are to provide visibility into Internet traffic from mobile devices, 
-exert control over this traffic and facilitate a large deployment across multiple 
-networks, OSes and devices. We discuss each of these in turn.
+exert control over this traffic and facilitate a large-scale deployment across multiple 
+networks, OSes and devices (smartphones and tablets). We discuss each of these in turn.
 
-\begin{packeditemize}
-\item \emph{Visibility}. One of our goals is to capture all of a mobile-device's Internet traffic all of the time, 
-allowing us to characterize network flows and interpose on them using software middleboxes. Thus, 
-we need a solution that works continuously over time, regardless of the device OS, network, 
-access technology, device or apps installed. Our VPN-based proxy achieves these goals. Further, 
-as network flows are increasingly encrypted, we lose the ability to interpose on the corresponding 
-traffic. To address this problem, we propose a limited use of SSL-bumping (enabled by the user) 
-that allows us to decrypt, inspect and modify encrypted traffic (\eg to strip out PII).
+%\begin{packeditemize}
+%\item 
+\noindent\textbf{Visibility}. One of our goals is to capture all of a mobile-device's Internet traffic,
+allowing us to characterize network flows and interpose on them using software middleboxes.\footnote{We can capture all of a device's traffic but we allow users to disable this at any time.}  Thus, 
+we need a solution that works continuously, regardless of the mobile OS, network/access 
+technology, or apps installed. Our VPN-based proxy achieves these goals. 
   
-\item \emph{Control}. Another important goal is to facilitate research into new middlebox approaches 
+\noindent\textbf{Control}. Another important goal is to facilitate research into new middlebox approaches 
 for interposing on mobile Internet traffic. The system must support the ability to deploy and distribute large numbers 
 of middlebox services quickly, easily and at scale~\cite{sherry:middleboxes} without 
 the need to deploy hardware in homes~\cite{bismarck} or ISPs~\cite{wang:middleboxes}. 
 It should present a simple API for researchers and developers to block, shape, inject or otherwise 
-modify network flows, and it should support services to improve network performance, security, 
-privacy and efficiency. 
+modify network flows. It should also support applications that operate on collections of flows over 
+time and across users (\eg Web caching/prefetching, malware detection/blocking and ISP characterization). 
 
-\item \emph{Deployable}. Our system can facilitate experiments in a lab environment and using naturally 
-user-generated flows ``in the wild''. To support the latter, we need a system that has incentives for users, 
-a low barrier to adoption, is easy to deploy and that scale gracefully. 
+\noindent\textbf{Deployability}. To improve the representativeness of studies using \meddle, we want to 
+recruit average (\ie, non-technical) users to participate in our system. To support this, we need a system 
+that has incentives for users, a low barrier to adoption, is easy to deploy and that scales gracefully. 
   
-\end{packeditemize}
+%\end{packeditemize}
   
 
 \subsection{Design}
 
-In this section, we describe the design and implementation of \meddle and describe how 
-it meets the goals described in the previous section.
+We now describe \meddle's design and how 
+it meets the goals described in the previous section. Figure~\ref{fig:architecture} 
+provides a high-level overview of the \meddle architecture.
 
-At a high level, \meddle is a system consisting of one or more servers that interact with a 
-mobile device's Internet traffic. Primarily, \meddle uses a VPN tunnel to directs all of a 
-mobile device's naturally generated Internet traffic to a proxy server, which we call a \meddlebox. 
+\meddle uses a VPN tunnel to direct all of a 
+mobile device's naturally generated Internet traffic to a proxy server (top of the Fig.~\ref{fig:architecture}). 
 Section~\ref{subsec:design_visibility} describes how this achieves our goal of visibility.
 
-Once traffic arrives at the \meddlebox, we can record, block, modify and/or otherwise interact 
+Once traffic arrives at \meddle server it is directed to a \meddlebox (middle of Fig.~\ref{fig:architecture}) 
+that can record, block, modify and/or otherwise interact 
 with mobile-device Internet traffic. Section~\ref{subsec:design_control} discusses how we 
 use software middlebox techniques to achieve our goal of controlling mobile-device traffic. 
 
@@ -55,7 +57,6 @@ Section~\ref{subsec:design_deploy} describes how we designed \meddle to have cle
 incentives for user adoption, a low barrier to entry to participate, and good performance that 
 is easy to scale to a global deployment.
 
-TODO insert new figure 
 
 \begin{figure}[h]
 \centering
@@ -102,7 +103,11 @@ relaying the traffic to the public Internet.  }
 %\item Filtering privacy invasive traffic. 
 %\end{packedenumerate}
 
-\subsubsection{Visibility into Mobile Internet Traffic}
+\section{System Overview}
+We describe the implementation of \meddle, evaluate its performance and discuss 
+the current deployment. We also discuss the benefits and limitations of our approach.
+
+\subsection{Visibility into Mobile Internet Traffic}
 \label{subsec:design_visibility}
 
 \meddle leverages the fact that the vast majority of mobile devices provide native VPN support, a feature typically provided to satisfy enterprise clients. We currently support VPN tunnels on iOS and Android; we anticipate being able to support the next version of Windows Phone that includes a native VPN implementation.
@@ -144,7 +149,7 @@ Currently we use this only in controlled experiments
 where \emph{no user traffic is intercepted}. We are also designing a study for IRB approval where we 
 will use SSL bumping to remove PII from user-generated traffic only when users opt in.
 
-\subsubsection{Services for Controlling Traffic}
+\subsection{Services for Controlling Traffic}
 \label{subsec:design_control}
 \begin{figure}
 \begin{center}
@@ -186,13 +191,13 @@ access network is modifying Web content in flight, and we use a companion app to
 test detect service differentiation within mobile ISPs. To support these services, we 
 run services on \meddle servers that are accessed via untunneled connections. 
 
-\subsubsection{Deployability}
+\subsection{Deployability}
 \label{subsec:design_deploy}
 
 This section describes how \meddle provides clear incentives for user adoption, a 
 low barrier to entry and reasonable performance that is easy to scale.
 
-\noindent \textbf{Incentives for user adoption.} \meddle presents a number of incentives 
+\subsubsection{Incentives for user adoption.} \meddle presents a number of incentives 
 that appeal to a wide range of users. Importantly, we do not charge users for any of these 
 services.
 
@@ -211,15 +216,14 @@ ISPs are modifying HTTP content in flight, and when they provide differentiated 
 traffic crossing their networks.
 \end{packeditemize}
 
-\noindent \textbf{Low barrier to entry.} 
+\subsubsection{Low barrier to entry.} 
 Manually configuring a VPN generally requires filling out five fields on an Android phone, and the VPN configuration can be distributed using a single file on iOS. 
 These configurations are primarily required to drive the key exchange algorithms required to establish the VPN tunnels.
 
 Our \meddlebox system requires only that the user can run a modern Linux OS with root privileges. This can be deployed 
 in a single-machine instance on a home computer, dedicated server or on a VM in the cloud. \meddle is currently in private beta with dedicated-server, EC2 and Aliyun deployments in the US, France and China. We will make the \meddle software publicly available.
 
-\noindent \textbf{Performance and Scalabilty.} 
-
+\subsubsection{Overheads} 
 \noindent\emph{Network Latency.}
 We measured 50 VPN-connection establishment times  on both iOS (iPhone 5 / iOS 6.1) and Android (Galaxy Nexus /
 Android 4.2), for \wifi{} and cellular connections. 
@@ -261,7 +265,7 @@ data plans in the US tend to cost \$30-\$90 per month -- more than two orders of
 
 \subsection{Generalizability and Limitations}
 
-\noindent \textbf{Generalizability.} A system for improving visibility and control over Internet traffic from mobile 
+\subsubsection{Generalizability} A system for improving visibility and control over Internet traffic from mobile 
 devices can be implemented at the endpoints (\eg in the OS), in the network (\eg a hardware middlebox), 
 somewhere else in the middle (our approach). \meddle is not intended as a blanket replacement for 
 these alternative approaches; rather it allows us to explore the opportunities for improving the state of the 
@@ -276,7 +280,7 @@ and at scale. \meddle allows us to identify and block unobfuscated PII in networ
 OS modifications or taint tracking. Regardless of the ultimate optimal solution, we can use \meddle today to inform the design 
 and deployment of future functionality in OSes and for in-network devices. 
 
-\noindent \textbf{Limitations.} The following technical limitations can impact \meddle's coverage.
+\subsubsection{Limitations} The following technical limitations can impact \meddle's coverage.
 
 \begin{packeditemize} 
 \item\emph{At most one VPN tunnel.}
