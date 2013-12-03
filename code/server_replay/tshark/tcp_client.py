@@ -99,13 +99,12 @@ class Queue(object):
             self.event.clear()
             
 def main():
-    
     PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
     configs.set('host', '129.10.115.141')
     configs.set('ports_file', '/tmp/free_ports')
-    configs.set('username', None)
-    configs.set('ssh_key', None)    
+    configs.set('username', 'arash')
+    configs.set('ssh_key', '~/.ssh/id_rsa')    
     python_lib.read_args(sys.argv, configs)
     
     try:
