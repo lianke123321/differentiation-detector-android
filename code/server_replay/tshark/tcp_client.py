@@ -26,22 +26,27 @@ def read_ports(host, username, key, ports_file):
     else:
         command = 'scp '
     command += host + ':' + ports_file + ' .'
-    print command
     os.system(command)
     return pickle.load(open('free_ports', 'rb'))
 class Connections(object):
     __metaclass__ = python_lib.Singleton
-    _connections = {}
+    _connections  = {}
+    
+    def _port_from_c_s_pair(self, c_s_pair):
+        return (c_s_pair.partition('-')[0]).rpartition('.')[2]
+    
     def get_sock(self, c_s_pair):
         try:
             return self._connections[c_s_pair]
         except:
-            print '\tStarting:', Configs().get('host'), Configs().get('ports')[c_s_pair]
             server_address = (Configs().get('host'), Configs().get('ports')[c_s_pair])
-            
+#            server_address = (Configs().get('host'), _port_from_c_s_pair(self, c_s_pair))
+            print '\tStarting:', server_address
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+
             sock.connect(server_address)
+            sock.sendall(c_s_pair)
             
             self.set_sock(c_s_pair, sock)
             return self._connections[c_s_pair]
@@ -97,14 +102,23 @@ class Queue(object):
             self.next()
             self.event.wait()
             self.event.clear()
-            
+
+          
 def main():
+    
     PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
-    configs.set('host', '129.10.115.141')
     configs.set('ports_file', '/tmp/free_ports')
+    os.system('rm -f ' + configs.get('ports_file'))
+
+    configs.set('host', '129.10.115.141')
     configs.set('username', 'arash')
-    configs.set('ssh_key', '~/.ssh/id_rsa')    
+    configs.set('ssh_key', '~/.ssh/id_rsa')
+    
+    configs.set('host', 'ec2-72-44-56-209.compute-1.amazonaws.com')
+    configs.set('username', 'ubuntu')
+    configs.set('ssh_key', '~/.ssh/ancsaaa-keypair_ec2.pem')
+    
     python_lib.read_args(sys.argv, configs)
     
     try:
@@ -118,17 +132,20 @@ def main():
     config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
     configs.read_config_file(config_file)    
     
+    configs.show_all()
+    
+    
     PRINT_ACTION('Downloading ports file', 0)
     configs.set('ports', read_ports(configs.get('host'),
                                     configs.get('username'),
                                     configs.get('ssh_key'),
                                     configs.get('ports_file')))
-    configs.show_all()
     
-    PRINT_ACTION('Firing off ...', 0)
+    PRINT_ACTION('Loading the queue', 0)
     queue = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
+
+    PRINT_ACTION('Firing off ...', 0)
     Queue(queue).run()
-        
     
 if __name__=="__main__":
     main()

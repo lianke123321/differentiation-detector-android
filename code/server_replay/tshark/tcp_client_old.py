@@ -8,130 +8,135 @@ Input: a config_file
 
 queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
 
+python tcp_client.py ../data/youtube_d host=ec2-72-44-56-209.compute-1.amazonaws.com ports_file='-i /Users/arash/.ssh/ancsaaa-keypair_ec2.pem ubuntu@72.44.56.209:/home/ubuntu/public_html/free_ports'
+
 '''
 
-import os, sys, socket, pickle, threading, time
-from python_lib import * 
+import os, sys, socket, pickle, threading, time, ConfigParser
+import python_lib 
+from python_lib import Configs, PRINT_ACTION
 
-def read_ports(ports_pickle_dump):
-    if ports_pickle_dump == None:
-        ports_pickle_dump = 'achtung.ccs.neu.edu:/home/arash/public_html/free_ports'
-    os.system(('scp ' + ports_pickle_dump + ' .'))
+DEBUG0 = False
+
+def read_ports(host, username, key, ports_file):
+    if key is not None:
+        command = 'scp -i ' + key + ' '
+    if username is not None:
+        command += username + '@'
+    else:
+        command = 'scp '
+    command += host + ':' + ports_file + ' .'
+    print command
+    os.system(command)
     return pickle.load(open('free_ports', 'rb'))
-def socket_connect(host, port):
-#    print 'Connecting to:', host, port
-    server_address = (host, port)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    sock.connect(server_address)
-    return sock        
-def send_single_request(req_set, sock, All_Hash, status, send_status):
-
-    buff_size = 4096
-
-    pld      = str(req_set[0])
-    c_s_pair = req_set[1]
-    res_len  = req_set[3]
+class Connections(object):
+    __metaclass__ = python_lib.Singleton
+    _connections = {}
+    def get_sock(self, c_s_pair):
+        try:
+            return self._connections[c_s_pair]
+        except:
+            print '\tStarting:', Configs().get('host'), Configs().get('ports')[c_s_pair]
+            server_address = (Configs().get('host'), Configs().get('ports')[c_s_pair])
+            
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            sock.connect(server_address)
+            
+            self.set_sock(c_s_pair, sock)
+            return self._connections[c_s_pair]
     
-    while status[c_s_pair] is False:
-        continue
+    def set_sock(self, c_s_pair, socket):
+        self._connections[c_s_pair] = socket
     
-    status[c_s_pair] = False
-#    print 'Sending:', c_s_pair, len(pld), '\n'
-    sock.sendall(pld)
-
-    send_status[0]   = True
-    
-    if res_len == 0:
-        status[c_s_pair] = True
-        return
-    
-#    buffer = ''
-    buffer_len = 0
-    while True:
-#        buffer += sock.recv(buff_size)
-        buffer_len += len(sock.recv(buff_size))
-#        if All_Hash:
-#            buffer = int(buffer)
-#        if len(buffer) == res_len:
-        if buffer_len == res_len:
-            break
-#        if hash(buffer) == res:
-#            break
-    status[c_s_pair] = True
-    
-#    print 'Recieved:', c_s_pair, len(buffer), '\n'
+    def remove_socket(self, c_s_pair):
+        del self._connections[c_s_pair]
+class SendRecv(object):        
+    def send_single_request(self, q, waitlist, sendlist, event):
+        sock = Connections().get_sock(q.c_s_pair)
+        if DEBUG0: print 'Sending:', q.c_s_pair, '\t', sock, '\t', len(q.payload) 
+        sock.sendall(q.payload)
+        
+        sendlist.pop()
+        if q.response_len == 0:
+            if DEBUG0: print '\tNoResponse', q.c_s_pair, '\t', len(q.payload)
+            waitlist.remove(q.c_s_pair)
+            event.set()
+        else:
+            if DEBUG0: print '\tWaiting for responce', q.c_s_pair, q.response_len
+            event.set()
+            buffer_len = 0
+            while True:
+                buffer_len += len(sock.recv(4096))
+                if buffer_len == q.response_len:
+                    break
+            if DEBUG0: print '\tReceived', q.c_s_pair, '\t', buffer_len
+            waitlist.remove(q.c_s_pair)
+            event.set()        
+class Queue(object):
+    def __init__(self, queue):
+        self.Q           = queue
+        self.event       = threading.Event()
+        self.waitlist    = []
+        self.sendlist    = []
+        self.time_origin = 0
+    def next(self):
+        if (len(self.sendlist) == 0):
+            q = self.Q[0]
+            if (q.c_s_pair not in self.waitlist):
+                if time.time() < self.time_origin + q.timestamp:
+                    time.sleep((self.time_origin + q.timestamp) - time.time())
+                self.Q.pop(0)
+                self.waitlist.append(q.c_s_pair)
+                self.sendlist.append(q.c_s_pair)
+                t = threading.Thread(target=SendRecv().send_single_request, args=[q, self.waitlist, self.sendlist, self.event])
+                t.start()
+    def run(self):
+        self.time_origin = time.time()
+        while self.Q:
+            self.next()
+            self.event.wait()
+            self.event.clear()
+            
 def main():
-    DEBUG = False
+    PRINT_ACTION('Reading configs file and args)', 0)
+    configs = Configs()
+    configs.set('ports_file', '/tmp/free_ports')
+    os.system('rm -f ' + configs.get('ports_file'))
+
+    configs.set('host', '129.10.115.141')
+    configs.set('username', 'arash')
+    configs.set('ssh_key', '~/.ssh/id_rsa')
+    
+    configs.set('host', 'ec2-72-44-56-209.compute-1.amazonaws.com')
+    configs.set('username', 'ubuntu')
+    configs.set('ssh_key', '~/.ssh/ancsaaa-keypair_ec2.pem')
+    
+    python_lib.read_args(sys.argv, configs)
     
     try:
-        pcap_folder = sys.argv[1]
+        pcap_folder = os.path.abspath(configs.get('pcap_folder'))
     except:
-        print 'USAGE: python tcp_client.py [pcap_folder]'   
+        print 'USAGE: python tcp_client.py pcap_folder=[]'
+        print '\tpcap_folder should contain the following files:'
+        print '\tconfig_file, client_pickle_dump, server_pickle_dump'
         sys.exit(-1)
-    
-    pcap_folder = os.path.abspath(pcap_folder)
-    config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
-    
-    [All_Hash, pcap_file, number_of_servers] = read_config_file(config_file)
-    print 'All_Hash         :', All_Hash
-    print 'pcap_file        :', pcap_file
-    print 'number_of_servers:', number_of_servers
-    
-    '''Defaults'''
-    port_file = None
-    host = '129.10.115.141'
-    
-    for arg in sys.argv:
-        a = (arg.strip()).partition('=')
-        if a[0] == 'port_file':
-            port_file = a[2]
-        if a[0] == 'host':
-            host = a[2]
-    
-    ports = read_ports(port_file)    
-    queue = pickle.load(open(pcap_file +'_client_pickle', 'rb'))
 
-    status = {} #status[c-s-pair] = True if the corresponding connection is ready to send a new request
-                #                   False if the corresponding connection is still waiting for the response to previous request
-    send_status = [True]
+    config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
+    configs.read_config_file(config_file)    
     
+    PRINT_ACTION('Downloading ports file', 0)
+    configs.set('ports', read_ports(configs.get('host'),
+                                    configs.get('username'),
+                                    configs.get('ssh_key'),
+                                    configs.get('ports_file')))
+    configs.show_all()
     
-    for q in queue:
-        c_s_pair = q[1]
-        if c_s_pair not in status:
-            status[c_s_pair] = True
-    
-    time_origin = time.time()
-    conns = {}  #conns[c-s-pair] = socket
-    for i in range(len(queue)):
-#        print 't count:', threading.activeCount()
-        q = queue[i]
-        c_s_pair  = q[1]
-        timestamp = q[4]
-        
-#        print timestamp
-        
-        while not send_status[0]:
-            continue
-        
-        send_status[0] = False
-        
-        while not time.time() > time_origin + timestamp:
-            continue
-        
-#        print 'Doing:', i+1, '/', len(queue), c_s_pair, len(q[0]), q[3]
-        try:
-            sock = conns[c_s_pair]
-        except:
-            conns[c_s_pair] = socket_connect(host, ports[c_s_pair])
-            sock  = conns[c_s_pair]
-        t = threading.Thread(target=send_single_request, args=[q, sock, All_Hash, status, send_status])
-        t.start()
+    PRINT_ACTION('Firing off ...', 0)
+    queue = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
+    Queue(queue).run()
         
     
 if __name__=="__main__":
     main()
-    
-    
     
