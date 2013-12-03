@@ -51,7 +51,9 @@ def stream_to_queue(stream_file, packet_dic):
     client   = convert_ip(((linecache.getline(stream_file, 5)).split()[2]).replace(':', '.'))
     server   = convert_ip(((linecache.getline(stream_file, 6)).split()[2]).replace(':', '.'))
     c_s_pair = client + '-' + server
-
+    
+    print c_s_pair
+    
     f = open(stream_file, 'r')
     
     for i in range(6):
@@ -66,7 +68,6 @@ def stream_to_queue(stream_file, packet_dic):
         info1 = packet_dic[c_s_pair][pl1_hash].pop(0)
     except KeyError:
         print 'Broken stream file!', stream_file
-        print '\tLook into it' 
         return queue, table, c_s_pair
     pl1_timestamp = info1[0]
     pl1_talking   = info1[1]
@@ -331,7 +332,10 @@ def do_tshark_follows(pcap_file, follow_folder):
                "done"
               )
     os.system(command)
-def read_client_ip(client_ip_file):
+def read_client_ip(client_ip_file, follows = False):
+    if follows:
+        l = linecache.getline((client_ip_file + '/follow-stream-0.txt'), 5)
+        return (l.split()[2]).partition(':')[0]
     f = open(client_ip_file, 'r')
     return (f.readline()).strip()
 def main():
@@ -344,7 +348,7 @@ def main():
         print 'Usage: python scapy_parser.py [pcap_folder]'
         sys.exit(-1)
         pcap_folder = '../data/dropbox_d/'
-        client_ip = '10.11.3.3'
+#        client_ip = '10.11.3.3'
 
     pcap_folder    = os.path.abspath(pcap_folder)
     pcap_file      = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap'
@@ -352,18 +356,21 @@ def main():
     follow_folder  = pcap_folder + '/' + os.path.basename(pcap_folder) + '_follows'
     packets_file   = pcap_file   + '_packets.txt'
 
-    client_ip      = read_client_ip(client_ip_file)
     
     if not os.path.isfile(pcap_file):
         print 'The folder is missing the pcap file! Exiting with error!'
-        sys.exit(-1)
-    if not os.path.isfile(client_ip_file):
-        print 'The folder is missing the client_ip_file! Exiting with error!'
         sys.exit(-1)
     if not os.path.isdir(follow_folder):
         print 'Follows folder doesnt exist. Creating the follows folder...'
         os.makedirs(follow_folder)
         do_tshark_follows(pcap_file, follow_folder)
+    if not os.path.isfile(client_ip_file):
+        print 'The folder is missing the client_ip_file!'
+        print 'Will extract this from tshark follows' 
+        client_ip = read_client_ip(follow_folder, True)
+    else:
+        print 'Reading client_ip from:', client_ip_file
+        client_ip = read_client_ip(client_ip_file)
     if not os.path.isfile(packets_file):
         print 'The packets_file is missing. Creating it right now...'
         create_packets_file(pcap_file, client_ip, packets_file)
