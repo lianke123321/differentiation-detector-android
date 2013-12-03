@@ -8,6 +8,8 @@ Input: a config_file
 
 queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
 
+ps aux | grep "python" |  awk '{ print $2}' | xargs kill -9
+
 '''
 
 import os, sys, socket, pickle, threading, time
@@ -86,14 +88,18 @@ class Server(object):
             break
 
 def main():
+#    time.sleep(30)
+#    print 'Kiri'
+#    sys.exit()
     '''Defaults'''
     configs = Configs()
     configs.set('host', '129.10.115.141')
     configs.set('ports_file', '/tmp/free_ports')
     
-    PRINT_ACTION('Reading configs file and args)', 0)
+    PRINT_ACTION('Reading configs file and args', 0)
     python_lib.read_args(sys.argv, configs)
     
+    print configs.get('pcap_folder')
     try:
         pcap_folder = os.path.abspath(configs.get('pcap_folder'))
     except:
@@ -103,7 +109,7 @@ def main():
         sys.exit(-1)
 
     config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
-    configs.read_config_file(config_file)   
+    configs.read_config_file(config_file)
     configs.show_all()
     
     ports   = {}
@@ -115,15 +121,15 @@ def main():
         threads[c_s_pair] = Server(Configs().get('host'))
         ports[c_s_pair]   = threads[c_s_pair].get_port()
 
-    PRINT_ACTION('Serializing port mapping to file', 0)
-    pickle.dump(ports, open(configs.get('ports_file'), "wb"))
-    
     PRINT_ACTION('Running servers', 0)
     for c_s_pair in table:
         t = threading.Thread(target=threads[c_s_pair].run_socket_server, args=[table[c_s_pair]])
         t.start()
     
-    time.sleep(2)
+    PRINT_ACTION('Serializing port mapping to file', 0)
+    pickle.dump(ports, open(configs.get('ports_file'), "wb"))
+    
+    time.sleep(5)
     PRINT_ACTION('Done! You can now run your client script.', 0)
     print '   Capture packets on server ports %d to %d' % ((min(ports.items(), key=lambda x: x[1])[1], max(ports.items(), key=lambda x: x[1])[1]))
     

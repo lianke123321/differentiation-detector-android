@@ -1,8 +1,11 @@
 import socket, sys, subprocess, commands, os, ConfigParser
 
-def PRINT_ACTION(string, indent):
-    print ''.join(['\t']*indent) + '[' + str(Configs().get('action_count')) + ']' + string
-    Configs().set('action_count', Configs().get('action_count') + 1)
+def PRINT_ACTION(string, indent, action=True):
+    if action:
+        print ''.join(['\t']*indent), '[' + str(Configs().get('action_count')) + ']' + string
+        Configs().set('action_count', Configs().get('action_count') + 1)
+    else:
+        print ''.join(['\t']*indent) + string
 def read_args(args, configs):
     for arg in args:
         a = (arg.strip()).partition('=')
