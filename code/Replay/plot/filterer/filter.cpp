@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <cstring>
-
+#define OPEN_FILE_HANDLE_LIMIT 1000
 // TCP:
 //  16:28:35.679756 IP 65.121.208.122.80 > 10.11.3.3.53453: Flags [F.], seq 1, ack 1, win 10456, options [nop,nop,TS val 189791440 ecr 1720112], length 0 <<<< IGNORE
 // 16:28:38.136027 IP 216.156.199.139.80 > 10.11.3.3.42287: Flags [.], seq 2809:4157, ack 1083, win 8457, options [nop,nop,TS val 15965058 ecr 1720518], length 1348 <<<< WRITE
@@ -115,6 +115,10 @@ int main(int argc, char ** argv)
     map<string,type_e> connection_type;
     // Maps files to connections.
     map<string,ofstream*> file_map;
+    // Keep a tap on the number of open files,
+    // more than 1019 files cannot be open at
+    // the same time.
+    long open_files = 0;
     map<string,ofstream*>::iterator it;
     // Keep total UDP length for each UDP connection.
     map<string,long> udp_offset;
@@ -132,6 +136,8 @@ int main(int argc, char ** argv)
     string p1, p2, protocol;
     // To skip over unnecessary strings in the input.
     string temp;
+    // To identify packet type (IP or non-IP)
+    string packet_type;
     // Starting time for the connection (used to calculate
     // time offset).
     long double start;
@@ -151,7 +157,7 @@ int main(int argc, char ** argv)
     eatspaces(inp);
 
     // Read the first line, up until protocol.
-    inp >> temp >> p1 >> temp >> p2 >> protocol; //>> seq1;
+    inp >> packet_type >> p1 >> temp >> p2 >> protocol; //>> seq1;
     // Remove the : from the destination address and port.
     p2.resize(p2.size()-1);
     ttime = start;
@@ -176,6 +182,7 @@ int main(int argc, char ** argv)
         {
             // Create a file for the new connection in "connections" directory.
             file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2).c_str());
+	    open_files++;
             // Add the reverse line in the revers map.
             reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
             // Increment the number of connections.
@@ -201,6 +208,7 @@ int main(int argc, char ** argv)
         inp >> len;
 
         file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2 + "_UDP").c_str());
+	open_files++;
         reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
         connection_count++;
         udp_offset[(p1 + "-" + p2)] = 0;
@@ -244,20 +252,32 @@ int main(int argc, char ** argv)
                 if(file_map.count(p1 + "-" + p2) == 0)
                 {
                     file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2).c_str());
+		    open_files++;
                     reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
                     connection_count++;
                     max_len[(p1 + "-" + p2)] = 0;
                     flag = false;
                     (*(file_map[p1+ "-" + p2])) << "0.000000 0" << endl;
+		    // If there are too many files open, close this one.
+		    if(open_files > OPEN_FILE_HANDLE_LIMIT) { (*(file_map[p1+ "-" + p2])).close(); open_files--;}
                     continue;
                 }
 
-                // Write the packet time and sequence number into the file for that connection.
-                (*(file_map[p1+ "-" + p2])) << setprecision(14) << ttime << " " << seq2 << endl;
+                // If the file has been closed, reopen it.
+		if(!((file_map[p1+ "-" + p2])->is_open())) 
+		{
+		    (file_map[p1+"-"+p2])->open(("connections/" + p1 + "-" + p2).c_str(), std::ofstream::out | std::ofstream::app);
+		    open_files++;
+		}
+                
+		// Write the packet time and sequence number into the file for that connection.
+		(*(file_map[p1+ "-" + p2])) << setprecision(14) << ttime << " " << seq2 << endl;
                 // Maximum connection length for a TCP connection is the last sequence number.
                 max_len[(p1 + "-" + p2)] = seq2;
                 eatspaces(inp);
                 flag = false;
+		// If there are too many files open, close this one.
+		if(open_files > OPEN_FILE_HANDLE_LIMIT) {(*(file_map[p1+ "-" + p2])).close(); open_files--;}
             }
         }
         else if (protocol == "UDP,") // UDP
@@ -267,6 +287,7 @@ int main(int argc, char ** argv)
             if(file_map.count(p1 + "-" + p2) == 0)
             {
                 file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2 + "_UDP").c_str());
+		open_files++;
                 reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
                 connection_count++;
                 udp_offset[(p1 + "-" + p2)] = 0;
@@ -276,8 +297,19 @@ int main(int argc, char ** argv)
 
             udp_offset[(p1 + "-" + p2)] += len;
             max_len[(p1 + "-" + p2)] = udp_offset[(p1 + "-" + p2)];
-            // Write the packet time and sequence number into the file for that connection.
+            
+	    // If the file has been closed, reopen it.
+	    if(!((file_map[p1+ "-" + p2])->is_open()))
+	    {
+		(file_map[p1+"-"+p2])->open(("connections/" + p1 + "-" + p2 + "_UDP").c_str(), std::ofstream::out | std::ofstream::app);
+		open_files++;
+	    }
+            
+	    // Write the packet time and sequence number into the file for that connection.
             (*(file_map[p1+ "-" + p2])) << setprecision(14) << ttime << " " << udp_offset[(p1 + "-" + p2)] << endl;
+
+	    // If there are too many files open, close this one.
+	    if(open_files > OPEN_FILE_HANDLE_LIMIT) {(*(file_map[p1+ "-" + p2])).close(); open_files--;}
         }
         skipline(inp);
         eatspaces(inp);

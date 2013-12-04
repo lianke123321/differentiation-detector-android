@@ -11,45 +11,6 @@ cexVal<-1.4
 newpar <- par(cex.lab=cexVal, cex.axis=cexVal, cex.main=cexVal, cex.sub=cexVal, cex=cexVal, xaxs="i", yaxs="i",lwd=3);
 
 # The connData must be a info file that has the oper_sys information                  
-labelProtoService <- function() {
-  # Remove the ones with unknowns
-   connData <- connData[connData$isp_id!=-1, ]
-   print("Processing Meta")
-   # POST PROCESSING BASED ON PORT VALUES   
-   connData[(connData$proto=="tcp" 
-      & (connData$id.resp_p==443 | connData$id.resp_p==5228 | connData$id.resp_p == 5900 |
-           connData$id.resp_p== 8883 | connData$id.resp_p==5222 |  
-           connData$id.resp_p == 1237 | connData$id.resp_p == 993 | 
-           connData$id.resp_p == 995| connData$id.resp_p == 7275)),]$service = "ssl"
-   
-   connData[(connData$proto=="tcp" 
-      & (connData$id.orig_p == 443 | connData$id.orig_p == 5228 | connData$id.orig_p == 5900 |
-           connData$id.orig_p == 8883 | connData$id.orig_p ==5222 | 
-           connData$id.orig_p == 1237 | connData$id.orig_p == 993 | 
-           connData$id.orig_p == 995 | connData$id.orig_p == 7275)),]$service = "ssl"
-   
-   #TODO:: What about VNC??      
-   connData[(connData$proto=="tcp")
-     &(connData$id.resp_p==5223|connData$id.orig_p==5223 |
-                         connData$id.orig_p == 443) 
-     & (connData$operating_system=="i"),]$service="ssl"   
-   # added 443 to ensure that this command does not return error
-   connData[(connData$proto=="udp")&((connData$id.orig_p ==53) | (connData$id.resp_p==53)), ]$service <- "dns"
-   # 5228 gtalk android
-   # 8882 mqtt ssl 
-   connData[(connData$proto=="tcp" & (connData$id.orig_p == 80 | connData$id.resp_p == 80 )),]$service = "http"
-   
-   connData[((connData$proto == "tcp") & (connData$service != "http") & (connData$service != "ssl")),]$service="other"
-   connData[((connData$proto == "udp") & (connData$service != "dns")),]$service="other" 
-   connData[((connData$proto != "tcp") & (connData$proto != "udp")),]$proto="other"   
-   connData[(connData$proto == "other"),]$service="other"
-
-   connData$tot_pkts <- connData$orig_pkts+connData$resp_pkts
-   connData$tot_bytes <- connData$orig_ip_bytes + connData$resp_ip_bytes  
-   connData
-}
-
-
 
 fName <- paste(broAggDir, "/conn.log.info", sep="");
 print(fName)
@@ -59,12 +20,68 @@ connData$num_flows <- 1
 # Compute and save summary
 y<-aggregate(connData[c("orig_pkts", "resp_pkts", "orig_ip_bytes", "resp_ip_bytes", "num_flows")],
                by=list(user_id=connData$user_id, proto=connData$proto, service=connData$service, 
-                       isp_id=connData$isp_id, operating_system=connData$operating_system, 
+                       isp_id=connData$isp_id, as=connData$as, prefix_id=connData$prefix_id, 
+                       operating_system=connData$operating_system, 
                        technology=connData$technology), 
                FUN=sum)
 fName <- paste(broAggDir, "/summary.conn.log.info", sep="");
 print(paste("Writing Meta in", fName))
 write.table(y, fName, sep="\t", quote=F, col.names=c(colnames(y)), row.names=FALSE)
+
+
+
+###################################################################################
+###################################################################################
+#### Get the Summary Info in a table ##############################################
+###################################################################################
+###################################################################################
+connSummary <- readTable(paste(broAggDir, "summary.conn.log.info", sep=""))
+connSummary$tot_bytes <- connSummary$orig_ip_bytes+ connSummary$resp_ip_bytes
+connSummary$tot_bytes <- as.numeric(connSummary$tot_bytes)
+connSummary$num_flows <- as.numeric(connSummary$num_flows)
+summaryAggr <- aggregate(connSummary[c("tot_bytes", "num_flows")],
+                         by=list(proto=connSummary$proto,
+                                 service=connSummary$service,
+                                 technology=connSummary$technology,
+                                 operating_system=connSummary$operating_system),
+                         FUN=sum)
+totBytes <- aggregate(connSummary[c("tot_bytes", "num_flows")],
+                      by=list(operating_system=connSummary$operating_system,
+                              technology=connSummary$technology),
+                      FUN=sum)
+colnames(totBytes) <- gsub("tot_bytes", "all_bytes",colnames(totBytes))
+colnames(totBytes) <- gsub("num_flows", "all_flows",colnames(totBytes))
+summaryAggr <- merge(x=summaryAggr, y=totBytes)
+summaryAggr$perc_bytes <- 100*summaryAggr$tot_bytes/summaryAggr$all_bytes
+summaryAggr$perc_flows <- 100*summaryAggr$num_flows/summaryAggr$all_flows
+write.table(summaryAggr, paste(resultsDir, "/classifytraffic_techos_summary.txt", sep=""), 
+            sep="\t", quote=F, col.names=c(colnames(summaryAggr)), row.names=FALSE)
+
+###################################################################################
+###################################################################################
+#### Get the Sorting order for users  #############################################
+###################################################################################
+###################################################################################
+
+connTcpAggr <- connSummary[connSummary$proto=="tcp",]
+connTcpAggr <- aggregate(connTcpAggr[c("tot_bytes")],
+                         by=list(user_id=connTcpAggr$user_id, 
+                                 operating_system=connTcpAggr$operating_system),
+                         FUN=sum)
+connTcpAggr <- connTcpAggr[order(connTcpAggr$tot_bytes, decreasing=TRUE),]
+connTcpAggr <- rbind(connTcpAggr[connTcpAggr$operating_system=="i",], connTcpAggr[connTcpAggr$operating_system=="a",])
+#numIOS <- nrow(sortOrderTable[sortOrderTable$operating_system=="i",])
+connTcpAggr$sort_order <- 1:nrow(connTcpAggr)
+write.table(connTcpAggr, paste(broAggDir, "/devices.sortorder.txt", sep=""), 
+            sep="\t", quote=F, col.names=c(colnames(connTcpAggr)), row.names=FALSE)
+
+
+###################################################################################
+###################################################################################
+#### Get the Sorting order for users  #############################################
+###################################################################################
+###################################################################################
+
 
 # 
 #    

@@ -6,8 +6,8 @@ signalCMD="${msgSignalUserUpDownPath}"
 
 function logState()
 {
-    echo "Env variables while signaling user ${PLUTO_VERB} " >> ${logFile}
-    printenv >> ${logFile}
+    echo "Env variables while signaling user ${PLUTO_VERB} ${PLUTO_PEER_ID} ${PLUTO_PEER_CLIENT} ${PLUTO_PEER} ${PLUTO_ME} " >> ${logFile}
+#   printenv >> ${logFile}
 }
 
 function genParams()
