@@ -1,21 +1,50 @@
-\section{Application: ISP Behavior}
+\section{Application: \\
+Revealing ISP Behavior}
+
+This section describes how we build two applications atop \meddle to 
+reveal the policies ISPs apply to mobile traffic traversing their networks. 
+Previous work focused on addressing this problem in fixed-line networks; to 
+the best of our knowledge we are the first to provide this functionality for 
+mobile systems.
+
+\subsection{Web Tripnets: Detecting ISP Content Manipulation}
+
+ISPs, middleboxes and client software are known to change Web page content for 
+a variety of reasons including performance optimization and security. In some cases, 
+a third party can change a page for selfish reasons, \eg to insert ads that generate revenue 
+for that party. Figure~\ref{fig:tripnet-example} depicts an example of content injection in China, where 
+a banner ad is replaced by information about the local airport.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{figures/injectioncrop.png}
+\caption{Screen capture of content injection by a Chinese ISP in November, 2013. The 
+highlighted region at the bottom should be an advertisement from a US company. }
+\label{fig:tripnet-example}
+\end{figure}
 
 
-
-\subsection{Web Tripnets: Detecting ISP Content Injection}
-
-\meddle can be configured to detect in-flight Web-page changes. 
-This problem of HTTP interference was first highlighted by Reis~\etal~\cite{reis:tripwires}. 
+This problem of Web interference was first highlighted by Reis~\etal~\cite{reis:tripwires}. 
 The authors demonstrated that although a small percent of users were affected by in-flight changes, those changes tend to introduce vulnerabilities including cross-site scripting (XSS) attacks~\cite{reis:tripwires}. 
 They proposed and deployed \emph{Web Tripwires}, a Javascript code to detect in-flight page changes. 
 The main limitation of \emph{Web Tripwires} is that it requires each Web site to modify their content to include a tripwire.
 
 In \meddle, we extended tripwires to alleviate this limitation. 
-Namely, we use the HTTP proxy present in \meddle to inject a tripwire on \emph{any} page without requiring support from Web site developers -- an approach we call a \emph{Web Tripnet}.
+Namely, we use the HTTP proxy present in \meddle to inject a tripwire on \emph{any} page 
+without requiring support from Web site developers -- an approach we call a \emph{Web Tripnet}.
 
-\tbd{Do we still want to go ahead with the transparent proxy approach mentioned in \ref{fig:tripnets}}
+\noindent\textbf{Implementation.} With \meddle all traffic is tunneled, thereby 
+preventing ISPs from modifying pages. To help inform non-users of ISP content 
+manipulation, we provide the Tripnet as an opt-in feature. Because this entails 
+two fetches of every Web page, we also support two modes: always-on and low-rate random trials, where we 
+insert tripwires for some small fraction of their visited sites.
 
-\drc{Add screenshot from China}
+The Tripnet works as follows (Fig.~\ref{fig:tripnet}. A client requests a Web page through the \meddle VPN 
+tunnel. This request is forwarded to the destination server. The response returns to 
+the \meddle server, where a transparent proxy injects the tripwire code.\footnote{We 
+recognize the irony of injecting content to detect content injection, but this is done only with user consent.}
+The tripwire-enabled response is forwarded to the client, which execute the javascript at page load time.
+
 
 \begin{figure}
 \centering
@@ -29,11 +58,35 @@ can compare the two pages to identify potential interference. }
 \label{fig:tripnet}
 \end{figure}
 
-\noindent\textbf{Sites tested.}
+The tripwire code contains information about the page content prior to traversing the ISP. When 
+executed, the code fetches the page again to compare with the (known) unmodified page content.  
+To ensure that this fetch does \emph{not} traverse the VPN connection, we use a \emph{pigeonhole} domain 
+whose traffic traverses an untunneled interface. For example, if the original request was for www.facebook.com, 
+we send the request to tripnet.meddle.mobi/www.facebook.com/, where we run a Web proxy. 
+
+When the request arrives at our proxy server, we could forward the request to the original target. In 
+practice, however, doing so would return different content due to the highly dynamic nature of most 
+Web content. Instead, we cache Web pages at the tripnet-injecting server and co-locate our Web proxy 
+there. Thus we return exactly the same Web page that was received over the tunneled connection. 
+Any difference in page content can only be due to ISP behavior. 
+
+
+\noindent\textbf{Sites and ISPs tested.} We conducted controlled experiments using our Tripnet 
+architecture, using the top 100 Web sites according to Alexa. We tested using 
+AT\&T, T-Mobile and Verizon in the US, and Orange, Sosh and Bouygues in France. 
+Many sites customize content according to User-Agent strings, so we spoof User-Agents 
+as coming from iOS, Andriod and desktop clients.
 
 \noindent\textbf{Page modification/injection.} Cases of manipulation of text content.
 
-\noindent\textbf{Content modification.} Downsampling, e.g.
+\noindent\textbf{Content modification.} In addition to detecting changes to text content in 
+Web pages, we also use our controlled experiments to investigate whether ISPs are manipulating 
+media content, \eg downsampling high-resolution images to reduce bandwidth consumption 
+from mobile devices. For this experiment, we augment our Tripnet experiments with the result 
+of wget results from the mobile device and the proxy server. Note that this experiment requires an 
+app or tethered laptop to collect the Web media objects fetched over the mobile network.
+
+Our results are as follows.
 
 \noindent\textbf{Implications.} 
 
