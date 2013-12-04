@@ -4,11 +4,18 @@ setwd(scriptsDir);
 broAggDir<-paste(baseDir,"/bro-aggregate-data/", sep="");
 miscDataDir<-paste(baseDir, "/miscData/", sep="")
 resultsDir<-paste(baseDir, "/paperData/", sep="");
-cexVal<-1.5
+cexVal<-1.6
 source(paste(scriptsDir, "/readLogFiles.R", sep=""))
 
+error.bar <- function(x, y, upper, lower=upper, length=0.1,...){
+  if(length(x) != length(y) | length(y) !=length(lower) | length(lower) != length(upper))
+    stop("vectors must be same length")
+  arrows(x,upper, x, lower, angle=90, code=3, length=length, ...)
+}
 # First plot the ads and analytics info
 adData <- readHttpData(paste(broAggDir, "filter.ads.http.log.info.ads.app", sep=""))
+sortOrderTable <-readTable(paste(broAggDir, 'devices.sortorder.txt', sep=""))
+numIOS <- nrow(sortOrderTable[sortOrderTable$operating_system=="i",])
 # Select first such adData column when multiple http flows have same uid
 # because of multiple redirections. This orig_ip_bytes will be the same 
 # in the flows because they have the same uid.
@@ -438,10 +445,178 @@ aggrApps[aggrApps$operating_system=="i", ]$frac_os_flows <- aggrApps[aggrApps$op
 #plot(aggrApps[aggrApps$operating_system=="i" & aggrApps$app_label != "-", ]$frac_os_flows)
 #plot(aggrApps[aggrApps$operating_system=="a" & aggrApps$app_label != "-", ]$frac_os_flows)
                         
+############################################################################################
+############################################################################################
+######### Analyze Ad traffic ###############################################################
+############################################################################################
+############################################################################################
+
+adData <- readHttpData(paste(broAggDir, "filter.ads.http.log.info.ads.app", sep=""))
+adData$num_flows <- 1
+adData$tot_bytes <- adData$orig_ip_bytes + adData$resp_ip_bytes
+adData$host_domain <- unlist(lapply(adData$host,  function(x) {  y<-unlist(strsplit(x,"\\."))
+                                                                 if (length(y)>2 & nchar(y[length(y)] < 3)) {
+                                                                      y<-y[(length(y)-1):length(y)]
+                                                                 }
+                                                                 y<-paste(y,collapse=".")
+                                                                 return(y) }))
+
+gaData <- adData[grep("google-analytics", adData$host), ]
+
+gaAggr <- aggregate(gaData[c("num_flows")],
+                    by=list(user_id=gaData$user_id,
+                            hour=gaData$hour,
+                            day=gaData$day,
+                            mon=gaData$mon,
+                            year=gaData$year),                    
+                    FUN=sum)
+gaAggr$num_flows <- 1;
+gaAggr <- aggregate(gaAggr[c("num_flows")],
+                    by=list(hour=gaAggr$hour,
+                            mon=gaAggr$mon,
+                            day=gaAggr$day,
+                            year=gaAggr$year),                            
+                    FUN=sum)
+gaAggrMaxInADay <- aggregate(gaAggr[c("num_flows")],
+                       by=list(hour=gaAggr$hour),                            
+                       FUN=max)
+gaAggr <- aggregate(gaData[c("num_flows")],
+                    by=list(user_id=gaData$user_id, 
+                            hour=gaData$hour),                            
+                    FUN=sum)
+gaAggr$num_flows <- 1;
+gaAggrAcrossDays <- aggregate(gaAggr[c("num_flows")],
+                              by=list(hour=gaAggr$hour),                            
+                              FUN=sum)
+
+##############################################################################
+#################### Number of sites per day per device ######################
+##############################################################################
+hostsPerDevice <- adData
+hostAggr <- aggregate(hostsPerDevice[c("num_flows")],
+                      by=list(host_domain=hostsPerDevice$host_domain,
+                              user_id=hostsPerDevice$user_id,                              
+                              day=hostsPerDevice$day,
+                              mon=hostsPerDevice$mon,
+                              year=hostsPerDevice$year),                    
+                      FUN=sum)
+hostAggr$num_flows <- 1
+hostAggr <- aggregate(hostAggr[c("num_flows")],
+                      by=list(user_id=hostAggr$user_id,                              
+                              day=hostAggr$day,
+                              mon=hostAggr$mon,
+                              year=hostAggr$year),                    
+                      FUN=sum)
+hostAggr <- aggregate(hostAggr[c("num_flows")],
+                      by=list(user_id=hostAggr$user_id),                              
+                      FUN=quantile, probs=c(0.1, 0.25, 0.5, 0.75, 0.9, 1.0))
+hostAggr <- merge(x=hostAggr, y=sortOrderTable)
+
+pdf(paste(resultsDir, "/ads_wild_sitescontacted.pdf", sep=""), height=7, width=16, pointsize=25)
+mar <- par()$mar
+mar[1] <- mar[1]-0.75
+mar[2] <- mar[2]+0.5
+mar[3] <- 0.25
+mar[4] <- 0.25
+par(mar=mar)
+plot(hostAggr$sort_order, hostAggr$num_flows[,6], pch=1,
+     ylim=c(0, 80),las=1,
+     xlim=c(1, nrow(sortOrderTable)),
+     cex.lab=cexVal, cex.axis=cexVal, cex.main=cexVal, cex.sub=cexVal, cex=cexVal,
+     xlab="Device ID (ordered by OS & total traffic from device)",
+     ylab="A&A visits per day")
+par(tcl=0.22)
+axis(2, at=seq(0,100,4), label=F)
+axis(1, at=seq(0,26,1), label=F)
+error.bar(hostAggr$sort_order, hostAggr$num_flows[,3], hostAggr$num_flows[,1], hostAggr$num_flows[,5])
+points(hostAggr$sort_order, hostAggr$num_flows[,3], pch=2, cex=cexVal)
+grid(lwd=3)
+legend(5,83, c("Max", "Median"), cex=cexVal, pch=c(1,2))
+text(numIOS-1, 70, "iOS", cex=cexVal, adj=1)
+text(numIOS+1.5, 70, "Android", cex=cexVal, adj=0)
+abline(v=(numIOS+0.5), h=NULL, lty=2,lwd=5, col="black")
+dev.off()
 
 
 
 
 
-     
+##########################################################################
+##########################################################################
+##########################################################################
+#userTrackData <- adData[(adData$user_id==1) | (adData$user_id==35), ]
+userTrackData <- adData
+userTrackAggr <- aggregate(userTrackData[c("num_flows")],
+                           by=list(host_domain=userTrackData$host_domain,
+                                   user_id=userTrackData$user_id,
+                                   hour=userTrackData$hour,
+                                   day=userTrackData$day,
+                                   mon=userTrackData$mon,
+                                   year=userTrackData$year),                    
+                           FUN=sum)
+userTrackAggr$num_flows <- 1;
+userTrackAggr <- aggregate(userTrackAggr[c("num_flows")],
+                           by=list(user_id=userTrackAggr$user_id,
+                                   hour=userTrackAggr$hour,
+                                   day=userTrackAggr$day,
+                                   mon=userTrackAggr$mon,
+                                   year=userTrackAggr$year),                    
+                           FUN=sum)
+userTrackAggrAcrossDays <- aggregate(userTrackAggr[c("num_flows")],
+                                     by=list(hour=userTrackAggr$hour),                            
+                                     FUN=quantile, probs=c(0.1, 0.25, 0.5, 0.75, 0.9, 1.0))  
+pdf(paste(resultsDir, "/ads_wild_usertracking.pdf", sep=""), height=7, width=16, pointsize=25)
+mar <- par()$mar
+mar[1] <- mar[1]-0.75
+mar[2] <- mar[2]+0.5
+mar[3] <- 0.25
+mar[4] <- 0.25
+par(mar=mar)
+plot(userTrackAggrAcrossDays$hour, userTrackAggrAcrossDays$num_flows,
+     pch=1, xlim=c(0,23), ylim=c(0,60),  yaxt="n",   
+     cex.lab=cexVal, cex.axis=cexVal, cex.main=cexVal, cex.sub=cexVal, cex=cexVal,
+     xlab="Hour of the day",
+     ylab="Number of sites") 
+axis(2, at=seq(0,100,20), label=seq(0,100,20), cex.axis=cexVal, cex.lab=cexVal, las=1)
+par(tcl=0.22)
+axis(2, at=seq(0,100,4), label=F)
+axis(1, at=seq(0,25,1), label=F)
+points(userTrackAggrMaxInADay$hour, userTrackAggrMaxInADay$num_flows, pch=2, cex=cexVal)
+grid(lwd=3)
+legend(-1, 60, legend=c("Across days", "Same day"), cex=cexVal, pch=c(1,2))
+dev.off()
+
+##################################################################################################
+##################################################################################################
+################ Ads and Analytics Leaks #########################################################
+##################################################################################################
+
+adData <- readHttpData(paste(broAggDir, "filter.ads.http.log.info.ads.app", sep=""))
+sortOrderTable <-readTable(paste(broAggDir, 'devices.sortorder.txt', sep=""))
+numIOS <- nrow(sortOrderTable[sortOrderTable$operating_system=="i",])
+# Select first such adData column when multiple http flows have same uid
+# because of multiple redirections. This orig_ip_bytes will be the same 
+# in the flows because they have the same uid.
+adData <- adData[!duplicated(adData$uid),]
+adData$upload_bytes <- adData$orig_ip_bytes
+adData$download_bytes <- adData$resp_ip_bytes
+adData[adData$id.orig_p==80,]$upload_bytes <- adData[adData$id.orig_p==80,]$resp_ip_bytes
+adData[adData$id.orig_p==80,]$download_bytes <- adData[adData$id.orig_p==80,]$orig_ip_bytes
+#adData <- adData[adData$ad_flag==1,];
+#adData[is.na(adData$operating_system), ]$operating_system="i";
+adData$num_flows <- 1
+adData$tot_bytes <- adData$orig_ip_bytes + adData$resp_ip_bytes
+
+adData$browser <- "-"
+adData[grep("mozilla", adData$user_agent, ignore.case=TRUE),]$browser <- "browser"
+adData[grep("safari", adData$user_agent, ignore.case=TRUE),]$browser <- "browser"
+adData[(adData$app_label=="-")&(adData$browser=="browser"), ]$app_label<-"osbrowser"
+adData[(adData$user_agent_signature=="")&(adData$browser=="browser"), ]$user_agent_signature<-"osbrowser"
+adAggr <- aggregate(adData[c("tot_bytes", "num_flows")],
+                           by=list(app_label=adData$app_label),
+                           FUN=sum)
+adAggr <- adAggr[order(adAggr$tot_bytes, decreasing=TRUE),]
+adAggr[1:10,]$app_label
+
+
 
