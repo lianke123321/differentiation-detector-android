@@ -97,9 +97,11 @@ MONTH, 2012 and currently has XXX users participating in an IRB-approved study.
 
 
 
-The rest of the paper is organized as follows. 
-We present an overview of \platname and describe its feasibility in \S\ref{sec:platform}, then describe our experiments and measurement dataset in \S\ref{sec:dataset}.
-In  \S\ref{sec:classification-methodology} we study how to classify observed network flows to the mobile apps that generated them. Last, we use the 
-unique view from \platname to characterize how apps leak private information in the clear and to third parties \S\ref{sec:characterize-app}. 
-We discuss related work in \S\ref{sec:related} and conclude in \S\ref{sec:conclusion}.
+The rest of the paper is organized as follows. We present the goals and design principles for \meddle in \S\ref{sec:goals}, then 
+discuss the implementation details in \S\ref{sec:impl}. We describe the datasets that we use in our evaluation in \S\ref{sec:dataset} and 
+analyze these datasets to understand key properties on mobile device network behavior, and how to map network flows to the 
+apps that generate them. We use these analyses to inform the design and implementation of several applications built atop \meddle. 
+In \S\ref{sec:characterize-app}, we describe how we detect and block privacy leaks in mobile traffic. \S\ref{sec:isp-behavior} discusses 
+how we use \meddle to detect ISP policies such as content manipulation and service differentiation, and \S\ref{sec:malware} details 
+how we use \meddle to detect and block mobile malware. In \S\ref{sec:related} we discuss related work and we conclude in \S\ref{sec:conclusion}.
 
