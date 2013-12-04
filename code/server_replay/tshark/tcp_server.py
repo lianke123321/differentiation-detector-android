@@ -12,7 +12,7 @@ ps aux | grep "python" |  awk '{ print $2}' | xargs kill -9
 
 '''
 
-import os, sys, socket, pickle, threading, time
+import os, sys, socket, pickle, threading, time, traceback
 import python_lib
 from python_lib import Configs, PRINT_ACTION
 
@@ -44,12 +44,12 @@ class Server(object):
             try:
                 sock.bind((self._host, self._port))
             except:
-                print '\n\n\nPORT BUSY!!!!!!!!', self._port, '\n\n\n'
+                print '\nCouldnt open port {}. Make sure you are sudo!\n'.format(self._port)
+                traceback.print_exc()
                 sys.exit(-1)
         self._socket = sock
         if DEBUG0: print 'Created socket server:', (self._host, self._port)
         sock.listen(1)
-        print self._port
     def handle_connection(self, table, connection, client_address):
         print '\nGot connection: ', connection, client_address
         try:
@@ -89,7 +89,10 @@ class Server(object):
         time.sleep(2)
         connection.shutdown(socket.SHUT_RDWR)
         connection.close()
-    def run_socket_server(self, table):
+    def run_socket_server(self, table, expected_conn_num):
+        if expected_conn_num == 0:
+            return
+        so_far = 0
         while True:
             if DEBUG0: print '\nServer waiting for connection: ', self._host, ':', self._port
             print '\tServer waiting for connection: ', self._host, ':', self._port
@@ -97,6 +100,11 @@ class Server(object):
             c_s_pair = connection.recv(43)
             t = threading.Thread(target=self.handle_connection, args=[table[c_s_pair], connection, client_address])
             t.start()
+            so_far += 1
+            print self._port, ':', so_far, '/', expected_conn_num
+            if so_far == expected_conn_num:
+                print 'breaking loop for:', self._port
+                break
 
 
 def read_c_s_pair_to_port(file):
@@ -107,6 +115,7 @@ def main():
     configs = Configs()
     configs.set('host', '129.10.115.141')
     configs.set('ports_file', '/tmp/free_ports')
+    configs.set('original_ports', True)
     
     PRINT_ACTION('Reading configs file and args', 0)
     python_lib.read_args(sys.argv, configs)
@@ -130,7 +139,7 @@ def main():
     threads = {} 
 
     PRINT_ACTION('Creating all socket servers', 0)
-    distinct_ports = []
+    distinct_ports = {}
     for c_s_pair in table:
         a = c_s_pair.partition('-')
         node0 = a[0]
@@ -138,19 +147,25 @@ def main():
         port0 = node0.rpartition('.')[2]
         port1 = node1.rpartition('.')[2]
         if port1 not in distinct_ports:
-            distinct_ports.append(port1)
-            print '\t', port1, ':', 
-            threads[port1] = Server(Configs().get('host'))
+            distinct_ports[port1] = 0
+            if configs.get('original_ports'):
+                threads[port1] = Server(Configs().get('host'), int(port1))
+            else:
+                threads[port1] = Server(Configs().get('host'))
+            print '\t', port1, ':', threads[port1].get_port()
+        if len(table[c_s_pair]) > 0:
+            distinct_ports[port1] += 1
         ports[c_s_pair] = threads[port1].get_port()
     
     PRINT_ACTION('Running servers', 0)
     for port in distinct_ports:
-        t = threading.Thread(target=threads[port].run_socket_server, args=[table])
+        t = threading.Thread(target=threads[port].run_socket_server, args=[table, distinct_ports[port]])
         t.start()
-        
-    time.sleep(1)
-    PRINT_ACTION('Serializing port mapping to file', 0)
-    pickle.dump(ports, open(configs.get('ports_file'), "wb"))
+    
+    if not configs.get('original_ports'):
+        time.sleep(1)
+        PRINT_ACTION('Serializing port mapping to file', 0)
+        pickle.dump(ports, open(configs.get('ports_file'), "wb"))
     
     time.sleep(5)
     PRINT_ACTION('Done! You can now run your client script.', 0)
