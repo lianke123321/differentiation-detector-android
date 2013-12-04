@@ -33,15 +33,18 @@ class Connections(object):
     _connections  = {}
     
     def _port_from_c_s_pair(self, c_s_pair):
-        return (c_s_pair.partition('-')[0]).rpartition('.')[2]
+        return int((c_s_pair.partition('-')[2]).rpartition('.')[2])
     
     def get_sock(self, c_s_pair):
         try:
             return self._connections[c_s_pair]
         except:
-            server_address = (Configs().get('host'), Configs().get('ports')[c_s_pair])
-#            server_address = (Configs().get('host'), _port_from_c_s_pair(self, c_s_pair))
+            if Configs().get('original_ports'):
+                server_address = (Configs().get('host'), self._port_from_c_s_pair(c_s_pair))
+            else:
+                server_address = (Configs().get('host'), Configs().get('ports')[c_s_pair])
             print '\tStarting:', server_address
+            print '           ', c_s_pair
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
@@ -105,11 +108,9 @@ class Queue(object):
 
           
 def main():
-    
     PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
-    configs.set('ports_file', '/tmp/free_ports')
-    os.system('rm -f ' + configs.get('ports_file'))
+    configs.set('original_ports', True)
 
     configs.set('host', '129.10.115.141')
     configs.set('username', 'arash')
@@ -134,12 +135,11 @@ def main():
     
     configs.show_all()
     
-    
-    PRINT_ACTION('Downloading ports file', 0)
-    configs.set('ports', read_ports(configs.get('host'),
-                                    configs.get('username'),
-                                    configs.get('ssh_key'),
-                                    configs.get('ports_file')))
+    if not configs.get('original_ports'):
+        PRINT_ACTION('Downloading ports file', 0)
+        configs.set('ports_file', '/tmp/free_ports')
+        os.system('rm -f ' + configs.get('ports_file'))
+        configs.set('ports', read_ports(configs.get('host'), configs.get('username'), configs.get('ssh_key'), configs.get('ports_file')))
     
     PRINT_ACTION('Loading the queue', 0)
     queue = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
