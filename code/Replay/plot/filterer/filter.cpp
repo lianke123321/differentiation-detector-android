@@ -44,7 +44,7 @@ enum type_e {TCP, UDP};
 // Skip the rest of the line.
 void skipline(ifstream &inp)
 {
-    while(inp.peek() != '\n') inp.get();
+    while(inp.get() != '\n');
 }
 
 int main(int argc, char ** argv)
@@ -140,7 +140,7 @@ int main(int argc, char ** argv)
     // To skip over unnecessary strings in the input.
     string temp;
     // TCP packet type (syn or ack)
-    string syn_or_ack;
+    string seq_or_ack;
     // To identify packet type (IP or non-IP)
     string packet_type;
     // Starting time for the connection (used to calculate
@@ -201,7 +201,7 @@ int main(int argc, char ** argv)
     if (protocol == "Flags") // TCP
     {
         // Find where the sequence number is.
-        inp >> temp >> syn_or_ack;
+        inp >> temp >> seq_or_ack;
         inp >> seq1;
 
         // If the sequence number is in form of xxx:yyy
@@ -270,7 +270,6 @@ int main(int argc, char ** argv)
         inp >> micros;
         ttime = hh * 3600 + mm * 60 + ss  + micros / 1000000 - start;
 
-        if (ttime )
         eatspaces(inp);
 
         // Read row up until protocol.
@@ -279,7 +278,7 @@ int main(int argc, char ** argv)
 
         if (protocol == "Flags") // TCP
         {
-            inp >> temp >> syn_or_ack;
+            inp >> temp >> seq_or_ack;
             inp >> seq1;
 
             if (inp.peek()==':')
@@ -288,7 +287,6 @@ int main(int argc, char ** argv)
                 inp.get();
                 inp >> seq2;
             }
-            skipline(inp);
             if(flag)
             {
                 if(file_map.count(p1 + "-" + p2) == 0)
@@ -302,24 +300,26 @@ int main(int argc, char ** argv)
                     (*(file_map[p1+ "-" + p2])) << ttime << " 0" << endl;
                     // If there are too many files open, close this one.
                     if(open_files > OPEN_FILE_HANDLE_LIMIT) { (*(file_map[p1+ "-" + p2])).close(); open_files--;}
-                            continue;
                 }
-
-                // If the file has been closed, reopen it.
-                if(!((file_map[p1+ "-" + p2])->is_open()))
+                else
                 {
-                    (file_map[p1+"-"+p2])->open(("connections/" + p1 + "-" + p2).c_str(), std::ofstream::out | std::ofstream::app);
-                    open_files++;
-                }
+                    // If the file has been closed, reopen it.
+                    if(!((file_map[p1+ "-" + p2])->is_open()))
+                    {
+                        (file_map[p1+"-"+p2])->open(("connections/" + p1 + "-" + p2).c_str(), std::ofstream::out | std::ofstream::app);
+                        open_files++;
+                    }
 
-                // Write the packet time and sequence number into the file for that connection.
-                (*(file_map[p1+ "-" + p2])) << setprecision(14) << ttime << " " << seq2 << endl;
-                // Maximum connection length for a TCP connection is the last sequence number.
-                max_len[(p1 + "-" + p2)] = seq2;
-                eatspaces(inp);
-                flag = false;
-                // If there are too many files open, close this one.
-                if(open_files > OPEN_FILE_HANDLE_LIMIT) {(*(file_map[p1+ "-" + p2])).close(); open_files--;}
+                    // Write the packet time and sequence number into the file for that connection.
+                    (*(file_map[p1+ "-" + p2])) << setprecision(14) << ttime << " " << seq2 << endl;
+                    // Maximum connection length for a TCP connection is the last sequence number.
+                    max_len[(p1 + "-" + p2)] = seq2;
+                    eatspaces(inp);
+                    flag = false;
+                    // If there are too many files open, close this one.
+                    if(open_files > OPEN_FILE_HANDLE_LIMIT) {(*(file_map[p1+ "-" + p2])).close(); open_files--;}
+
+                }
 
                 // If packet time is in the current throughput interval, add the length to the interval.
                 if(long(ttime / xput_interval) == now_time)
@@ -339,7 +339,7 @@ int main(int argc, char ** argv)
 
             // Look for packet loss.
             // If there's a duplicate "seq m:n", it is a retransmit.
-            if(syn_or_ack == "seq" && flag)
+            if(seq_or_ack == "seq" && flag)
             {
                 string s;
                 char seq1c[20];
@@ -361,7 +361,7 @@ int main(int argc, char ** argv)
             }
             // If there is a duplicate "ack n" that has been seen only once before,
             // a packet has been lost.
-            else if (syn_or_ack == "ack")
+            else if (seq_or_ack == "ack")
             {
                 string s;
                 char seq1c[20];
