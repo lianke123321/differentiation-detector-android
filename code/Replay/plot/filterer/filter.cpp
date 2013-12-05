@@ -372,7 +372,7 @@ int main(int argc, char ** argv)
                 if(acks.count(s) != 0 && acks[s] == false)
                 {
                     acks[s] = true;
-                    cout << "Duplicate ack: " << p1 << ">" << p2 << " ack " << seq1c << endl;
+                    //cout << "Duplicate ack: " << p1 << ">" << p2 << " ack " << seq1c << endl;
                     total_tcp_lost++;
                 }
                 else
