@@ -168,7 +168,7 @@ were responsible for more 78\% of the flows that sent the location
 information in the clear. Other apps that do not require location information, 
 such as YouTube, Epicurious and EditorsChoice, also leaked GPS coordinates.
 Further, \emph{SpringBoard} (the app responsible for managing the home screen of iOS devices) sends location information in the clear to fetch weather information from Yahoo servers. 
-In Figure~\ref{fig:springboard-wild}, we observe that \emph{SpringBoard} leaked location information for 11 devices in the \mobWild dataset, a maximum of 14 leaks per day was observed for one device. 
+We observe that \emph{SpringBoard} leaked location information for 11 devices in the \mobWild dataset, a maximum of 14 leaks per day was observed for one device. 
 We also observe that these devices include the iPodtouch device and all the iPhones in \mobWild, however, we do not observe such leaks for the iPad devices in the \mobWild dataset.  
 
 
@@ -215,8 +215,11 @@ Further, 66.12\% of the ads and analytics traffic volume in the \mobWild dataset
 traffic contained a blank user-agent field, and 4.8\% of the traffic contained a signature of \emph{Google-Analytics} library.
 The rest of the traffic contained signatures of other apps such as Facebook, Pandora, and YouTube.
 
-\subsection{Visualizing and Controlling PII Leaks}
-Given the extensive nature of tracking over mobile devices, we developed a tool, \emph{ReCon} that allows users to visualize their devices' tracking, and the apps that facilitate this tracking, with the help of a web-based interfaces similar to that of Mozilla Collusion~\cite{collusion}. \emph{ReCon} provides a visual interface that allows 
+\subsection{Revealing and Controlling PII Leaks}
+Given the extensive nature of tracking over mobile devices, we developed a tool, 
+\emph{ReCon} that allows users to reveal and visualize their devices' tracking, and the 
+apps that facilitate this tracking, with the help of a web-based interfaces similar to that of 
+Mozilla Collusion~\cite{collusion}. \emph{ReCon} provides a visual interface that allows 
  users to specify block lists for connections based on (app, 3rd party) tuples. A demo of our tool is 
  located at \url{http://goo.gl/A17h9}. 
 %\tbd{A demo of this can be found at ...}

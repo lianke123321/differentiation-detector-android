@@ -24,7 +24,7 @@ technology, or apps installed. Our VPN-based proxy achieves these goals.
 \noindent\textbf{Control}. Another important goal is to facilitate research into new middlebox approaches 
 for interposing on mobile Internet traffic. The system must support the ability to deploy and distribute large numbers 
 of middlebox services quickly, easily and at scale~\cite{sherry:middleboxes} without 
-the need to deploy hardware in homes~\cite{bismarck} or ISPs~\cite{wang:middleboxes}. 
+the need to deploy hardware in homes~\cite{bismark} or ISPs~\cite{wang:middleboxes}. 
 It should present a simple API for researchers and developers to block, shape, inject or otherwise 
 modify network flows. It should also support applications that operate on collections of flows over 
 time and across users (\eg Web caching/prefetching, malware detection/blocking and ISP characterization). 
@@ -209,7 +209,7 @@ are less vulnerable to data leakage (\eg via open WiFi hotspots).
 \item \emph{Device-wide content filters.} We use \meddle to block content that users do 
 not wish to access -- for all apps running on a device. The most popular instance of this is 
 device-wide ad blocking.
-\item \emph{Privacy revelations.} The \emph{ReCon} tool allows users to see how they are being 
+\item \emph{Privacy revelations~\cite{wetherall:revelations}.} The \emph{ReCon} tool allows users to see how they are being 
 tracked by ad and analytic servers, and allows them to create per-connection block lists.  
 \item \emph{Malware detection.} \meddle uses network signatures to identify malware, block it from 
 communicating and prevent future downloads onto other \meddle-enabled devices.  
@@ -277,7 +277,7 @@ In some cases, \meddle is the right location to implement new services that coul
 to deploy on devices (prefetching) or impractical to deploy in network (detecting ISP service differentiation). 
 In other cases, \meddle provides a practical partial solution to a problem where the complete solution has an impractical 
 cost. For example, identifying privacy leaks from mobile devices is reliably addressed using information flow 
-analysis~\cite{taintdroid}. However, due to the overheads of this approach it is difficult to deploy to users 
+analysis~\cite{enck:taintdroid}. However, due to the overheads of this approach it is difficult to deploy to users 
 and at scale. \meddle allows us to identify and block unobfuscated PII in network flows from arbitrary devices without requiring 
 OS modifications or taint tracking. Regardless of the ultimate optimal solution, we can use \meddle today to inform the design 
 and deployment of future functionality in OSes and for in-network devices. 
