@@ -462,9 +462,9 @@ int main(int argc, char ** argv)
             break;
     }
 
-    meta << "Maximum throughput: " << xp_max / 1e+3 << "KB/s" << endl;
-    meta << "Mean throughput: " << (xp_sum / xputs.size()) / 1e+3 << "KB/s" << endl;
-    meta << "Median throughput: " << xputs[xputs.size() / 2] / 1e+3 << "KB/s" << endl;
+    meta << "Maximum throughput: " << xp_max / 1e+3 << " KB/s" << endl;
+    meta << "Mean throughput: " << (xp_sum / xputs.size()) / 1e+3 << " KB/s" << endl;
+    meta << "Median throughput: " << xputs[xputs.size() / 2] / 1e+3 << " KB/s" << endl;
 
     meta << "TCP packets lost: " << total_tcp_lost << endl;
     meta << "Total TCP packets: " << total_tcp_packets << endl;
@@ -475,7 +475,7 @@ int main(int argc, char ** argv)
     // Throughput plot.
     ofstream xputplot("xput.gp");
     xputplot    << "set style data lines"  << endl
-            << "set title \"" << plot_title << " Throughput\"" << endl
+            << "set title \"" << plot_title << " Throughput (" << xput_interval * 1000 << " ms intervals)\"" << endl
             << "set key off" << endl
             << "set xlabel \"Time (seconds)\"" << endl
             << "set ylabel \"Throughput (KB/s)\"" << endl
@@ -495,9 +495,9 @@ int main(int argc, char ** argv)
     // Convert it to JPEG for convenience.
     stringstream ssstr;
     ssstr   << "convert -font helvetica -fill black -draw \'text 50,100 \""
-            << "Maximum throughput: " << xp_max / 1e+3 << "KB/s\n"
-            << "Mean throughput: " << (xp_sum / xputs.size()) / 1e+3 << "KB/s\n"
-            << "Median throughput: " << xputs[xputs.size() / 2] / 1e+3 << "KB/s\n"
+            << "Maximum throughput: " << xp_max / 1e+3 << " KB/s\n"
+            << "Mean throughput: " << (xp_sum / xputs.size()) / 1e+3 << " KB/s\n"
+            << "Median throughput: " << xputs[xputs.size() / 2] / 1e+3 << " KB/s\n"
             << "TCP packets lost: " << total_tcp_lost << "\n"
             << "Total TCP packets: " << total_tcp_packets << "\n"
             << "Loss rate: " << double(total_tcp_lost) / double(total_tcp_packets) * 100.0 << "%\n"
