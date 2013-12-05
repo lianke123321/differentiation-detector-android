@@ -118,7 +118,7 @@ def run(argv):
     configs.set('username', 'arash')
     configs.set('ssh_key', '~/.ssh/id_rsa')
     
-    configs.set('host', 'ec2-72-44-56-209.compute-1.amazonaws.com')
+    configs.set('host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
     configs.set('username', 'ubuntu')
     configs.set('ssh_key', '~/.ssh/ancsaaa-keypair_ec2.pem')
     

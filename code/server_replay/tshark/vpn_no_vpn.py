@@ -1,5 +1,6 @@
-import sys, commands, time, subprocess
-import tcp_client
+import sys, commands, time, subprocess, urllib2
+import tcp_client, python_lib
+from python_lib import Configs, PRINT_ACTION
 
 class tcpdump(object):
     def __init__(self, dump_name=None, interface='en0'):
@@ -28,6 +29,23 @@ def meddle_vpn(command):
         print 'command needs to be "connect" or "disconnect"'
     
 def main():
+    PRINT_ACTION('Creating configs', 0)
+    configs = Configs()
+    configs.set('server-host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
+    configs.set('server-port', 10001)
+    
+    python_lib.read_args(sys.argv, configs)
+    
+    url = ('http://' + configs.get('server-host') + ':' + str(configs.get('server-port')) 
+        + '/re-run?pcap_folder=' + configs.get('pcap_folder'))
+    
+    response = urllib2.urlopen(url).read()
+    print '\n', response
+    if 'Busy! Try later!' in response:
+        sys.exit(-1)
+    
+    time.sleep(10)
+    
     print 'With VPN',
     dump_vpn = tcpdump(dump_name='vpn')
     sys.stdout.flush()

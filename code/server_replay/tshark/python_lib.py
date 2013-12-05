@@ -9,7 +9,15 @@ def PRINT_ACTION(string, indent, action=True):
 def read_args(args, configs):
     for arg in args:
         a = (arg.strip()).partition('=')
-        configs.set(a[0], a[2])
+        if a[2] in ['True', 'true']:
+            configs.set(a[0], True)
+        elif a[2] in ['False', 'false']:
+            configs.set(a[0], False)
+        else:
+            try:
+                configs.set(a[0], int(a[2]))
+            except ValueError:
+                configs.set(a[0], a[2])
 def append_to_file(line, filename):
     f = open(filename, 'a')
     f.write((line + '\n'))
