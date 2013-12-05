@@ -148,6 +148,7 @@ def run():
     if configs.get('vpn-no-vpn'):
         configs.set('number_of_runs', 2*configs.get('number_of_runs'))
     configs.show_all()
+    
     PRINT_ACTION('Loading the tables', 0)
     table   = pickle.load(open(configs.get('pcap_file') +'_server_pickle', 'rb'))
     ports   = {}
