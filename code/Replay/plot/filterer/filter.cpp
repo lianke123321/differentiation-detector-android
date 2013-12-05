@@ -378,7 +378,7 @@ int main(int argc, char ** argv)
                 else
                 {
                     // If it hasn't been seen before, add it.
-                    if (acks.count(s) != 0)
+                    if (acks.count(s) == 0)
                         acks[s] = false;
                 }
             }
