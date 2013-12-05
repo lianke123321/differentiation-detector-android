@@ -29,7 +29,7 @@ def meddle_vpn(command):
     
 def main():
     print 'With VPN',
-    dump_vpn   = tcpdump(dump_name='vpn')
+    dump_vpn = tcpdump(dump_name='vpn')
     sys.stdout.flush()
     meddle_vpn('connect')
     dump_vpn.start()

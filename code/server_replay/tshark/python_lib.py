@@ -63,8 +63,8 @@ class Singleton(type):
         return cls._instances[cls]
 class Configs(object):
     __metaclass__ = Singleton
-    _Config       = None
-    _configs      = {}
+    _Config  = None
+    _configs = {}
     def __init__(self, config_file = None):
         self._Config = ConfigParser.ConfigParser()
         self._configs['action_count'] = 0
