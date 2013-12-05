@@ -29,9 +29,9 @@ def read_ports(host, username, key, ports_file):
     os.system(command)
     return pickle.load(open('free_ports', 'rb'))
 class Connections(object):
-    __metaclass__ = python_lib.Singleton
-    _connections  = {}
-    
+    def __init__(self):
+        self._connections = {}
+
     def _port_from_c_s_pair(self, c_s_pair):
         return int((c_s_pair.partition('-')[2]).rpartition('.')[2])
     
@@ -47,6 +47,7 @@ class Connections(object):
             print '           ', c_s_pair
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
             sock.connect(server_address)
             sock.sendall(c_s_pair)
@@ -60,9 +61,9 @@ class Connections(object):
     def remove_socket(self, c_s_pair):
         del self._connections[c_s_pair]
 class SendRecv(object):        
-    def send_single_request(self, q, waitlist, sendlist, event):
-        sock = Connections().get_sock(q.c_s_pair)
-        if DEBUG0: print 'Sending:', q.c_s_pair, '\t', sock, '\t', len(q.payload) 
+    def send_single_request(self, q, waitlist, sendlist, event, connections):
+        sock = connections.get_sock(q.c_s_pair)
+        if DEBUG0: print 'Sending:', q.c_s_pair, '\t', sock, '\t', len(q.payload)
         sock.sendall(q.payload)
         
         sendlist.pop()
@@ -88,6 +89,7 @@ class Queue(object):
         self.waitlist    = []
         self.sendlist    = []
         self.time_origin = 0
+        self.connections = Connections()
     def next(self):
         if (len(self.sendlist) == 0):
             q = self.Q[0]
@@ -97,7 +99,7 @@ class Queue(object):
                 self.Q.pop(0)
                 self.waitlist.append(q.c_s_pair)
                 self.sendlist.append(q.c_s_pair)
-                t = threading.Thread(target=SendRecv().send_single_request, args=[q, self.waitlist, self.sendlist, self.event])
+                t = threading.Thread(target=SendRecv().send_single_request, args=[q, self.waitlist, self.sendlist, self.event, self.connections])
                 t.start()
     def run(self):
         self.time_origin = time.time()
@@ -107,7 +109,7 @@ class Queue(object):
             self.event.clear()
 
           
-def main():
+def run(argv):
     PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
     configs.set('original_ports', True)
@@ -120,7 +122,7 @@ def main():
     configs.set('username', 'ubuntu')
     configs.set('ssh_key', '~/.ssh/ancsaaa-keypair_ec2.pem')
     
-    python_lib.read_args(sys.argv, configs)
+    python_lib.read_args(argv, configs)
     
     try:
         pcap_folder = os.path.abspath(configs.get('pcap_folder'))
@@ -146,6 +148,10 @@ def main():
 
     PRINT_ACTION('Firing off ...', 0)
     Queue(queue).run()
+    configs.reset()
+    
+def main():
+    run(sys.argv)
     
 if __name__=="__main__":
     main()

@@ -84,3 +84,8 @@ class Configs(object):
     def show_all(self):
         for key in self._configs:
             print '\t', key , ':\t', self._configs[key]
+    def reset_action_count(self):
+        self._configs['action_count'] = 0
+    def reset(self):
+        _configs = {}
+        self._configs['action_count'] = 0
