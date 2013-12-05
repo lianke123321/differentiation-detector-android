@@ -3,6 +3,9 @@
 measurementStartTime <- 1351727700
 # Nov 1 2012
 
+# For this tree
+#baseDir<-"/user/arao/home/china_meddle_data/"
+
 convertStringColsToDouble <- function (stringCol) {
   stringCol <- as.double(stringCol)
   stringCol[is.na(stringCol)] <-0;
@@ -11,7 +14,7 @@ convertStringColsToDouble <- function (stringCol) {
 
 readConnData <- function(fName, filterTs=FALSE) {
   print(paste("Reading file name", fName))
-  connData <- read.table(fName, header=T, sep="\t", fill=TRUE, stringsAsFactors=FALSE, quote="");
+  connData <- read.table(fName, header=T, sep="\t", fill=TRUE, stringsAsFactors=FALSE, quote="", row.names=NULL);
   connData$orig_ip_bytes <- convertStringColsToDouble(connData$orig_ip_bytes);
   connData$resp_ip_bytes <- convertStringColsToDouble(connData$resp_ip_bytes);
   connData$orig_pkts <- convertStringColsToDouble(connData$orig_pkts);
@@ -25,15 +28,18 @@ readConnData <- function(fName, filterTs=FALSE) {
       connData <- connData[connData$ts > measurementStartTime, ]
   }
   print("Done")
+  # For consistency of SSL traffic and labeling.    
   connData;
 }
 
 readHttpData <- function(fName, filterTs=FALSE) {
   print(paste("Reading file name", fName))
-  httpData <- read.table(fName, header=T, sep="\t", fill=TRUE, stringsAsFactors=FALSE, quote="");
+  httpData <- read.table(fName, header=T, sep="\t", fill=TRUE, stringsAsFactors=FALSE, quote="", row.names=NULL);
   httpData$content_length <- convertStringColsToDouble(httpData$content_length)
   httpData$response_body_len <- convertStringColsToDouble(httpData$response_body_len)
   httpData$request_body_len <- convertStringColsToDouble(httpData$request_body_len)
+  httpData$orig_ip_bytes <- convertStringColsToDouble(httpData$orig_ip_bytes);
+  httpData$resp_ip_bytes <- convertStringColsToDouble(httpData$resp_ip_bytes);  
   httpData$ts <- convertStringColsToDouble(httpData$ts);  
   if (filterTs==TRUE) {
        httpData<-httpData[httpData$ts > measurementStartTime, ]
@@ -42,9 +48,9 @@ readHttpData <- function(fName, filterTs=FALSE) {
   httpData
 }
 
-readSslData <- function(fName, filterTs) {
+readSslData <- function(fName, filterTs=FALSE) {
   print(paste("Reading file name", fName))
-  sslData <- read.table(fName, header=T, sep="\t", fill=TRUE, stringsAsFactors=FALSE, quote="");  
+  sslData <- read.table(fName, header=T, sep="\t", fill=TRUE, stringsAsFactors=FALSE, quote="", row.names=NULL)
   # Todo add stuff here!
   sslData$ts <- convertStringColsToDouble(sslData$ts);  
   if (filterTs ==TRUE) {
@@ -56,34 +62,46 @@ readSslData <- function(fName, filterTs) {
 
 readTable <- function(fName) {
   print(paste("Reading file name", fName))
-  tableData <- read.table(fName, header=T, sep="\t", fill=TRUE, stringsAsFactors=FALSE, quote="");
+  tableData <- read.table(fName, header=T, sep="\t", fill=TRUE, stringsAsFactors=FALSE, quote="", row.names=NULL);
   print("Done")
   tableData
 }
 
-#annotateLocalTime <- function(data) {
-#  # Convert the time stamps to date time
-  # For each user group by the day, hour, on which at least one packet was seen
-
-  # This takes too much time 
-  #connData$ts_date <- mapply(x=as.numeric(connData$ts), y=connData$time_zone, function(x,y) {z<-as.POSIXlt(x, tz=y, origin = "1970-01-01"); z})
-
-#  unique_tz <- unique(data$time_zone)
-#  data$year <- 0; data$mon <- 0; data$day <- 0; data$hour <- 0 ; data$min <- 0 ; data$sec <- 0
-#  i<-1
-#  data$ts_date <- as.POSIXlt(0, tz="America/Los_Angeles", origin = "1970-01-01")
-#  for(i in 1:length(unique_tz)) {
-#    tz_rows <- grep(unique_tz[i], data$time_zone)
-#    print(paste(unique_tz[i], length(tz_rows)))
-#    tsDate <- as.POSIXlt(data[tz_rows, ]$ts, tz=unique_tz[i], origin = "1970-01-01");
-#    data[tz_rows, ]$hour <- tsDate$hour
-#    data[tz_rows, ]$min <- tsDate$min
-#    data[tz_rows, ]$sec <- tsDate$sec
-#    data[tz_rows, ]$year <- tsDate$year
-#    data[tz_rows, ]$mon <- tsDate$mon
-#    data[tz_rows, ]$day <- tsDate$mday
-#  }
-#  data
-#}
-
-
+#assumes connData is available
+labelProtoService <- function() {
+  # Remove the ones with unknowns
+  connData <- connData[connData$isp_id!=-1, ]
+  print("Processing Meta")
+  # POST PROCESSING BASED ON PORT VALUES   
+  connData[(connData$proto=="tcp" 
+            & (connData$id.resp_p==443 | connData$id.resp_p==5228 | connData$id.resp_p == 5900 |
+                 connData$id.resp_p== 8883 | connData$id.resp_p==5222 |  
+                 connData$id.resp_p == 1237 | connData$id.resp_p == 993 | 
+                 connData$id.resp_p == 995| connData$id.resp_p == 7275)),]$service = "ssl"
+  
+  connData[(connData$proto=="tcp" 
+            & (connData$id.orig_p == 443 | connData$id.orig_p == 5228 | connData$id.orig_p == 5900 |
+                 connData$id.orig_p == 8883 | connData$id.orig_p ==5222 | 
+                 connData$id.orig_p == 1237 | connData$id.orig_p == 993 | 
+                 connData$id.orig_p == 995 | connData$id.orig_p == 7275)),]$service = "ssl"
+  
+  #TODO:: What about VNC??      
+  connData[(connData$proto=="tcp")
+           &(connData$id.resp_p==5223|connData$id.orig_p==5223 |
+               connData$id.orig_p == 443) 
+           & (connData$operating_system=="i"),]$service="ssl"   
+  # added 443 to ensure that this command does not return error
+  connData[(connData$proto=="udp")&((connData$id.orig_p ==53) | (connData$id.resp_p==53)), ]$service <- "dns"
+  # 5228 gtalk android
+  # 8882 mqtt ssl 
+  connData[(connData$proto=="tcp" & (connData$id.orig_p == 80 | connData$id.resp_p == 80 )),]$service = "http"
+  
+  connData[((connData$proto == "tcp") & (connData$service != "http") & (connData$service != "ssl")),]$service="other"
+  connData[((connData$proto == "udp") & (connData$service != "dns")),]$service="other" 
+  connData[((connData$proto != "tcp") & (connData$proto != "udp")),]$proto="other"   
+  connData[(connData$proto == "other"),]$service="other"
+  
+  connData$tot_pkts <- connData$orig_pkts+connData$resp_pkts
+  connData$tot_bytes <- connData$orig_ip_bytes + connData$resp_ip_bytes  
+  connData
+}

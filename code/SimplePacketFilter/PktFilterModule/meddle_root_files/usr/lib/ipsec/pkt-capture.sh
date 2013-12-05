@@ -14,7 +14,7 @@ function logState()
 {
     echo "Env variables for pktcapt" >> ${logFile}
     echo "$PLUTO_ME $PLUTO_PEER $PLUTO_PEER_ID $PLUTO_PEER_CLIENT ${PLUTO_VERB} " >> ${logFile}
-    printenv >> ${logFile}
+#    printenv >> ${logFile}
 }
 
 function genDumpName()
@@ -23,7 +23,8 @@ function genDumpName()
     #TODO:: Assuming that the last field of the DN in the certificate is the login name of the client 
     export clientID=`echo ${PLUTO_PEER_ID} | awk -F '=' '{print $NF}'`
     export clientIP=`echo ${PLUTO_PEER_CLIENT} | awk -F '/' '{print $1}'`    
-    export dumpPath="${basePath}/${clientID}/"
+    export dumpDateDir=`date +%Y-%h-%d`  
+    export dumpPath="${basePath}/${dumpDateDir}/${clientID}/"
     mkdir -p ${dumpPath}
     export dumpName="${dumpPath}/tcpdump-${clientID}-${timeStamp}-${PLUTO_ME}-${clientIP}-${PLUTO_PEER}.pcap.enc"
     echo "Dump Name is ${dumpName}" >> ${logFile}
