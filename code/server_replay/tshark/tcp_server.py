@@ -128,7 +128,7 @@ def run():
     configs.set('number_of_runs', 1)
     configs.set('vpn-no-vpn', True)
     configs.set('original_ports', True)
-    configs.set('host', '129.10.115.141')
+    configs.set('host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
     configs.set('ports_file', '/tmp/free_ports')
     
     PRINT_ACTION('Reading configs file and args', 0)
@@ -148,7 +148,6 @@ def run():
     if configs.get('vpn-no-vpn'):
         configs.set('number_of_runs', 2*configs.get('number_of_runs'))
     configs.show_all()
-    
     PRINT_ACTION('Loading the tables', 0)
     table   = pickle.load(open(configs.get('pcap_file') +'_server_pickle', 'rb'))
     ports   = {}
