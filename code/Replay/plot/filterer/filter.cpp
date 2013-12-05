@@ -350,7 +350,7 @@ int main(int argc, char ** argv)
 
                 if(find(seqs.begin(), seqs.end(), s) != seqs.end())
                 {
-                    cout << "Duplicate seq: " << p1 << ">" << p2 << " seq " << seq1c << ":" << seq2c << endl;
+                    //cout << "Duplicate seq: " << p1 << ">" << p2 << " seq " << seq1c << ":" << seq2c << endl;
                     total_tcp_lost++;
                 }
                 else
@@ -372,7 +372,7 @@ int main(int argc, char ** argv)
                 if(acks.count(s) != 0 && acks[s] == false)
                 {
                     acks[s] = true;
-                    cout << "Duplicate ack: " << p1 << ">" << p2 << " ack " << seq1c << endl;
+                    //cout << "Duplicate ack: " << p1 << ">" << p2 << " ack " << seq1c << endl;
                     total_tcp_lost++;
                 }
                 else

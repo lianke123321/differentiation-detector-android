@@ -33,7 +33,9 @@ int main(int argc, char **argv)
     while(!inp.eof())
     {
         inp >> rtt;
-        rtts.push_back(rtt);
+	// RTTs that are abnormally low should be ditched.
+	if (rtt > 0.010)
+    	    rtts.push_back(rtt);
     }
 
     double rtt_max = rtts[0];
