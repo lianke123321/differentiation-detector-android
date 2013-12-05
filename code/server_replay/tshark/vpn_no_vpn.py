@@ -33,38 +33,44 @@ def main():
     configs = Configs()
     configs.set('server-host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
     configs.set('server-port', 10001)
+    configs.set('rounds', 1)
     
     python_lib.read_args(sys.argv, configs)
     
-    url = ('http://' + configs.get('server-host') + ':' + str(configs.get('server-port')) 
-        + '/re-run?pcap_folder=' + configs.get('pcap_folder'))
+    configs.show_all()
     
-    response = urllib2.urlopen(url).read()
-    print '\n', response
-    if 'Busy! Try later!' in response:
-        sys.exit(-1)
+#    url = ('http://' + configs.get('server-host') + ':' + str(configs.get('server-port')) 
+#        + '/re-run?pcap_folder=' + configs.get('pcap_folder'))
+#    
+#    response = urllib2.urlopen(url).read()
+#    print '\n', response
+#    if 'Busy! Try later!' in response:
+#        sys.exit(-1)
+#    
+#    time.sleep(10)
     
-    time.sleep(10)
+    for i in range(configs.get('rounds')):
+        print 'DOING ROUND: ', i+1
+        
+        print 'With VPN',
+        dump_vpn = tcpdump(dump_name='vpn_'+str(i))
+        sys.stdout.flush()
+        meddle_vpn('connect')
+        dump_vpn.start()
+        time.sleep(2)
+        tcp_client.run(sys.argv)
+        time.sleep(2)
+        dump_vpn.stop()
     
-    print 'With VPN',
-    dump_vpn = tcpdump(dump_name='vpn')
-    sys.stdout.flush()
-    meddle_vpn('connect')
-    dump_vpn.start()
-    time.sleep(2)
-    tcp_client.run(sys.argv)
-    time.sleep(2)
-    dump_vpn.stop()
-
-    print 'Without VPN',
-    dump_novpn = tcpdump(dump_name='novpn')
-    sys.stdout.flush()
-    meddle_vpn('disconnect')
-    time.sleep(2)
-    dump_novpn.start()
-    tcp_client.run(sys.argv)
-    time.sleep(2)
-    dump_novpn.stop()
+        print 'Without VPN',
+        dump_novpn = tcpdump(dump_name='novpn_'+str(i))
+        sys.stdout.flush()
+        meddle_vpn('disconnect')
+        time.sleep(2)
+        dump_novpn.start()
+        tcp_client.run(sys.argv)
+        time.sleep(2)
+        dump_novpn.stop()
     
 if __name__=="__main__":
     main()
