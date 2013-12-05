@@ -16,7 +16,7 @@ import os, sys, socket, pickle, threading, time, traceback
 import python_lib
 from python_lib import Configs, PRINT_ACTION
 
-DEBUG0 = False
+DEBUG = 2
 
 class Server(object):
     def __init__(self, host, port=None, buffer_size = 4096):
@@ -30,6 +30,7 @@ class Server(object):
     def _create_socket_server(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         if self._port is None:
             port = 7600
             while True:
@@ -48,27 +49,30 @@ class Server(object):
                 traceback.print_exc()
                 sys.exit(-1)
         self._socket = sock
-        if DEBUG0: print 'Created socket server:', (self._host, self._port)
+        if DEBUG == 0: print 'Created socket server:', (self._host, self._port)
         sock.listen(1)
     def handle_connection(self, table, connection, client_address):
-        print '\nGot connection: ', connection, client_address
+        table_pointer = 0
+        if DEBUG == 1: print '\tGot connection: ', connection, client_address
         try:
-            response_set = table.pop(0)
+#            response_set = table.pop(0)
+            response_set = table[table_pointer]
+            table_pointer += 1
         except IndexError:
             print '\tEmpty connection:', self._host, ':', self._port
             return
         
         buffer_len = 0
         while True:
-            if DEBUG0: print 'waiting for:\t', self._host, ':', self._port, response_set.request_len
+            if DEBUG == 0: print 'waiting for:\t', self._host, ':', self._port, response_set.request_len
             if buffer_len >= response_set.request_len:
-                if DEBUG0: print '\nReceived\t', self._host, ':', self._port, len(buffer), response_set.request_len, '\n' 
+                if DEBUG == 0: print '\nReceived\t', self._host, ':', self._port, len(buffer), response_set.request_len, '\n' 
                 buffer_len -= response_set.request_len
                 if len(response_set.response_list) == 0:
                     pass
-                    if DEBUG0: print 'No need to send back anything!', self._host, ':', self._port
+                    if DEBUG == 0: print 'No need to send back anything!', self._host, ':', self._port
                 else:
-                    if DEBUG0: print '\nSending\t', self._host, ':', self._port, len(response_set.response_list), '\n'
+                    if DEBUG == 0: print '\nSending\t', self._host, ':', self._port, len(response_set.response_list), '\n'
                     time_origin = time.time()
                     
                     for i in range(len(response_set.response_list)):
@@ -77,15 +81,18 @@ class Server(object):
                         if time.time() < time_origin + timestamp:
                             time.sleep((time_origin + timestamp) - time.time())
                         connection.sendall(str(res))
-                        if DEBUG0: print '\tSent\t', i+1, '\t', len(res) 
-                if len(table) > 0:
-                    response_set = table.pop(0)
+                        if DEBUG == 0: print '\tSent\t', i+1, '\t', len(res) 
+#                if len(table) > 0:
+#                    response_set = table.pop(0)
+                if table_pointer < len(table):
+                    response_set = table[table_pointer]
+                    table_pointer += 1
                 else:
                     break
             else:
                 buffer_len += len(connection.recv(self.buffer_size))
 
-        print '\tDone with:', self._host, ':', self._port
+        if DEBUG == 1: print '\tDone with:', self._host, ':', self._port
         time.sleep(2)
         connection.shutdown(socket.SHUT_RDWR)
         connection.close()
@@ -93,29 +100,36 @@ class Server(object):
         if expected_conn_num == 0:
             return
         so_far = 0
+        round  = 1
         while True:
-            if DEBUG0: print '\nServer waiting for connection: ', self._host, ':', self._port
-            print '\tServer waiting for connection: ', self._host, ':', self._port
+            if DEBUG == 1: print '\nServer waiting for connection: ', self._host, ':', self._port
             connection, client_address = self._socket.accept()
             c_s_pair = connection.recv(43)
             t = threading.Thread(target=self.handle_connection, args=[table[c_s_pair], connection, client_address])
             t.start()
             so_far += 1
-            print self._port, ':', so_far, '/', expected_conn_num
+            if DEBUG == 2: print '\t', self._port, ':', so_far, 'out of', expected_conn_num
             if so_far == expected_conn_num:
-                print 'breaking loop for:', self._port
-                break
+                if round >= int(Configs().get('number_of_runs')):
+                    break
+                round += 1
+                print 'Resetting so_far for:', self._port
+                so_far = 0
+#                if DEBUG == 1: print 'breaking loop for:', self._port
+#                break
 
 
 def read_c_s_pair_to_port(file):
     return pickle.load(open(file, 'rb'))
 
-def main():
+def run():
     '''Defaults'''
     configs = Configs()
+    configs.set('number_of_runs', 1)
+    configs.set('vpn-no-vpn', True)
+    configs.set('original_ports', True)
     configs.set('host', '129.10.115.141')
     configs.set('ports_file', '/tmp/free_ports')
-    configs.set('original_ports', True)
     
     PRINT_ACTION('Reading configs file and args', 0)
     python_lib.read_args(sys.argv, configs)
@@ -131,6 +145,8 @@ def main():
 
     config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
     configs.read_config_file(config_file)
+    if configs.get('vpn-no-vpn'):
+        configs.set('number_of_runs', 2*configs.get('number_of_runs'))
     configs.show_all()
     
     PRINT_ACTION('Loading the tables', 0)
@@ -167,9 +183,12 @@ def main():
         PRINT_ACTION('Serializing port mapping to file', 0)
         pickle.dump(ports, open(configs.get('ports_file'), "wb"))
     
-    time.sleep(5)
+    time.sleep(3)
     PRINT_ACTION('Done! You can now run your client script.', 0)
     print '   Capture packets on server ports %d to %d' % ((min(ports.items(), key=lambda x: x[1])[1], max(ports.items(), key=lambda x: x[1])[1]))
+
+def main():
+    run()
     
 if __name__=="__main__":
     main()
