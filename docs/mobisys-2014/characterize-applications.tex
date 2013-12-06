@@ -44,6 +44,7 @@ Third Party&Android&732&3 (0.4\%)&57 (7.8\%)&3 (0.4\%)&0 (0\%)&85 (11.6\%)&6 (0.
     \end{tabular}
     \end{small}
     \caption{Summary of PII leaked in plaintext (HTTP) by Android and iPhone apps. \emph{The popular iOS apps tend to leak the location information in the clear while Android apps leak the IMEI number and Android ID in the clear. }}
+    \vspace{\postfigspace}
     \label{tab:pii}
 \end{table*}
 
@@ -102,7 +103,7 @@ user credentials (which are often used for multiple services).
        \hline
     \end{tabular}
     \end{small}
-    \caption{Top 10 hosts that receive the IMEI or Device ID over HTTPS. \emph{Hosts are ordered by the number of flows that send the IMEI number, followed by the number of flows that send the device ID over HTTPS. Four of the top 10 hosts that receive this information are ads and analytics sites.}}
+    \caption{Top 10 hosts that receive the IMEI or Device ID over HTTPS. \emph{Hosts are ordered by the number of flows that send the IMEI number, followed by the number of flows that send the device ID over HTTPS. Four of the top 10 hosts that receive this information are ads and analytics sites.\drc{This will probably be cut.}}}
     \label{tab:pii-leakage-https-sites}
     \vspace{\postfigspace}
 \end{table}
@@ -204,6 +205,7 @@ scorecardresearch.com &  21 & 11 & 10 \tabularnewline
 \end{small}
 \caption{The top 5 ads and analytics sites that were contacted by the devices in our dataset.
 \emph{All 26 devices in} \mobWild \emph{contacted doubleclick.net and google-analytics.com}.}
+\vspace{\postfigspace}
 \label{tab:top-trackers}
 \end{table}
 
