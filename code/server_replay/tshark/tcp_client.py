@@ -107,24 +107,11 @@ class Queue(object):
             self.next()
             self.event.wait()
             self.event.clear()
-class Instance(object):
-    def __init__(self, dict):
-        self.host     = dict['host']
-        self.username = dict['username']
-        self.ssh_key  = dict['ssh_key']
 def run(argv):
-    '''Add your instance to this dictionary'''
-    instances = {'meddle'  : {'host'     : 'ec2-54-243-17-203.compute-1.amazonaws.com',
-                              'username' : 'ubuntu',
-                              'ssh_key'  : '~/.ssh/meddle'},
-                 'achtung' : {'host'     :'129.10.115.141',
-                              'username' : 'arash',
-                              'ssh_key'  : '~/.ssh/id_rsa'},
-                }
-    
     PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
     configs.set('original_ports', True)
+    #Add your instance to Instance class in python_lib.py
     configs.set('instance', 'meddle')
     
     python_lib.read_args(argv, configs)
@@ -139,7 +126,7 @@ def run(argv):
 
     configs.read_config_file((pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'))    
     
-    configs.set('instance', Instance(instances[configs.get('instance')]))
+    configs.set('instance', python_lib.Instance(configs.get('instance')))
     configs.show_all()
     
     if not configs.get('original_ports'):

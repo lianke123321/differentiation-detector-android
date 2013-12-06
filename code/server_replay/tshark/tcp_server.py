@@ -128,8 +128,9 @@ def run():
     configs.set('rounds', 1)
     configs.set('vpn-no-vpn', True)
     configs.set('original_ports', True)
-    configs.set('host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
     configs.set('ports_file', '/tmp/free_ports')
+    #Add your instance to Instance class in python_lib.py
+    configs.set('instance', 'meddle')
     
     PRINT_ACTION('Reading configs file and args', 0)
     python_lib.read_args(sys.argv, configs)
@@ -146,6 +147,7 @@ def run():
     config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
     configs.read_config_file(config_file)
     
+    configs.set('instance', python_lib.Instance(configs.get('instance')))
     configs.show_all()
 
     if configs.get('vpn-no-vpn'):
@@ -167,9 +169,9 @@ def run():
         if port1 not in distinct_ports:
             distinct_ports[port1] = 0
             if configs.get('original_ports'):
-                threads[port1] = Server(Configs().get('host'), int(port1))
+                threads[port1] = Server(Configs().get('instance').host, int(port1))
             else:
-                threads[port1] = Server(Configs().get('host'))
+                threads[port1] = Server(Configs().get('instance').host)
             print '\t', port1, ':', threads[port1].get_port()
         if len(table[c_s_pair]) > 0:
             distinct_ports[port1] += 1

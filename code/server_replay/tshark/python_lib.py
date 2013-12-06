@@ -97,3 +97,22 @@ class Configs(object):
     def reset(self):
         _configs = {}
         self._configs['action_count'] = 0
+class Instance(object):
+    instance_list = {
+                     'meddle'  : {'host'     : 'ec2-54-243-17-203.compute-1.amazonaws.com',
+                                  'username' : 'ubuntu',
+                                  'ssh_key'  : '~/.ssh/meddle'},
+                     'achtung' : {'host'     :'129.10.115.141',
+                                  'username' : 'arash',
+                                  'ssh_key'  : '~/.ssh/id_rsa'},
+                     'alan-ec2': {'host'     :'ec2-54-204-220-73.compute-1.amazonaws.com',
+                                  'username' : 'ubuntu',
+                                  'ssh_key'  : '~/.ssh/ancsaaa-keypair_ec2.pem'},
+                     }
+    def __init__(self, instance, instances=instance_list):
+        self.host     = instances[instance]['host']
+        self.username = instances[instance]['username']
+        self.ssh_key  = instances[instance]['ssh_key']
+        
+
+        
