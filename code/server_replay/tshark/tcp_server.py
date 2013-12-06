@@ -149,7 +149,8 @@ def run():
     
     configs.set('instance', python_lib.Instance(configs.get('instance')))
     configs.show_all()
-
+    configs.get('instance').show()
+    
     if configs.get('vpn-no-vpn'):
         configs.set('rounds', 2*configs.get('rounds'))
     

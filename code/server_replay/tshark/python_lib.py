@@ -110,9 +110,14 @@ class Instance(object):
                                   'ssh_key'  : '~/.ssh/ancsaaa-keypair_ec2.pem'},
                      }
     def __init__(self, instance, instances=instance_list):
+        self.name     = instance
         self.host     = instances[instance]['host']
         self.username = instances[instance]['username']
         self.ssh_key  = instances[instance]['ssh_key']
-        
-
+    def show(self):
+        print '\tname     :', self.name
+        print '\thost     :', self.host
+        print '\tusername :', self.username
+        print '\tssh_key  :', self.ssh_key
+    
         

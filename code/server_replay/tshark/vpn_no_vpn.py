@@ -52,25 +52,26 @@ def main():
     
     PRINT_ACTION('Creating configs', 0)
     configs = Configs()
-    configs.set('server-host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
-    configs.set('server-port', 10001)
+#     configs.set('server-host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
+#     configs.set('server-port', 10001)
+#     configs.set('auto-server', False)
     configs.set('rounds', 1)
-    configs.set('auto-server', False)
     
     python_lib.read_args(sys.argv, configs)
     
     configs.show_all()
+    configs.get('instance').show()
     
-    if configs.get('auto-server'):
-        PRINT_ACTION('Sending request to the server', 0)
-        url = ('http://' + configs.get('server-host') + ':' + str(configs.get('server-port')) 
-            + '/re-run?pcap_folder=' + configs.get('pcap_folder'))
-        response = urllib2.urlopen(url).read()
-        print '\n', response
-        if 'Busy! Try later!' in response:
-            sys.exit(-1)
-        PRINT_ACTION('Giving server 10 seconds to get ready!', 0)
-        time.sleep(10)
+#     if configs.get('auto-server'):
+#         PRINT_ACTION('Sending request to the server', 0)
+#         url = ('http://' + configs.get('server-host') + ':' + str(configs.get('server-port')) 
+#             + '/re-run?pcap_folder=' + configs.get('pcap_folder'))
+#         response = urllib2.urlopen(url).read()
+#         print '\n', response
+#         if 'Busy! Try later!' in response:
+#             sys.exit(-1)
+#         PRINT_ACTION('Giving server 10 seconds to get ready!', 0)
+#         time.sleep(10)
     
     PRINT_ACTION('Firing off', 0)
     for i in range(configs.get('rounds')):
