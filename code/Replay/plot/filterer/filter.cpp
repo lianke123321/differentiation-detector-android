@@ -462,13 +462,13 @@ int main(int argc, char ** argv)
             break;
     }
 
-    meta << "Maximum throughput: " << xp_max / 1e+3 << " KB/s" << endl;
-    meta << "Mean throughput: " << (xp_sum / xputs.size()) / 1e+3 << " KB/s" << endl;
-    meta << "Median throughput: " << xputs[xputs.size() / 2] / 1e+3 << " KB/s" << endl;
+    meta << "xput_max\t" << xp_max / 1e+3 << endl;
+    meta << "xput_avg\t" << (xp_sum / xputs.size()) / 1e+3 << endl;
+    meta << "xput_mdn\t" << xputs[xputs.size() / 2] / 1e+3 << endl;
 
-    meta << "TCP packets lost: " << total_tcp_lost << endl;
-    meta << "Total TCP packets: " << total_tcp_packets << endl;
-    meta << "Loss rate: " << double(total_tcp_lost) / double(total_tcp_packets) * 100.0 << "%" << endl;
+    meta << "tcp_lost\t" << total_tcp_lost << endl;
+    meta << "tcp_total\t" << total_tcp_packets << endl;
+    meta << "loss_rate\t" << double(total_tcp_lost) / double(total_tcp_packets) * 100.0 << endl;
 
     meta.close();
 
