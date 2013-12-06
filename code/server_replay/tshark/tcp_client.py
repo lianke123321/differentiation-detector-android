@@ -40,9 +40,9 @@ class Connections(object):
             return self._connections[c_s_pair]
         except:
             if Configs().get('original_ports'):
-                server_address = (Configs().get('host'), self._port_from_c_s_pair(c_s_pair))
+                server_address = (Configs().get('instance').host, self._port_from_c_s_pair(c_s_pair))
             else:
-                server_address = (Configs().get('host'), Configs().get('ports')[c_s_pair])
+                server_address = (Configs().get('instance').host, Configs().get('ports')[c_s_pair])
             print '\tStarting:', server_address
             print '           ', c_s_pair
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -107,20 +107,25 @@ class Queue(object):
             self.next()
             self.event.wait()
             self.event.clear()
-
-          
+class Instance(object):
+    def __init__(self, dict):
+        self.host     = dict['host']
+        self.username = dict['username']
+        self.ssh_key  = dict['ssh_key']
 def run(argv):
+    '''Add your instance to this dictionary'''
+    instances = {'meddle'  : {'host'     : 'ec2-54-243-17-203.compute-1.amazonaws.com',
+                              'username' : 'ubuntu',
+                              'ssh_key'  : '~/.ssh/meddle'},
+                 'achtung' : {'host'     :'129.10.115.141',
+                              'username' : 'arash',
+                              'ssh_key'  : '~/.ssh/id_rsa'},
+                }
+    
     PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
     configs.set('original_ports', True)
-
-    configs.set('host', '129.10.115.141')
-    configs.set('username', 'arash')
-    configs.set('ssh_key', '~/.ssh/id_rsa')
-    
-    configs.set('host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
-    configs.set('username', 'ubuntu')
-    configs.set('ssh_key', '~/.ssh/ancsaaa-keypair_ec2.pem')
+    configs.set('instance', 'meddle')
     
     python_lib.read_args(argv, configs)
     
@@ -132,16 +137,16 @@ def run(argv):
         print '\tconfig_file, client_pickle_dump, server_pickle_dump'
         sys.exit(-1)
 
-    config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
-    configs.read_config_file(config_file)    
+    configs.read_config_file((pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'))    
     
+    configs.set('instance', Instance(instances[configs.get('instance')]))
     configs.show_all()
     
     if not configs.get('original_ports'):
         PRINT_ACTION('Downloading ports file', 0)
         configs.set('ports_file', '/tmp/free_ports')
         os.system('rm -f ' + configs.get('ports_file'))
-        configs.set('ports', read_ports(configs.get('host'), configs.get('username'), configs.get('ssh_key'), configs.get('ports_file')))
+        configs.set('ports', read_ports(configs.get('instance').host, configs.get('instance').username, configs.get('instance').ssh_key, configs.get('ports_file')))
     
     PRINT_ACTION('Loading the queue', 0)
     queue = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
