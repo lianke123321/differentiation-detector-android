@@ -110,7 +110,7 @@ class Server(object):
             so_far += 1
             if DEBUG == 2: print '\t', self._port, ':', so_far, 'out of', expected_conn_num
             if so_far == expected_conn_num:
-                if round >= int(Configs().get('number_of_runs')):
+                if round >= int(Configs().get('rounds')):
                     break
                 round += 1
                 print 'Resetting so_far for:', self._port
@@ -125,7 +125,7 @@ def read_c_s_pair_to_port(file):
 def run():
     '''Defaults'''
     configs = Configs()
-    configs.set('number_of_runs', 1)
+    configs.set('rounds', 1)
     configs.set('vpn-no-vpn', True)
     configs.set('original_ports', True)
     configs.set('host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
@@ -145,9 +145,11 @@ def run():
 
     config_file = pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'
     configs.read_config_file(config_file)
-    if configs.get('vpn-no-vpn'):
-        configs.set('number_of_runs', 2*configs.get('number_of_runs'))
+    
     configs.show_all()
+
+    if configs.get('vpn-no-vpn'):
+        configs.set('rounds', 2*configs.get('rounds'))
     
     PRINT_ACTION('Loading the tables', 0)
     table   = pickle.load(open(configs.get('pcap_file') +'_server_pickle', 'rb'))
