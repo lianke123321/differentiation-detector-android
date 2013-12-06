@@ -21,6 +21,10 @@ echo Making the filterer...
 cd filterer
 make >/dev/null
 cd ..
+cd rtt
+make >/dev/null
+cd ..
+
 echo Done.
 
 # For every pcap you find in data/pcaps
@@ -39,8 +43,12 @@ do
     # Generate the script to draw the plot.
     echo ../../../plot/filterer/filter ../../text_pcaps/$name.txt `cat ../../confs/"$name"`\; >filterit.sh
     cd ../../../plot/splitcap/; mono ./SplitCap.exe -r ../../data/pcaps/$f -o ../../data/generated_plots/$name/dissected_pcaps/ >/dev/null  2>/dev/null; cd ../../data/generated_plots/$name/;
-    echo echo File: `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'` \>rttstats.txt >>filterit.sh
-    echo tcptrace -lr `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'`\| awk \'/RTT samples/,/RTT avg:/\' \>\>rttstats.txt\; >>filterit.sh
+    echo echo File: `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'` \>$name.rtt.txt >>filterit.sh
+    echo tcptrace -lr `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'`\| awk \'/RTT min/,/RTT stdev/\' \>\>$name.rtt.txt\; >>filterit.sh
+    echo cat meta.txt \>$name.stats.txt\; >>filterit.sh
+    echo cat $name.rtt.txt \| ../../../plot/rtt/rtt \>\>$name.stats.txt\; >>filterit.sh
+    echo rm -rf $name.rtt.txt\; >>filterit.sh
+    echo rm -rf meta.txt\; >>filterit.sh
     chmod +x filterit.sh
     # Run the script.
     ./filterit.sh
