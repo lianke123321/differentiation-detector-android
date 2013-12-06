@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from twisted.scripts.test.test_tap2rpm import _queryRPMTags
 import tornado.ioloop
 import tornado.web
 import ctypes
@@ -10,6 +11,7 @@ from recaptcha.client import captcha
 import urllib
 import httplib
 import sys
+from tornado.escape import json_encode
 
 # The python files to manage the meddle pages
 import MeddleCommunicator
@@ -19,6 +21,9 @@ import ConfigHandler
 # The variables and string constants
 from StringConstants import *
 from ConfigHandler import configParams
+import GetGraphData
+import AuthTokenMap
+import ConvisTemplate
 
 #import smtplib
 # THE PROBLEM HERE IS THAT SOUNDER HAS AN OLDER VERSION OF DJANGO RUNNING 
@@ -33,6 +38,7 @@ ERR_OTHER=3
 ERR_FAILUPDATE = 4
 ERR_CAPTCHA = 5
 ERR_EMAIL = 6
+ERR_INVALIDARGS = 7
 
 
 
@@ -51,6 +57,8 @@ class CommonHandler(tornado.web.RequestHandler):
             page += "Oops! We encountered a captcha error! Please try again."
         elif self.mainErr == ERR_EMAIL:
             page += "We encountered an error while validating your email! Please try again."
+        elif self.mainErr == ERR_INVALIDARGS:
+            page += "We encountered an error while validating the arguments."
         else:
             page += "Internal error on webserver. Please try again later."
         page += TEMPLATE_PAGE_FOOTER
@@ -97,12 +105,12 @@ class ViewConfigsHandler(CommonHandler):
         self.mainErr = -1
         self.dispPage(self.getIpInfo())
     
-    def dispPage(self, ipInfo):
+    def dispPage(self, ipInfo):       
         if ipInfo is None:
             self.write(self.getERRPage())
             return
         uConfig = UserConfigs.UserConfigs()  
-        if False == uConfig.fetchConfigs(ipInfo.userID):
+        if False == uConfig.fetchConfigs(ipInfo.userID):        
             self.write("Error getting the configurations for user at IP"+str(self.request.remote_ip))
             return
         page = uConfig.displayConfigs()
@@ -149,9 +157,62 @@ class ViewConfigsHandler(CommonHandler):
             self.__post()
         except (socket.error, IOError) , msg:
             logging.error("Error in POST message"+str(msg))
-            self.write(self.getERRPage)
+            self.write(self.getERRPage())
         return
-        
+
+class ViewGraphHandler(CommonHandler):
+    def __get(self):
+        queryType = self.get_argument('qt', 0, True)
+        authToken = self.get_argument('auth', None, True)
+        userID = 0
+        logging.warning("Received a query of type"+str(queryType)+str(authToken))        
+        if queryType == VIEWGRAPH_QT_TEMPLATE:
+            ipInfo = self.getIpInfo()
+            if ipInfo is not None:
+                userID = ipInfo.userID
+                authToken = AuthTokenMap.gAuthTokenMap.getAuthToken(str(userID))
+            if authToken is not None:
+                strGraphPage = ConvisTemplate.CONVISTEMPLATE
+                strGraphPage = strGraphPage.replace(ConvisTemplate.authTokenPlaceholder, str(authToken))
+                self.write(strGraphPage)
+                self.finish()
+                return
+        if queryType == VIEWGRAPH_QT_RANGE:
+            if authToken is not None:
+                userID = AuthTokenMap.gAuthTokenMap.getUserID(authToken)
+            g = GetGraphData.GraphData(userID, 0, 0)
+            retJson = g.getTimeRange()
+            logging.warning(json_encode(retJson))
+            self.set_header('Content-Type', 'application/json')
+            self.write(json_encode(retJson))
+            self.finish()            
+            return
+        if queryType == VIEWGRAPH_QT_GRAPH:
+            minTs = self.get_argument('min', 0, True)
+            maxTs = self.get_argument('max', 0, True)
+            if authToken is not None:
+                userID = AuthTokenMap.gAuthTokenMap.getUserID(authToken)            
+            logging.warning("Requesing for range:" + str(minTs) + "to" + str(maxTs))
+            g = GetGraphData.GraphData(userID, minTs, maxTs)
+            retJson = g.getHttpFlowData()
+            #logging.warning(retJson)
+            #logging.warning(json_encode(retJson))
+            self.set_header('Content-Type', 'application/json')
+            self.write(json_encode(retJson))
+            self.finish()
+            return
+        self.mainErr = ERR_INVALIDARGS
+        logging.info("Error")
+        self.write(self.getERRPage())
+        return
+
+    def get(self):
+        try:
+            self. __get()
+        except (socket.error, IOError) , msg:
+            logging.error("Error in POST message"+str(msg))
+            self.write(self.getERRPage())
+
 class DefaultHandler(CommonHandler):
     def get(self):
         global configParams
@@ -159,7 +220,6 @@ class DefaultHandler(CommonHandler):
             self.render(str(configParams.getParam(MCFG_WEBPAGES_PATH))+"/index.html")
         except (socket.error, IOError), msg:
             self.write(self.getERRPage())
-            
             
 class SignUpHandler(CommonHandler):
     def __getThanksPage(self):
@@ -247,10 +307,11 @@ if __name__ == "__main__":
     if False == configParams.readConfigs(sys.argv[1]):
         logging.error("Error while reading the config file")
         sys.exit(-1)
-        
-    
+    reload(sys)
+    sys.setdefaultencoding("utf-8")        
     handlers = [(r"/",DefaultHandler),
             (r""+str(PAGE_VIEWCONFIGS), ViewConfigsHandler),
+            (r""+str(PAGE_VIEWGRAPH), ViewGraphHandler),
             (r"/dyn/signupCaptcha", SignUpHandler),
             (r"/(.+\..+)", tornado.web.StaticFileHandler, {'path': str(configParams.getParam(MCFG_WEBPAGES_PATH))})]
     settings = {}

@@ -55,3 +55,6 @@ ${MEDDLE_BRO_HOME}/bin/broctl
 >scripts
 # Start
 >start
+
+# For Assigning Signatures
+sudo apt-get install r-base-core r-cran-rmysql
