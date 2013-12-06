@@ -24,7 +24,7 @@ technology, or apps installed. Our VPN-based proxy achieves these goals.
 \noindent\textbf{Control}. Another important goal is to facilitate research into new middlebox approaches 
 for interposing on mobile Internet traffic. The system must support the ability to deploy and distribute large numbers 
 of middlebox services quickly, easily and at scale~\cite{sherry:middleboxes} without 
-the need to deploy hardware in homes~\cite{bismarck} or ISPs~\cite{wang:middleboxes}. 
+the need to deploy hardware in homes~\cite{bismark} or ISPs~\cite{wang:middleboxes}. 
 It should present a simple API for researchers and developers to block, shape, inject or otherwise 
 modify network flows. It should also support applications that operate on collections of flows over 
 time and across users (\eg Web caching/prefetching, malware detection/blocking and ISP characterization). 
@@ -42,8 +42,8 @@ We now describe \meddle's design and how
 it meets the goals described in the previous section. Figure~\ref{fig:architecture} 
 provides a high-level overview of the \meddle architecture.
 
-\meddle uses a VPN tunnel to direct all of a 
-mobile device's naturally generated Internet traffic to a proxy server (top of the Fig.~\ref{fig:architecture}). 
+\meddle uses a VPN tunnel to direct all of a participating 
+mobile device's Internet traffic to a proxy server (top of the Fig.~\ref{fig:architecture}). 
 Section~\ref{subsec:design_visibility} describes how this achieves our goal of visibility.
 
 Once traffic arrives at \meddle server it is directed to a \meddlebox (middle of Fig.~\ref{fig:architecture}) 
@@ -203,20 +203,24 @@ low barrier to entry and reasonable performance that is easy to scale.
 that appeal to a wide range of users. Importantly, we do not charge users for any of these 
 services.
 
-\begin{packeditemize}
-\item \emph{Improved security.} By securely tunneling all of a mobile device's traffic, users 
+%\begin{packeditemize}
+\noindent \textbf{Improved security.} By securely tunneling all of a mobile device's traffic, users 
 are less vulnerable to data leakage (\eg via open WiFi hotspots). 
-\item \emph{Device-wide content filters.} We use \meddle to block content that users do 
+
+\noindent \textbf{Device-wide content filters.} We use \meddle to block content that users do 
 not wish to access -- for all apps running on a device. The most popular instance of this is 
 device-wide ad blocking.
-\item \emph{Privacy revelations.} The \emph{ReCon} tool allows users to see how they are being 
+
+\noindent \textbf{Privacy revelations~\cite{wetherall:revelations}.} The \emph{ReCon} tool (\S\ref{subsec:recon}) allows users to see how they are being 
 tracked by ad and analytic servers, and allows them to create per-connection block lists.  
-\item \emph{Malware detection.} \meddle uses network signatures to identify malware, block it from 
-communicating and prevent future downloads onto other \meddle-enabled devices.  
-\item \emph{ISP transparency.} We provide services that allow users to identify cases where 
+
+\noindent \textbf{Malware detection.} \meddle uses network signatures to identify malware, block it from 
+communicating and prevent future downloads onto other \meddle-enabled devices (\S\ref{sec:malware}).  
+
+\noindent \textbf{ISP transparency.} We provide services that allow users to identify cases where 
 ISPs are modifying HTTP content in flight, and when they provide differentiated service to 
-traffic crossing their networks.
-\end{packeditemize}
+traffic crossing their networks (\S\ref{sec:isp-behavior}).
+%\end{packeditemize}
 
 \subsubsection{Low barrier to entry.} 
 Manually configuring a VPN generally requires filling out five fields on an Android phone, and the VPN configuration can be distributed using a single file on iOS. 
@@ -277,33 +281,33 @@ In some cases, \meddle is the right location to implement new services that coul
 to deploy on devices (prefetching) or impractical to deploy in network (detecting ISP service differentiation). 
 In other cases, \meddle provides a practical partial solution to a problem where the complete solution has an impractical 
 cost. For example, identifying privacy leaks from mobile devices is reliably addressed using information flow 
-analysis~\cite{taintdroid}. However, due to the overheads of this approach it is difficult to deploy to users 
+analysis~\cite{enck:taintdroid}. However, due to the overheads of this approach it is difficult to deploy to users 
 and at scale. \meddle allows us to identify and block unobfuscated PII in network flows from arbitrary devices without requiring 
 OS modifications or taint tracking. Regardless of the ultimate optimal solution, we can use \meddle today to inform the design 
 and deployment of future functionality in OSes and for in-network devices. 
 
 \subsubsection{Limitations} The following technical limitations can impact \meddle's coverage.
 
-\begin{packeditemize} 
-\item\emph{At most one VPN tunnel.}
+%\begin{packeditemize} 
+\noindent\emph{At most one VPN tunnel.}
 Currently iOS and Android support exactly one VPN connection at a time. 
 This allows \meddle to measure traffic over either \wifi or cellular interfaces, but not both at once.
 The vast majority of traffic uses only one of these interfaces, and VPNs can be used to tunnel that traffic.
 \tbd{MPTCP on iOS 7??}
 
-\item\emph{Proxy location.} 
+\noindent\emph{Proxy location.} 
 When traffic traverses \meddle, destinations will see the \meddle box address, not the device IP, as the source. 
 This might impact services  that customize (or block access to) content according to IP address (e.g., in case of localization). 
-A solution to this problem is to use a \meddle{} instance with an appropriate IP address
+A solution to this problem is to use a \meddle{} instance with an appropriate IP address.
 
-\item\emph{ISP support.}
+\noindent\emph{ISP support.}
 Some ISPs block VPN traffic, which prevents access to our current \meddle implementation. 
 We note that few ISPs block VPN traffic, and there is an incentive not to block VPN traffic to support enterprise clients.
 
-\item\emph{IPv6.}
+\noindent\emph{IPv6.}
 \meddle{} cannot be currently used on networks using IPv6 because IPv6 is not fully supported by mobile devices. 
-Indeed, we observe that though iOS and Android support IPv6 they currently do not support IPv6 traffic through VPN tunnels
-\end{packeditemize} 
+Indeed, we observe that though iOS and Android support IPv6 they currently do not support IPv6 traffic through VPN tunnels.
+%\end{packeditemize} 
 
 
 %\noindent\item \textbf{Wi-Fi Gateways powered by Cellular Modems.}

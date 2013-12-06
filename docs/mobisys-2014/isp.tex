@@ -40,7 +40,7 @@ manipulation, we provide the Tripnet as an opt-in feature. Because this entails
 two fetches of every Web page, we also support two modes: always-on and low-rate random trials, where we 
 insert tripwires for some small fraction of their visited sites.
 
-The Tripnet works as follows (Fig.~\ref{fig:tripnet}. A client requests a Web page through the \meddle VPN 
+The Tripnet works as follows (Fig.~\ref{fig:tripnet}). A client requests a Web page through the \meddle VPN 
 tunnel. This request is forwarded to the destination server. The response returns to 
 the \meddle server, where a transparent proxy injects the tripwire code.\footnote{We 
 recognize the irony of injecting content to detect content injection, but this is done only with user consent.}
@@ -50,20 +50,20 @@ The tripwire-enabled response is forwarded to the client, which execute the java
 \begin{figure}
 \centering
 \includegraphics[width=0.9\linewidth]{figures/tripnet.pdf}
-\caption{Overview of the \meddle Web-tripnet. A Web page is loaded
+\caption{Overview of the Web Tripnet. A Web page loads 
 through the VPN tunnel, where a meddlebox inserts a Web tripwire. The
 tripwire causes the browser to reload the Web page using the address of a
 transparent proxy server that is accessed using an unencrypted connection.
-After the proxied version of the page is loaded, the browser or a meddlebox
-can compare the two pages to identify potential interference. }
+After the proxied version of the page is loaded, the browser (or a meddlebox)
+compare the two pages to identify manipulation. }
 \label{fig:tripnet}
 \end{figure}
 
 The tripwire code contains information about the page content prior to traversing the ISP. When 
 executed, the code fetches the page again to compare with the (known) unmodified page content.  
 To ensure that this fetch does \emph{not} traverse the VPN connection, we use a \emph{pigeonhole} domain 
-whose traffic traverses an untunneled interface. For example, if the original request was for www.facebook.com, 
-we send the request to tripnet.meddle.mobi/www.facebook.com/, where we run a Web proxy. 
+whose traffic traverses an untunneled interface. For example, if the original request was for \url{www.facebook.com}, 
+we send the request to \url{tripnet.meddle.mobi/www.facebook.com/}, where we run a Web proxy. 
 
 When the request arrives at our proxy server, we could forward the request to the original target. In 
 practice, however, doing so would return different content due to the highly dynamic nature of most 
@@ -104,7 +104,7 @@ for a number of reasons, including load balancing, bandwidth management or busin
 Specifically, we focus on detecting whether certain types of network traffic receive 
 better (or worse) performance. 
 
-Previous work~\cite{glasnost,netdiff} explored this problem in limited 
+Previous work~\cite{dischinger:glasnost,tariq:nano,zhang:netdiff} explored this problem in limited 
 environments. Glasnost focused on BitTorrent in the desktop/laptop environment, 
 and lacked the ability to conduct controlled experiments to provide strong evidence 
 of differentiation. NetDiff covered a wide range of passively gathered traffic from a 
@@ -174,6 +174,24 @@ In our experiments, YouTube was the only app that exhibited such behavior.
 
 \textbf{Graph}: If we find a case of difference between \wifi and cell, plot it here.
 
+
+
+\noindent\textbf{Methodology.} We detect differentiation according to the following metrics. First, we 
+compute checksums to verify that the bytes sent/received at each endpoint during the replay are 
+exactly the same as the original trace. If not, we flag a case of content manipulation/blocking. Second, we
+compute summary statistics on throughput, latency and loss. Unlike manipulation/blocking, there are 
+confounding factors other than differentiation that may causes changes in these statistics between the 
+record and replay.
+
+To address this issue, we run multiple trials of replay (X total), alternating between using a VPN connection ($R_T$) and 
+a plain (untunneled) one ($R_U$). By computing statistics over multiple trials of one category ($R_T$ or $R_U$) we 
+can control for whether the ISP can differentiate and assign the variance in these trials as being due to 
+any number of other confounding factors. Having computed the variance over $R_T$ and $R_U$, we can 
+compare the summary statistics (mean/median) of $R_T$ and $R_U$ and use the variance in each category 
+to determine if the differences are statistically significant.
+
+Note that ISPs may apply differentiation to all VPN traffic, \eg by throttling. To detect this, we group all $R_T$ 
+samples and compare them to all $R_U$ samples across all applications and use the analysis described above. 
 
 \textbf{Graph}: Similarity score for network traffic in setting where we know there is no differentiation. 
 Score can include overall throughput, latency characteristics, loss, packet timings.
