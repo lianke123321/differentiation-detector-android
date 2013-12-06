@@ -50,5 +50,12 @@ int main(int argc, char ** argv)
     cout << "rtt_ba_avg\t" << s << endl;
     skipline(cin);
     
+    eatspaces(cin);
+    cin >> s >> s >> s;
+    cout << "rtt_ab_stdev\t" << s << endl;
+    cin >> s >> s >> s >> s;
+    cout << "rtt_ba_stdev\t" << s << endl;
+    skipline(cin);
+    
     return 0;
 }
