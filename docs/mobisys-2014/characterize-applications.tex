@@ -10,23 +10,23 @@ Mobile Privacy Revelations}
 %
 %
 %\subsection{Identifying Privacy Leaks}
-Privacy has rapidly become a critical issue for networked services, as large numbers of organizations develop 
-extensive tracking infrastructure to gather information from users for ads and analytics. While the problem 
-is well known and has been extensively studied in previous work~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}, they lack a general 
+Privacy has rapidly become a critical issue for user interactions with Internet services, particularly in 
+mobile environment where location, contact information and other PII are readily available. While the problem 
+is well known~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}, previous work lacks a general 
 way to identify leaks using network flows alone, and they provide no portable way to block those 
 activities. Our key 
-contributions are 1) we conduct controlled experiments to identify how PII is being leaked by apps via 
-their network flows and 2) use SSL bumping enabled by \platname{} to understand how this information is being shared over 
-secure channels (in addition to those revealed in the clear). 
+contributions are 1) we conduct controlled experiments to identify how PII is being leaked by apps  
+ and 2) use \platname{} to understand how this information is being shared both in plaintext and over 
+secure channels. 
 For our analysis we focus on {\it what} PII is sent,  {\it to whom} is the PII sent, and {\it how frequently} is PII sent.
 Then we describe a system that visualizes 
 this activity and allows users to block it.
 %To answer these questions, we rely on the controlled experiments and the \mobWild dataset.
 
-We evaluate PII in terms of two threat models. First, we assume a passive eavesdropper that can sniff 
-traffic over open WiFi APs or within a cellular provider. Any PII sent unencrypted is available to the attacker. 
-Second, we assume an attack conducted by (or on) a third-party service that is able to identify a user's fine-grained locations 
-over time. 
+%We evaluate PII in terms of two threat models. First, we assume a passive eavesdropper that can sniff 
+%traffic over open WiFi APs or within a cellular provider. Any PII sent unencrypted is available to the attacker. 
+%Second, we assume an attack conducted by (or on) a third-party service that is able to identify a user's fine-grained locations 
+%over time. 
 
 \begin{table*}[t]    
     \centering
@@ -49,28 +49,29 @@ Third Party&Android&732&3 (0.4\%)&57 (7.8\%)&3 (0.4\%)&0 (0\%)&85 (11.6\%)&6 (0.
 
 \subsection{Controlled experiments}
 
-For our experiments, we created fake user accounts with fake contact
-information, and fake Twitter and Facebook accounts.  Our goal is to
+For our controlled experiments, we created dummy user accounts with fake contact
+information (see \S\ref{sec:dataset-contr-exper}).  Our goal is to
 detect if any PII---email
-address, phone number, IMEI number---stored on the device is leaked
-across the network over HTTP or HTTPS (using the SSL bumping plugin).
+address, phone number, IMEI---stored on the device is leaked
+across the network over HTTP or HTTPS.
 Some of this information is required for normal app operation; however, such information should
-never travel across the network in plaintext (HTTP).  We ran the experiments for ten minutes on each app.
+never travel across the network in plaintext (HTTP).  
 
-In Table~\ref{tab:pii}, we present the different PII leaked by both Android and iPhone apps.  We observe that
-the IMEI, a unique identifier tied to a phone, is the most commonly
-leaked PII by Android apps.  This IMEI can be used to track
-and correlate a user's behavior across Web services.  Similarly, we
-observe that Android apps leak the Android ID, a unique
-identifier tied to an Android device.  In Table~\ref{tab:pii}, we also
-observe that other information like contacts, emails, and passwords
+In Table~\ref{tab:pii}, we present the different PII leaked by Android and iPhone apps. 
+The IMEI, a unique identifier tied to a phone, and the Android ID (tied an Android installation) 
+are the most commonly
+leaked PII by Android apps.  These can be used to track
+and correlate a user's behavior across Web services. Table~\ref{tab:pii} 
+shows that other information like contacts, emails, and passwords
 are leaked in the clear.  The email address used to sign
 up for the services was leaked in the clear by 13 iOS and 3 Android
 apps from our set of popular apps.
 
 While only one Android app (belonging to the \emph{Photography} category) leaked a password in the clear, 
 we were surprised to learn that six of the most popular iOS apps send user 
-credentials in the clear, \emph{including the password}. Particularly disconcerting 
+credentials in the clear, \emph{including the password}. 
+
+Particularly disconcerting 
 is our observation that an app in the Medicine category -- which the provider claims has ``\emph{1 million active members 
 of which 50\% are US physicians}'' -- sends the user's first name, last name, 
 email, password, and zip code in the clear. Given US physician access to highly sensitive 
@@ -122,7 +123,7 @@ that received either the IMEI or Device ID in the clear or over HTTPS,
 
 We note that our observations are a conservative estimate of PII leakage. Specifically, 
 we cannot detect PII leakage if the data is obfuscated (\eg via hashing). Regardless, 
-our study showed that a significant amount of PII leaks not only through unobfuscated 
+our study shows that a significant amount of PII leaks not only through unobfuscated 
 channels but even unencrypted ones. 
 
 %In summary, we use our controlled experiments to identify PII leaks on
@@ -137,9 +138,9 @@ channels but even unencrypted ones.
 
 \subsection{PII in the Wild}
 
-In the previous section, we focused on controlled experiments. We now
-analyze the \mobWild{} dataset. We do not use SSL bumping on this data 
-for privacy reasons. Instead, we focus on information is leaked in the clear.
+We now
+analyze the \mobWild{} dataset. Note that we do not use SSL bumping on this data 
+for privacy reasons. 
 
 %\begin{figure}[tb]
 %\subfloat[Apps leaking location in the clear.]{\label{fig:location-cloud} \includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_location_image.png}}
@@ -161,25 +162,22 @@ for privacy reasons. Instead, we focus on information is leaked in the clear.
 
 %In Figure~\ref{fig:location-wordcloud}, we present a \emph{word cloud} of
 %the apps that send the location information of the devices.
-We observe that a bus service app (\emph{One Bus Away}), the
+\noindent\textbf{Location leaks.} We observe that a bus service app (\emph{One Bus Away}), the
 app that manages the iOS homescreen (\emph{SpringBoard}), and
 weather apps (\emph{TWC}, \emph{Weather}, and \emph{Hurricane})
 were responsible for more 78\% of the flows that sent the location
 information in the clear. Other apps that do not require location information, 
 such as YouTube, Epicurious and EditorsChoice, also leaked GPS coordinates.
-Further, \emph{SpringBoard} (the app responsible for managing the home screen of iOS devices) sends location information in the clear to fetch weather information from Yahoo servers. 
-We observe that \emph{SpringBoard} leaked location information for 11 devices in the \mobWild dataset, a maximum of 14 leaks per day was observed for one device. 
-We also observe that these devices include the iPodtouch device and all the iPhones in \mobWild, however, we do not observe such leaks for the iPad devices in the \mobWild dataset.  
+Further, \emph{SpringBoard} sends location information in the clear to fetch weather information from Yahoo servers. 
+We observe that \emph{SpringBoard} leaked location information for 11 devices in the \mobWild dataset, a maximum of 14 leaks per day was observed for one device, sufficient to expose a user's daily movements. 
+%We also observe that these devices include the iPodtouch device and all the iPhones in \mobWild, however, we do not observe such leaks for the iPad devices in the \mobWild dataset.  
 
 
-In addition, we observe that the device ID and IMEI number of
-devices in the \mobWild dataset are leaked in the clear.  Based on our
-classification methodology, we observe that the IMEI number and device
-ID is leaked by Web browsers; we do not observe any other app 
-signature in non-browser flows leaking these IDs in the \mobWild dataset.  As in the case of
-controlled experiments, A\&A sites are the most popular
-destination for the IMEI number leaks.  Among the 16 sites that received 
-the IMEI number in the clear, 10 are A\&A sites;
+\noindent\textbf{Unique ID leaks.} The device ID and IMEI are frequently leaked 
+in the clear by mobile Web browsers, but no apps in \mobWild do so.  
+As in the case of controlled experiments, A\&A sites are the most popular
+destination for the IMEI leaks.  Among the 16 sites that received 
+the IMEI in the clear, 10 are A\&A sites;
 the rest of the sites includes sites for games, news, and manufacturer
 updates.
 
@@ -209,7 +207,7 @@ scorecardresearch.com &  21 & 11 & 10 \tabularnewline
 \label{tab:top-trackers}
 \end{table}
 
-In Table~\ref{tab:top-trackers}, we present the number of devices in the \mobWild dataset that contact the most popular A\&A sites, an activity that is receiving considerable attention~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}.
+In Table~\ref{tab:top-trackers}, we present the number of devices in the \mobWild dataset that contact the most popular A\&A sites.
 We observe that all the devices in the \mobWild dataset contacted doubleclick.com, an ad site, and google-analytics.com, a tracking site. 
 Further, 66.12\% of the ads and analytics traffic volume in the \mobWild dataset was from browsers, 6.46\% of the
 traffic contained a blank user-agent field, and 4.8\% of the traffic contained a signature of \emph{Google-Analytics} library.
@@ -218,12 +216,13 @@ The rest of the traffic contained signatures of other apps such as Facebook, Pan
 \subsection{Revealing and Controlling PII Leaks}
 \label{subsec:recon}
 
-Given the extensive nature of tracking over mobile devices, we developed a tool, 
-\emph{ReCon} that allows users to reveal and visualize their devices' tracking, and the 
-apps that facilitate this tracking, with the help of a web-based interfaces similar to that of 
-Mozilla Collusion~\cite{collusion}. \emph{ReCon} provides a visual interface that allows 
- users to specify block lists for connections based on (app, 3rd party) tuples. A demo of our tool is 
- located at \url{http://goo.gl/A17h9}. 
+Given the extensive nature of tracking over mobile devices, we developed  
+\emph{ReCon}, a tool to visualize how user's are being tracked as they use their devices. 
+\emph{ReCon} provides a visual interface similar to Mozilla Collusion~\cite{collusion}; instead of 
+visualizing only websites, our tool shows apps and the 3rd party sites they contact. Figure~\ref{fig:recon} shows screen captures of our tool, with the default view of trackers contacted by apps (left) and how 
+hovering/tapping on a tracker reveals the apps contacting the tracker (right). Similarly, hovering/tapping on an app 
+highlights all the trackers contacted by the app.
+
 %\tbd{A demo of this can be found at ...}
 %\tbd{Add some comment about ConVis (Nick's work), say that it's another 
 %contribution in that it helps average users visualize their tracking and PII, 
@@ -242,16 +241,17 @@ Mozilla Collusion~\cite{collusion}. \emph{ReCon} provides a visual interface tha
 % SpringBoard/50 CFNetwork/609.1.4 Darwin/13.0.0 \tabularnewline
 % \hline
 % \end{tabular}}\newline
-\subfloat[Highlighted view, showing apps tracked by Scorecard Research.]{\label{fig:recon-highlight} \includegraphics[width=0.47\columnwidth]{figures/ReConHighlight.pdf}}
-\caption{Illustration of the \emph{ReCon} tool, allowing users to visualize how they are being tracked by apps, and install custom filters by clicking on links to ``remove'' them. }
+\subfloat[View showing tracking by Scorecard Research.]{\label{fig:recon-highlight} \includegraphics[width=0.47\columnwidth]{figures/ReConHighlight.pdf}}
+\caption{Screen captures of the \emph{ReCon} tool, allowing users to visualize how they are being tracked by apps, and install custom filters by clicking on links to ``remove'' them. }
 \label{fig:recon}
 \vspace{\postfigspace}
 \end{figure}
 
-Figure~\ref{fig:recon} depicts our visualization, showing the default view of trackers contacted by apps and how 
-hovering/tapping on a tracker reveals the apps contacting the tracker. Similarly, hovering/tapping on an app 
-highlights all the trackers contacted by the app. Users can click/tap on a link to ``destroy'' it -- installing a custom 
-filter for the corresponding (app, tracker) pair. 
+In addition to revealing privacy leaks, \emph{ReCon} allows users to block them. Specifically, users can 
+click/tap on a link to ``destroy'' it -- installing a custom 
+filter for the corresponding (app, tracker) pair. To make this approach practical, we are developing 
+an interface to crowdsource block lists, much like how Web browser ad-blocking filters are maintained 
+and distributed. A demo of our tool is located at \url{http://goo.gl/A17h9}. \drc{Update this link}
 
 
 %%% Local Variables: 
