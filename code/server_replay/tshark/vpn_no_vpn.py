@@ -59,6 +59,7 @@ def main():
     
     python_lib.read_args(sys.argv, configs)
     
+    configs.set('instance', python_lib.Instance(configs.get('instance')))
     configs.show_all()
     configs.get('instance').show()
     
