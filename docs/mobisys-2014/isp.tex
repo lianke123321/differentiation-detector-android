@@ -21,13 +21,14 @@ a banner ad is replaced by information about the local airport.
 \includegraphics[width=0.9\linewidth]{figures/injectioncrop.png}
 \caption{Screen capture of content injection by a Chinese ISP in November, 2013. The 
 highlighted region at the bottom should be an advertisement from a US company. }
+\vspace{\postfigspace}
 \label{fig:tripnet-example}
 \end{figure}
 
 
 This problem of Web interference was first highlighted by Reis~\etal~\cite{reis:tripwires}. 
-The authors demonstrated that although a small percent of users were affected by in-flight changes, those changes tend to introduce vulnerabilities including cross-site scripting (XSS) attacks~\cite{reis:tripwires}. 
-They proposed and deployed \emph{Web Tripwires}, a Javascript code to detect in-flight page changes. 
+The authors demonstrated that although a small percent of users were affected by in-flight changes, those changes tend to introduce vulnerabilities including cross-site scripting (XSS) attacks. 
+They proposed and deployed \emph{Web Tripwires}, Javascript code to detect in-flight page changes. 
 The main limitation of \emph{Web Tripwires} is that it requires each Web site to modify their content to include a tripwire.
 
 In \meddle, we extended tripwires to alleviate this limitation. 
@@ -56,6 +57,7 @@ tripwire causes the browser to reload the Web page using the address of a
 transparent proxy server that is accessed using an unencrypted connection.
 After the proxied version of the page is loaded, the browser (or a meddlebox)
 compare the two pages to identify manipulation. }
+\vspace{\postfigspace}
 \label{fig:tripnet}
 \end{figure}
 

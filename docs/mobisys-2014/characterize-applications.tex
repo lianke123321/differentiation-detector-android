@@ -44,6 +44,7 @@ Third Party&Android&732&3 (0.4\%)&57 (7.8\%)&3 (0.4\%)&0 (0\%)&85 (11.6\%)&6 (0.
     \end{tabular}
     \end{small}
     \caption{Summary of PII leaked in plaintext (HTTP) by Android and iPhone apps. \emph{The popular iOS apps tend to leak the location information in the clear while Android apps leak the IMEI number and Android ID in the clear. }}
+    \vspace{\postfigspace}
     \label{tab:pii}
 \end{table*}
 
@@ -78,6 +79,8 @@ email, password, and zip code in the clear. Given US physician access to highly 
 data like medical records, we believe it is particularly important for this app to protect 
 user credentials (which are often used for multiple services). 
 
+We compared the overlap of the top hundred apps for iOS and Android. 26 apps fell into this category. Only 2 apps had the same data leakage in both operating systems: TuneIn Player leaked Location and Yahoo! Mail leaked Android ID and an iOS serial number. Another 2 apps both leaked data, but different types: Snapchat leaked Android ID and IMEI but leaked username in iOS and Brightest Flashlight leaked Android ID and leaked location in iOS. 2 apps leaked only in iOS (Groupon and Pandora), while 11 apps leaked data only in Android. However, most of what was leaked in Android was the Android ID, which is not as bad as leaking IMEI, since the ID is reset when the device is wiped. However, 4 of those 11 leaked Location and 1 leaked IMEI, so Android may still be a poorer choice for privacy. 
+
 % For your eyes only ;)
 %services.epocrates.com  Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7   1370172894.1735 JXMXaFcr2Pd 10.11.4.52  55904   63.241.66.139   80  7   GET /userprofile/userprofile/userprofile/userprofile?datatype=json&os=6.1.3&device_model=iPhone&appVersion=5.2&appId=nc-2&data={"countryId":"10","lastName":"Test","firstName":"Meddle","password":"epocratespwdW1","passwordConfirm":"epocratespwdW1","email":"mailmeddle@yahoo.com","occupationId":"56","zipCode":"98105"}&action=useraccount&platform=14&subaction=createuser    -   0   40001   200 OK  -   -   -   (empty) -   -   -   text/plain  -   -   -   0       -   -   shen
 
@@ -102,7 +105,7 @@ user credentials (which are often used for multiple services).
        \hline
     \end{tabular}
     \end{small}
-    \caption{Top 10 hosts that receive the IMEI or Device ID over HTTPS. \emph{Hosts are ordered by the number of flows that send the IMEI number, followed by the number of flows that send the device ID over HTTPS. Four of the top 10 hosts that receive this information are ads and analytics sites.}}
+    \caption{Top 10 hosts that receive the IMEI or Device ID over HTTPS. \emph{Hosts are ordered by the number of flows that send the IMEI number, followed by the number of flows that send the device ID over HTTPS. Four of the top 10 hosts that receive this information are ads and analytics sites.\drc{This will probably be cut.}}}
     \label{tab:pii-leakage-https-sites}
     \vspace{\postfigspace}
 \end{table}
@@ -169,7 +172,7 @@ were responsible for more 78\% of the flows that sent the location
 information in the clear. Other apps that do not require location information, 
 such as YouTube, Epicurious and EditorsChoice, also leaked GPS coordinates.
 Further, \emph{SpringBoard} sends location information in the clear to fetch weather information from Yahoo servers. 
-We observe that \emph{SpringBoard} leaked location information for 11 devices in the \mobWild dataset, a maximum of 14 leaks per day was observed for one device, sufficient to expose a user's daily movements. 
+We observe that \emph{SpringBoard} leaked location information for 11 devices in the \mobWild dataset, a maximum of 14 leaks per day was observed for one device, sufficient to expose a user's daily movements to anyone tapping Internet connections~\cite{nsa:globaltracking}. 
 %We also observe that these devices include the iPodtouch device and all the iPhones in \mobWild, however, we do not observe such leaks for the iPad devices in the \mobWild dataset.  
 
 
@@ -204,6 +207,7 @@ scorecardresearch.com &  21 & 11 & 10 \tabularnewline
 \end{small}
 \caption{The top 5 ads and analytics sites that were contacted by the devices in our dataset.
 \emph{All 26 devices in} \mobWild \emph{contacted doubleclick.net and google-analytics.com}.}
+\vspace{\postfigspace}
 \label{tab:top-trackers}
 \end{table}
 

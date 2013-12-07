@@ -67,6 +67,7 @@ a \meddle frontend, which includes services such as a VPN proxy, Web proxy and
 traffic replay server. VPN proxy traffic is forwarded to a \meddlebox, which provides 
 software middlebox services that measure and/or interpose on network flows before 
 relaying the traffic to the public Internet.  }
+\vspace{\postfigspace}
 \label{fig:architecture}
 \end{figure}
 
@@ -159,6 +160,7 @@ will use SSL bumping to remove PII from user-generated traffic only when users o
 \end{center}
 \caption{Plugin infrastructure for \platname, which allows traffic to pass through 
 a series of middlebox services before being forwarded to the destination. }
+\vspace{\postfigspace}
 \label{fig:packet-monitoring-solution}
 \end{figure}
 
@@ -269,9 +271,9 @@ data plans in the US tend to cost \$30-\$90 per month -- more than two orders of
 
 %\end{packedenumerate}
 
-\subsection{Generalizability and Limitations}
+\subsection{Discussion}
 
-\subsubsection{Generalizability} A system for improving visibility and control over Internet traffic from mobile 
+\mypara{Generalizability} A system for improving visibility and control over Internet traffic from mobile 
 devices can be implemented at the endpoints (\eg in the OS), in the network (\eg a hardware middlebox), 
 somewhere else in the middle (our approach). \meddle is not intended as a blanket replacement for 
 these alternative approaches; rather it allows us to explore the opportunities for improving the state of the 
@@ -286,7 +288,7 @@ and at scale. \meddle allows us to identify and block unobfuscated PII in networ
 OS modifications or taint tracking. Regardless of the ultimate optimal solution, we can use \meddle today to inform the design 
 and deployment of future functionality in OSes and for in-network devices. 
 
-\subsubsection{Limitations} The following technical limitations can impact \meddle's coverage.
+\mypara{Limitations} The following technical limitations can impact \meddle's coverage.
 
 %\begin{packeditemize} 
 \noindent\emph{At most one VPN tunnel.}
@@ -302,7 +304,8 @@ A solution to this problem is to use a \meddle{} instance with an appropriate IP
 
 \noindent\emph{ISP support.}
 Some ISPs block VPN traffic, which prevents access to our current \meddle implementation. 
-We note that few ISPs block VPN traffic, and there is an incentive not to block VPN traffic to support enterprise clients.
+We note that few ISPs block VPN traffic, and there is an incentive not to block VPN traffic to 
+support enterprise clients.
 
 \noindent\emph{IPv6.}
 \meddle{} cannot be currently used on networks using IPv6 because IPv6 is not fully supported by mobile devices. 
