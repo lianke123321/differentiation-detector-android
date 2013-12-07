@@ -3,6 +3,15 @@
 by: Arash Molavi Kakhki (arash@ccs.neu.edu)
     Northeastern University
     Dec 2013
+    
+USAGE:  python throughput_tshark.py pcap_file=[] interval=[] outfile=[]
+
+        pcap_file: the file you want to analyze. This input is mandotory
+        interval : the interval size for calculating throughput (in seconds)
+                   default: 1 second
+        outfile  : name of the output file. Format is "interval [tab] throughput"
+                   default is xput.txt
+                   throughput is in bytes/second
 """
 
 import os, sys, subprocess, re
@@ -41,13 +50,18 @@ def run(args):
     configs = Configs()
     
     '''Defaults'''
-    configs.set('pcap_file', '../data/dropbox_d/dropbox_d.pcap')
     configs.set('interval', 1)
     configs.set('outfile', 'xput.txt')
     
     '''Command line arguments'''
     python_lib.read_args(args, configs)
-    
+
+    try:
+        configs.get('pcap_file')
+    except:
+        print "USAGE: python throughput_tshark.py pcap_file=[]"
+        print 'You MUST give a pcap_file as input'
+        sys.exit(-1)
     
     p = subprocess.Popen(['tshark', '-qz', ('io,stat,' + str(configs.get('interval'))), '-r', configs.get('pcap_file')], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, err = p.communicate()
