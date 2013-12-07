@@ -46,21 +46,9 @@ Enter password: <meddle_password_for_this_server>
 $> iptables -A INPUT -p tcp -s localhost --dport 3306 -j ACCEPT
 $> iptables -A INPUT -p tcp --dport 3306 -j REJECT
   
-# CREATE THE Tables required by Meddle
-# Table where the user configurations are present
-mysql> CREATE TABLE UserConfigs (userID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, userName VARCHAR(512), filterAdsAnalytics INT NOT NULL DEFAULT 0, UNIQUE(userName)) ENGINE="InnoDB";
+# Create the tables using the CreateTable.sql file
 
-# Table where the tunnel information is kept. This is used for book keeping and is currently not used. 
-mysql> CREATE TABLE UserTunnelInfo (rowID SERIAL PRIMARY KEY, userID INT NOT NULL, clientTunnelIpAddress VARCHAR(64) NOT NULL, clientRemoteIpAddress VARCHAR(64) NOT NULL, serverIpAddress VARCHAR(64) NOT NULL, timestamp TIMESTAMP NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, startStopFlag BOOLEAN NOT NULL DEFAULT 0) ENGINE="InnoDB"; 
-#mysql> ALTER TABLE UserTunnelInfo ADD INDEX (timestamp);
+mysql -u meddle -p MeddleDB < CreateTables.sql
 
-# For each user add this entry to he table while creating users. This step shall be performed by the scripts to manage users. 
-# mysql> INSERT INTO UserConfigs VALUES (0, 'arao-ipod', 0);
-
-# Table that logs the change in configuration parameters.
-mysql> CREATE TABLE UserConfigChange(userID INT NOT NULL,  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, configVariable VARCHAR (512), newValue VARCHAR (512)) ENGINE="InnoDB";
-
-# Table keeping the list of Interested Users
-mysql> CREATE TABLE InterestedUsers(rowID SERIAL PRIMARY KEY, timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, emailAddress VARCHAR (512), responded BOOLEAN NOT NULL DEFAULT 0) ENGINE="InnoDB";  
-
+# Repeat the steps for .sql files in the PopulateDB/ folder 
 # Hurray! Database is setup
