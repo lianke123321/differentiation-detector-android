@@ -17,16 +17,17 @@ broad visibility into mobile network traffic to identify problems, but also give
 to build systems to address those problems. 
 
 This paper presents \meddle:  a platform for measuring and interposing on mobile-device (\eg smartphones and tablets) 
-traffic regardless of where and how the device connects to the Internet. We rely on two key observations 
-that enable our system to provide broad visibility and strong control over network flows from a mobile device. 
-First, we 
+traffic regardless of where and how the device connects to the Internet. Our approach is to combine software middleboxes 
+with VPN proxying, enabling our system to provide broad visibility and strong control over network flows from a mobile device. 
+
+\mypara{Approach} Our approach is based on the following observations. We 
  leverage the fact that 
 the vast majority of Internet-enabled mobile devices provide the ability to connect to a remote host over a virtual private 
 network (VPN). This allows us to achieve broad visibility across a wide range of devices and networks by using indirection 
 to tunnel mobile-device Internet traffic to a proxy that serves as a monitoring vantage point.
-Second, we observe that  
+We also observe that  
 software middleboxes deployed on cloud computing services give us a practical way to achieve strong control over 
-network flows sent to such a proxy. This approach allows us to deploy and distribute large numbers 
+network flows sent to such a proxy. This allows us to deploy and distribute large numbers 
 of middlebox services (\eg compression, content filtering, malware blocking, Web caching), quickly, easily and at scale~\cite{sherry:middleboxes} without 
 the need to deploy hardware in homes~\cite{bismark} or ISPs~\cite{wang:middleboxes}, or 
 deploy custom OSes that require rooting phones~\cite{enck:taintdroid}. 
@@ -39,7 +40,7 @@ securely tunneled out of the access network (\wifi or cell) to a software middle
 in the cloud. Once the traffic arrives at the software middlebox, we can measure those flows 
 and enforce custom user- and device-specific policies. \tbd{PG: reviewer says: does tunneling the traffic in this way impact the mobile ISPs ability to optimize their network? DC: Not sure this is the right place to address it but leaving the comment here for now.}
 
-One of the key advantages of \meddle is that it gives researchers the ability to experiment 
+\mypara{Opportunities} One of the key advantages of \meddle is that it gives researchers the ability to experiment 
 with new mobile middlebox applications on real user network flows. To convince users to adopt our 
 system, we designed \meddle with a low barrier for deployment and strong incentives for 
 user adoption. The system uses only existing device, app and network support without requiring 
@@ -84,7 +85,7 @@ privacy, block unwanted traffic, notify users of ISP interference and block malw
 In particular, we make available a new visualization tool, \emph{ReCon}, for users to track and control how 
 they are being monitored by ad and analytics services. 
 %A demo of our tool is located at \url{http://goo.gl/A17h9}. 
- We are also the first to develop tools for detecting content manipulation by ISPs (Web Tripnets) and 
+ We also develop new tools for detecting content manipulation by ISPs (Web Tripnets) and 
  service differentiation (Mobile Replay) in the mobile environment, whereas previous work focused on 
  fixed-line networks~\cite{reis:tripwires,dischinger:glasnost}. 
 % PG: Flip 2&3 or merge
