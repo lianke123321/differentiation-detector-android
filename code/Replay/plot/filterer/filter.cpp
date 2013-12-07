@@ -167,6 +167,7 @@ int main(int argc, char ** argv)
 
     // Throughput timer.
     double now_time = 0;
+    double last_time = 0;
 
     // Momentary throughput.
     long now_length = 0;
@@ -329,9 +330,16 @@ int main(int argc, char ** argv)
                 else
                 {
                 // Otherwise, write the current interval throughput and set a new interval.
+                    for (double i = double(last_time + 1) * xput_interval; i < double(now_time) * xput_interval; i += xput_interval)
+                    {
+                        xput_data << i << " " << 0 << endl;
+                        xputs.push_back(0);
+                    }
+
                     xput_data << double(now_time) * xput_interval << " " << now_length / xput_interval << endl;
                     // Keep values to in an array for median finding purposes.
                     xputs.push_back(now_length / xput_interval);
+                    last_time = now_time;
                     now_time = long(ttime / xput_interval);
                     now_length = seq2 - seq1;
                 }
@@ -420,8 +428,16 @@ int main(int argc, char ** argv)
             }
             else
             {
+                for (double i = double(last_time + 1) * xput_interval; i < double(now_time) * xput_interval; i += xput_interval)
+                {
+                    xput_data << i << " " << 0 << endl;
+                    xputs.push_back(0);
+                }
+
                 xput_data << double(now_time) * xput_interval << " " << now_length / xput_interval << endl;
+                // Keep values to in an array for median finding purposes.
                 xputs.push_back(now_length / xput_interval);
+                last_time = now_time;
                 now_time = long(ttime / xput_interval);
                 now_length = len;
             }
