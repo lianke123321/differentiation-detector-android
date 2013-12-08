@@ -65,7 +65,7 @@ The tripwire code contains information about the page content prior to traversin
 executed, the code fetches the page again to compare with the (known) unmodified page content.  
 To ensure that this fetch does \emph{not} traverse the VPN connection, we use a \emph{pigeonhole} domain 
 whose traffic traverses an untunneled interface. For example, if the original request was for \url{www.facebook.com}, 
-we send the request to \url{tripnet.meddle.mobi/www.facebook.com/}, where we run a Web proxy. 
+we send the request to \url{tripnet.meddle.mobi/www.facebook.com}, where we run a Web proxy. 
 
 When the request arrives at our proxy server, we could forward the request to the original target. In 
 practice, however, doing so would return different content due to the highly dynamic nature of most 

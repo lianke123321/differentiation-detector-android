@@ -27,14 +27,14 @@ to a remote service for coordination (\eg C\&C), exfiltration (stealing personal
 We can detect the first two cases if they use IP; we cannot detect circuit switched activity such as sending SMS or making 
 phone calls.
 
-Focusing on IP traffic, \meddle gives us two opportunities to detect and block malware activity. First, we can detect 
+\meddle gives us two opportunities to detect and block malware activity over IP. First, we can detect 
 the app binary being downloaded via a hash and block that transfer if it is identified as malware. Second, we can use network 
 behavioral analysis to identify malicious activity from apps that passed through our hash filters and successfully installed. 
 In the following paragraphs we describe how existing hash registries fail to capture most confirmed malware, how to 
 use network activity to identify and block malware and how to augment hash registries by automatically identifying the 
 malicious app binary responsible for the activity -- thus inoculating other users from this malware. Importantly, 
-this approach works at machine instead of human timescales, protecting infected users and preventing new infections 
-within minutes, not days.
+this approach works at machine instead of human timescales.%, protecting infected users and preventing new infections 
+%within minutes, not days.
 
 \mypara{Dataset} To understand malware network behavior, we use a 
 dataset consisting of 111 confirmed malicious Android APKs gathered by the Andrubis project~\cite{andrubis} in September, 2013.  
