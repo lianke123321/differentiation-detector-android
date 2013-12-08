@@ -203,46 +203,52 @@ run services on \meddle servers that are accessed via untunneled connections.
 This section describes how \meddle provides clear incentives for user adoption, a 
 low barrier to entry and reasonable performance that is easy to scale.
 
-\subsubsection{Incentives for user adoption.} \meddle presents a number of incentives 
+\mypara{Incentives for user adoption} \meddle presents a number of incentives 
 that appeal to a wide range of users. Importantly, we do not charge users for any of these 
 services.
 
 %\begin{packeditemize}
-\noindent \textbf{Improved security.} By securely tunneling all of a mobile device's traffic, users 
+\noindent \emph{Improved security.} By securely tunneling all of a mobile device's traffic, users 
 are less vulnerable to data leakage (\eg via open WiFi hotspots). 
 
-\noindent \textbf{Device-wide content filters.} We use \meddle to block content that users do 
+\noindent \emph{Device-wide content filters.} We use \meddle to block content that users do 
 not wish to access -- for all apps running on a device. The most popular instance of this is 
 device-wide ad blocking.
 
-\noindent \textbf{Privacy revelations~\cite{wetherall:revelations}.} The \emph{ReCon} tool (\S\ref{subsec:recon}) allows users to see how they are being 
+\noindent \emph{Privacy revelations~\cite{wetherall:revelations}.} The \emph{ReCon} tool (\S\ref{subsec:recon}) allows users to see how they are being 
 tracked by ad and analytic servers, and allows them to create per-connection block lists.  
 
-\noindent \textbf{ISP transparency.} We provide services that allow users to identify cases where 
+\noindent \emph{ISP transparency.} We provide services that allow users to identify cases where 
 ISPs are modifying HTTP content in flight, and when they provide differentiated service to 
 traffic crossing their networks (\S\ref{sec:isp-behavior}).
 
-\noindent \textbf{Malware detection.} \meddle uses network signatures to identify malware, block it from 
+\noindent \emph{Malware detection.} \meddle uses network signatures to identify malware, block it from 
 communicating and prevent future downloads onto other \meddle-enabled devices (\S\ref{sec:malware}).  
 %\end{packeditemize}
 
-\subsubsection{Low barrier to entry.} 
+\mypara{Low barrier to entry} 
 Manually configuring a VPN generally requires filling out five fields on an Android phone, and the VPN configuration can be distributed using a single file on iOS. 
 These configurations are primarily required to drive the key exchange algorithms required to establish the VPN tunnels.
 
 Our \meddlebox system requires only that the user can run a modern Linux OS with root privileges. This can be deployed 
 in a single-machine instance on a home computer, dedicated server or on a VM in the cloud. \meddle is currently in private beta with dedicated-server, EC2 and Aliyun deployments in the US, France and China. We will make the \meddle software publicly available.
 
-\subsubsection{Overheads} 
+\mypara{Overheads} 
 \noindent\emph{Network Latency.}
-We measured 50 VPN-connection establishment times  on both iOS (iPhone 5 / iOS 6.1) and Android (Galaxy Nexus /
-Android 4.2), for \wifi{} and cellular connections. 
+We first test indirection overhead from mobile networks to a \meddle instance. In the 
+US with EC2, delays from mobile-network egress points to EC2 nodes are on generally less than 10\,ms. 
+For other networks, we will achieve similarly low indirection overhead by placing instances in a cloud/hosting 
+provider near subscribers and use DNS redirection (\eg via Amazon's Route 53) to direct clients to nearby instances. 
+
+The other source of network delays is connection establishment time, incurred once per session. We measured 
+50 VPN-connection establishment times on both iOS (iPhone 5 / iOS 6.1) and Android (Galaxy Nexus /
+Android 4.2), for \wifi{} and cellular connections. We conduct tests in rapid succession to prevent RRC demotion.
 The \meddle server was running on a university network. 
 For Android (using IKEv2), the maximum establishment time was 0.81 seconds on \wifi{} and 1.59 seconds on cellular. 
 For iOS (using IKEv1), the connection takes longer due to the older protocol version: we observe a maximum of 2 seconds on \wifi{} and 2.18 seconds on cellular. 
 Because each VPN session supports many flows, the amortized cost of connecting is  small. 
-\tbd{Cite results from latency to home gateways based on DSL results in PAM and IMC.}
-\tbd{Address comments in conext review on latency}
+%\tbd{Cite results from latency to home gateways based on DSL results in PAM and IMC.}
+%\tbd{Address comments in conext review on latency}
 
 \noindent\emph{Power Consumption.}
 Mobile devices expend additional power to establish, maintain and encrypt data for a VPN tunnel. 
@@ -250,7 +256,7 @@ To evaluate the impact on battery, we used a power meter to measure the draw fro
 We run 10-minute experiments with and without the VPN enabled. 
 For each experiment, we used an activity script that included Web and map searches, Facebook interaction, e-mail and video
 streaming. 
-The VPN leads to a 10\% power overhead. \tbd{min, max, median for results given by dave}. 
+The VPN leads to a 10\% power overhead. 
 For iOS devices, we relied on the battery readings provided by iOS because we cannot attach a power meter directly to the battery.
 We again found an approximately 10\% power overhead of using VPNs when we drained a fully charged battery while performing the operations performed during the tests for Android devices.  
 
@@ -302,7 +308,7 @@ can run on a server of their choice.
 Currently iOS and Android support exactly one VPN connection at a time. 
 This allows \meddle to measure traffic over either \wifi or cellular interfaces, but not both at once.
 The vast majority of traffic uses only one of these interfaces, and VPNs can be used to tunnel that traffic.
-\tbd{MPTCP on iOS 7??}
+%\tbd{MPTCP on iOS 7??}
 
 \noindent\emph{Proxy location.} 
 When traffic traverses \meddle, destinations will see the \meddle box address, not the device IP, as the source. 
