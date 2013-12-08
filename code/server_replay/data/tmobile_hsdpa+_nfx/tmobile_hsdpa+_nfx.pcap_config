@@ -1,0 +1,5 @@
+[Section1]
+all_hash = False
+pcap_file = ../data/tmobile_hsdpa+_nfx/tmobile_hsdpa+_nfx.pcap
+number_of_servers = 23
+

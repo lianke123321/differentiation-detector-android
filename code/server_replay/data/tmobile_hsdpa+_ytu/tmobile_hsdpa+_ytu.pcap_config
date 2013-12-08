@@ -1,0 +1,5 @@
+[Section1]
+all_hash = False
+pcap_file = ../data/tmobile_hsdpa+_ytu/tmobile_hsdpa+_ytu.pcap
+number_of_servers = 6
+
