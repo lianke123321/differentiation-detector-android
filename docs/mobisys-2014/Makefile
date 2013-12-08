@@ -1,13 +1,5 @@
 LATEX= pdflatex
 BIBTEX= bibtex
-XDVI = xdvi
-DVIPDF= dvipdfm -p letter
-PS2PDF= ps2pdf
-DVIPS= dvips -t letter -P pdf
-RM = /bin/rm -f
-CAT = cat
-ISPELL = ispell
-SORT = sort
 
 MAINDOC = meddle-main
 MAINPDF = ${MAINDOC}.pdf
