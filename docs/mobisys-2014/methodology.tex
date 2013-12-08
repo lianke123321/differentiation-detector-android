@@ -63,7 +63,7 @@ ground-truth information for a large number of apps running in a controlled
 setting for a short period of time. To understand the network behavior of 
 devices with real users "in the wild" over longer time periods, we conducted 
 an IRB-approved measurement study with a small set of subjects, from 
-Oct. 15, 2012 to Sep. 01, 2013.\footnote{The measurement study is ongoing, we report a subset of results. \tbd{Removed recent from this sentence.}}
+Oct. 15, 2012 to Sep. 01, 2013.\footnote{The measurement study is ongoing, we report a subset of results.}
 
 We deployed two \platname servers, one in the USA and one in France
 that were used by 26 devices: 10 iPhones, 4 iPads, 1 iPodTouch, and 11
@@ -112,8 +112,8 @@ obtain a comprehensive view of Internet traffic from mobile devices.
 \noindent\textbf{Observation 1: \emph{Devices use a variety of networks and use each differently.}} First, we describe the diversity 
 of networks that our users connected to. 
 We infer the access technology (WiFi or cellular) using the AS description from \emph{WHOIS} data for each IP address used by a mobile device.
-Based on this classification, the \mobWild dataset consists of traffic from 65 distinct ASes\drc{How many are academic?}, of which 8 are cellular ASes.
-\tbd{AR: 7 of these ASes belong to Universities -- however if the university is being served by an ISP then I cannot identify it}
+Based on this classification, the \mobWild dataset consists of traffic from 65 distinct ASes, of which 8 are cellular ASes and 7 are university networks.
+%\tbd{AR: 7 of these ASes belong to Universities -- however if the university is being served by an ISP then I cannot identify it}
 During the measurement study, each device connected to our \platname server from at most two distinct cellular ASes. 
 In contrast, a median of 4 \wifi ASes were observed per device and for one device we observed traffic from 36 different \wifi ASes spread across 5 countries.
 In terms of traffic volumes, collectively our users' who had a cellular data plan for their devices transferred 24-56\% of their traffic over cellular and the remainder over WiFi. 
@@ -213,7 +213,7 @@ for most popular apps; we then develop techniques to improve this mapping and ap
 \drc{Update with Ashwin's thesis?}
 \tbd{Added text}
 Previous works have used these fields in combination with other HTTP header fields to classify and analyze HTTP flows.
-However, their focus was to detect misbehaving sources of HTTP traffic such as bots or viruses~\cite{sommers:cellwificomp, perdisci:behavioralclustering, yegneswaran:nemean}, or to identify the category of the apps---gaming, photography,\etc---generating the HTTP flows~\cite{maier:mobtraffic,xu:appusage,falaki:imcphones,falaki:smartphoneusage}.
+However, their focus was to detect misbehaving sources of HTTP traffic such as bots or viruses~\cite{sommers:cellwifi, perdisci:malwaresig, yegneswaran:nemean}, or to identify the category of the apps---gaming, photography,\etc---generating the HTTP flows~\cite{maier:mobtraffic,xu:appusage,falaki:mobileusage,falaki:smartphoneusage}.
 Rather that limiting ourselves to category of apps, we now show that the HTTP headers, in particular the \useragent and \httphost fields, can be used to identify the apps and Web services responsible for the HTTP flows.
 
 \begin{table} 
@@ -356,7 +356,7 @@ In the first phase we use the port number and hostname to identify the service a
 The five most popular groups that we found in our dataset are social network, mail, media, instant messages, and notification.
 For example, flows to \emph{facebook.com}, \emph{twitter.com}, \emph{plus.google.com} are grouped as social networks.
 Traffic to well known email ports such as TCP port 993, and traffic to hosts such as \emph{mail.google.com} are classified as mail traffic.
-Similarly, we use the documentation for notification services to identify the ports and hostnames used by notification services and instant messages~\cite{gcm, facebook:mqtt}.
+Similarly, we use documented ports to identify notification services (Android push) and instant messages (Facebook Messenger).
 
 In the second phase, we group hostnames that do not contain details of Web services.
 For example, the hostname \emph{fbcdn-photos-a.akamaihd.net} is a strong indication that the traffic is due to Facebook (due to \emph{fbcdn}), while \emph{www.googleapis.com} hides the underlying app and Web services.
