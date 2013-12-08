@@ -76,22 +76,26 @@ class Configs(object):
     def __init__(self, config_file = None):
         self._Config = ConfigParser.ConfigParser()
         self._configs['action_count'] = 0
+        self._maxlen = 0
         if config_file != None:
             read_config_file(config_file)
     def read_config_file(self, config_file):
         self._Config.read(config_file)
         for section in self._Config.sections():
             for option in self._Config.options(section):
-                self._configs[option] = self._Config.get(section, option)
+                self.set(option, self._Config.get(section, option))
+#                self._configs[option] = self._Config.get(section, option)
     def get(self, key):
         return self._configs[key]
     def set(self, key, value):
         self._configs[key] = value
+        if len(key) > self._maxlen:
+            self._maxlen = len(key)
     def show(self, key):
         print key , ':\t', value
     def show_all(self):
         for key in self._configs:
-            print '\t', key , ':\t', self._configs[key]
+            print '\t', key.ljust(self._maxlen) , ':', self._configs[key]
     def reset_action_count(self):
         self._configs['action_count'] = 0
     def reset(self):
@@ -115,9 +119,11 @@ class Instance(object):
         self.username = instances[instance]['username']
         self.ssh_key  = instances[instance]['ssh_key']
     def show(self):
-        print '\tname     :', self.name
-        print '\thost     :', self.host
-        print '\tusername :', self.username
-        print '\tssh_key  :', self.ssh_key
+        print '\n\tInstance:'
+        print '\t\tname     :', self.name
+        print '\t\thost     :', self.host
+        print '\t\tusername :', self.username
+        print '\t\tssh_key  :', self.ssh_key
+        print '\n'
     
         
