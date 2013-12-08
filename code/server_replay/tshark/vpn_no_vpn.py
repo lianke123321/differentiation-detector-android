@@ -52,34 +52,35 @@ def main():
     
     PRINT_ACTION('Creating configs', 0)
     configs = Configs()
-#     configs.set('server-host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
-#     configs.set('server-port', 10001)
-#     configs.set('auto-server', False)
+    configs.set('server-host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
+    configs.set('server-port', 10001)
+    configs.set('auto-server', False)
     configs.set('rounds', 1)
     
-    python_lib.read_args(sys.argv, configs)
+    python_lib.read_args(sys.argv[1:], configs)
     
     configs.set('instance', python_lib.Instance(configs.get('instance')))
     configs.show_all()
     configs.get('instance').show()
     
-#     if configs.get('auto-server'):
-#         PRINT_ACTION('Sending request to the server', 0)
-#         url = ('http://' + configs.get('server-host') + ':' + str(configs.get('server-port')) 
-#             + '/re-run?pcap_folder=' + configs.get('pcap_folder'))
-#         response = urllib2.urlopen(url).read()
-#         print '\n', response
-#         if 'Busy! Try later!' in response:
-#             sys.exit(-1)
-#         PRINT_ACTION('Giving server 10 seconds to get ready!', 0)
-#         time.sleep(10)
+    if configs.get('auto-server'):
+        PRINT_ACTION('Sending request to the server', 0)
+        url = ('http://' + configs.get('server-host') + ':' + str(configs.get('server-port')) 
+            + '/re-run?pcap_folder=' + configs.get('pcap_folder'))
+        response = urllib2.urlopen(url).read()
+        print '\n', response
+        if 'Busy! Try later!' in response:
+            sys.exit(-1)
+        PRINT_ACTION('Giving server 10 seconds to get ready!', 0)
+        time.sleep(10)
     
     PRINT_ACTION('Firing off', 0)
     for i in range(configs.get('rounds')):
-        print 'DOING ROUND: ', i+1
+        print '\nDOING ROUND: {} -- VPN ON'.format(i+1)
         run_one(i, vpn=True)
+        print '\nDOING ROUND: {} -- VPN OFF'.format(i+1)
         run_one(i, vpn=False)
-        print 'Done with round :', i+1
+        print 'Done with round :{}\n'.format(i+1)
     
 if __name__=="__main__":
     main()
