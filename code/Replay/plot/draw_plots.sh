@@ -18,10 +18,16 @@ mkdir ../data/generated_plots
 mkdir ../data/text_pcaps
 
 echo Making the filterer...
+
 cd filterer
 make >/dev/null
 cd ..
+
 cd rtt
+make >/dev/null
+cd ..
+
+cd xput
 make >/dev/null
 cd ..
 
@@ -46,6 +52,24 @@ do
     echo echo File: `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'` \>$name.rtt.txt >>filterit.sh
     echo tcptrace -lr `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'`\| awk \'/RTT min/,/RTT stdev/\' \>\>$name.rtt.txt\; >>filterit.sh
     echo cat meta.txt \>$name.stats.txt\; >>filterit.sh
+    echo tshark -qz io,stat,0.1 -r ../../pcaps/$f \| ../../../plot/xput/xput xput.txt \>\>$name.stats.txt\; >>filterit.sh
+    echo 'set style data lines
+set title "Throughput"
+set key off
+set xlabel "Time (seconds)"
+set ylabel "Throughput (KB/s)"
+set term postscript color eps enhanced "Helvetica" 16
+set size ratio 0.5
+# Line style for axes
+set style line 80 lt 0
+set grid back linestyle 81
+set border 3 back linestyle 80
+set xtics nomirror
+set ytics nomirror
+set out "xp.ps"
+plot "xput.txt" using 1:($2/1e3) with lines lw 3' >xputplot.gp
+    echo gnuplot xputplot.gp\; >>filterit.sh
+    echo convert -density 1000 xp.ps -scale 2000x1000 xp.jpg >>filterit.sh
     echo cat $name.rtt.txt \| ../../../plot/rtt/rtt \>\>$name.stats.txt\; >>filterit.sh
     echo rm -rf $name.rtt.txt\; >>filterit.sh
     echo rm -rf meta.txt\; >>filterit.sh

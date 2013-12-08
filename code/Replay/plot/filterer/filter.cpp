@@ -164,9 +164,10 @@ int main(int argc, char ** argv)
 
     // Map of SEQs.
     vector<string> seqs;
-
+/*
     // Throughput timer.
     double now_time = 0;
+    double last_time = 0;
 
     // Momentary throughput.
     long now_length = 0;
@@ -179,7 +180,7 @@ int main(int argc, char ** argv)
 
     // Throughput file.
     ofstream xput_data("./xput.txt");
-
+*/
     // Metadata file.
     ofstream meta("meta.txt");
 
@@ -234,7 +235,7 @@ int main(int argc, char ** argv)
             // Reset the "acceptable TCP packet" flag.
             flag = false;
             // Add to the length for the current throughput interval.
-            now_length += seq2 - seq1;
+            //now_length += seq2 - seq1;
         }
         // Increment the total number of TCP packets.
         total_tcp_packets++;
@@ -255,7 +256,7 @@ int main(int argc, char ** argv)
         connection_type[(p1 + "-" + p2)] = UDP;
         (*(file_map[p1+ "-" + p2])) << "0.000000" << len << endl;
         // Add to the length for the current throughput interval.
-        now_length += len;
+        //now_length += len;
     }
     skipline(inp);
     eatspaces(inp);
@@ -321,6 +322,7 @@ int main(int argc, char ** argv)
 
                 }
 
+                /*
                 // If packet time is in the current throughput interval, add the length to the interval.
                 if(long(ttime / xput_interval) == now_time)
                 {
@@ -329,12 +331,20 @@ int main(int argc, char ** argv)
                 else
                 {
                 // Otherwise, write the current interval throughput and set a new interval.
+                    for (double i = double(last_time + 1) * xput_interval; i < double(now_time) * xput_interval; i += xput_interval)
+                    {
+                        xput_data << i << " " << 0 << endl;
+                        xputs.push_back(0);
+                    }
+
                     xput_data << double(now_time) * xput_interval << " " << now_length / xput_interval << endl;
                     // Keep values to in an array for median finding purposes.
                     xputs.push_back(now_length / xput_interval);
+                    last_time = now_time;
                     now_time = long(ttime / xput_interval);
                     now_length = seq2 - seq1;
                 }
+                */
             }
 
             // Look for packet loss.
@@ -414,22 +424,33 @@ int main(int argc, char ** argv)
 
             // If there are too many files open, close this one.
             if(open_files > OPEN_FILE_HANDLE_LIMIT) {(*(file_map[p1+ "-" + p2])).close(); open_files--;}
+
+            /*
             if(long(ttime / xput_interval) == now_time)
             {
                 now_length += len;
             }
             else
             {
+                for (double i = double(last_time + 1) * xput_interval; i < double(now_time) * xput_interval; i += xput_interval)
+                {
+                    xput_data << i << " " << 0 << endl;
+                    xputs.push_back(0);
+                }
+
                 xput_data << double(now_time) * xput_interval << " " << now_length / xput_interval << endl;
+                // Keep values to in an array for median finding purposes.
                 xputs.push_back(now_length / xput_interval);
+                last_time = now_time;
                 now_time = long(ttime / xput_interval);
                 now_length = len;
-            }
+            }*/
         }
         skipline(inp);
         eatspaces(inp);
     }
 
+/*
     xputs.push_back(now_length / xput_interval);
     xput_data << now_time * xput_interval << " " << now_length / xput_interval << endl;
 
@@ -462,16 +483,17 @@ int main(int argc, char ** argv)
             break;
     }
 
+
     meta << "xput_max\t" << xp_max / 1e+3 << endl;
     meta << "xput_avg\t" << (xp_sum / xputs.size()) / 1e+3 << endl;
     meta << "xput_mdn\t" << xputs[xputs.size() / 2] / 1e+3 << endl;
-
+*/
     meta << "tcp_lost\t" << total_tcp_lost << endl;
     meta << "tcp_total\t" << total_tcp_packets << endl;
     meta << "loss_rate\t" << double(total_tcp_lost) / double(total_tcp_packets) * 100.0 << endl;
 
     meta.close();
-
+/*
     // Throughput plot.
     ofstream xputplot("xput.gp");
     xputplot    << "set style data lines"  << endl
@@ -503,6 +525,7 @@ int main(int argc, char ** argv)
             << "Loss rate: " << double(total_tcp_lost) / double(total_tcp_packets) * 100.0 << "%\n"
             << "\"\' -pointsize 6 -density 1000 xp.ps -scale 2000x1000 xp.jpg";
     system(ssstr.str().c_str());
+*/
 
     // Create a file to map the plot legend to connections in the plot.
     ofstream index_file("connection_index.txt");
