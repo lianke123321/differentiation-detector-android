@@ -57,9 +57,10 @@ Previous work in fixed-line environments~\cite{perdisci:malwaresig} use network 
 from network flows. In particular, they rely on \useragent information and perform clustering on this to distinguish 
 malware from non-malicious traffic. In our dataset, we find that ...
 
-Of the 99 apps generating network traffic, we observe that \tbd{}\% 
+Of the 99 apps generating network traffic, we observe that 81\% (73)  
 exfiltrate PII. Unique identifiers such as IMEI, Android ID and MAC address are most commonly leaked, and 
-we further find 9 apps leaking telephone numbers. 
+we further find 9 apps leaking telephone numbers. For the remaining 26 apps, we did not detect PII;12 use HTTP  
+traffic, 7 use nonstandard ports and 1 attempts to communicate with a server that is not online. 
 
 \mypara{Effectiveness of behavioral filters}
 TBD 

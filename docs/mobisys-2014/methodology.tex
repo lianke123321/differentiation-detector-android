@@ -257,8 +257,8 @@ Below we describe the limitations of this approach for a large fraction of apps,
      \end{tabular}
      \end{small}
      \caption{Classification of apps based on \httphost and \useragent. \emph{A large majority of iOS apps use dedicated \useragent strings to fetch data over HTTP. A combination of \useragent and \httphost can be used to identify the majority of Android and iOS apps.} }
-\vspace{\postfigspace}
      \label{tab:classification-success}
+\vspace{\postfigspace}
 \end{table}
 
 %%
@@ -292,37 +292,42 @@ However, for the apps from the Third-party store we observe that the \httphost f
 Primarily this is due to the fact that a majority of the apps we tested (about 77\%) were stand-alone services such as games where the provider did not use its own Web service. %Instead, these apps either contacted some advertisement sites or sites hosted by CDNs. 
 %While we can use the \httphost field to identify these 3rd-party sites contacted by an app, we cannot determine which app generated the traffic. 
 
-\begin{table}
-\begin{small}
-\begin{tabular}{|l|p{0.85\columnwidth}|}
-\hline
-{\bf No. } & {\bf User-Agent}\tabularnewline
-\hline
-1 & YahooMobileMail/1.0 (Android Mail; 1.4.6) (crespo;samsung;Nexus S;4.1.2/JZO54K)\tabularnewline
-\hline
-2 & AppleCoreMedia/1.0.0.10A523 (iPad; U; CPU OS 6\_0\_1 like Mac OS X; en\_us) \tabularnewline
-\hline
-3 & Dalvik/1.6.0 (Linux; U; Android 4.2.2; Nexus 4 Build/JDQ39) \tabularnewline
-\hline
-\end{tabular}
-\end{small}
-\caption{Sample \useragent strings. \emph{The first string contains the app identifier, the second hides the app and describes the OS service/library used, while the third does not contain any useful signature.}}
-\vspace{\postfigspace}
-\label{tab:user-agent}
-\end{table}
+%\begin{table}
+%\begin{small}
+%\begin{tabular}{|p{0.85\columnwidth}|}
+%\hline
+%%{\bf No. } & {\bf User-Agent}\tabularnewline
+%%\hline
+% YahooMobileMail/1.0 (Android Mail; 1.4.6) ... %(crespo;samsung;Nexus S;4.1.2/JZO54K)
+%\tabularnewline
+%\hline
+% AppleCoreMedia/1.0.0.10A523 ... %(iPad; U; CPU OS 6\_0\_1 like Mac OS X; en\_us) 
+%\tabularnewline
+%\hline
+% Dalvik/1.6.0 ... %(Linux; U; Android 4.2.2; Nexus 4 Build/JDQ39) 
+%\tabularnewline
+%\hline
+%\end{tabular}
+%\end{small}
+%\caption{Sample \useragent strings. \emph{The first string contains the app identifier, the second hides the app and describes the OS service/library used, while the third does not contain any useful signature.}}
+%\vspace{\postfigspace}
+%\label{tab:user-agent}
+%\end{table}
 
 \emph{Augmenting with \useragent: } We now show that by augmenting the information in the \useragent to the information gained by the \httphost field, we can classify a majority of iOS and Android apps. 
 In our controlled experiments we observed a non-empty \useragent string in more than 99.7\% of the HTTP flows from iOS and 90.9\%flows from Android. 
 
-A \useragent string may contain an app identifier and other auxiliary information such as details of the OS, manufacturer, and compatibility with Web browsers~\cite{mozilla:useragentdetection}. 
-For example, the first \useragent in Table~\ref{tab:user-agent} contains the information of the app, YahooMobileMail, while the second \useragent hides the app and specifies the \emph{AppleCoreMedia} service of iOS, and the third does not provide any useful information. 
+A \useragent string may contain an app identifier and other auxiliary information such as details of the OS, manufacturer, and compatibility with Web browsers~\cite{mozilla:useragentdetection}. For example, Yahoo Mail's \useragent string contains the string \emph{YahooMobileMail/1.0}. However, 
+some apps use more generic \useragent strings such as \emph{AppleCoreMedia} (streaming video on iOS) or \emph{Dalvik} (generic 
+text for Android). 
+%For example, the first \useragent in Table~\ref{tab:user-agent} contains the information of the app, YahooMobileMail, while the second \useragent hides the app and specifies the \emph{AppleCoreMedia} service of iOS, and the third does not provide any useful information. 
 To extract the app information, we use a set of regular expressions to filter out the auxiliary information in the \useragent and further cluster these extracted tokens using the edit distance between the tokens.%\footnote{We plan to release this code along with \platname package.}
 
 Table~\ref{tab:classification-success} shows that 84.6\% of the 176 iOS apps generating HTTP traffic were correctly identified based \useragent, which we verified by manual inspection.
 However, this works only for 23\% of the Android apps generating HTTP traffic. 
 For the 27 iOS apps which we failed to identify, we observed signatures for OS services and libraries.
 %, such as \emph{Apple Core Media}, \emph{Game Kit}, \emph{Geo Services}, etc. and signatures of third-party libraries and services such as \emph{Google Analytics} and \emph{Adobe Air}.
-Similarly, the majority of Android HTTP traffic contained flows with the default \useragent (similar to the third \useragent in Table~\ref{tab:user-agent}).
+Similarly, the majority of Android HTTP traffic contained flows with the default \useragent (\emph{Dalvik}).
 %Further, for the apps from the third-party store, we observe that the \useragent for ads and analytics libraries such as \emph{Google Analytics} and \emph{Adsense for Mobile} were the most common \useragent after the default \useragent.
 
 To summarize, \useragent is more effective for classifying iOS apps and \httphost is more effective for Android apps; however, neither alone is a complete 
@@ -484,12 +489,12 @@ Other Google Services & 58.665   & 13.32510 & 45.024 & 46.089 \tabularnewline
 \hline
 \end{tabular} 
 \end{small}
-\caption{Classification of \mobWild SSL traffic based on names in certificate, server name identification, and DNS request.}
-\vspace{\postfigspace}
+\caption{Classification of \mobWild SSL traffic based on names in certificate, server name identification, and DNS.}
 \label{tab:classify-ssl-traffic}
+\vspace{\postfigspace}
 \end{table}
 
-In Table~\ref{tab:classify-ssl-traffic} we present our SSL classification results.
+Table~\ref{tab:classify-ssl-traffic} shows our SSL classification results.
 Note that the iOS devices in our dataset generated a significant number of e-mail flows.
 Similarly, 12.5\% of iOS and 36.7\% of Android traffic map to social network services that include \emph{Google Plus, Facebook, and Twitter}.
 We speculate the increase in traffic share for Android devices is due to backing up photos on \emph{Google Plus}.
