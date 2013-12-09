@@ -20,12 +20,12 @@ networks, OSes and devices (smartphones and tablets). We discuss each of these i
 allowing us to characterize network flows and interpose on them using software middleboxes.\footnote{We can capture all of a device's traffic but we allow users to disable this at any time.}  To achieve this, we need a solution that works continuously, regardless of the mobile OS, network/access 
 technology, or apps installed. %Our VPN-based proxy achieves these goals. 
   
-\noindent\textbf{Control}. Another important goal is to facilitate research into new middlebox approaches 
-for interposing on mobile Internet traffic. The system must support the ability to deploy and distribute large numbers 
+\noindent\textbf{Control}. Another important goal is to facilitate research into new middlebox 
+applications for mobile traffic. The system must support the ability to deploy and distribute large numbers 
 of middlebox services quickly, easily and at scale~\cite{sherry:middleboxes} without 
 the need to deploy hardware in homes~\cite{bismark} or ISPs~\cite{wang:middleboxes}. 
-It should present a simple API for researchers and developers to block, shape, inject or otherwise 
-modify network flows. It should also support applications that operate on collections of flows over 
+It should present a simple API and policy framework for researchers and developers to block, shape, 
+inject or otherwise modify network flows matching various criteria. It should also support applications that operate on collections of flows over 
 time and across users (\eg Web caching/prefetching, malware detection/blocking and ISP characterization). 
 
 \noindent\textbf{Deployability}. To improve the representativeness of studies using \meddle, we want to 
@@ -53,14 +53,11 @@ We now describe \meddle's design and how
 it meets the goals described in the previous section. Figure~\ref{fig:architecture} 
 provides a high-level overview of the \meddle architecture.
 
-\meddle uses a VPN to direct all of a participating 
-mobile device's Internet traffic to a proxy server (top of the Fig.~\ref{fig:architecture}). 
-Section~\ref{subsec:design_visibility} describes how this achieves our goal of visibility.
-
-Traffic arriving at \meddle server is directed to a \meddlebox (middle of Fig.~\ref{fig:architecture}) 
-that can record, block, modify and/or otherwise interact 
-with mobile-device flows. Section~\ref{subsec:design_control} discusses how we 
-use software middlebox techniques to achieve our goal of controlling mobile-device traffic. 
+To achieve our goal of visibility, \meddle uses a VPN to direct all of a participating 
+mobile device's Internet traffic to a proxy server (top of the Fig.~\ref{fig:architecture}, 
+describe in \S\ref{subsec:design_visibility}). To achieve our goal of controlling mobile-device traffic, 
+the \meddle proxy directs traffic to a software middlebox, called a \meddlebox (middle of Fig.~\ref{fig:architecture}, described in \S\ref{subsec:design_control}),
+that can record, block, modify and/or otherwise interact with mobile-device flows. 
 
 A key advantage of \meddle is that it provides a platform for experimenting 
 with new and existing services that interact with user-generated traffic (\ie ``in the wild''). 
@@ -110,7 +107,7 @@ is easy to scale to a global deployment.
 We describe the implementation of \meddle, evaluate its performance and discuss 
 the current deployment. We also discuss the benefits and limitations of our approach.
 
-\subsection{Visibility into Mobile Internet Traffic}
+\subsection{Visibility: into Mobile Internet Traffic}
 \label{subsec:design_visibility}
 
 \meddle leverages the fact that the vast majority of mobile devices provide native VPN support, a feature typically provided to satisfy enterprise clients. We currently support VPN tunnels on iOS and Android; we anticipate being able to support the next version of Windows Phone that includes a native VPN implementation.
@@ -152,18 +149,18 @@ Currently we use this only in controlled experiments
 where \emph{no user traffic is intercepted}. We are also designing a study for IRB approval where we 
 will use SSL bumping to remove PII from user-generated traffic only when users opt in.
 
-\subsection{Services for Controlling Traffic}
-\label{subsec:design_control}
-\begin{figure}
-\begin{center}
-\includegraphics[width=\columnwidth]{figures/packet-monitoring-plugin.pdf}
-\end{center}
-\vspace{\postfigspace}
-\caption{Plugin infrastructure for \platname, which allows traffic to pass through 
-a series of middlebox services before being forwarded to the destination. }
-\label{fig:packet-monitoring-solution}
-\vspace{\postfigspace}
-\end{figure}
+\subsection{Control: Something for Controlling Traffic}
+%\label{subsec:design_control}
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=\columnwidth]{figures/packet-monitoring-plugin.pdf}
+%\end{center}
+%\vspace{\postfigspace}
+%\caption{Plugin infrastructure for \platname, which allows traffic to pass through 
+%a series of middlebox services before being forwarded to the destination. }
+%\label{fig:packet-monitoring-solution}
+%\vspace{\postfigspace}
+%\end{figure}
 
 Once traffic arrives at a \meddlebox, it interacts with one or more 
 services. These consist of software middleboxes that interpose on 
@@ -171,17 +168,16 @@ user-generated traffic, which are accessed
 via a plugin infrastructure, and proxy services that interact with 
 flows that \meddle induces.  
 
-\noindent\textbf{Plugin infrastructure.} Figure~\ref{fig:packet-monitoring-solution} shows how 
+\noindent\textbf{Plugin infrastructure.}
 \platname{} supports a plugin
 infrastructure for custom flow processing. Each plugin takes as input a 
 network flow and outputs a network flow (potentially empty). 
-When a packet is received at the TUN
-device, it is sent to a software-defined switch~\cite{Openvswitch} that 
-determines the ordered set of plugins that flows will traverse. 
+When a packet arrives at the VPN proxy, \meddle forwards it to a software-defined switch~\cite{Openvswitch} that 
+determines the ordered set of plugins that the corresponding flow will traverse. 
 This order is configured by a policy manager, which determines 
 the set of plugins that should operate on each flow. After the last 
-plugin is traversed, the network flow is sent out through the TUN device 
-to the Internet. 
+plugin is traversed, \meddle forwards the network flow to the Internet. 
+The same approach applies to traffic from the Internet destined for \meddle subscribers. 
 
 Plugins support a variety of features such as ad blocking, 
 analyzing PII leakage or page speed optimization. We 
@@ -196,7 +192,7 @@ access network is modifying Web content in flight, and we use a companion app to
 test detect service differentiation within mobile ISPs. To support these services, we 
 run services on \meddle servers that are accessed via untunneled connections. 
 
-\subsection{Deployability}
+\subsection{Deployability: Something}
 \label{subsec:design_deploy}
 
 This section describes how \meddle provides clear incentives for user adoption, a 
@@ -212,9 +208,10 @@ are less vulnerable to data leakage (\eg via open WiFi hotspots).
 
 \noindent \emph{Device-wide content filters.} We use \meddle to block content that users do 
 not wish to access -- for all apps running on a device. The most popular instance of this is 
-device-wide ad blocking.
+device-wide ad blocking, implemented using a DNS server that returns {\em localhost} for 
+requests to names for known ad servers.
 
-\noindent \emph{Privacy revelations~\cite{wetherall:revelations}.} The \emph{ReCon} tool (\S\ref{subsec:recon}) allows users to see how they are being 
+\noindent \emph{Privacy revelations~\cite{wetherall:revelations}.} The \emph{ReCon} tool (\S\ref{sec:characterize-app}) allows users to see how they are being 
 tracked by ad and analytic servers, and allows them to create per-connection block lists.  
 
 \noindent \emph{ISP transparency.} We provide services that allow users to identify cases where 
