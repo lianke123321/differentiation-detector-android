@@ -18,7 +18,7 @@ class tcpdump(object):
         self._running = True
     def stop(self):
         print '\nStoping tcpdump on: {}'.format(self._interface, self._dump_name, self._p.pid)
-        self._p.kill()
+        self._p.terminate()
         print '\tDump stopped: {}'.format(self._interface, self._dump_name, self._p.pid)
         self._running = False
     def status(self):
