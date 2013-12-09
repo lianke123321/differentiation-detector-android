@@ -12,6 +12,7 @@
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage[sort]{cite}
+%\usepackage[compact]{titlesec}
 
 %%%%%%%%%% LIST OF COMMANDS
 \newcommand{\ie}{{\it i.e.,}\xspace}
@@ -52,24 +53,30 @@
 \newenvironment{packedenumerate}{\begin{list}{\thepackednmbr.}{\usecounter{packednmbr}\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
 \newenvironment{packeditemize}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
 
+%Added by ARAO for letterpaper 
+\pdfpagewidth=\paperwidth
+\pdfpageheight=\paperheight
 
 \begin{document}
 
 \date{}
 
-\title{{\Large \bf Using the Middle to Meddle with Mobile}} 
+\title{{\Large \bf Using the Middle to Meddle with Mobile} 
+%\subtitle{}
 %\\
-%{\large A Practical Approach to Improving Transparency and Control for Mobile Networking}}
-
-
-\author{}
-%\large Ashwin Rao${^a}$, Amy Tang${^b}$, Shen Wang${^c}$, Nick Martindell${^c}$, Justine Sherry${^b}$, Arnaud Legout${^a}$, \\
-%\large Walid Dabbous${^a}$, Arvind Krishnamurthy${^c}$, and David Choffnes${^d}$\\ 
-%\large $^{a}$INRIA $^{b}$University of California, Berkeley \\
-%\large $^{c}$University of Washington $^{d}$Northeastern University
-%} 
+%\vspace{1em}
+%%{\large A Practical Approach to Improving Transparency and Control for Mobile Networking}}
+%\author{} 
+%\large Ashwin Rao${^a}$, Arash Molavi Kakhki${^b}$, Abbas Razaghpanah${^e}$, Amy Tang${^c}$, Shen Wang${^d}$, Justine Sherry${^c}$,%Nick Martindell${^d}$, 
+% Alan Mislove${^b}$, Phillipa Gill${^e}$, Arnaud Legout${^a}$,  Walid Dabbous${^a}$, 
+%\large Arvind Krishnamurthy${^d}$, and David Choffnes${^b}$\\ 
+%\vspace{1em}
+%\large $^{a}$INRIA $^{b}$Northeastern Univ. $^{c}$UC, Berkeley $^{d}$Univ. of Washington  ${^e}$Stony Brook
+%\vspace{-2em}
+} 
 
 \maketitle
+\vspace{-2em}
 
 % Use the following at camera-ready time to suppress page numbers.
 % Comment it out when you first submit the paper for review.

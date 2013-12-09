@@ -27,14 +27,14 @@ to a remote service for coordination (\eg C\&C), exfiltration (stealing personal
 We can detect the first two cases if they use IP; we cannot detect circuit switched activity such as sending SMS or making 
 phone calls.
 
-Focusing on IP traffic, \meddle gives us two opportunities to detect and block malware activity. First, we can detect 
+\meddle gives us two opportunities to detect and block malware activity over IP. First, we can detect 
 the app binary being downloaded via a hash and block that transfer if it is identified as malware. Second, we can use network 
 behavioral analysis to identify malicious activity from apps that passed through our hash filters and successfully installed. 
 In the following paragraphs we describe how existing hash registries fail to capture most confirmed malware, how to 
 use network activity to identify and block malware and how to augment hash registries by automatically identifying the 
 malicious app binary responsible for the activity -- thus inoculating other users from this malware. Importantly, 
-this approach works at machine instead of human timescales, protecting infected users and preventing new infections 
-within minutes, not days.
+this approach works at machine instead of human timescales.%, protecting infected users and preventing new infections 
+%within minutes, not days.
 
 \mypara{Dataset} To understand malware network behavior, we use a 
 dataset consisting of 111 confirmed malicious Android APKs gathered by the Andrubis project~\cite{andrubis} in September, 2013.  
@@ -57,9 +57,10 @@ Previous work in fixed-line environments~\cite{perdisci:malwaresig} use network 
 from network flows. In particular, they rely on \useragent information and perform clustering on this to distinguish 
 malware from non-malicious traffic. In our dataset, we find that ...
 
-Of the 99 apps generating network traffic, we observe that \tbd{}\% 
+Of the 99 apps generating network traffic, we observe that 81\% (73)  
 exfiltrate PII. Unique identifiers such as IMEI, Android ID and MAC address are most commonly leaked, and 
-we further find 9 apps leaking telephone numbers. 
+we further find 9 apps leaking telephone numbers. For the remaining 26 apps, we did not detect PII;12 use HTTP  
+traffic, 7 use nonstandard ports and 1 attempts to communicate with a server that is not online. 
 
 \mypara{Effectiveness of behavioral filters}
 TBD 
