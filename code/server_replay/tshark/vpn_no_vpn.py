@@ -29,7 +29,6 @@ def meddle_vpn(command):
     else:
         print 'command needs to be "connect" or "disconnect"'
 def run_one(rounds, vpn=False):
-    print '\n~~~~~~~~~~~~~~ VPN = {} ~~~~~~~~~~~~~~~'.format(str(vpn))
     if vpn:
         dump = tcpdump(dump_name='vpn_'+str(rounds))
         meddle_vpn('connect')
@@ -76,9 +75,14 @@ def main():
     
     PRINT_ACTION('Firing off', 0)
     for i in range(configs.get('rounds')):
-        print '\nDOING ROUND: {} -- VPN ON'.format(i+1)
+        print '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+        print 'DOING ROUND: {} -- VPN ON'.format(i+1)
+        print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         run_one(i, vpn=True)
-        print '\nDOING ROUND: {} -- VPN OFF'.format(i+1)
+        
+        print '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+        print 'DOING ROUND: {} -- VPN OFF'.format(i+1)
+        print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         run_one(i, vpn=False)
         print 'Done with round :{}\n'.format(i+1)
     
