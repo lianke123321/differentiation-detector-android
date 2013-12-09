@@ -1,15 +1,6 @@
-\section{Application: \\
-Mobile Privacy Revelations}
+\section{Application: Mobile Privacy\\ Revelations}
 \label{sec:characterize-app}
-%In this section we describe how we use \meddle to identify privacy leaks and tracking by third parties 
-%in mobile systems. While previous work identifies many of the same issues, they lack a general 
-%way to identify leaks using network flows alone, and they provide no portable way to block those 
-%activities. In the following sections, we describe how we identify the apps responsible for privacy 
-%leaks and tracking, regardless of whether they use SSL. Then we describe a system that visualizes 
-%this activity and allows users to block it.
-%
-%
-%\subsection{Identifying Privacy Leaks}
+
 Privacy has rapidly become a critical issue for user interactions with Internet services, particularly in 
 mobile environment where location, contact information and other PII are readily available. While the problem 
 is well known~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}, previous work lacks a general 
@@ -21,12 +12,6 @@ secure channels.
 For our analysis we focus on {\it what} PII is sent,  {\it to whom} is the PII sent, and {\it how frequently} is PII sent.
 Then we describe a system that visualizes 
 this activity and allows users to block it.
-%To answer these questions, we rely on the controlled experiments and the \mobWild dataset.
-
-%We evaluate PII in terms of two threat models. First, we assume a passive eavesdropper that can sniff 
-%traffic over open WiFi APs or within a cellular provider. Any PII sent unencrypted is available to the attacker. 
-%Second, we assume an attack conducted by (or on) a third-party service that is able to identify a user's fine-grained locations 
-%over time. 
 
 \begin{table*}[t]    
     \centering
@@ -50,121 +35,66 @@ Third Party&Android&732&3 (0.4\%)&57 (7.8\%)&3 (0.4\%)&0 (0\%)&85 (11.6\%)&6 (0.
 
 \subsection{Controlled experiments}
 
-For our controlled experiments, we created dummy user accounts with fake contact
-information (see \S\ref{sec:dataset-contr-exper}).  Our goal is to
-detect if any PII---email
-address, phone number, IMEI---stored on the device is leaked
-across the network over HTTP or HTTPS.
-Some of this information is required for normal app operation; however, such information should
-never travel across the network in plaintext (HTTP).  
+For our controlled experiments, we created dummy user accounts with fake contact information (see \S\ref{sec:dataset-contr-exper}).  
+Our goal is to detect if any PII---email address, phone number, IMEI---stored on the device is leaked across the network over HTTP or HTTPS.
+Some of this information is required for normal app operation; however, such information should never travel across the network in plaintext (HTTP).  
 
-\mypara{PII leaked from each OS} Table~\ref{tab:pii} presents the PII leaked by Android and iPhone apps. 
-The IMEI, a unique identifier tied to a phone, and the Android ID (tied an Android installation) 
-are the most commonly
-leaked PII by Android apps.  These can be used to track
-and correlate a user's behavior across Web services. Table~\ref{tab:pii} 
-shows that other information like contacts, emails, and passwords
-are leaked in the clear.  The email address used to sign
-up for the services was leaked in the clear by 13 iOS and 3 Android
-apps from our set of popular apps.
+\mypara{PII leaks in the clear} 
+Table~\ref{tab:pii} presents the PII leaked by Android and iPhone apps. 
+The IMEI, a unique identifier tied to a mobile device, and the Android ID (tied an Android installation) are the most commonly leaked PII by Android apps.  
+These can be used to track and correlate a user's behavior across Web services. 
+Table~\ref{tab:pii} shows that other information like contacts, emails, and passwords are also leaked in the clear. 
+The email address used to sign up for the services was leaked in the clear by 13 iOS and 3 Android apps from our set of popular apps.
+While only one Android app (belonging to the \emph{Photography} category) leaked a password in the clear, we were surprised to learn that six of the most popular iOS apps send user credentials in the clear, \emph{including the password}. 
 
-While only one Android app (belonging to the \emph{Photography} category) leaked a password in the clear, 
-we were surprised to learn that six of the most popular iOS apps send user 
-credentials in the clear, \emph{including the password}. 
+Particularly disconcerting is our observation that an app in the Medicine category -- which the provider claims has ``\emph{1 million active members 
+of which 50\% are US physicians}'' -- sends the user's first name, last name, email, password, and zip code in the clear. 
+Given US physicians have access to highly sensitive data like medical records, we believe it is particularly important for this app to protect user credentials (which are often used for multiple services). 
 
-Particularly disconcerting 
-is our observation that an app in the Medicine category -- which the provider claims has ``\emph{1 million active members 
-of which 50\% are US physicians}'' -- sends the user's first name, last name, 
-email, password, and zip code in the clear. Given US physician access to highly sensitive 
-data like medical records, we believe it is particularly important for this app to protect 
-user credentials (which are often used for multiple services). 
-
-\mypara{PII leaked from same apps on different OSes} We compared the overlap of the top hundred apps for iOS and Android. 26 apps fell into this category, 17 leaked PII. Only one app had the same data leakage in both OSes: TuneIn Player leaked Location. Another two apps both leaked data, but different types: Snapchat leaked Android ID and IMEI but leaked username in iOS and Brightest Flashlight leaked Android ID and leaked location in iOS. Two apps leaked PII only in iOS (Groupon and Pandora), while 12 apps leaked data only in Android. Most Android leaks were  Android ID; however, 4 of these apps leaked location and 1 leaked IMEI. For the top apps, Android leaks more PII than iOS.
-
-% For your eyes only ;)
-%services.epocrates.com  Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7   1370172894.1735 JXMXaFcr2Pd 10.11.4.52  55904   63.241.66.139   80  7   GET /userprofile/userprofile/userprofile/userprofile?datatype=json&os=6.1.3&device_model=iPhone&appVersion=5.2&appId=nc-2&data={"countryId":"10","lastName":"Test","firstName":"Meddle","password":"epocratespwdW1","passwordConfirm":"epocratespwdW1","email":"mailmeddle@yahoo.com","occupationId":"56","zipCode":"98105"}&action=useraccount&platform=14&subaction=createuser    -   0   40001   200 OK  -   -   -   (empty) -   -   -   text/plain  -   -   -   0       -   -   shen
+\mypara{PII leaked from same apps on different OSes} 
+We observed that the information leaked by an app depends on the OS.
+Of the top hundred apps for iOS and Android, 26 apps are available on both iOS and Android. 
+Of these 26 apps, 17 apps leaked PII on at least one OS: 12 apps leaked PIIs only on Android, 2 apps leaked PII only on iOS, while only one app had the same data leakage in both OSes.
+Of the remaining two apps that leaked PII, one app leaked the android ID and IMEI in Android and username in iOS, while the other app leaked the Android~ID in Android and location in iOS. 
+This observation, the dependence of PII leaks on the OS, highlights the importance of \meddle that can analyze PII leaks across multiple OSes.
 
 \begin{table}
     \centering
     \begin{small}
     \begin{tabular}{|l|c|c||c|}
        \hline
-       {\bf Host}&{\bf IMEI}&{\bf Device ID} & {\em Ads \& Analytics} \tabularnewline
+       {\bf Host}& {\em Ads \& Analytics} \tabularnewline
        \hline              
-       chartboost.com                & \checkmark & \checkmark & \checkmark  \tabularnewline
-       tapjoyads.com                 & \checkmark & -          & \checkmark  \tabularnewline
-       getjar.com                    & \checkmark & \checkmark & -   \tabularnewline
-       pocketchange.com              & \checkmark & \checkmark & -   \tabularnewline
-       iheart.com                    & \checkmark & \checkmark & -   \tabularnewline
-       aarki.net                     & \checkmark & -          & \checkmark  \tabularnewline
-       zynga.com                     & \checkmark & -          & -   \tabularnewline
-       droidsecurity.appspot.com     & \checkmark & -          & -   \tabularnewline
-       google.com                    & -          & \checkmark & -   \tabularnewline
-       flurry.com                    & -          & \checkmark & \checkmark  \tabularnewline
-       groupon.com                   & -          & \checkmark & -   \tabularnewline
+       android.clients.google.com & -  \tabularnewline
+       getjar.com        & -  \tabularnewline
+       chartboost.com    & \checkmark \tabularnewline
+       pocketchange.com  & -   \tabularnewline
+       flurry.com        & \checkmark \tabularnewline       
        \hline
     \end{tabular}
     \end{small}
-    \caption{Top 10 hosts that receive the IMEI or Device ID over HTTPS. \emph{Hosts are ordered by the number of flows that send the IMEI number, followed by the number of flows that send the device ID over HTTPS. Four of the top 10 hosts that receive this information are ads and analytics sites.\drc{This will probably be cut.}}}
+    \caption{\textbf{Top 5 domains that receive PII over SSL ordered according to number of flows leaking PIIs during controlled experiments}. \emph{Two of the top 5 hosts that receive this information is an ads and analytics site.}}
     \label{tab:pii-leakage-https-sites}
     \vspace{\postfigspace}
 \end{table}
 
-\mypara{PII leaked over SSL} During our experiments, we observed that PII is also sent over HTTPS.  In the following, we
-focus on device identifiers such as the IMEI and the Android device
-ID.  In Table~\ref{tab:pii-leakage-https-sites}, we present the top 10
-sites ordered by the number of flows that sent the IMEI over HTTPS.  We
-observe that four of the top 10 sites that receive this information
-are ads and analytics (A\&A) sites. \drc{Why is this only for IMEI and Android ID? Also, the table is weak, consider cutting.}
+\mypara{PII leaked over SSL} 
+During our experiments, we observed that PII is also sent over HTTPS. 
+We observe that two of the top 5 sites  that receive this information are ads and analytics (A\&A) sites.
 
-Our observations highlight the limitations of current mobile OSes with 
-respect to controlling access to PII via app permissions. In particular, it is unlikely that users are 
-made aware that they are granting access to PII for A\&A sites when embedded 
-in an app that serves a different purpose. This problem is pervasive: of the 77 sites
-that received either the IMEI or Device ID in the clear or over HTTPS,
-35 sites were third party ads and analytics sites.
+Our observations highlight the limitations of current mobile OSes with respect to controlling access to PII via app permissions. 
+In particular, it is unlikely that users are made aware that they are granting access to PII for A\&A sites when embedded in an app that serves a different purpose. 
+This problem is pervasive: of the 77 sites that received some PII in the clear or over HTTPS, 35 sites were third party ads and analytics sites.
 
-We note that our observations are a conservative estimate of PII leakage. Specifically, 
-we cannot detect PII leakage if the data is obfuscated (\eg via hashing). Regardless, 
-our study shows that a significant amount of PII leaks not only through unobfuscated 
-channels but even unencrypted ones. 
-
-%In summary, we use our controlled experiments to identify PII leaks on
-%both HTTP and HTTPS, and we show that PII are leaked to third party
-%sites such as ads and analytics. These controlled experiments are a
-%practical use case of \platname, experiments requiring warranty
-%voiding the devices otherwise. In particular, \platname{} enable to
-%reveal PII leaks over HTTPS.
-%However, we would like to point out that we were not able to analyze traffic in which the data sent was encoded and exchanged as binary objects. 
-
-%Stats value 13 of 22 in the clear device ID, 16 of 39 IMEI clear,  3 of 6 IMEI HTTPs, 3 of 10 device HTTPs}
+We note that our observations are a conservative estimate of PII leakage. 
+Specifically, we cannot detect PII leakage if the data is obfuscated (\eg via hashing). 
+Regardless,  our study shows that a significant amount of PII leaks not only through unobfuscated channels but even unencrypted ones. 
 
 \subsection{PII in the Wild}
 
-We now
-analyze the \mobWild{} dataset. Note that we do not use SSL bumping on this data 
-for privacy reasons. 
+We now analyze the \mobWild{} dataset. 
+Note that we do not use SSL bumping on this data for privacy reasons. 
 
-%\begin{figure}[tb]
-%\subfloat[Apps leaking location in the clear.]{\label{fig:location-cloud} \includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_location_image.png}}
-%%\includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_location_image.png}
-%\newline
-%%\subfloat[Springboard \useragent strings leaking the device location.]{\label{fig:springboard}
-%%\begin{tabular}{|l|}
-%% \hline
-%% SpringBoard/50 CFNetwork/548.1.4 Darwin/11.0.0 \tabularnewline
-%% SpringBoard/50 CFNetwork/609 Darwin/13.0.0 \tabularnewline   
-%% SpringBoard/50 CFNetwork/609.1.4 Darwin/13.0.0 \tabularnewline
-%% \hline
-%% \end{tabular}}\newline
-%\subfloat[Frequency of leaks by \emph{SpringBoard}.]{\label{fig:springboard-wild} \includegraphics[width=0.9\columnwidth]{plots/piileaks_locclearspringboard.pdf}}
-%\caption{Apps that send the location information in the clear. \emph{The font size in the cloud represent the number of flows that sent the location information in the clear. We observe location leaks across different version of SpringBoard and from all the iPhones and the iPodtouch devices in the \mobWild dataset. }}
-%\label{fig:location-wordcloud}
-%\vspace{\postfigspace}
-%\end{figure}
-
-%In Figure~\ref{fig:location-wordcloud}, we present a \emph{word cloud} of
-%the apps that send the location information of the devices.
 \noindent\textbf{Location leaks.} We observe that a bus service app (\emph{One Bus Away}), the
 app that manages the iOS homescreen (\emph{SpringBoard}), and
 weather apps (\emph{TWC}, \emph{Weather}, and \emph{Hurricane})
@@ -173,16 +103,10 @@ information in the clear. Other apps that do not require location information,
 such as YouTube, Epicurious and EditorsChoice, also leaked GPS coordinates.
 Further, \emph{SpringBoard} sends location information in the clear to fetch weather information from Yahoo servers. 
 We observe that \emph{SpringBoard} leaked location information for 11 devices in the \mobWild dataset, a maximum of 14 leaks per day was observed for one device, sufficient to expose a user's daily movements to anyone tapping Internet connections~\cite{nsa:globaltracking}. 
-%We also observe that these devices include the iPodtouch device and all the iPhones in \mobWild, however, we do not observe such leaks for the iPad devices in the \mobWild dataset.  
 
-
-\noindent\textbf{Unique ID leaks.} The device ID and IMEI are frequently leaked 
-in the clear by mobile Web browsers, but no apps in \mobWild do so.  
-As in the case of controlled experiments, A\&A sites are the most popular
-destination for the IMEI leaks.  Among the 16 sites that received 
-the IMEI in the clear, 10 are A\&A sites;
-the rest of the sites includes sites for games, news, and manufacturer
-updates.
+\noindent\textbf{Unique ID leaks.} 
+The device ID and IMEI are frequently leaked in the clear, and as in the case of controlled experiments, A\&A sites are the most popular destination for the IMEI leaks.  
+Among the 16 sites that received  these unique IDs in the clear, 10 are A\&A sites; the rest of the sites includes sites for games, news, and manufacturer updates.
 
 \begin{table}
 \centering
@@ -213,8 +137,7 @@ scorecardresearch.com &  21 & 11 & 10 \tabularnewline
 
 In Table~\ref{tab:top-trackers}, we present the number of devices in the \mobWild dataset that contact the most popular A\&A sites.
 We observe that all the devices in the \mobWild dataset contacted doubleclick.com, an ad site, and google-analytics.com, a tracking site. 
-Further, 66.12\% of the ads and analytics traffic volume in the \mobWild dataset was from browsers, 6.46\% of the
-traffic contained a blank user-agent field, and 4.8\% of the traffic contained a signature of \emph{Google-Analytics} library.
+Further, 66.12\% of the ads and analytics traffic volume in the \mobWild dataset contained the default OS \useragent or the user agent of browsers, 6.46\% of the traffic contained a blank user-agent field, and 4.8\% of the traffic contained a signature of \emph{Google-Analytics} library.
 The rest of the traffic contained signatures of other apps such as Facebook, Pandora, and YouTube.
 
 \subsection{Revealing and Controlling PII Leaks}
@@ -227,24 +150,9 @@ visualizing only websites, our tool shows apps and the 3rd party sites they cont
 hovering/tapping on a tracker reveals the apps contacting the tracker (right). Similarly, hovering/tapping on an app 
 highlights all the trackers contacted by the app.
 
-%\tbd{A demo of this can be found at ...}
-%\tbd{Add some comment about ConVis (Nick's work), say that it's another 
-%contribution in that it helps average users visualize their tracking and PII, 
-%and that we make it available to participating users, and the URL for the 
-%demo is at location X.}
-
 \begin{figure}[tb]
 \subfloat[Default view.]{\label{fig:recon-all} \includegraphics[width=0.47\columnwidth]{figures/ReConAll.pdf}}
-%\includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_location_image.png}
 \hspace{0.1in}
-%\subfloat[Springboard \useragent strings leaking the device location.]{\label{fig:springboard}
-%\begin{tabular}{|l|}
-% \hline
-% SpringBoard/50 CFNetwork/548.1.4 Darwin/11.0.0 \tabularnewline
-% SpringBoard/50 CFNetwork/609 Darwin/13.0.0 \tabularnewline   
-% SpringBoard/50 CFNetwork/609.1.4 Darwin/13.0.0 \tabularnewline
-% \hline
-% \end{tabular}}\newline
 \subfloat[View showing tracking by Scorecard Research.]{\label{fig:recon-highlight} \includegraphics[width=0.47\columnwidth]{figures/ReConHighlight.pdf}}
 \caption{Screen captures of the \emph{ReCon} tool, allowing users to visualize how they are being tracked by apps, and install custom filters by clicking on links to ``remove'' them. }
 \label{fig:recon}
@@ -345,3 +253,62 @@ and distributed. A demo of our tool is located at \url{http://goo.gl/A17h9}. \dr
 % facilitate this tracking.
 %\tbd{This must come before Furthermore, we observed that 7\% of the traffic contained the Google-Analytics in the signature field; this signature was observed even in the flows for users that did not have the Google Analytics application installed on the device. Mention that we will wrongly classify the flows from Google Analytics app as ads and analytics traffic} 
 
+%In summary, we use our controlled experiments to identify PII leaks on
+%both HTTP and HTTPS, and we show that PII are leaked to third party
+%sites such as ads and analytics. These controlled experiments are a
+%practical use case of \platname, experiments requiring warranty
+%voiding the devices otherwise. In particular, \platname{} enable to
+%reveal PII leaks over HTTPS.
+%However, we would like to point out that we were not able to analyze traffic in which the data sent was encoded and exchanged as binary objects. 
+
+%Stats value 13 of 22 in the clear device ID, 16 of 39 IMEI clear,  3 of 6 IMEI HTTPs, 3 of 10 device HTTPs}
+
+%In this section we describe how we use \meddle to identify privacy leaks and tracking by third parties 
+%in mobile systems. While previous work identifies many of the same issues, they lack a general 
+%way to identify leaks using network flows alone, and they provide no portable way to block those 
+%activities. In the following sections, we describe how we identify the apps responsible for privacy 
+%leaks and tracking, regardless of whether they use SSL. Then we describe a system that visualizes 
+%this activity and allows users to block it.
+%
+%
+%\subsection{Identifying Privacy Leaks}
+
+%To answer these questions, we rely on the controlled experiments and the \mobWild dataset.
+
+%We evaluate PII in terms of two threat models. First, we assume a passive eavesdropper that can sniff 
+%traffic over open WiFi APs or within a cellular provider. Any PII sent unencrypted is available to the attacker. 
+%Second, we assume an attack conducted by (or on) a third-party service that is able to identify a user's fine-grained locations 
+%over time. 
+
+%TuneIn Player leaked the device location.
+%Another two apps both leaked data, but different types: Snapchat leaked Android ID and IMEI but leaked username in iOS and Brightest Flashlight leaked Android ID and leaked location in iOS. Two apps leaked PII only in iOS (Groupon and Pandora), while 12 apps leaked data only in Android. Most Android leaks were  Android ID; however, 4 of these apps leaked location and 1 leaked IMEI. For the top apps, Android leaks more PII than iOS.
+
+% For your eyes only ;)
+%services.epocrates.com  Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7   1370172894.1735 JXMXaFcr2Pd 10.11.4.52  55904   63.241.66.139   80  7   GET /userprofile/userprofile/userprofile/userprofile?datatype=json&os=6.1.3&device_model=iPhone&appVersion=5.2&appId=nc-2&data={"countryId":"10","lastName":"Test","firstName":"Meddle","password":"epocratespwdW1","passwordConfirm":"epocratespwdW1","email":"mailmeddle@yahoo.com","occupationId":"56","zipCode":"98105"}&action=useraccount&platform=14&subaction=createuser    -   0   40001   200 OK  -   -   -   (empty) -   -   -   text/plain  -   -   -   0       -   -   shen
+
+% \begin{table}
+%     \centering
+%     \begin{small}
+%     \begin{tabular}{|l|c|c||c|}
+%        \hline
+%        {\bf Host}&{\bf IMEI}&{\bf Device ID} & {\em Ads \& Analytics} \tabularnewline
+%        \hline              
+%        chartboost.com                & \checkmark & \checkmark & \checkmark  \tabularnewline
+%        tapjoyads.com                 & \checkmark & -          & \checkmark  \tabularnewline
+%        getjar.com                    & \checkmark & \checkmark & -   \tabularnewline
+%        pocketchange.com              & \checkmark & \checkmark & -   \tabularnewline
+%        iheart.com                    & \checkmark & \checkmark & -   \tabularnewline
+%        aarki.net                     & \checkmark & -          & \checkmark  \tabularnewline
+%        zynga.com                     & \checkmark & -          & -   \tabularnewline
+%        droidsecurity.appspot.com     & \checkmark & -          & -   \tabularnewline
+%        google.com                    & -          & \checkmark & -   \tabularnewline
+%        flurry.com                    & -          & \checkmark & \checkmark  \tabularnewline
+%        groupon.com                   & -          & \checkmark & -   \tabularnewline
+%        \hline
+%     \end{tabular}
+%     \end{small}
+%     \caption{Top 10 hosts that receive the IMEI or Device ID over HTTPS. \emph{Hosts are ordered by the number of flows that send the IMEI number, followed by the number of flows that send the device ID over HTTPS. Four of the top 10 hosts that receive this information are ads and analytics sites.\drc{This will probably be cut.}}}
+%     \label{tab:pii-leakage-https-sites}
+%     \vspace{\postfigspace}
+% \end{table}
+%We also observe that these devices include the iPodtouch device and all the iPhones in \mobWild, however, we do not observe such leaks for the iPad devices in the \mobWild dataset.  

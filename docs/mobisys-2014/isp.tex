@@ -73,6 +73,16 @@ Web content. Instead, we cache Web pages at the tripnet-injecting server and co-
 there. Thus we return exactly the same Web page that was received over the tunneled connection. 
 Any difference in page content can only be due to ISP behavior. 
 
+
+\noindent\textbf{Sites and ISPs tested.} We conducted controlled experiments using our Tripnet 
+architecture, using the top 100 Web sites according to Alexa. We tested using 
+AT\&T, T-Mobile and Verizon in the US, and Sosh in France. 
+Many sites customize content according to User-Agent strings, so we spoof User-Agents 
+as coming from iOS, Andriod and desktop clients.
+
+
+
+\noindent\textbf{Content modification.}
 In addition to detecting changes to text content in 
 Web pages, we use our controlled experiments to investigate whether ISPs are manipulating 
 media content, \eg downsampling high-resolution images to reduce bandwidth consumption 
