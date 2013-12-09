@@ -1,10 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <vector>
 #include <string>
 #include <iomanip>
 #include <cstdlib>
 #include <cstring>
+#include <sstream>
+#include <algorithm>
 #define OPEN_FILE_HANDLE_LIMIT 1000
 // TCP:
 //  16:28:35.679756 IP 65.121.208.122.80 > 10.11.3.3.53453: Flags [F.], seq 1, ack 1, win 10456, options [nop,nop,TS val 189791440 ecr 1720112], length 0 <<<< IGNORE
@@ -41,7 +44,7 @@ enum type_e {TCP, UDP};
 // Skip the rest of the line.
 void skipline(ifstream &inp)
 {
-    while(inp.peek() != '\n') inp.get();
+    while(inp.get() != '\n');
 }
 
 int main(int argc, char ** argv)
@@ -136,6 +139,8 @@ int main(int argc, char ** argv)
     string p1, p2, protocol;
     // To skip over unnecessary strings in the input.
     string temp;
+    // TCP packet type (syn or ack)
+    string seq_or_ack;
     // To identify packet type (IP or non-IP)
     string packet_type;
     // Starting time for the connection (used to calculate
@@ -147,6 +152,37 @@ int main(int argc, char ** argv)
     // determine if the first line in the plot.gp file
     // has been written.
     bool flag = false, first = false;
+
+    // Total number of all TCP packets.
+    long total_tcp_packets = 0;
+
+    // Total number of lost TCP packets.
+    long total_tcp_lost = 0;
+
+    // Map of ACKS
+    map<string, bool> acks;
+
+    // Map of SEQs.
+    vector<string> seqs;
+/*
+    // Throughput timer.
+    double now_time = 0;
+    double last_time = 0;
+
+    // Momentary throughput.
+    long now_length = 0;
+
+    // Throughput interval.
+    double xput_interval = 0.1;
+
+    // Throughput vector.
+    vector<double> xputs;
+
+    // Throughput file.
+    ofstream xput_data("./xput.txt");
+*/
+    // Metadata file.
+    ofstream meta("meta.txt");
 
     // Read the first time value (starting time).
     inp >> hh; inp.get();
@@ -166,7 +202,7 @@ int main(int argc, char ** argv)
     if (protocol == "Flags") // TCP
     {
         // Find where the sequence number is.
-        inp >> temp >> temp;
+        inp >> temp >> seq_or_ack;
         inp >> seq1;
 
         // If the sequence number is in form of xxx:yyy
@@ -182,7 +218,7 @@ int main(int argc, char ** argv)
         {
             // Create a file for the new connection in "connections" directory.
             file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2).c_str());
-	    open_files++;
+            open_files++;
             // Add the reverse line in the revers map.
             reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
             // Increment the number of connections.
@@ -198,7 +234,11 @@ int main(int argc, char ** argv)
             (*(file_map[p1+ "-" + p2])) << "0.000000 0" << endl;
             // Reset the "acceptable TCP packet" flag.
             flag = false;
+            // Add to the length for the current throughput interval.
+            //now_length += seq2 - seq1;
         }
+        // Increment the total number of TCP packets.
+        total_tcp_packets++;
     }
     else if (protocol == "UDP,") // UDP
     {
@@ -208,13 +248,15 @@ int main(int argc, char ** argv)
         inp >> len;
 
         file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2 + "_UDP").c_str());
-	open_files++;
+        open_files++;
         reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
         connection_count++;
         udp_offset[(p1 + "-" + p2)] = 0;
         max_len[(p1 + "-" + p2)] = 0;
         connection_type[(p1 + "-" + p2)] = UDP;
         (*(file_map[p1+ "-" + p2])) << "0.000000" << len << endl;
+        // Add to the length for the current throughput interval.
+        //now_length += len;
     }
     skipline(inp);
     eatspaces(inp);
@@ -237,7 +279,7 @@ int main(int argc, char ** argv)
 
         if (protocol == "Flags") // TCP
         {
-            inp >> temp >> temp;
+            inp >> temp >> seq_or_ack;
             inp >> seq1;
 
             if (inp.peek()==':')
@@ -246,39 +288,111 @@ int main(int argc, char ** argv)
                 inp.get();
                 inp >> seq2;
             }
-            skipline(inp);
             if(flag)
             {
                 if(file_map.count(p1 + "-" + p2) == 0)
                 {
                     file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2).c_str());
-		    open_files++;
+                    open_files++;
                     reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
                     connection_count++;
                     max_len[(p1 + "-" + p2)] = 0;
                     flag = false;
-                    (*(file_map[p1+ "-" + p2])) << "0.000000 0" << endl;
-		    // If there are too many files open, close this one.
-		    if(open_files > OPEN_FILE_HANDLE_LIMIT) { (*(file_map[p1+ "-" + p2])).close(); open_files--;}
-                    continue;
+                    (*(file_map[p1+ "-" + p2])) << ttime << " 0" << endl;
+                    // If there are too many files open, close this one.
+                    if(open_files > OPEN_FILE_HANDLE_LIMIT) { (*(file_map[p1+ "-" + p2])).close(); open_files--;}
+                }
+                else
+                {
+                    // If the file has been closed, reopen it.
+                    if(!((file_map[p1+ "-" + p2])->is_open()))
+                    {
+                        (file_map[p1+"-"+p2])->open(("connections/" + p1 + "-" + p2).c_str(), std::ofstream::out | std::ofstream::app);
+                        open_files++;
+                    }
+
+                    // Write the packet time and sequence number into the file for that connection.
+                    (*(file_map[p1+ "-" + p2])) << setprecision(14) << ttime << " " << seq2 << endl;
+                    // Maximum connection length for a TCP connection is the last sequence number.
+                    max_len[(p1 + "-" + p2)] = seq2;
+                    eatspaces(inp);
+                    flag = false;
+                    // If there are too many files open, close this one.
+                    if(open_files > OPEN_FILE_HANDLE_LIMIT) {(*(file_map[p1+ "-" + p2])).close(); open_files--;}
+
                 }
 
-                // If the file has been closed, reopen it.
-		if(!((file_map[p1+ "-" + p2])->is_open())) 
-		{
-		    (file_map[p1+"-"+p2])->open(("connections/" + p1 + "-" + p2).c_str(), std::ofstream::out | std::ofstream::app);
-		    open_files++;
-		}
-                
-		// Write the packet time and sequence number into the file for that connection.
-		(*(file_map[p1+ "-" + p2])) << setprecision(14) << ttime << " " << seq2 << endl;
-                // Maximum connection length for a TCP connection is the last sequence number.
-                max_len[(p1 + "-" + p2)] = seq2;
-                eatspaces(inp);
-                flag = false;
-		// If there are too many files open, close this one.
-		if(open_files > OPEN_FILE_HANDLE_LIMIT) {(*(file_map[p1+ "-" + p2])).close(); open_files--;}
+                /*
+                // If packet time is in the current throughput interval, add the length to the interval.
+                if(long(ttime / xput_interval) == now_time)
+                {
+                    now_length += seq2 - seq1;
+                }
+                else
+                {
+                // Otherwise, write the current interval throughput and set a new interval.
+                    for (double i = double(last_time + 1) * xput_interval; i < double(now_time) * xput_interval; i += xput_interval)
+                    {
+                        xput_data << i << " " << 0 << endl;
+                        xputs.push_back(0);
+                    }
+
+                    xput_data << double(now_time) * xput_interval << " " << now_length / xput_interval << endl;
+                    // Keep values to in an array for median finding purposes.
+                    xputs.push_back(now_length / xput_interval);
+                    last_time = now_time;
+                    now_time = long(ttime / xput_interval);
+                    now_length = seq2 - seq1;
+                }
+                */
             }
+
+            // Look for packet loss.
+            // If there's a duplicate "seq m:n", it is a retransmit.
+            if(seq_or_ack == "seq" && flag)
+            {
+                string s;
+                char seq1c[20];
+                sprintf(seq1c,"%ld", seq1);
+                char seq2c[20];
+                sprintf(seq2c,"%ld", seq2);
+                s += p1 + p2 + seq1c + seq2c;
+
+                if(find(seqs.begin(), seqs.end(), s) != seqs.end())
+                {
+                    //cout << "Duplicate seq: " << p1 << ">" << p2 << " seq " << seq1c << ":" << seq2c << endl;
+                    total_tcp_lost++;
+                }
+                else
+                {
+                    // If it hasn't been seen before, add it.
+                    seqs.push_back(s);
+                }
+            }
+            // If there is a duplicate "ack n" that has been seen only once before,
+            // a packet has been lost.
+            else if (seq_or_ack == "ack")
+            {
+                string s;
+                char seq1c[20];
+                sprintf(seq1c,"%ld", seq1);
+                s += p1 + p2 + seq1c;
+
+                // If this has been seen and only seen once, a packet was lost.
+                if(acks.count(s) != 0 && acks[s] == false)
+                {
+                    acks[s] = true;
+                    //cout << "Duplicate ack: " << p1 << ">" << p2 << " ack " << seq1c << endl;
+                    total_tcp_lost++;
+                }
+                else
+                {
+                    // If it hasn't been seen before, add it.
+                    if (acks.count(s) == 0)
+                        acks[s] = false;
+                }
+            }
+            total_tcp_packets++;
         }
         else if (protocol == "UDP,") // UDP
         {
@@ -287,7 +401,7 @@ int main(int argc, char ** argv)
             if(file_map.count(p1 + "-" + p2) == 0)
             {
                 file_map[(p1 + "-" + p2)] = new ofstream(("connections/" + p1 + "-" + p2 + "_UDP").c_str());
-		open_files++;
+                open_files++;
                 reverse[(p1 + "-" + p2)] = (p2 + "-" + p1);
                 connection_count++;
                 udp_offset[(p1 + "-" + p2)] = 0;
@@ -297,23 +411,121 @@ int main(int argc, char ** argv)
 
             udp_offset[(p1 + "-" + p2)] += len;
             max_len[(p1 + "-" + p2)] = udp_offset[(p1 + "-" + p2)];
-            
-	    // If the file has been closed, reopen it.
-	    if(!((file_map[p1+ "-" + p2])->is_open()))
-	    {
-		(file_map[p1+"-"+p2])->open(("connections/" + p1 + "-" + p2 + "_UDP").c_str(), std::ofstream::out | std::ofstream::app);
-		open_files++;
-	    }
-            
-	    // Write the packet time and sequence number into the file for that connection.
+
+            // If the file has been closed, reopen it.
+            if(!((file_map[p1+ "-" + p2])->is_open()))
+            {
+                (file_map[p1+"-"+p2])->open(("connections/" + p1 + "-" + p2 + "_UDP").c_str(), std::ofstream::out | std::ofstream::app);
+                open_files++;
+            }
+
+            // Write the packet time and sequence number into the file for that connection.
             (*(file_map[p1+ "-" + p2])) << setprecision(14) << ttime << " " << udp_offset[(p1 + "-" + p2)] << endl;
 
-	    // If there are too many files open, close this one.
-	    if(open_files > OPEN_FILE_HANDLE_LIMIT) {(*(file_map[p1+ "-" + p2])).close(); open_files--;}
+            // If there are too many files open, close this one.
+            if(open_files > OPEN_FILE_HANDLE_LIMIT) {(*(file_map[p1+ "-" + p2])).close(); open_files--;}
+
+            /*
+            if(long(ttime / xput_interval) == now_time)
+            {
+                now_length += len;
+            }
+            else
+            {
+                for (double i = double(last_time + 1) * xput_interval; i < double(now_time) * xput_interval; i += xput_interval)
+                {
+                    xput_data << i << " " << 0 << endl;
+                    xputs.push_back(0);
+                }
+
+                xput_data << double(now_time) * xput_interval << " " << now_length / xput_interval << endl;
+                // Keep values to in an array for median finding purposes.
+                xputs.push_back(now_length / xput_interval);
+                last_time = now_time;
+                now_time = long(ttime / xput_interval);
+                now_length = len;
+            }*/
         }
         skipline(inp);
         eatspaces(inp);
     }
+
+/*
+    xputs.push_back(now_length / xput_interval);
+    xput_data << now_time * xput_interval << " " << now_length / xput_interval << endl;
+
+    double xp_max = xputs[0];
+    double xp_sum = 0;
+
+    // Find the maximum throughput and calculate the sum of all throughputs.
+    for(int i = 0; i < xputs.size(); i++)
+    {
+        if (xp_max < xputs[i])
+            xp_max = xputs[i];
+        xp_sum += xputs[i];
+    }
+
+
+    // Simplest sorting algorithm in the world! :)
+    bool swapped = false;
+    for(int i = xputs.size(); i > 0; i--)
+    {
+        swapped = false;
+        for (int j = 1; j <= i; j++)
+        {
+            if (xputs[i-1] > xputs[i])
+            {
+                swap(xputs[i-1], xputs[i]);
+                swapped = true;
+            }
+        }
+        if(!swapped)
+            break;
+    }
+
+
+    meta << "xput_max\t" << xp_max / 1e+3 << endl;
+    meta << "xput_avg\t" << (xp_sum / xputs.size()) / 1e+3 << endl;
+    meta << "xput_mdn\t" << xputs[xputs.size() / 2] / 1e+3 << endl;
+*/
+    meta << "tcp_lost\t" << total_tcp_lost << endl;
+    meta << "tcp_total\t" << total_tcp_packets << endl;
+    meta << "loss_rate\t" << double(total_tcp_lost) / double(total_tcp_packets) * 100.0 << endl;
+
+    meta.close();
+/*
+    // Throughput plot.
+    ofstream xputplot("xput.gp");
+    xputplot    << "set style data lines"  << endl
+            << "set title \"" << plot_title << " Throughput (" << xput_interval * 1000 << " ms intervals)\"" << endl
+            << "set key off" << endl
+            << "set xlabel \"Time (seconds)\"" << endl
+            << "set ylabel \"Throughput (KB/s)\"" << endl
+            << "set term postscript color eps enhanced \"Helvetica\" 16" << endl
+            << "set size ratio 0.5" << endl
+            << "# Line style for axes" << endl
+            << "set style line 80 lt 0" << endl
+            << "set grid back linestyle 81" << endl
+            << "set border 3 back linestyle 80" << endl
+            << "set xtics nomirror" << endl
+            << "set ytics nomirror" << endl
+            << "set out \'xp.ps\'" << endl
+            << "plot \"xput.txt\" using 1:($2/1e3) with lines lw 3";
+    xputplot.close();
+    // Draw the plot.
+    system("gnuplot xput.gp");
+    // Convert it to JPEG for convenience.
+    stringstream ssstr;
+    ssstr   << "convert -font helvetica -fill black -draw \'text 50,100 \""
+            << "Maximum throughput: " << xp_max / 1e+3 << " KB/s\n"
+            << "Mean throughput: " << (xp_sum / xputs.size()) / 1e+3 << " KB/s\n"
+            << "Median throughput: " << xputs[xputs.size() / 2] / 1e+3 << " KB/s\n"
+            << "TCP packets lost: " << total_tcp_lost << "\n"
+            << "Total TCP packets: " << total_tcp_packets << "\n"
+            << "Loss rate: " << double(total_tcp_lost) / double(total_tcp_packets) * 100.0 << "%\n"
+            << "\"\' -pointsize 6 -density 1000 xp.ps -scale 2000x1000 xp.jpg";
+    system(ssstr.str().c_str());
+*/
 
     // Create a file to map the plot legend to connections in the plot.
     ofstream index_file("connection_index.txt");
@@ -399,6 +611,7 @@ int main(int argc, char ** argv)
     }
     plot << endl;
     plot.close();
+
     // Draw the plot.
     system("gnuplot plot.gp");
     // Convert it to JPEG for convenience.
