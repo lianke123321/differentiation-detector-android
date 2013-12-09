@@ -107,7 +107,7 @@ is easy to scale to a global deployment.
 We describe the implementation of \meddle, evaluate its performance and discuss 
 the current deployment. We also discuss the benefits and limitations of our approach.
 
-\subsection{Visibility into Mobile Internet Traffic}
+\subsection{Visibility: into Mobile Internet Traffic}
 \label{subsec:design_visibility}
 
 \meddle leverages the fact that the vast majority of mobile devices provide native VPN support, a feature typically provided to satisfy enterprise clients. We currently support VPN tunnels on iOS and Android; we anticipate being able to support the next version of Windows Phone that includes a native VPN implementation.
@@ -148,8 +148,8 @@ This enables our approach to provide visibility into secure channels established
 Currently we use this only in controlled experiments 
 where \emph{no user traffic is intercepted}. We are also designing a study for IRB approval where we 
 will use SSL bumping to remove PII from user-generated traffic only when users opt in.
-%
-%\subsection{Services for Controlling Traffic}
+
+\subsection{Control: Something for Controlling Traffic}
 %\label{subsec:design_control}
 %\begin{figure}
 %\begin{center}
@@ -192,7 +192,7 @@ access network is modifying Web content in flight, and we use a companion app to
 test detect service differentiation within mobile ISPs. To support these services, we 
 run services on \meddle servers that are accessed via untunneled connections. 
 
-\subsection{Deployability}
+\subsection{Deployability: Something}
 \label{subsec:design_deploy}
 
 This section describes how \meddle provides clear incentives for user adoption, a 

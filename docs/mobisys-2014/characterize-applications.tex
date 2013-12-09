@@ -1,17 +1,44 @@
 \section{Application: Mobile Privacy\\ Revelations}
 \label{sec:characterize-app}
 
+
 Privacy has rapidly become a critical issue for user interactions with Internet services, particularly in 
 mobile environment where location, contact information and other PII are readily available. While the problem 
 is well known~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}, previous work lacks a general 
 way to identify leaks using network flows alone, and they provide no portable way to block those 
-activities. Our key 
-contributions are 1) we conduct controlled experiments to identify how PII is being leaked by apps  
- and 2) use \platname{} to understand how this information is being shared both in plaintext and over 
-secure channels. 
-For our analysis we focus on {\it what} PII is sent,  {\it to whom} is the PII sent, and {\it how frequently} is PII sent.
-Then we describe a system that visualizes 
-this activity and allows users to block it.
+activities. In this section, we use \meddle to identify and block these leaks. First, we describe \emph{ReCon}, 
+a tool that allows users to visualize and block privacy-invasive connections. Then we describe how we populate 
+this tool with information about privacy leaks, using controlled experiments to identify how PII is being leaked by apps  
+ both in plaintext and over secure channels. 
+%For our analysis we focus on {\it what} PII is sent,  {\it to whom} is the PII sent, and {\it how frequently} is PII sent.
+%Then we describe a system that visualizes 
+%this activity and allows users to block it.
+
+\subsection{Revealing and Controlling PII Leaks}
+\label{subsec:recon}
+
+\emph{ReCon} is a \meddle application for visualizing how users are being tracked as they 
+use their devices, and for blocking unwanted connections.
+It provides a visual interface similar to Mozilla Collusion~\cite{collusion}; instead of 
+visualizing only websites, our tool shows apps and the 3rd party sites they contact. 
+Figure~\ref{fig:recon} shows screen captures of our tool, with the default view of trackers contacted by apps (left) and how 
+hovering/tapping on a tracker reveals the apps contacting the tracker (right). Similarly, hovering/tapping on an app 
+highlights all the trackers contacted by the app.
+
+\begin{figure}[tb]
+\subfloat[Default view.]{\label{fig:recon-all} \includegraphics[width=0.47\columnwidth]{figures/ReConAll.pdf}}
+\hspace{0.1in}
+\subfloat[View showing tracking by Scorecard Research.]{\label{fig:recon-highlight} \includegraphics[width=0.47\columnwidth]{figures/ReConHighlight.pdf}}
+\caption{Screen captures of the \emph{ReCon} tool, allowing users to visualize how they are being tracked by apps, and install custom filters by clicking on links to ``remove'' them. }
+\label{fig:recon}
+\vspace{\postfigspace}
+\end{figure}
+
+In addition to revealing privacy leaks, \emph{ReCon} allows users to block them. Specifically, users can 
+click/tap on a link to ``destroy'' it -- installing a custom 
+filter for the corresponding (app, tracker) pair. To make this approach practical, we are developing 
+an interface to crowdsource block lists, much like how Web browser ad-blocking filters are maintained 
+and distributed. A demo of our tool is located at \url{http://goo.gl/A17h9}. \drc{Update this link}
 
 \begin{table*}[t]    
     \centering
@@ -142,30 +169,7 @@ We observe that all the devices in the \mobWild dataset contacted doubleclick.co
 Further, 66.12\% of the ads and analytics traffic volume in the \mobWild dataset contained the default OS \useragent or the user agent of browsers, 6.46\% of the traffic contained a blank user-agent field, and 4.8\% of the traffic contained a signature of \emph{Google-Analytics} library.
 The rest of the traffic contained signatures of other apps such as Facebook, Pandora, and YouTube.
 
-\subsection{Revealing and Controlling PII Leaks}
-\label{subsec:recon}
 
-Given the extensive nature of tracking over mobile devices, we developed  
-\emph{ReCon}, a tool to visualize how user's are being tracked as they use their devices. 
-\emph{ReCon} provides a visual interface similar to Mozilla Collusion~\cite{collusion}; instead of 
-visualizing only websites, our tool shows apps and the 3rd party sites they contact. Figure~\ref{fig:recon} shows screen captures of our tool, with the default view of trackers contacted by apps (left) and how 
-hovering/tapping on a tracker reveals the apps contacting the tracker (right). Similarly, hovering/tapping on an app 
-highlights all the trackers contacted by the app.
-
-\begin{figure}[tb]
-\subfloat[Default view.]{\label{fig:recon-all} \includegraphics[width=0.47\columnwidth]{figures/ReConAll.pdf}}
-\hspace{0.1in}
-\subfloat[View showing tracking by Scorecard Research.]{\label{fig:recon-highlight} \includegraphics[width=0.47\columnwidth]{figures/ReConHighlight.pdf}}
-\caption{Screen captures of the \emph{ReCon} tool, allowing users to visualize how they are being tracked by apps, and install custom filters by clicking on links to ``remove'' them. }
-\label{fig:recon}
-\vspace{\postfigspace}
-\end{figure}
-
-In addition to revealing privacy leaks, \emph{ReCon} allows users to block them. Specifically, users can 
-click/tap on a link to ``destroy'' it -- installing a custom 
-filter for the corresponding (app, tracker) pair. To make this approach practical, we are developing 
-an interface to crowdsource block lists, much like how Web browser ad-blocking filters are maintained 
-and distributed. A demo of our tool is located at \url{http://goo.gl/A17h9}. \drc{Update this link}
 
 
 %%% Local Variables: 
