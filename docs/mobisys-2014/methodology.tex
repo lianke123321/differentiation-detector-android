@@ -45,7 +45,7 @@ in a controlled environment.
 We enter unique and distinguishable user credentials when 
 interacting with apps to easily extract the corresponding PII from 
 network flows (if they are not obfuscated). We use the same technique 
-to test malware apps (\S\ref{sec:malware}).
+to test malware apps (\S\ref{subsec:malware}).
 \tbd{Dave: we need to fix this once you are done with section on PIIs}
 
 \noindent\textbf{Automated tests.} The second set of controlled experiments consist of fully-automated
@@ -296,7 +296,6 @@ First, we note that 176 of the 209 iOS apps we manually tested generated HTTP tr
 We observe that the \httphost field uniquely identified the corresponding app for 47\% of the iOS apps we tested (column 5); the flows containing the application signature was responsible from 15\% to 98\% of the traffic volume from the application during  our measurements. The rest of the traffic was either due to ads or to CDNs that did not contain the app signature.  
 The \httphost field also can identify the provider that released an app (\eg Zynga but not \emph{Farmville}).
 In column 6 of Table~\ref{tab:classification-success}, we see that classification by organization is effective for 67\% of iOS apps. 
-\drc{AM doesn't follow the classification}
 
 \emph{Android:} We observe similar results for flows from apps in Google Play.
 However, for the apps from the Third-party store we observe that the \httphost field is less effective. 

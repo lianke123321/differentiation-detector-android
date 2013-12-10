@@ -17,7 +17,7 @@ approaches regarding network behavior of mobile systems.
 \begin{tabular}{|l|l|l|l|l|l|}
 \hline
  & \textbf{Network Coverage} &  \textbf{Portability} &  \textbf{Deployment model} &   \textbf{Meas. Type}  & \textbf{Control?} \\ \hline
-AT\&T/Telefonica study~\cite{vallina-rod:ads,gerber:passivespeed} & Single carrier & All OSes & Instrument cell infrastructure & Passive & No \\ \hline
+Large ISP studies~\cite{vallina-rod:ads,gerber:passivespeed} & Single carrier & All OSes & Instrument cell infrastructure & Passive & No \\ \hline
 WiFi study~\cite{chen:wifi} & Single WiFi network & All OSes & Instrument WiFi network & Passive & No \\ \hline
 PhoneLab~\cite{PhoneLab}/TaintDroid~\cite{enck:taintdroid} & Multiple networks & Android & Install custom OS & Active/Passive & Yes \\ \hline
 MobiPerf~\cite{wang:middleboxes}/SpeedTest~\cite{sommers:cellwifi} & Multiple networks & Android & Install App & Active & Yes \\ \hline \hline
@@ -44,7 +44,7 @@ estimate network performance for mobile devices.  %\cite{maier:mobtraffic} \cite
 Similar to these approaches, \platname provides continuous passive monitoring of mobile network 
 traffic; however, \platname is the first to do so across all networks to which a device connects.
 
-Active measurements~\cite{wang:middleboxes,sommers:cellwifi} allow researchers to understand network topologies and instantaneous 
+Active measurements~\cite{wang:middleboxes,sommers:cellwifi} capture network topologies and instantaneous 
 performance at the cost of additional, synthetic traffic for probing. In contrast, \platname uses 
 passive measurements to characterize the traffic that devices
 naturally generate. PhoneLab~\cite{PhoneLab} provides a mobile experimentation platform with 
