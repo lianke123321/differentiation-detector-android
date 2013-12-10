@@ -8,7 +8,7 @@ Previous work focused on addressing this problem in fixed-line networks; to
 the best of our knowledge we are the first to provide this functionality for 
 mobile systems.
 
-\subsection{Web Tripnets: Detecting ISP Content Manipulation}
+\subsection{Detecting Content Manipulation}
 
 ISPs, middleboxes and client software are known to change Web page content for 
 a variety of reasons including performance optimization and security. In some cases, 
@@ -73,16 +73,12 @@ Web content. Instead, we cache Web pages at the tripnet-injecting server and co-
 there. Thus we return exactly the same Web page that was received over the tunneled connection. 
 Any difference in page content can only be due to ISP behavior. 
 
+Note that this does not address cases 
+where modification is based on destination IP or when the entire page is replaced (\eg a block page). 
+To detect this, we can set the tripwire to fetch the page from the origin server at the cost of imprecise 
+identification due to dynamic content.  
 
-\noindent\textbf{Sites and ISPs tested.} We conducted controlled experiments using our Tripnet 
-architecture, using the top 100 Web sites according to Alexa. We tested using 
-AT\&T, T-Mobile and Verizon in the US, and Sosh in France. 
-Many sites customize content according to User-Agent strings, so we spoof User-Agents 
-as coming from iOS, Andriod and desktop clients.
-
-
-
-\noindent\textbf{Content modification.}
+\noindent\textbf{Content modification/replacement.}
 In addition to detecting changes to text content in 
 Web pages, we use our controlled experiments to investigate whether ISPs are manipulating 
 media content, \eg downsampling high-resolution images to reduce bandwidth consumption 
@@ -92,9 +88,11 @@ app or tethered laptop to collect the Web media objects fetched over the mobile 
 
 \noindent\textbf{Sites and ISPs tested.} We conducted controlled experiments using our Tripnet 
 architecture, using the top 100 Web sites according to Alexa. We tested using 
-AT\&T, T-Mobile and Verizon in the US, and Orange, Sosh and Bouygues in France. 
-Many sites customize content according to User-Agent strings, so we spoof User-Agents 
-as coming from iOS, Andriod and desktop clients.
+AT\&T, T-Mobile and Verizon in the US, and Sosh in France. 
+Many sites customize content according to \useragent strings, so we spoof them  
+as coming from iOS, Android and desktop clients.
+
+
 
 \noindent\textbf{Content modification/injection.} We found no cases of page modifications in 
 the networks tested. In addition the example in Fig.~\ref{fig:tripnet-example}, we found whole-page replacement in the case of T-Mobile. A 
@@ -106,7 +104,7 @@ script size is 256\,KB; when accessed from the proxy server the script is 93\,KB
 size is because the latter uses a minified version of the script; it is unclear why this is not served 
 to all the networks.
 
-\subsection{Mobile Replay: Detecting Service Differentiation}
+\subsection{Detecting Service Differentiation}
 
 In this section, we describe how we use \meddle to detect service differentiation 
 in ISPs. To the best of our knowledge, this is the first system to provide such information 
