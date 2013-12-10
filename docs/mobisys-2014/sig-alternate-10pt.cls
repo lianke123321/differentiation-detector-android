@@ -127,8 +127,8 @@
 \typeout{Excerpts were taken from (Journal Style) 'esub2acm.cls'.}
 \typeout{****** Bugs/comments/suggestions/technicalities to Gerry Murray -- murray@hq.acm.org ******}
 \typeout{Questions on the style, SIGS policies, etc. to Adrienne Griscti griscti@acm.org}
-\oddsidemargin 4.5pc
-\evensidemargin 4.5pc
+\oddsidemargin 0.75in
+\evensidemargin 0.75in
 \advance\oddsidemargin by -1in  % Correct for LaTeX gratuitousness
 \advance\evensidemargin by -1in % Correct for LaTeX gratuitousness
 \marginparwidth 0pt             % Margin pars are not allowed.
@@ -136,7 +136,7 @@
                                 % marginal note
 
                                 % Top of page:
-\topmargin 4.5pc                % Nominal distance from top of page to top of
+\topmargin 0.875in               % Nominal distance from top of page to top of
                                 % box containing running head.
 \advance\topmargin by -1in      % Correct for LaTeX gratuitousness
 \headheight 0pt                 % Height of box containing running head.
@@ -154,10 +154,10 @@
 \headheight 12pt                % Height of box containing running head.
 \headsep 25pt                   % Space between running head and text.
 
-\textheight 666pt       % 9 1/4 column height
-\textwidth 42pc         % Width of text line.
+\textheight 9.25in      % 9 1/4 column height
+\textwidth 7in         % Width of text line.
                         % For two-column mode:
-\columnsep 2pc          %    Space between columns
+\columnsep 0.33in          %    Space between columns
 \columnseprule 0pt      %    Width of rule between columns.
 \hfuzz 1pt              % Allow some variation in column width, otherwise it's
                         % too hard to typeset in narrow columns.
