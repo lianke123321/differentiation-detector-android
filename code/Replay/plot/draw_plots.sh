@@ -48,6 +48,7 @@ novpn_xput_avg='0'
 novpn_xput_mdn='0'
 
 novpn_loss_rate='0'
+novpn_loss_rate2='0'
 
 novpn_rtt_ab_min='0'
 novpn_rtt_ba_min='0'
@@ -66,6 +67,7 @@ vpn_xput_avg='0'
 vpn_xput_mdn='0'
 
 vpn_loss_rate='0'
+vpn_loss_rate2='0'
 
 vpn_rtt_ab_min='0'
 vpn_rtt_ba_min='0'
@@ -96,8 +98,37 @@ do
     # Generate the script to draw the plot.
     echo ../../../../plot/filterer/filter ../../text_pcaps/$name.txt `cat ../../confs/"$name"`\; >filterit.sh
     cd ../../../../plot/splitcap/; mono ./SplitCap.exe -r ../../data/$dir/$f -o ../../data/$dir/generated_plots/$name/dissected_pcaps/ >/dev/null  2>/dev/null; cd ../../data/$dir/generated_plots/$name/;
-    echo echo File: `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'` \>$name.rtt.txt >>filterit.sh
-    echo tcptrace -lr `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'`\| awk \'/RTT min/,/RTT stdev/\' \>\>$name.rtt.txt\; >>filterit.sh
+    echo echo File: `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'` \>$name.rtt.txt\; >>filterit.sh
+    echo tcptrace -lr `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'` \| awk \'/RTT min/,/RTT stdev/\' \>\>$name.rtt.txt\; >>filterit.sh
+
+    mkdir rtts
+    echo cd rtts >>filterit.sh
+    echo tcptrace -Z ../../../$f \>/dev/null \; >>filterit.sh
+    echo cat *_rttraw.dat \| grep -v " 0" \| sort -n -k2,2 \| awk \'{print \$2}\' \>rtts.txt >>filterit.sh
+    echo cd .. >>filterit.sh
+    echo gnuplot cdfrtt.gp\; >>filterit.sh
+
+    echo 'set title "RTT CDF"
+set style data lines
+set key bottom right
+set xlabel "CDF"
+set ylabel "RTT"
+set yrange [0:1]
+set term postscript color eps enhanced "Helvetica" 16
+set size ratio 0.5
+# Line style for axes
+set style line 80 lt 0
+set grid back linestyle 81
+set border 3 back linestyle 80
+set xtics nomirror
+set ytics nomirror
+set out "cdfrttp.ps"
+a=0
+cumulative_sum(x)=(a=a+x,a)
+countpoints(file) = system( sprintf("grep -v \"^#\" %s| wc -l", file) )
+pointcount = countpoints("rtts/rtts.txt")
+plot "rtts/rtts.txt" using 1:(1/pointcount) smooth cumulative with lines lw 3 linecolor rgb "green" t "A to B"' >cdfrtt.gp
+
     echo cat meta.txt \>$name.stats.txt\; >>filterit.sh
     echo tshark -qz io,stat,0.1 -r ../../../$dir/$f \| ../../../../plot/xput/xput xput.txt \>\>$name.stats.txt\; >>filterit.sh
     echo 'set style data lines
@@ -229,3 +260,4 @@ echo encrypted_rtt_ab_avg: `bc -l <<< "$vpn_rtt_ab_avg / $vpn_rtt_count"` >>../d
 echo encrypted_rtt_ba_avg: `bc -l <<< "$vpn_rtt_ba_avg / $vpn_rtt_count"` >>../data/$dir.stats.txt
 echo encrypted_rtt_ab_stdev: `bc -l <<< "$vpn_rtt_ab_stdev / $vpn_rtt_count"` >>../data/$dir.stats.txt
 echo encrypted_rtt_ba_stdev: `bc -l <<< "$vpn_rtt_ba_stdev / $vpn_rtt_count"` >>../data/$dir.stats.txt
+

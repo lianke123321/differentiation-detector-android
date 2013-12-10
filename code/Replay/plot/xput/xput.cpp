@@ -43,14 +43,24 @@ int main(int argc, char **argv)
     string temp;
     vector<double> xputs;
     ofstream output_file(argv[1]);
+    if (newer)
+    {
+	for (int i = 0; i < 4; i++) skipline(cin);
 
-    for (int i = 0; i < 4; i++) skipline(cin);
+	cin >> temp >> temp >> temp;
+	cin.get();
+	cin >> xput_interval;
 
-    cin >> temp >> temp >> temp;
-    cin.get();
-    cin >> xput_interval;
+        for (int i = 0; i < 7; i++) skipline(cin);
+    }
+    else
+    {
+	for (int i = 0; i < 3; i++) skipline(cin);
 
-    for (int i = 0; i < 7; i++) skipline(cin);
+	cin >> temp >> xput_interval;
+
+        for (int i = 0; i < 4; i++) skipline(cin);
+    }
 
     double start, end;
     long frames, bytes;
