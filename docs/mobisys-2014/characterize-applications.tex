@@ -2,28 +2,20 @@
 \label{sec:characterize-app}
 
 
-Privacy has rapidly become a critical issue for user interactions with Internet services, particularly in 
-mobile environment where location, contact information and other PII are readily available. While the problem 
-is well known~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}, previous work lacks a general 
-way to identify leaks using network flows alone, and they provide no portable way to block those 
-activities. In this section, we use \meddle to identify and block these leaks. First, we describe \emph{ReCon}, 
-a tool that allows users to visualize and block privacy-invasive connections. Then we describe how we populate 
-this tool with information about privacy leaks, using controlled experiments to identify how PII is being leaked by apps  
- both in plaintext and over secure channels. 
-%For our analysis we focus on {\it what} PII is sent,  {\it to whom} is the PII sent, and {\it how frequently} is PII sent.
-%Then we describe a system that visualizes 
-%this activity and allows users to block it.
+Privacy has rapidly become a critical issue for user interactions with Internet services, particularly in mobile environment where location, contact information and other PII are readily available. 
+While the problem is well known~\cite{roesner:webtrackers,leontiadis:mobileads,vallina-rod:ads}, previous work lacks a general way to identify leaks using network flows alone, and they provide no portable way to block those activities. 
+In this section, we use \meddle to identify and block these leaks. 
+First, we describe \emph{ReCon}, a tool that allows users to visualize and block privacy-invasive connections. 
+Then we describe how we populate this tool with information about privacy leaks, using controlled experiments to identify how PII is being leaked by apps both in plaintext and over secure channels. 
 
 \subsection{Revealing and Controlling PII Leaks}
 \label{subsec:recon}
 
-\emph{ReCon} is a \meddle application for visualizing how users are being tracked as they 
-use their devices, and for blocking unwanted connections.
-It provides a visual interface similar to Mozilla Collusion~\cite{collusion}; instead of 
-visualizing only websites, our tool shows apps and the third party sites they contact. 
-Figure~\ref{fig:recon} shows screen captures of our tool, with the default view of trackers contacted by apps (left) and how 
-hovering/tapping on a tracker reveals the apps contacting the tracker (right). Similarly, hovering/tapping on an app 
-highlights all the trackers contacted by the app.
+\emph{ReCon} is a \meddle application for visualizing how users are being tracked as they use their devices, and for blocking unwanted connections.
+It provides a visual interface similar to Mozilla Collusion~\cite{collusion}; instead of visualizing only websites, our tool shows apps and the third party sites (trackers) they contact. 
+We identify trackers using a publicly available database of tracker domains~\cite{yoyoads}; we augment this list with the domain that leaked PII during our controlled experiments, discussed later in this section, and recent research on mobile ads~\cite{hornyack:appfence, leontiadis:mobileads}.
+Figure~\ref{fig:recon} shows screen captures of our tool, with the default view of trackers contacted by apps (left) and how hovering/tapping on a tracker reveals the apps contacting the tracker (right). 
+Similarly, hovering/tapping on an app highlights all the trackers contacted by the app.
 
 \begin{figure}[tb]
 \subfloat[Default view.]{\label{fig:recon-all} \includegraphics[width=0.47\columnwidth]{figures/ReConAll.pdf}}
@@ -34,11 +26,11 @@ highlights all the trackers contacted by the app.
 \vspace{\postfigspace}
 \end{figure}
 
-In addition to revealing privacy leaks, \emph{ReCon} allows users to block them. Specifically, users can 
-click/tap on a link to ``destroy'' it -- installing a custom 
-filter for the corresponding (app, tracker) pair. To make this approach practical, we are developing 
-an interface to crowdsource block lists, much like how Web browser ad-blocking filters are maintained 
-and distributed. A demo of our tool is located at \url{http://goo.gl/pU689F}. 
+In addition to revealing privacy leaks, \emph{ReCon} allows users to block them. 
+Specifically, users can click/tap on a link to ``destroy'' it -- installing a  custom (device specific) filter for the corresponding tracker. 
+\tbd{AR: I have replaced pair with tracker. Our filter is DNS based and we cannot block for a specific app because DNS requests are agnostic to the apps.}
+To make this approach practical, we are developing an interface to crowdsource block lists, much like how Web browser ad-blocking filters are maintained and distributed. 
+A demo of our tool is located at \url{http://goo.gl/pU689F}. 
 
 \begin{table*}[t]    
     \centering
@@ -51,22 +43,27 @@ and distributed. A demo of our tool is located at \url{http://goo.gl/pU689F}.
        \hline
        Google Play&Android&100&3 (3\%)&10 (10\%)&2 (2\%)&1 (1\%)&21 (21\%)&0 (0\%)&13 (13\%)\\
        \hline
-Third Party&Android&732&3 (0.4\%)&57 (7.8\%)&3 (0.4\%)&0 (0\%)&85 (11.6\%)&6 (0.8\%)&39 (5.3\%)\\
+       Third Party&Android&732&3 (0.4\%)&57 (7.8\%)&3 (0.4\%)&0 (0\%)&85 (11.6\%)&6 (0.8\%)&39 (5.3\%)\\
        \hline
+       Malware&Android&111&1(0.9\%)&20 (18.01\%)&0 (0.0\%)&0 (0\%)&20 (18.01\%)&9 (8.1\%)&68 (61.2\%)\\ 
+       \hline  
     \end{tabular}
     \end{small}
-    \caption{Summary of PII leaked in plaintext (HTTP) by Android and iPhone apps. \emph{The popular iOS apps tend to leak the location information in the clear while Android apps leak the IMEI number and Android ID in the clear. }}
+    \caption{\textbf{Summary of PII leaked in plaintext (HTTP) by Android and iPhone apps.} \emph{The popular iOS apps tend to leak the location information in the clear while Android apps leak the IMEI number and Android ID in the clear.}}
     \vspace{\postfigspace}
     \label{tab:pii}
 \end{table*}
 
 \subsection{Controlled experiments}
+\label{subsec:exptpii}
 
+We use the traffic traces from our controlled experiments to identify how apps leak PII. 
 For our controlled experiments, we created dummy user accounts with fake contact information (see \S\ref{sec:dataset-contr-exper}).  
-Our goal is to detect if any PII---email address, phone number, IMEI---stored on the device is leaked across the network over HTTP or HTTPS.
+Our goal is to detect if any PII stored on the device is leaked across the network over HTTP or HTTPS.
+For our analysis we focus on the email address, location, username and password used during authentication, device ID, contact information, and the IMEI number. 
 Some of this information is required for normal app operation; however, such information should never travel across the network in plaintext (HTTP).  
 
-\mypara{PII leaks in the clear} 
+\mypara{PII leaks in the clear.} 
 Table~\ref{tab:pii} presents the PII leaked by Android and iPhone apps. 
 The IMEI, a unique identifier tied to a mobile device, and the Android ID (tied an Android installation) are the most commonly leaked PII by Android apps.  
 These can be used to track and correlate a user's behavior across Web services. 
@@ -74,25 +71,24 @@ Table~\ref{tab:pii} shows that other information like contacts, emails, and pass
 The email address used to sign up for the services was leaked in the clear by 13 iOS and 3 Android apps from our set of popular apps.
 While only one Android app (belonging to the \emph{Photography} category) leaked a password in the clear, we were surprised to learn that six of the most popular iOS apps send user credentials in the clear, \emph{including the password}. 
 
-Particularly disconcerting is our observation that an app in the Medicine category -- which the provider claims has ``\emph{1 million active members 
-of which 50\% are US physicians}'' -- sends the user's first name, last name, email, password, and zip code in the clear. 
-Given US physicians have access to highly sensitive data like medical records, we believe it is particularly 
-important for this app to protect user credentials (which are often used for multiple services). Following 
-responsible disclosure, we will notify app authors of these sensitive privacy leaks. 
+Particularly disconcerting is our observation that an app in the Medicine category -- which the provider claims has ``\emph{1 million active members of which 50\% are US physicians}'' -- sends the user's first name, last name, email, password, and zip code in the clear. 
+Given US physicians have access to highly sensitive data like medical records, we believe it is particularly important for this app to protect user credentials (which are often used for multiple services). 
+Following responsible disclosure, we will notify app authors of these sensitive privacy leaks. 
 
 \mypara{PII leaked from same apps on different OSes} 
 We observed that the information leaked by an app depends on the OS.
 Of the top hundred apps for iOS and Android, 26 apps are available on both iOS and Android. 
 Of these 26 apps, 17 apps leaked PII on at least one OS: 12 apps leaked PIIs only on Android, 2 apps leaked PII only on iOS, while only one app had the same data leakage in both OSes.
 Of the remaining two apps that leaked PII, one app leaked the android ID and IMEI in Android and username in iOS, while the other app leaked the Android~ID in Android and location in iOS. 
-This observation, the dependence of PII leaks on the OS, highlights the importance of \meddle that can analyze PII leaks across multiple OSes.
+The difference in the PII leaks is primarily due to the different privileges that the underlying OS provides these apps. 
+The dependence of PII leaks on the OS highlights the importance of \meddle that can be used to analyze the behavior of apps across multiple OSes.
 
 \begin{table}
     \centering
     \begin{small}
     \begin{tabular}{|l|c|c||c|}
        \hline
-       {\bf Host}& {\em Ads \& Analytics} \tabularnewline
+       {\bf Host}& {\bf Tracker} \tabularnewline
        \hline              
        android.clients.google.com & -  \tabularnewline
        getjar.com        & -  \tabularnewline
@@ -107,35 +103,92 @@ This observation, the dependence of PII leaks on the OS, highlights the importan
     \vspace{\postfigspace}
 \end{table}
 
-\mypara{PII leaked over SSL} 
-During our experiments, we observed that PII is also sent over HTTPS. 
-We observe that two of the top 5 sites  that receive this information are ads and analytics (A\&A) sites.
+\mypara{PII leaked over SSL.} 
+During our experiments, we observed that PII is also sent over encrypted channels.  
+We observe that two of the top 5 sites that receive PII over SSL are trackers.
+Though Web services that are not trackers require PIIs for their proper functioning, users are mostly unaware of their PII being sent to these trackers. 
 
 Our observations highlight the limitations of current mobile OSes with respect to controlling access to PII via app permissions. 
-In particular, it is unlikely that users are made aware that they are granting access to PII for A\&A sites when embedded in an app that serves a different purpose. 
-This problem is pervasive: of the 77 sites that received some PII in the clear or over HTTPS, 35 sites were third party ads and analytics sites.
+In particular, it is unlikely that users are made aware that they are granting access to PII for tracker libraries embedded in an app that serves a different purpose. 
+This problem is pervasive: of the 77 sites that received some PII in the clear or over SSL during our controlled experiments, 35 sites were third party trackers.
 
 We note that our observations are a conservative estimate of PII leakage. 
 Specifically, we cannot detect PII leakage if the data is obfuscated (\eg via hashing). 
-Regardless,  our study shows that a significant amount of PII leaks not only through unobfuscated channels but even unencrypted ones. 
+Regardless, our study shows that a significant amount of PII leaks not only through unobfuscated channels but even unencrypted ones. 
+
+\subsection{PII Leaks by Malware}
+\label{subsec:exptpii}
+
+PII leaks are not limited to apps found in authorized stores, we observe that malwares aggressively leak the PIIs.
+In the fixed-line environment, malwares are used for botnets, spam, data exfiltration, and sabotage, among other purposes. 
+We use \meddle to not only investigate PII leaks by known malware but also show that with the help of \meddle users can block this exfiltration to minimize the impact of the malware.
+
+We base our analysis on the likely incentives for malware authors, mainly that they distribute malware and the information exfiltrated for profit. 
+In this setting, we assume that malware \emph{must} communicate some information to a remote service and use some PII to identify the compromised device.
+Note that, \meddle can be used to monitor and detect malwares that use IP; we cannot detect circuit switched activity such as sending SMS or making phone calls.
+
+\meddle gives us two opportunities to detect and block malware activity over IP. 
+First, we can detect the app binary being downloaded via a hash and block that transfer if it is identified as malware. 
+Note that, \meddle can compute hashes only if the app binary is downloaded in the clear and not over a secure channel (unless SSL bumping is enabled).
+Second, we can use the techniques discussed in \S\ref{subsec:exptpii} to identify and block PII leaks by malware. 
+
+To understand malware network behavior, we use a dataset consisting of 111 confirmed malicious Android APKs gathered by the Andrubis project~\cite{andrubis} in September, 2013.  
+Similar to the approach in \S\ref{sec:dataset-contr-exper}, we conduct controlled experiments by installing a malware app on a clean OS with dummy user data, manually interacting with it for 10 minutes and recording the network traces using \meddle. 
+\tbd{AR: DAVE: We need to add this in previous sections.}
+
+The malware consists of 46 families ranging from backdoors to spyware. 
+Of the 111 apps, 99 (89\%) apps generated network traffic; 37 of the 111 apps targeted earlier versions (below 4.0) of the Android OS and thus did not work to their full potential in our tests.\footnote{\meddle supports Android version 4.0 and above because the previous version of Android do not have native VPN support.}
+
+% 24 + 5 + 1 + 6 + 1
+\mypara{Signature-based detection is insufficient} 
+First, we determine whether existing malware hash registries contain signatures for the malicious apps in our dataset. 
+Even in December 2013, 3 months after the malware was identified by Andrubis, we find that only 9 (8.1\%) apps were correctly identified as malware by cymru~\cite{cymru}, a hash registry that internally uses 30 anti-virus software packages~\cite{cymru:hash}; 7 of these 9 apps generated network traffic. 
+
+
+\begin{table}
+    \centering
+    \begin{small}
+    \begin{tabular}{|l|c|c|}
+       \hline
+       {\bf Host} & {\bf \# Malware} & {\bf App Store} \tabularnewline
+       \hline              
+       cooguo.com & 19  & \checkmark \tabularnewline
+       umeng.com  & 16  & -          \tabularnewline
+       wapx.cn    & 11  & \checkmark \tabularnewline
+       flurry.com & 9   & -          \tabularnewline
+       veegao.com & 9   & -          \tabularnewline       
+       \hline
+    \end{tabular}
+    \end{small}
+    \caption{\textbf{Top 5 domains that receive PII, and the number of malwares sending them the PII.} \emph{Two of the top 5 sites that receive PII are stores from which users can download apps.}}
+    \label{tab:pii-leakage-malware}
+    \vspace{\postfigspace}
+\end{table}
+
+\mypara{PII leaks by Malware} 
+Of the 99 apps generating network traffic, we were able to identify PII leaks from 74 apps.
+Similar to the Android apps previously examined, we observe that the IMEI, and Android ID are most commonly leaked PII.
+Of the remaining 25 apps that generated traffic and did not leak PII over HTTP and HTTPs, 17 tried to contact a remote host that was down (did not respond to a TCP SYN) or sent encoded data over HTTP and HTTPs, while 8 apps are known to exploit previous versions of Android.
+
+In \ref{tab:pii-leakage-malware} we present the top domains that receive the PII leaked when we tested the malware. 
+We observe that two of the top five domains are stores from which Android apps can be downloaded, and the most frequently contacted store, cooguo.com, was known to host malware software~\cite{google:browsecooguo}.
+\tbd{Can we add this link?}
+Along with blocking known trackers, \meddle can be used to block access to these stores. 
 
 \subsection{PII in the Wild}
 
-We now analyze the \mobWild{} dataset. 
+We now analyze the PII leaks in the \mobWild{} dataset. 
 Note that we do not use SSL bumping on this data for privacy reasons. 
 
-\noindent\textbf{Location leaks.} We observe that a bus service app (\emph{One Bus Away}), the
-app that manages the iOS homescreen (\emph{SpringBoard}), and
-weather apps (\emph{TWC}, \emph{Weather}, and \emph{Hurricane})
-were responsible for more 78\% of the flows that sent the location
-information in the clear. Other apps that do not require location information, 
-such as YouTube, Epicurious and EditorsChoice, also leaked GPS coordinates.
-Further, \emph{SpringBoard} sends location information in the clear to fetch weather information from Yahoo servers. 
-We observe that \emph{SpringBoard} leaked location information for 11 devices in the \mobWild dataset, a maximum of 14 leaks per day was observed for one device, sufficient to expose a user's daily movements to anyone tapping Internet connections~\cite{nsa:globaltracking}. 
+\noindent\textbf{Location leaks.}
+We observe that a bus service app (\emph{One Bus Away}), the app that manages the iOS homescreen (\emph{SpringBoard}), and the weather apps (\emph{TWC}, \emph{Weather}, and \emph{Hurricane}) were responsible for more 78\% of the flows that sent the location information in the clear. 
+Other apps that do not require location information, such as YouTube, Epicurious and EditorsChoice, also leaked the device location. 
+%Further, \emph{SpringBoard} sends location information in the clear to fetch weather information from Yahoo servers.
+Further, \emph{SpringBoard} leaked location information for all 11 iOS devices in the \mobWild dataset, a maximum of 14 leaks per day was observed for one device, sufficient to expose a user's daily movements to anyone tapping Internet connections~\cite{nsa:globaltracking}. 
 
 \noindent\textbf{Unique ID leaks.} 
-The device ID and IMEI are frequently leaked in the clear, and as in the case of controlled experiments, A\&A sites are the most popular destination for the IMEI leaks.  
-Among the 16 sites that received  these unique IDs in the clear, 10 are A\&A sites; the rest of the sites includes sites for games, news, and manufacturer updates.
+The device ID and IMEI are frequently leaked in the clear, and as in the case of controlled experiments, trackers are the most popular destination for the IMEI leaks.  
+Among the 16 sites that received these unique IDs in the clear, 10 are trackers; the rest of the sites includes sites for games, news, and manufacturer updates.
 
 \begin{table}
 \centering
@@ -164,13 +217,14 @@ scorecardresearch.com &  21 & 11 & 10 \tabularnewline
 \label{tab:top-trackers}
 \end{table}
 
-In Table~\ref{tab:top-trackers}, we present the number of devices in the \mobWild dataset that contact the most popular A\&A sites.
-We observe that all the devices in the \mobWild dataset contacted doubleclick.com, an ad site, and google-analytics.com, a tracking site. 
-Further, 66.12\% of the ads and analytics traffic volume in the \mobWild dataset contained the default OS \useragent or the user agent of browsers, 6.46\% of the traffic contained a blank user-agent field, and 4.8\% of the traffic contained a signature of \emph{Google-Analytics} library.
-The rest of the traffic contained signatures of other apps such as Facebook, Pandora, and YouTube.
+In Table~\ref{tab:top-trackers}, we present the top 5 trackers ordered according to the number of devices in the \mobWild dataset that contacted them.
+We observe that all the devices in the \mobWild dataset contacted doubleclick.com, an ad site, and google-analytics.com, an analytics site. 
+% Further, 66.12\% of the ads and analytics traffic volume in the \mobWild dataset contained the default OS \useragent or the user agent of browsers, 6.46\% of the traffic contained a blank user-agent field, and 4.8\% of the traffic contained a signature of \emph{Google-Analytics} library.
+% The rest of the traffic contained signatures of other apps such as Facebook, Pandora, and YouTube.
 
-
-
+To summarize, we perform controlled experiments to identify and compare PII leaks in Android and iOS. 
+We observe that trackers receive PIIs over HTTP and also over SSL, and that the most popular trackers were able to track all the users in our \mobWild dataset.
+We build on our observations and allow users of \meddle to visualize and block traffic to trackers, an incentive for users to participate in our on going study. 
 
 %%% Local Variables: 
 %%% mode: latex

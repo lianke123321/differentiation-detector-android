@@ -22,48 +22,45 @@ behavior and develop new techniques for detecting and blocking malware activity 
 activity.
 
 \mypara{Assumptions and methodology} We base our analysis on the likely incentives for malware authors, mainly 
-that they distribute malware for profit. In this setting, we observe that malware \emph{must} communicate some information 
-to a remote service for coordination (\eg C\&C), exfiltration (stealing personal information) or billing (contacting toll services). 
-We can detect the first two cases if they use IP; we cannot detect circuit switched activity such as sending SMS or making 
-phone calls.
+that they distribute malware for profit. 
+In this setting, we assume that malware \emph{must} communicate some information to a remote service for coordination (\eg C\&C), exfiltration (stealing personal information) or billing (contacting toll services). 
+Mobile malwares can be broadly categorized as either 1) Spywares that leak private information, 2) Trojans and Viruses that gain access to the resources and increase the resource usage, for example, send messages, and make calls, 3) Phishing apps that redirect users to fraudulent sites that are impostors to legitimate sites, and 4) Bots that become active on specific user activities and request for commands from their command and control servers (C\&C). 
+[ http://www.veracode.com/blog/2013/10/common-mobile-malware-types-cybersecurity-101/ ] 
+\meddle can be used to monitor and detect malwares that use IP; we cannot detect circuit switched activity such as sending SMS or making phone calls.
 
-\meddle gives us two opportunities to detect and block malware activity over IP. First, we can detect 
-the app binary being downloaded via a hash and block that transfer if it is identified as malware. Second, we can use network 
-behavioral analysis to identify malicious activity from apps that passed through our hash filters and successfully installed. 
-In the following paragraphs we describe how existing hash registries fail to capture most confirmed malware, how to 
-use network activity to identify and block malware and how to augment hash registries by automatically identifying the 
-malicious app binary responsible for the activity -- thus inoculating other users from this malware. Importantly, 
-this approach works at machine instead of human timescales.%, protecting infected users and preventing new infections 
+\meddle gives us two opportunities to detect and block malware activity over IP. 
+First, we can detect the app binary being downloaded via a hash and block that transfer if it is identified as malware. 
+Note that, \meddle can compute hashes only if the app binary is downloaded in the clear and not over a secure channel.
+Second, we can use network behavioral analysis to identify malicious activity from apps that passed through our hash filters and were successfully installed. 
+In the following paragraphs we describe how existing hash registries fail to capture most confirmed malware, how to use network activity to identify and block malware and how to augment hash registries by automatically identifying the malicious app binary responsible for the activity -- thus inoculating other users from this malware. 
+Importantly, this approach works at machine instead of human timescales.%, protecting infected users and preventing new infections 
 %within minutes, not days.
 
-\mypara{Dataset} To understand malware network behavior, we use a 
-dataset consisting of 111 confirmed malicious Android APKs gathered by the Andrubis project~\cite{andrubis} in September, 2013.  
-Similar to the approach in \S\ref{sec:dataset-contr-exper}, we conduct controlled experiments by installing 
-a malware app on a clean OS with dummy user data, interacting with it for \tbd{X} minutes and recording the 
-network traces using \meddle. To compare with non-malicous apps, we use the dataset gathered in \S\ref{sec:dataset}.
+\mypara{Dataset} 
+To understand malware network behavior, we use a dataset consisting of 111 confirmed malicious Android APKs gathered by the Andrubis project~\cite{andrubis} in September, 2013.  
+Similar to the approach in \S\ref{sec:dataset-contr-exper}, we conduct controlled experiments by installing a malware app on a clean OS with dummy user data, manually interacting with it for 10 minutes and recording the network traces using \meddle. 
+To compare with non-malicous apps, we use the dataset gathered in \S\ref{sec:dataset}.
 
-The malware consists of 46 families ranging from backdoors to spyware.  99 (89\%) of the apps generated network 
-traffic, of which 91\% generated HTTP traffic. Many of the remaining apps targeted earlier versions of the Android 
-OS and thus did not work in our tests. Note that although our study focuses on Android malware, our approach 
-is applicable to iOS and other mobile OSes because it relies only on the ability to monitor network traffic.
+The malware consists of 46 families ranging from backdoors to spyware. 
+Of the 111 apps, 99 (89\%) apps generated network traffic, and 90 (81\%) apps generated HTTP traffic. 
+Many of the remaining apps targeted earlier versions of the Android OS and thus did not work in our tests. 
+Note that although our study focuses on Android malware, our approach is applicable to iOS and other mobile OSes because it relies only on monitoring network traffic.
 
-\mypara{Signature-based detection is insufficient} First, we determine whether existing malware hash registries 
-contain signatures for the malicious APKs in our data. Even in MONTH (X months after the malware was identified 
-by Andrubis), we find that only Y\% of the apps in our dataset were correctly identified. This motivates the need 
-for behavioral analysis.
+\mypara{Signature-based detection is insufficient} 
+First, we determine whether existing malware hash registries contain signatures for the malicious APKs in our data. 
+Even in December 2013, 3 months after the malware was identified by Andrubis, we find that only 9 (8.1\%) of the apps in our dataset were correctly identified as malware; 7 of these 9 apks generated network traffic. 
+This motivates the need for behavioral analysis.
 
 \mypara{Malware exhibits distinctive network behavior} 
 Previous work in fixed-line environments~\cite{perdisci:malwaresig} use network behavioral analysis to identify malware 
-from network flows. In particular, they rely on \useragent information and perform clustering on this to distinguish 
-malware from non-malicious traffic. In our dataset, we find that ...
+from network flows. 
+In particular, they extract signatures from the parts of HTTP requests including the request method (GET, POST, \etc), and fields of the URI and perform clustering on these values to identify distinguish malware from non-malicious traffic. 
 
-Of the 99 apps generating network traffic, we observe that 81\% (73)  
-exfiltrate PII. Unique identifiers such as IMEI, Android ID and MAC address are most commonly leaked, and 
-we further find 9 apps leaking telephone numbers. For the remaining 26 apps, we did not detect PII;12 use HTTP  
-traffic, 7 use nonstandard ports and 1 attempts to communicate with a server that is not online. 
+Of the 99 apps generating network traffic, we observe that 81\% (74) exfiltrate PII without encoding the PII. 
+Unique identifiers such as IMEI, and Android ID are most commonly leaked, and we further find 9 apps leaking telephone numbers. 
+For the remaining 26 apps, we did not detect PII;12 use HTTP traffic, 7 use nonstandard ports and 1 attempts to communicate with a server that is not online. 
 
 \mypara{Effectiveness of behavioral filters}
-TBD 
 
 %\subsection{Unsolicited traffic}
 %Presumably there is none, but probably worth looking at inbound unsolicited traffic from a 
