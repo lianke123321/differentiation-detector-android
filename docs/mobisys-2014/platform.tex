@@ -122,10 +122,10 @@ Our version ensures re-establishment of VPN tunnels on network state changes (\e
 \noindent\textbf{Server-side implementation.} 
 \meddle uses the open-source Strongswan project~\cite{strongswan} to manage the VPN tunnels 
 on its servers. When traffic arrives at the server, \meddle uses \emph{tcpdump} and \emph{bro} to record 
-traffic via two approaches. One approach captures full packets, 
+traffic via two IRB-approved approaches. The first captures full packets, 
 and requires subjects to be interviewed and provide written informed consent before participating. 
 We used this study to inform the second approach, which captures only relevant packet headers 
-necessary for the applications we discuss in the remainder in the paper. 
+necessary for the \meddle applications in this paper. 
 
 As we described in the previous section, encrypted flows give \meddle no visibility into the 
 content of network flows and no ability to interpose on that traffic. To regain this visibility, we use SSL 
