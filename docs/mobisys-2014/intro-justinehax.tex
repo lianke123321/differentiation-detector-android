@@ -15,18 +15,21 @@ transparent proxies or malware blocking). Likewise, custom Android extensions pr
 strong control over network flows but measurement visibility is limited to the devices running these 
 custom OSes or apps, often requiring warranty-voiding ``jailbreaking.'' 
 
-To avoid these limitations and address problems across a wide range of devices and locations, 
-we need a system that sacrifices neither visibility nor control over mobile-device Internet traffic.
-Ideally, such a system would be easily deployable and usable for a typical smartphone users 
+To understand and address the above problems in mobile systems as they evolve over time, we 
+need an approach that supports long-term studies of mobile Internet traffic and the ability to 
+interpose on these flows. 
+Ideally, such a system would be easy to deploy and use for a typical smartphone user 
 running any operating system anywhere in the world.
 
-This paper presents \meddle:  a platform for measuring and interposing on mobile-device traffic (\eg smartphones and tablets) 
-regardless of how the device connects to the Internet. \meddle combines software middleboxes 
+This paper presents \meddle:  a platform for measuring and interposing on all mobile-device 
+Internet traffic (\eg from smartphones and tablets). \meddle combines software middleboxes 
 with VPN proxying, enabling both visibility and control over network flows. 
 
-The vast majority of Internet-enabled mobile devices provide the ability to connect to a remote host over a virtual private network (VPN), so \meddle is readily deployable and usable. 
+The vast majority of Internet-enabled mobile devices provide the ability to connect to a remote 
+host over a virtual private network (VPN), so \meddle is readily deployable and usable. 
 By redirecting all smartphone traffic over a VPN, \meddle provides a central vantage point for traffic monitoring.
-Further, software middleboxes can provide control over flows going to and from each device, and even experiment with network services for mobile devices (\eg content filtering, malware blocking, Web proxying), quickly, easily and at scale using cloud infrastructure~\cite{sherry:middleboxes}. 
+Further, software middleboxes can provide control over flows going to and from each device, and even experiment 
+with network services for mobile devices (\eg content filtering, malware blocking, Web proxying), quickly, easily and at scale using cloud infrastructure~\cite{sherry:middleboxes}. 
 This paper demonstrates the feasibility of our approach and explores several new opportunities 
 for implementing applications not broadly supported in today's mobile 
 environment. 
@@ -71,15 +74,13 @@ connecting to a variety of cellular and \wifi networks. These users interact wit
 
 
 Third, we implement applications atop \meddle that improve 
-privacy, block unwanted traffic, notify users of ISP interference and block malware. 
+privacy, block unwanted traffic from ads and malware, and notify users of ISP interference. 
 In particular, we make available a new visualization tool, \emph{ReCon}, for users to track and control how 
 they are being monitored by ad and analytics services. 
 %A demo of our tool is located at \url{http://goo.gl/A17h9}. 
  We also develop tools for detecting content manipulation by ISPs (Web Tripnets) and 
  service differentiation (Mobile Replay) in the mobile environment, building upon previous 
- work in these areas~\cite{reis:tripwires,dischinger:glasnost}. \drc{Add blurb about malware}
-% PG: Flip 2&3 or merge
-\meddle has been running since 
+ work in these areas~\cite{reis:tripwires,dischinger:glasnost}. \meddle has been running since 
 October, 2012 as part of an IRB-approved study, new users can sign up at \url{http://meddle.mobi}. 
 
 
@@ -92,7 +93,7 @@ October, 2012 as part of an IRB-approved study, new users can sign up at \url{ht
 
 
 
-\noindent\textbf{Roadmap.} The rest of the paper is organized as follows. We present the goals and implementation for \meddle in \S\ref{sec:goals}, then evaluate it in terms of overhead and effectiveness as a vantage point for mobile traffic in \S\ref{sec:eval}. We use these analyses to inform the design and implementation of several applications built atop \meddle. 
+\noindent\textbf{Roadmap.} The rest of the paper is organized as follows. We present the goals and implementation for \meddle in \S\ref{sec:goals}, then evaluate it in terms of overhead and effectiveness as a vantage point for mobile traffic in \S\ref{sec:eval}. We use this analysis to inform the design and implementation of several applications built atop \meddle. 
 In \S\ref{sec:characterize-app}, we describe how we detect and block privacy leaks in mobile traffic. \S\ref{sec:isp-behavior} discusses 
-how we use \meddle to detect ISP interference with network traffic, and \S\ref{sec:malware} uses \meddle detect and block mobile malware. In \S\ref{sec:related} we discuss related work and we conclude in \S\ref{sec:conclusion}.
+how we use \meddle to detect ISP interference with network traffic. In \S\ref{sec:related} we discuss related work and we conclude in \S\ref{sec:conclusion}.
 
