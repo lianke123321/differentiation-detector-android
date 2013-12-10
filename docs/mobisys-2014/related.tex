@@ -7,26 +7,26 @@ When attempting to characterize this behavior, researchers face a number
 of trade-offs: compromising network coverage (limiting the number and type of ISPs measured), 
 portability (limiting the device OSes) and/or deployability (limiting subscriber coverage).
 \platname compromises 
-none of these, enabling comprehensive measurements across carriers, devices and access 
-technologies. Table~\ref{tab:relatedCompare} puts our approach in context with previous 
-approaches for measuring the network behavior of mobile systems. 
+none of these, enabling visibility and control of network traffic across carriers, devices and access 
+technologies. Table~\ref{tab:relatedCompare} puts our approach in context with related  
+approaches regarding network behavior of mobile systems. 
 
 \begin{table*}[t]
 \begin{center}
 {\footnotesize
-\begin{tabular}{|l|l|l|l|l|}
+\begin{tabular}{|l|l|l|l|l|l|}
 \hline
- & \textbf{Network Coverage} &  \textbf{Portability} &  \textbf{Deployment model} &   \textbf{Meas. Type}  \\ \hline
-AT\&T/Telefonica study~\cite{vallina-rod:ads,gerber:passivespeed} & Single carrier & All OSes & Instrument cell infrastructure & Passive \\ \hline
-WiFi study~\cite{chen:wifi} & Single WiFi network & All OSes & Instrument WiFi network & Passive \\ \hline
-PhoneLab/TaintDroid~\cite{enck:taintdroid} & Multiple networks & Android & Install custom OS & Active/Passive \\ \hline
-MobiPerf~\cite{wang:middleboxes}/SpeedTest~\cite{sommers:cellwifi} & Multiple networks & Android & Install App & Active \\ \hline \hline
-\platname & Any network & Most OSes & VPN configuration & Passive \\ \hline
+ & \textbf{Network Coverage} &  \textbf{Portability} &  \textbf{Deployment model} &   \textbf{Meas. Type}  & \textbf{Control?} \\ \hline
+AT\&T/Telefonica study~\cite{vallina-rod:ads,gerber:passivespeed} & Single carrier & All OSes & Instrument cell infrastructure & Passive & No \\ \hline
+WiFi study~\cite{chen:wifi} & Single WiFi network & All OSes & Instrument WiFi network & Passive & No \\ \hline
+PhoneLab~\cite{PhoneLab}/TaintDroid~\cite{enck:taintdroid} & Multiple networks & Android & Install custom OS & Active/Passive & Yes \\ \hline
+MobiPerf~\cite{wang:middleboxes}/SpeedTest~\cite{sommers:cellwifi} & Multiple networks & Android & Install App & Active & Yes \\ \hline \hline
+\platname & Any network & Most OSes & VPN configuration & Active/Passive & Yes \\ \hline
 \end{tabular} }
 \end{center}
 \vspace{\postfigspace}
-\caption{Comparison of alternative measurement approaches. \platname is the first approach to cover all access networks and most device OSes, capturing 
-network traffic passively and with low overhead via VPN proxying.}
+\caption{Comparison of related work. \platname is the first approach to provide visibility and control over network traffic for all access 
+networks and most device OSes.}
 \label{tab:relatedCompare}
 \vspace{\postfigspace}
 \end{table*}%
@@ -35,7 +35,7 @@ Traces from mobile devices can inform a number of interesting analyses. Previous
 uses custom OSes to investigate how devices waste energy~\cite{pathak:eprof}, network bandwidth and 
 leak private information~\cite{enck:taintdroid,hornyack:appfence}. Similarly, AppInsight~\cite{ravindranath:appinsight} and PiOS~\cite{egele:pios} can inform 
 app performance through binary instrumentation and/or static analysis. In this work, we explore the opportunity to use network traces 
-alone to reveal these cases without requiring any OS or app modifications.
+alone to reveal these cases without requiring any OS or app modifications. 
 
 Network traces from inside carrier networks provide a detailed view for large numbers 
 of subscribers. For example, Vallina-Rodriguez~\etal~\cite{vallina-rod:ads} use this approach to characterize performance and 
@@ -44,10 +44,14 @@ estimate network performance for mobile devices.  %\cite{maier:mobtraffic} \cite
 Similar to these approaches, \platname provides continuous passive monitoring of mobile network 
 traffic; however, \platname is the first to do so across all networks to which a device connects.
 
-Last, active measurements~\cite{wang:middleboxes,sommers:cellwifi} allow researchers to understand network topologies and instantaneous 
+Active measurements~\cite{wang:middleboxes,sommers:cellwifi} allow researchers to understand network topologies and instantaneous 
 performance at the cost of additional, synthetic traffic for probing. In contrast, \platname uses 
 passive measurements to characterize the traffic that devices
-naturally generate.
+naturally generate. PhoneLab~\cite{PhoneLab} provides a mobile experimentation platform with 
+low-level OS and device access; however, it does not run on unmodified device operating systems. 
+In contrast, \meddle does not require OS modification---facilitating large-scale, global deployment.
+
+
 
 %From DJW @ CCS:
 %more privacy leakage shown from zero-permission Android APIs
