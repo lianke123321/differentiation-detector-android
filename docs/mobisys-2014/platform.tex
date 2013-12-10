@@ -252,7 +252,8 @@ A solution to this problem is to use a \meddle{} instance with an appropriate IP
 \noindent\emph{ISP support.}
 Some ISPs block VPN traffic, which prevents access to our current \meddle implementation. 
 We note that few ISPs block VPN traffic, and there is an incentive not to block VPN traffic to 
-support enterprise clients.
+support enterprise clients. We also note that China blocks VPN access to all but domestic 
+destinations; thus, we use a Chinese cloud host (Aliyun) to run  \meddle in China.
 
 \noindent\emph{IPv6.}
 \meddle{} cannot be currently used on networks using IPv6; though iOS, Android and StrongSwan support IPv6 

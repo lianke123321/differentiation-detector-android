@@ -46,7 +46,6 @@ We enter unique and distinguishable user credentials when
 interacting with apps to easily extract the corresponding PII from 
 network flows (if they are not obfuscated). We use the same technique 
 to test malware apps (\S\ref{subsec:malware}).
-\tbd{Dave: we need to fix this once you are done with section on PIIs}
 
 \noindent\textbf{Automated tests.} The second set of controlled experiments consist of fully-automated
 experiments on 732 Android apps from a free,
@@ -68,7 +67,7 @@ uninstall the app and reboot the device to forcibly end any
 lingering connections. This set of experiments is limited to
 Android devices because iOS does not provide equivalent 
 scripting functionality. 
-\tbd{Are they stores from which you can download apps for non jail-broken iOS devices?}
+%\tbd{Are they stores from which you can download apps for non jail-broken iOS devices? DC: No.}
 
 \subsubsection{In Situ Study}
 \label{sec:dataset-wild-measurements}
@@ -127,9 +126,8 @@ For users that have limited data plans and consume most of their quota per month
 a significant impact. We note that this is partially offset by \meddle services such as content filtering and 
 connection blocking. % and optimizations such as transcoding and compression. 
 
-\noindent\emph{Scalability.} We currently use Amazon EC2 to support users outside of China.\footnote{China 
-blocks VPN access to all but domestic destinations; thus, we use a Chinese cloud host (Aliyun) to run  
-\meddle in China.} Without exploring opportunities for economies of scale, we estimate that 
+\noindent\emph{Scalability.} We currently use Amazon EC2 to support users at our cost. 
+Without exploring opportunities for economies of scale, we estimate that 
 it will cost less than a penny (\$0.0084) per user per day. At this cost, we can support up to 
 10,000 users with research funds. If \meddle were to become extraordinarily popular, it would 
 cost each user approximately a quarter per month to pay their own way. By comparison, 
@@ -227,7 +225,7 @@ This motivates the need for a platform that covers multiple OSes and multiple ac
 
 Mapping network flows to apps is an important step for determining the origins of potentially costly 
 network traffic, and for identifying which apps are responsible for privacy leaks. The following 
-sections show that  \emph{previous approaches to classifying passively gathered traffic fail to identify
+sections show that  \emph{previous approaches to mapping passively gathered traffic fail to identify
 apps responsible for that traffic most of the time} and that \meddle facilitates a first look at 
 determining which apps generate traffic over SSL connections.
 
@@ -242,7 +240,7 @@ determining which apps generate traffic over SSL connections.
 
 %\subsubsection{Classification of Mobile Apps and Services}
 
-Our \mobWild dataset suggests that apps, OS services and libraries often rely on HTTP and SSL to exchange data~\cite{maier:mobtraffic,falaki:mobileusage,xu:appusage}.
+Our \mobWild dataset suggests that apps, OS services and libraries often rely on HTTP and SSL to exchange data.
 %To analyze the behavior of mobile services we need to first associate the observed flows with the applications and the OS services responsible for the flows.
 In the following analysis, we focus on identifying the apps, OS services, and other services responsible for these HTTP and SSL flows. 
 We use ground-truth data from controlled experiments to show that the previous approach for classification fails 
@@ -293,7 +291,9 @@ effectiveness of app classification using only header data. We begin classificat
 
 \emph{iOS:}
 First, we note that 176 of the 209 iOS apps we manually tested generated HTTP traffic.
-We observe that the \httphost field uniquely identified the corresponding app for 47\% of the iOS apps we tested (column 5); the flows containing the application signature was responsible from 15\% to 98\% of the traffic volume from the application during  our measurements. The rest of the traffic was either due to ads or to CDNs that did not contain the app signature.  
+Column 5 of Tab.~\ref{tab:classification-success} shows that the \httphost field uniquely identified 
+the corresponding app for 47\% of the iOS apps. Each app generated multiple flows, some of which did not use the 
+\httphost field, \eg when contacting ad sites or CDNs. This comprised 2\% to 85\% of the traffic volume from the application during  our measurements. 
 The \httphost field also can identify the provider that released an app (\eg Zynga but not \emph{Farmville}).
 In column 6 of Table~\ref{tab:classification-success}, we see that classification by organization is effective for 67\% of iOS apps. 
 
@@ -302,23 +302,23 @@ However, for the apps from the Third-party store we observe that the \httphost f
 Primarily this is due to the fact that a majority of the apps we tested (about 77\%) were stand-alone services such as games. 
 These apps contacted advertisement or or CDN sites that do not uniquely identify the app.
 
-\emph{Augmenting with \useragent: } We now show that by augmenting \httphost with the information in the \useragent string, we classify a majority of iOS and Android apps. 
+\emph{Augmenting with \useragent: } We now show that by augmenting \httphost with the information in the \useragent string, we map a majority of iOS and Android apps. 
 We observed a non-empty \useragent string in more than 99.7\% of the HTTP flows from iOS and 90.9\%flows from Android. 
 
 A \useragent string may contain an app identifier and other auxiliary information such as details of the OS~\cite{mozilla:useragentdetection}. 
 For example, Yahoo Mail's \useragent string contains the string \emph{YahooMobileMail/1.0}. 
 However, some apps use more generic \useragent strings such as \emph{AppleCoreMedia} (streaming video on iOS) or \emph{Dalvik} (generic text for Android). 
-To extract the app information, we use a set of regular expressions on the \useragent and cluster the extracted tokens using the edit distance.
+To extract the app information, we manually generate set of regular expressions on the \useragent and cluster the extracted tokens using the edit distance.
 
 Table~\ref{tab:classification-success} shows that 84.6\% of the 176 iOS apps generating HTTP traffic were correctly identified based \useragent, which we verified by manual inspection.
-However, this works only for 23\% of the Android apps generating HTTP traffic. 
+However, this works only for 23\% of the Android apps generating HTTP traffic, meaning previous techniques depending on \useragent will fail~\cite{maier:mobtraffic,xu:appusage,falaki:mobileusage,falaki:smartphoneusage}. 
 For the 27 iOS apps which we failed to identify, we observed signatures for OS services and libraries.
 % such as \emph{Apple Core Media}, \emph{Game Kit}, \emph{Geo Services}, etc. and signatures of third-party libraries and services such as \emph{Google Analytics} and \emph{Adobe Air}.
 Similarly, the majority of Android HTTP traffic contained flows with the default \useragent (\emph{Dalvik}).
 %Further, for the apps from the third-party store, we observe that the \useragent for ads and analytics libraries such as \emph{Google Analytics} and \emph{Adsense for Mobile} were the most common \useragent after the default \useragent.
 
-To summarize, \useragent is more effective for classifying iOS apps and \httphost is more effective for Android apps; however, neither alone is a complete solution. 
-To fill this gap, we are currently investigating how to use ad-network identifiers to classify apps. 
+To summarize, \useragent is more effective for mapping iOS apps and \httphost is more effective for Android apps; however, neither alone is a complete solution. 
+%To fill this gap, we are currently investigating how to use ad-network identifiers to classify apps. 
 
 \begin{figure}
 \subfloat[iOS]{\label{fig:http-wordcloud-ios}\includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_ios_image.png}}\newline
@@ -329,14 +329,14 @@ To fill this gap, we are currently investigating how to use ad-network identifie
 \end{figure}
 
 \textbf{In situ data.}
-We now describe the results of our classification on data gathered from our user study.
+We now describe the results of mapping data gathered from our user study.
 Using only the \useragent on the \mobWild dataset we map flows to 256 iOS and 86 Android apps, OS libraries, and services. 
-The \emph{word cloud} in Fig.~\ref{fig:http-wordcloud} contains the summary of our results; the font size of a signature is proportional to the number of users for which the signature was observed.
+The \emph{word cloud} in Fig.~\ref{fig:http-wordcloud} contains the summary of our results; the font size of an app/service name is proportional to the number of users for which it was observed.
 Note that \emph{Apple Core Media} and \emph{Stagefright} are services for downloading media content on iOS and Android devices, respectively.
 For the iOS devices in the \mobWild dataset, we observe a signature of \emph{Apple Core Media} in more than 98.45\% of the content downloaded from the YouTube servers (identified by their \httphost field).
-Similarly, depending the Android version we observe either the signature for Stagefright or no app or OS service signature for YouTube traffic. % to Android devices depending on the OS version. 
+Similarly, we observe that YouTube flows contain ``Stagefright'' in HTTP headers. % to Android devices depending on the OS version. 
 We observe a similar signatures for other popular media services such as Netflix, YouTube, Vimeo, Pandora, etc, so we use the \httphost field to identify these Web services.
-\drc{AM: Suggests removing word cloud.}
+\drc{AM: Suggests removing word cloud. PG doesn't like them either.}
 
 
 \begin{table}
@@ -364,30 +364,30 @@ We observe a similar signatures for other popular media services such as Netflix
 \hline
 \end{tabular}
 \end{small}
-\caption{\textbf{Classification of HTTP Traffic}. \emph{OS services$^{*}$ includes services other than those used to download media content.}}
+\caption{\textbf{Effectiveness of mapping HTTP traffic}. \emph{OS services$^{*}$ includes services other than those used to download media content.}}
 \label{tab:classify-http}
 \end{table}
 
 
-In Table~\ref{tab:classify-http}, we observe that with a combination of \useragent and \httphost field in HTTP headers, we classify more than 92\% of the traffic (flows and bytes) from iOS and Android devices.
+Table~\ref{tab:classify-http} shows that a combination of \useragent and \httphost field in HTTP headers can map more than 92\% of the traffic (flows and bytes) from iOS and Android devices.
 We observe that media from popular hosts in our \mobWild dataset, including Netflix, YouTube, Pandora, Spotify, and Vimeo, contribute to more than 50\% of the traffic volume from iOS and Android devices.
 We also observe that unmapped media served from CDNs and others hosts comprises less than 5\% of the traffic volume for the iOS and Android devices.
 
-\subsubsection{SSL Traffic Classification without Decryption}
+\subsubsection{SSL Traffic Mapping without Decryption}
 
 SSL flows provide limited information in plaintext that identify apps. 
-For the traces captured during our controlled experiments, we use SSL bumping to classify HTTP flows using 
+For the traces captured during our controlled experiments, we use SSL bumping to map HTTP flows using 
 the techniques described in the previous section. 
 However, we did not perform SSL bumping for the devices in the \mobWild dataset, so we now describe how to 
-classify SSL flows \emph{without decryption}. 
+map SSL flows \emph{without decryption}. 
 
-\noindent\textbf{Overview of classification technique.}
+\noindent\textbf{Overview of mapping technique.}
 Using port numbers, we observe in that more than 99\% of the SSL flows observed in our controlled experiments were due to HTTPS, the rest of the flows were due to email, instant messaging, and OS notification services. 
 We therefore focus our attention on identifying the Web services responsible for the HTTPS flows.
 We use the DNS messages and subsequent SSL handshakes to determine the \emph{hostnames} of the remote hosts contacted by mobile devices.
-We then map these hostnames to Web services using our technique for HTTP traffic classification.
+We then map these hostnames to Web services using our technique for HTTP traffic mapping.
 
-Once we identify the hostnames, we classify the traffic in two phases.
+Once we identify the hostnames, we map the traffic in two phases.
 In the first phase we use the port number and hostname to identify the service and group the traffic based on service.
 The five most popular groups that we found in our dataset are social network, mail, media, instant messages, and notification.
 For example, flows to \url{facebook.com}, \url{twitter.com}, \url{plus.google.com} are grouped as social networks.
@@ -399,7 +399,7 @@ For example, the hostname \url{fbcdn-photos-a.akamaihd.net} indicates that the t
 We group hostnames that hide the app and Web service based on the parent organization.
 During manual examination of the traces, we observe two main groups: Google Services and Apple Services.
 Google Services includes flows whose remote hosts are served by Google, \eg \url{www.googleapis.com}, while Apple Services includes flows to servers managed by Apple, \eg \url{*.phobos.apple.com}
-This classification, though crude, gives insights on the key sources of SSL traffic.
+This mapping, though crude, gives insights on the key sources of SSL traffic.
 
 \noindent\textbf{Identifying Hostnames using SSL Handshake.}
 We first use the common name (CN) field of certificates to identify the servers that exchanged data using HTTPS.
@@ -452,12 +452,12 @@ This difference is either due to caching of DNS requests or when the same IP is 
 \hline
 \end{tabular}
 \end{small}
-\caption{\textbf{Classification of SSL traffic in the \mobWild dataset.} \emph{The iOS and Android SSL traffic in the \mobWild dataset is dominated by Google and Apple Services. The share of Social Network traffic is higher for Android devices because the default photo backup services on Android devices uses the Google Plus (and Picasa) Social Network.}}
+\caption{\textbf{Mapping SSL traffic in the \mobWild dataset.} \emph{The iOS and Android SSL traffic in the \mobWild dataset is dominated by Google and Apple Services. The share of Social Network traffic is higher for Android devices because the default photo backup services on Android devices uses the Google Plus (and Picasa) Social Network.}}
 \label{tab:classify-ssl-traffic}
 \end{table}
 
-\noindent\textbf{Classification results.} 
-Table~\ref{tab:classify-ssl-traffic} shows our SSL classification results on the SSL traffic in the \mobWild dataset. 
+\noindent\textbf{Mapping results.} 
+Table~\ref{tab:classify-ssl-traffic} shows our SSL mapping results on the SSL traffic in the \mobWild dataset. 
 As discussed previously, we first group hostnames depending on the type of app and Web service.
 For flows whose hostnames are ambiguous, we group them according to organizations such as Google and Apple.
 %Note that these results apply only to users in our dataset.
@@ -477,8 +477,8 @@ We observe that Google and Apple are the dominant sources of SSL traffic in both
 %Our goal was to identify the apps and Web services responsible for the network traffic flowing through \meddle servers.
 %To meet this goal we used results from our controlled experiments to obtain the ground truth information on network flows generated by apps and OS services.
 We use the a combination of \useragent and \httphost field to identify apps and Web services responsible for HTTP flows.
-Similarly, we use certificates, SNI, and DNS messages to classify SSL flows.
-The following sections use this classification to identify and block privacy leaks.
+Similarly, we use certificates, SNI, and DNS messages to map SSL flows.
+The following sections use this to identify and block privacy leaks.
 
 %%% Local Variables: 
 %%% mode: latex
