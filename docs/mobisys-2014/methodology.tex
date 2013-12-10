@@ -371,7 +371,7 @@ We observe a similar signatures for other popular media services such as Netflix
 
 Table~\ref{tab:classify-http} shows that a combination of \useragent and \httphost field in HTTP headers can map more than 92\% of the traffic (flows and bytes) from iOS and Android devices.
 We observe that media from popular hosts in our \mobWild dataset, including Netflix, YouTube, Pandora, Spotify, and Vimeo, contribute to more than 50\% of the traffic volume from iOS and Android devices.
-We also observe that unmapped media served from CDNs and others hosts comprises less than 5\% of the traffic volume for the iOS and Android devices.
+We also observe that unmapped media served from CDNs and others hosts comprises less than 5\% of the traffic volume for the iOS and Android devices. \drc{From PG: How is mapping to organization done?}
 
 \subsubsection{SSL Traffic Mapping without Decryption}
 
@@ -384,11 +384,14 @@ map SSL flows \emph{without decryption}.
 \noindent\textbf{Overview of mapping technique.}
 Using port numbers, we observe in that more than 99\% of the SSL flows observed in our controlled experiments were due to HTTPS, the rest of the flows were due to email, instant messaging, and OS notification services. 
 We therefore focus our attention on identifying the Web services responsible for the HTTPS flows.
-We use the DNS messages and subsequent SSL handshakes to determine the \emph{hostnames} of the remote hosts contacted by mobile devices.
-We then map these hostnames to Web services using our technique for HTTP traffic mapping.
+We use DNS responses and subsequent SSL handshakes to determine the 
+\emph{hostnames} of the remote hosts contacted by mobile devices.
+We then map these hostnames to Web services using techniques in the previous section.
 
-Once we identify the hostnames, we map the traffic in two phases.
-In the first phase we use the port number and hostname to identify the service and group the traffic based on service.
+After identifying a hostname, we map the corresponding traffic in two phases.
+In the first phase we use the port number and hostname to identify the service 
+and group the traffic based on service. \drc{Why are you using the term ``service'' instead of app? 
+Why is this classification so different from the previous section? Need to make it more uniform.}
 The five most popular groups that we found in our dataset are social network, mail, media, instant messages, and notification.
 For example, flows to \url{facebook.com}, \url{twitter.com}, \url{plus.google.com} are grouped as social networks.
 Traffic to well known email ports such as TCP port 993, and traffic to hosts such as \url{mail.google.com} are classified as mail traffic.
