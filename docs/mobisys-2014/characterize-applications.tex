@@ -88,7 +88,7 @@ The difference in the PII leaks is primarily due to the different privileges tha
     \begin{small}
     \begin{tabular}{|l|c|c||c|}
        \hline
-       {\bf Host}& {\bf Tracker} \tabularnewline
+       {\bf Site}& {\bf Tracker} \tabularnewline
        \hline              
        android.clients.google.com & -  \tabularnewline
        getjar.com        & -  \tabularnewline
@@ -98,7 +98,7 @@ The difference in the PII leaks is primarily due to the different privileges tha
        \hline
     \end{tabular}
     \end{small}
-    \caption{\textbf{Top 5 domains that receive PII over SSL ordered according to number of flows leaking PIIs during controlled experiments}. \emph{Two of the top 5 hosts that receive this information are an ad and analytics sites.}}
+    \caption{\textbf{Top 5 sites that receive PII over SSL ordered according to number of flows leaking PIIs during controlled experiments}. \emph{Two of the top 5 sites that receive this information are trackers.}}
     \label{tab:pii-leakage-https-sites}
     \vspace{\postfigspace}
 \end{table}
@@ -121,7 +121,7 @@ visible from \meddle.
 
 Mobile malware is distributed for a variety of reasons, including profit, espionage and mayhem. With  
 \meddle, we can monitor and detect any malware activity over IP but not circuit switched activity such as 
-sending SMS or making phone calls.. This section focuses on PII leaked by malware; 
+sending SMS or making phone calls. This section focuses on PII leaked by malware; 
 we also discuss how we can our results and \emph{ReCon} to provide malware blocking.
 
 \meddle gives us two opportunities to detect and block malware activity over IP. 
@@ -134,7 +134,7 @@ gathered by the Andrubis project~\cite{andrubis} in September, 2013.
 We use the approach in \S\ref{sec:dataset-contr-exper} to conduct controlled experiments on the malware.
 
 The malware consists of 46 families ranging from backdoors to spyware. 
-Of the 111 apps, 99 (89\%) apps generated network traffic; 37 of the 111 apps targeted earlier versions (below 4.0) of the Android OS and thus did not work to their full potential in our tests.%\footnote{\meddle supports Android version 4.0 and above because the previous version of Android do not have native VPN support.}
+Of the 111 apps, 99 (89\%) apps generated network traffic; 37 of the 111 apps targeted earlier versions (below 4.0) of the Android OS and thus did not work to their full potential during our experiments.%\footnote{\meddle supports Android version 4.0 and above because the previous version of Android do not have native VPN support.}
 
 % 24 + 5 + 1 + 6 + 1
 \mypara{Signature-based detection is insufficient} 
@@ -147,7 +147,7 @@ Even in December 2013, 3 months after the malware was identified by Andrubis, we
     \begin{small}
     \begin{tabular}{|l|c|c|}
        \hline
-       {\bf Host} & {\bf \# Malware} & {\bf App Store} \tabularnewline
+       {\bf Domain Name} & {\bf \# Malware} & {\bf App Store} \tabularnewline
        \hline              
        cooguo.com & 19  & \checkmark \tabularnewline
        umeng.com  & 16  & -          \tabularnewline
@@ -157,7 +157,7 @@ Even in December 2013, 3 months after the malware was identified by Andrubis, we
        \hline
     \end{tabular}
     \end{small}
-    \caption{\textbf{Top 5 domains that receive PII, and the number of malwares sending them the PII.} \emph{Two of the top 5 sites that receive PII are third-party app stores.}}
+    \caption{\textbf{Top 5 sites that receive PII, and the number of malwares sending them the PII.} \emph{Two of the top 5 sites that receive PII are third-party app stores.}}
     \label{tab:pii-leakage-malware}
     \vspace{\postfigspace}
 \end{table}
@@ -167,10 +167,10 @@ Of the 99 apps generating network traffic, we were able to identify PII leaks fr
 Similar to the Android apps previously examined, we observe that the IMEI, and Android ID are most commonly leaked PII.
 Of the remaining 25 apps that generated traffic and did not leak PII over HTTP and HTTPs, 17 tried to contact a remote host that was down (did not respond to a TCP SYN) or sent encoded data over HTTP and HTTPs, while 8 apps are known to exploit previous versions of Android.
 
-In Table \ref{tab:pii-leakage-malware} we present the top domains that receive the PII leaked when we tested the malware. 
-We observe that two of the top five domains are stores from which Android apps can be downloaded, and the most frequently contacted store, cooguo.com, was known to host malware software~\cite{google:browsecooguo}.
+In Table \ref{tab:pii-leakage-malware}, we present the top 5 sites that receive the PII leaked when we tested the malware. 
+We observe that 2 of the top 5 site are stores from which Android apps can be downloaded, and the most frequently contacted store, cooguo.com, was known to host malware software~\cite{google:browsecooguo}.
 
-\mypara{Blocking malware.} We observe that malware apps connect to different sites, app stores and use 
+\mypara{Blocking malware} We observe that malware apps connect to different sites, app stores and use 
 different ports from most non-malicious traffic. For known malware stores, we can simply block access to 
 the site via \meddle. For other types of malware, we are investigating the effectiveness of behavioral 
 filtering and crowdsourcing. We can use a classifier to determine app activity that is likely malware, then 
@@ -212,7 +212,7 @@ scorecardresearch.com &  21 & 11 & 10 \tabularnewline
 \hline
 \end{tabular}
 \end{small}
-\caption{\textbf{The top 5 ads and analytics sites that were contacted by the devices in our dataset.}
+\caption{\textbf{The top 5 trackers that were contacted by the devices in our dataset.}
 \emph{All 26 devices in} \mobWild \emph{contacted doubleclick.net and google-analytics.com}.}
 \vspace{\postfigspace}
 \label{tab:top-trackers}
