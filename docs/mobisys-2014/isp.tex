@@ -18,7 +18,7 @@ a banner ad is replaced by information about the local airport.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/injectioncrop.png}
+\includegraphics[width=0.8\linewidth]{figures/injectioncrop.png}
 \caption{\textbf{Screen capture of content injection by a Chinese ISP in November, 2013.} \emph{The 
 highlighted region at the bottom should be an advertisement from a US company.} }
 \vspace{\postfigspace}
@@ -51,6 +51,7 @@ The tripwire-enabled response is forwarded to the client, which executes the Jav
 \begin{figure}
 \centering
 \includegraphics[width=0.9\linewidth]{figures/tripnet.pdf}
+\vspace{-1em}
 \caption{\textbf{Overview of the Web Tripnet.} \emph{A Web page loads 
 through the VPN tunnel, where a \meddlebox inserts a Web tripwire. The
 tripwire causes the browser to reload the Web page using the address of a
@@ -59,6 +60,7 @@ After the proxied version of the page is loaded, the browser (or a \meddlebox)
 compare the two pages to identify manipulation.} }
 \label{fig:tripnet}
 \vspace{\postfigspace}
+\vspace{-1em}
 \end{figure}
 
 The tripwire code contains information about the page content prior to traversing the ISP. When 
@@ -101,7 +103,7 @@ Further, our tests allowed us to identify differences in Web content not due an 
 we observe that Wordpress hosts a jquery.js file using the Edgecast CDN, and the file contents 
 differ depending on where the client is located. When accessed directly from mobile devices the 
 script size is 256\,KB; when accessed from the proxy server the script is 93\,KB. The difference in 
-size is because the latter uses a minified version of the script; it is unclear why this is not served 
+size is because the latter uses a minified version; it is unclear why this is not served 
 to all the networks.
 
 \subsection{Detecting Service Differentiation}
@@ -179,8 +181,8 @@ the recorded trace.}}
 \end{figure}
 
 Another key challenge is how to establish ground truth as to whether the ISP is 
-differentiating service for replay traffic. To address this, we exploit the fact 
-that \meddle already gives participating users access to a VPN connection. When the 
+differentiating service for replay traffic. To address this, we exploit the VPN connection 
+that \meddle provides as follows. When the 
 VPN is enabled, the ISP cannot inspect flow contents and thus cannot differentiate based 
 on the above factors except total bandwidth and time of day. 
 We then compare this performance to the case when we send traffic untunneled.  

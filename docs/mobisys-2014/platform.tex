@@ -29,10 +29,10 @@ time and across users (\eg Web caching/prefetching, malware detection/blocking a
 
 
 \noindent\textbf{Deployability}. The system must support the ability to deploy and distribute large numbers 
-of middlebox services quickly, easily and at scale~\cite{sherry:middleboxes} without 
+of middlebox services quickly, easily, and at scale~\cite{sherry:middleboxes} without 
 the need to deploy hardware in homes~\cite{bismark} or ISPs~\cite{wang:middleboxes}. 
 To improve the representativeness of studies using \meddle, we want to 
-recruit average (\ie non-technical) users to participate in our system. To support this, we need a system 
+recruit average (\ie non-technical) users to participate. To support this, we need a system 
 that has incentives for users, a low barrier to adoption, is easy to deploy and that scales gracefully. 
 
 
@@ -115,7 +115,7 @@ To setup this configuration, users need to install a single file, a step that ne
 
 \noindent\textbf{Android support.} As of Android 4.2, Android supports ``always on'' VPN connections that ensure all traffic is always tunneled.
 For Android version 4.0+ we use a modified StrongSwan implementation of a VPN client app~\cite{strongswanclient}  that 
-uses an Android API to manage VPN tunnels. 
+manages VPN tunnels. 
 Our version ensures re-establishment of VPN tunnels on network state changes (\eg when a device switches from cellular to \wifi).
 %\meddle thus supports devices running Android version 4.0 and above.
 
