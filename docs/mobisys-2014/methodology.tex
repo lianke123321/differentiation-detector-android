@@ -135,13 +135,13 @@ data plans in the US tend to cost \$30-\$90 per month -- more than two orders of
 \subsection{Meddle Visiblity}
 
 %We now highlight key features of the \mobWild dataset. 
-We now use data gathered from users to demonstrate that there is a need for a platform like \meddle that provides a comprehensive view of Internet traffic from mobile devices. 
+We now use data gathered from users to motivate the need for a platform like \meddle that provides a comprehensive view of Internet traffic from mobile devices. 
 Note that due to the relatively small number of users in our study, we do not attempt to  
 draw strong and generalizable conclusions. 
 
 \noindent\textbf{Observation 1: \emph{End-host instrumentation provides a more complete view of 
 Internet traffic from mobile devices.}} We infer the access technology (WiFi or cellular) for 
-each session with the AS description from a \emph{WHOIS} lookup for each IP address used by a mobile device.
+each session using \emph{WHOIS} data for each IP address used by a mobile device.
 Based on this classification, the \mobWild dataset consists of traffic from 65 distinct ASes, of which 8 are cellular ASes and 7 are university networks.
 
 We observe less diversity in cellular ASes compared to \wifi ASes.
@@ -159,8 +159,8 @@ There are three key take-aways from this table.
 First, Web and SSL traffic dominate the traffic for users in the \mobWild dataset; 91.26\% (137.63 GB) of the traffic volume in the \mobWild dataset is either HTTP or SSL.
 Second, there is significant diversity in the usage patterns for users with Android and iOS devices; the fraction of total flows over cellular or \wifi differ significantly for each OS. 
 Third, a platform that cannot analyze SSL traffic will miss a large fraction of the traffic.
-Indeed, a significant fraction of flows use SSL, which prevents classification using deep packet inspection.
-This calls into question the overall effectiveness of traffic optimization approaches that rely on middlebox technologies that interpose on plaintext traffic (\eg page rewriting or downsampling media).
+A significant fraction of flows use SSL, which prevents classification using deep packet inspection.
+%This calls into question the overall effectiveness of traffic optimization approaches that rely on middlebox technologies that interpose on plaintext traffic (\eg page rewriting or downsampling media).
 This motivates the need for a platform that not only covers multiple OSes and multiple access technologies but is also capable of intercepting all mobile Internet traffic, including SSL traffic, for the purpose of analysis and interposition. 
 
 \begin{table}
@@ -329,13 +329,13 @@ We use the \httphost field only if we were unable to extract any useful signatur
 In Table~\ref{tab:classification-success}, we observe that by using a combination of the \useragent and \httphost we were able to identify 64\% of the Android apps and 89\% of the iOS apps. 
 %To fill this gap, we are currently investigating how to use ad-network identifiers to classify apps. 
 
-\begin{figure}
-\subfloat[iOS]{\label{fig:http-wordcloud-ios}\includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_ios_image.png}}\newline
-\subfloat[Android]{\label{fig:http-wordcloud-android}\includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_android_image.png}}
-\caption{\textbf{\useragent signatures in  iOS and Android HTTP flows.} \emph{The font weight represents the number of users for which a particular signature was observed.}}
-%\vspace{\postfigspace}
-\label{fig:http-wordcloud}
-\end{figure}
+%\begin{figure}
+%\subfloat[iOS]{\label{fig:http-wordcloud-ios}\includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_ios_image.png}}\newline
+%\subfloat[Android]{\label{fig:http-wordcloud-android}\includegraphics[width=\columnwidth]{figures/wordcloud_useragentsignature_android_image.png}}
+%\caption{\textbf{\useragent signatures in  iOS and Android HTTP flows.} \emph{The font weight represents the number of users for which a particular signature was observed.}}
+%%\vspace{\postfigspace}
+%\label{fig:http-wordcloud}
+%\end{figure}
 
 %We now describe the results of classifying HTTP traffic in the \mobWild dataset. %mapping data gathered from our user study.
 %Using only the \useragent on the \mobWild dataset, we were able to identify 256 iOS and 86 Android apps, OS libraries, and services. 
@@ -376,15 +376,14 @@ In Table~\ref{tab:classification-success}, we observe that by using a combinatio
 \end{table}
 
 \textbf{In situ data.}
-Table~\ref{tab:classify-http} shows that a combination of \useragent and \httphost field in HTTP headers can map more than 92\% of the traffic (flows and bytes) from iOS and Android devices.
-
+Table~\ref{tab:classify-http} shows that a combination of \useragent and \httphost field maps more than 92\% of the traffic (flows and bytes) from iOS and Android devices.
 Using only the \useragent on the \mobWild dataset, we were able to identify 256 iOS and 86 Android apps, OS libraries, and services. 
-We observe that the \useragent is more effective in identifying iOS apps compared to Android apps, which concurs with what we observed during our controlled experiments.
+We observe that the \useragent is more effective in identifying iOS apps compared to Android apps, which agrees with what we observed in controlled experiments.
 
-The \emph{word cloud} in Fig.~\ref{fig:http-wordcloud} contains the signatures we extracted from the \useragent; the font size of an app/service name is proportional to the number of users for which it was observed.
-Signatures such as facebook and youtube are useful in identifying the apps, Facebook and YouTube respectively.
-However, signatures such as applecoremedia and stagefright represent the OS services provided by iOS and Android to download media content which are internally used by media streaming apps such as Pandora and YouTube.
-Audio and video streaming apps such as Pandora and YouTube use the \emph{Apple Core Media} and \emph{Stagefright} services on iOS and Android respectively to download media content, and for other auxiliary content such as list of related videos and recommendations these apps use the \useragent that contains their app signature.
+%The \emph{word cloud} in Fig.~\ref{fig:http-wordcloud} contains the signatures we extracted from the \useragent; the font size of an app/service name is proportional to the number of users for which it was observed.
+%Text such as \emph{facebook} and \emph{youtube} are useful in identifying the apps, Facebook and YouTube respectively.
+%However, signatures such as \emph{applecoremedia} and \emph{stagefright} represent the OS services provided by iOS and Android to download media content for apps such as Pandora and YouTube.
+Audio and video streaming apps such as Pandora and You\-Tube use the \emph{Apple Core Media} and \emph{Stagefright} services on iOS and Android respectively to download media content, and for other auxiliary content such as list of related videos and recommendations these apps use the \useragent that contains their app signature.
 We therefore use a combination of \useragent and \httphost field to identify such apps.
 
 In Table~\ref{tab:classify-http}, we observe that media from popular streaming services---Netflix, YouTube, Pandora, Spotify, and Vimeo---contribute to more than 50\% of the traffic volume from iOS and Android devices in the \mobWild dataset.
@@ -427,7 +426,7 @@ After identifying hostnames, we map them to apps using the technique described i
 
 \noindent\textbf{Identifying hostname using the SSL Handshake.}
 We first use the common name (CN) field of certificates to identify the servers that exchanged data using HTTPS.
-We observe that less than 25\% of the HTTPS traffic from iOS and Android contains the fully qualified domain name (FQDN) in the subject of the certificate; the rest of the traffic either contains regular expressions such as *.google.com or is a continuation of a previous SSL session. 
+Less than 25\% of the HTTPS traffic from iOS and Android contains the fully qualified domain name (FQDN) in the subject of the certificate; the rest of the traffic either contains regular expressions such as *.google.com or is a continuation of a previous SSL session. 
 To further resolve the hostnames, we rely on the \emph{Server Name Indication} (SNI) used by SSL flows~\cite{rfc:servernametls}.
 Servers that host multiple services use the SNI to distinguish these services.   
 For example, we observe an SNI of \url{plus.google.com} and \url{s.youtube.com} in two flows that used a certificate with a CN \url{*.google.com}.

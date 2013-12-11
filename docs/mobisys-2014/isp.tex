@@ -18,7 +18,7 @@ a banner ad is replaced by information about the local airport.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\linewidth]{figures/injectioncrop.png}
+\includegraphics[width=0.9\linewidth]{figures/injectioncrop.png}
 \caption{\textbf{Screen capture of content injection by a Chinese ISP in November, 2013.} \emph{The 
 highlighted region at the bottom should be an advertisement from a US company.} }
 \vspace{\postfigspace}
@@ -60,7 +60,6 @@ After the proxied version of the page is loaded, the browser (or a \meddlebox)
 compare the two pages to identify manipulation.} }
 \label{fig:tripnet}
 \vspace{\postfigspace}
-\vspace{-1em}
 \end{figure}
 
 The tripwire code contains information about the page content prior to traversing the ISP. When 
@@ -167,7 +166,7 @@ from a \emph{replay server}.
 The replay system consists of a client running on the mobile device and a replay server. 
 The client and server coordinate to replay the original flows in a way that reproduces packet timings, 
 sequence of bytes, ports and source IPs. Since our replay is limited to using our own replay servers,
- we cannot detect differentiation based on arbitrary destination IPs. \drc{Add UDP challenges?}
+ we cannot detect differentiation based on arbitrary destination IPs. 
 
 
 \begin{figure}
