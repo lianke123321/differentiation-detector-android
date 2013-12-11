@@ -396,7 +396,7 @@ map SSL flows \emph{without decryption}.
 Using port numbers, we observe in that more than 98\% of SSL flows observed in our controlled experiments were due to HTTPS, the rest of the flows were due to email, instant messaging, and OS notification services. 
 We therefore focus our attention on identifying the apps responsible for the HTTPS flows.
 We use DNS responses and subsequent SSL handshakes to determine the \emph{hostnames} of the remote hosts contacted by mobile devices.
-After identifying the hostnames, we try to map these hostnames to apps using the technique described in the previous section.
+After identifying hostnames, we map them to apps using the technique described in the previous section.
 
 %During manual examination of the results, we observe that Google and Apple to the be two main groups of organizations: Google and Apple.
 
@@ -422,7 +422,7 @@ We observe that less than 25\% of the HTTPS traffic from iOS and Android contain
 To further resolve the hostnames, we rely on the \emph{Server Name Indication} (SNI) used by SSL flows~\cite{rfc:servernametls}.
 Servers that host multiple services use the SNI to distinguish these services.   
 For example, we observe an SNI of \url{plus.google.com} and \url{s.youtube.com} in two flows that used a certificate with a CN \url{*.google.com}.
-Using either the certificate or the SNI we were able to identify the hostname for less than 40\% of HTTPS traffic.
+Using either the certificate or the SNI we identified the hostname for	 less than 40\% of HTTPS traffic.
 
 \noindent\textbf{Identifying hostname using the DNS messages.} 
 For the remaining flows we use DNS messages exchanged by the mobile device with its DNS server before starting the HTTPS flows, a technique similar to DN-Hunter~\cite{bermudez:dnhunter}.
@@ -502,7 +502,7 @@ Apple Services  & 25.26 & 28.26 & $<$0.01 & $<$0.01 \tabularnewline
 Table~\ref{tab:classify-ssl-traffic} shows our SSL mapping results on the SSL traffic in the \mobWild dataset. 
 We first group hostnames to the apps and we were able to identify the apps for more than 40\% of the iOS and Android SSL flows.
 For flows whose hostnames are ambiguous, we group them according to organizations.
-During manual examination of the results, we observe that Google and Apple to be the two main organizations that contributed to the majority of the flows; we label these flows as Google Services and Apple services respectively. 
+During manual examination of the results, we observe that Google and Apple to be the two main organizations that contributed to the majority of the flows; we label these flows as Google Services and Apple Services. 
 
 In Table~\ref{tab:classify-ssl-traffic}, we observe that 61.5\% of iOS and 47.3\% of Android traffic (by bytes) is respectively 
 to Google and Apple servers where the hostname does not contain signatures of the app.

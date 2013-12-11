@@ -1,5 +1,8 @@
+
 \section{Related Work}
 \label{sec:related}
+
+
 
 The network behavior of mobile systems has implications for battery life, 
 data-plan consumption, privacy, security and performance, among others. 
@@ -11,25 +14,6 @@ none of these, enabling visibility and control of network traffic across carrier
 technologies. Table~\ref{tab:relatedCompare} puts our approach in context with related  
 approaches regarding network behavior of mobile systems. 
 
-\begin{table*}[t]
-\begin{center}
-{\footnotesize
-\begin{tabular}{|l|l|l|l|l|l|}
-\hline
- & \textbf{Network Coverage} &  \textbf{Portability} &  \textbf{Deployment model} &   \textbf{Meas. Type}  & \textbf{Control?} \\ \hline
-Large ISP studies~\cite{vallina-rod:ads,gerber:passivespeed} & Single carrier & All OSes & Instrument cell infrastructure & Passive & No \\ \hline
-WiFi study~\cite{chen:wifi} & Single WiFi network & All OSes & Instrument WiFi network & Passive & No \\ \hline
-PhoneLab~\cite{PhoneLab}/TaintDroid~\cite{enck:taintdroid} & Multiple networks & Android & Install custom OS & Active/Passive & Yes \\ \hline
-MobiPerf~\cite{wang:middleboxes}/SpeedTest~\cite{sommers:cellwifi} & Multiple networks & Android & Install App & Active & Yes \\ \hline \hline
-\platname & Any network & Most OSes & VPN configuration & Active/Passive & Yes \\ \hline
-\end{tabular} }
-\end{center}
-\vspace{\postfigspace}
-\caption{\textbf{Comparison of related work.} \emph{ \platname is the first approach to provide visibility and control over network traffic for all access 
-networks and most device OSes}.}
-\label{tab:relatedCompare}
-\vspace{\postfigspace}
-\end{table*}%
 
 Traces from mobile devices can inform a number of interesting analyses. Previous work 
 uses custom OSes to investigate how devices waste energy~\cite{pathak:eprof}, network bandwidth and 
