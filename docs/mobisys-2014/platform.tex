@@ -114,8 +114,8 @@ To ensure all possible destinations match this list, we exploit the fact that iO
 To setup this configuration, users need to install a single file, a step that needs to be performed only once. 
 
 \noindent\textbf{Android support.} As of Android 4.2, Android supports ``always on'' VPN connections that ensure all traffic is always tunneled.
-For Android version 4.0+ we use a modified StrongSwan implementation of a VPN client app~\cite{strongswanclient}  that 
-manages VPN tunnels. 
+For Android version 4.0+ we use a modified StrongSwan implementation of a VPN client app %~\cite{strongswanclient}  
+that manages VPN tunnels. 
 Our version ensures re-establishment of VPN tunnels on network state changes (\eg when a device switches from cellular to \wifi).
 %\meddle thus supports devices running Android version 4.0 and above.
 
@@ -157,8 +157,8 @@ This enables our approach to provide visibility into secure channels established
 %\end{figure}
 
 Once traffic arrives at a \meddlebox, it interacts with software middleboxes that interpose on 
-user-generated traffic and proxy services that interact with 
-flows that \meddle induces.  
+user-generated traffic and proxy services that interact with untunneled  
+flows.  
 
 \noindent\textbf{Plugin infrastructure.}
 \platname{} supports a plugin

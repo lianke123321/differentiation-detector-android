@@ -96,12 +96,12 @@ US with EC2, delays from mobile-network egress points to EC2 nodes are on genera
 For other networks, we will achieve similarly low indirection overhead by placing instances in a cloud/hosting 
 provider near subscribers and use DNS redirection (\eg via Amazon's Route 53) to direct clients to nearby instances. 
 
-The other source of network delays is connection establishment time, incurred once per session. We measured 
+The other source of latency is connection establishment time, incurred once per session. We measured 
 50 VPN-connection establishment times on both iOS (iPhone 5 / iOS 6.1) and Android (Galaxy Nexus /
 Android 4.2), for \wifi{} and cellular connections. We conduct tests in rapid succession to ensure the radio is in the high power state.
 The \meddle server was running on a university network. 
 For Android (using IKEv2), the maximum establishment time was 0.81 seconds on \wifi{} and 1.59 seconds on cellular. 
-For iOS (using IKEv1), the connection takes longer due to the older protocol version: we observe a maximum of 2 seconds on \wifi{} and 2.18 seconds on cellular. 
+For iOS, the connection is slower because it uses IKEv1: we observe a maximum of 2 seconds on \wifi{} and 2.18 seconds on cellular. 
 Because each VPN session supports many flows, the amortized cost of connecting is  small. 
 %\tbd{Cite results from latency to home gateways based on DSL results in PAM and IMC.}
 %\tbd{Address comments in conext review on latency}
@@ -308,7 +308,7 @@ Along with the organizations of the apps we tested, we used the Google Play API~
 
 \emph{Classifying with \useragent:} 
 We observed a non-empty \useragent string in more than 99.7\% of the HTTP flows from iOS and 90.9\%flows from Android. 
-A \useragent string may contain an app identifier and other auxiliary information such as details of the OS~\cite{mozilla:useragentdetection}. 
+A \useragent string may contain an app identifier and other auxiliary information such as details of the OS. 
 For example, Yahoo Mail's \useragent string contains the string \emph{YahooMobileMail/1.0}. 
 However, some apps use more generic \useragent strings such as \emph{AppleCoreMedia} (streaming video on iOS) or \emph{Dalvik} (generic text for Android). 
 To extract the app information, we use regular expressions to filter the auxiliary information from the \useragent and cluster the extracted tokens using the edit distance.
@@ -373,6 +373,7 @@ In Table~\ref{tab:classification-success}, we observe that by using a combinatio
 \end{small}
 \caption{\textbf{Effectiveness of mapping HTTP traffic}. \emph{OS services$^{*}$ includes services other than those used to download media content.}}
 \label{tab:classify-http}
+\vspace{\postfigspace}
 \end{table}
 
 \textbf{In situ data.}
@@ -504,6 +505,7 @@ Apple Services  & 25.26 & 28.26 & $<$0.01 & $<$0.01 \tabularnewline
 \end{small}
 \caption{\textbf{Mapping SSL traffic in the \mobWild dataset.} \emph{The SSL traffic from the iOS and Android devices in the \mobWild dataset is dominated by Google and Apple services.}}
 \label{tab:classify-ssl-traffic}
+\vspace{\postfigspace}
 \end{table}
 
 \noindent\textbf{Mapping results.} 

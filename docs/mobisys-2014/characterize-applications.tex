@@ -59,7 +59,7 @@ A demo of our tool is located at \url{http://goo.gl/pU689F}.
 
 We use the traffic traces from our controlled experiments to identify how apps leak PII. 
 For our controlled experiments, we created dummy user accounts with fake contact information (see \S\ref{sec:dataset-contr-exper}).  
-Our goal is to detect if any PII stored on the device is leaked across the network over HTTP/S.
+Our goal is to detect if any PII stored on the device is leaked over HTTP/S.
 For our analysis we focus on the email address, location, username and password used during authentication, device ID, contact information, and the IMEI number. 
 Some of this information is required for normal app operation; however, such information should never travel across the network in plaintext.  
 
@@ -83,25 +83,26 @@ Of the remaining two apps that leaked PII, one app leaked the android ID and IME
 The difference in the PII leaks is primarily due to the different privileges that the underlying OS provides these apps. 
 %The dependence of PII leaks on the OS highlights the importance of \meddle that can be used to analyze the behavior of apps across multiple OSes.
 
-\begin{table}
-    \centering
-    \begin{small}
-    \begin{tabular}{|l|c|c||c|}
-       \hline
-       {\bf Site}& {\bf Tracker} \tabularnewline
-       \hline              
-       android.clients.google.com & -  \tabularnewline
-       getjar.com        & -  \tabularnewline
-       chartboost.com    & \checkmark \tabularnewline
-       pocketchange.com  & -   \tabularnewline
-       flurry.com        & \checkmark \tabularnewline       
-       \hline
-    \end{tabular}
-    \end{small}
-    \caption{\textbf{Top 5 sites that receive PII over SSL ordered according to number of flows leaking PIIs during controlled experiments}. \emph{Two of the top 5 sites that receive this information are trackers.}}
-    \label{tab:pii-leakage-https-sites}
-    \vspace{\postfigspace}
-\end{table}
+%\begin{table}
+%    \centering
+%    \begin{small}
+%    \begin{tabular}{|l|c|c||c|}
+%       \hline
+%       {\bf Site}& {\bf Tracker} \tabularnewline
+%       \hline              
+%       android.clients.google.com & -  \tabularnewline
+%       getjar.com        & -  \tabularnewline
+%       chartboost.com    & \checkmark \tabularnewline
+%       pocketchange.com  & -   \tabularnewline
+%       flurry.com        & \checkmark \tabularnewline       
+%       \hline
+%    \end{tabular}
+%    \end{small}
+%    \caption{\textbf{Top 5 sites that receive PII over SSL ordered according to number of flows leaking PIIs during controlled experiments}. \emph{Two of the top 5 sites that receive this information are trackers.}}
+%    \label{tab:pii-leakage-https-sites}
+%    \vspace{\postfigspace}
+%    \vspace{\postfigspace}
+%\end{table}
 
 \mypara{PII leaked over SSL} 
 During our experiments, we observed that PII is also sent over encrypted channels.  
@@ -119,7 +120,7 @@ visible from \meddle.
 \subsection{PII Leaked by Malware}
 \label{subsec:malware}
 
-Mobile malware is distributed for a variety of reasons, including profit, espionage and mayhem. With  
+Mobile malware is an increasingly important threat in mobile systems. With  
 \meddle, we can monitor and detect any malware activity over IP but not circuit switched activity such as 
 sending SMS or making phone calls. This section focuses on PII leaked by malware; 
 we also discuss how we can our results and \emph{ReCon} to provide malware blocking.
@@ -132,14 +133,13 @@ Second, we can use the techniques discussed in \S\ref{subsec:exptpii} to identif
 To understand malware network behavior, we use a dataset consisting of 111 confirmed malicious Android APKs 
 gathered by the Andrubis project~\cite{andrubis} in September, 2013.  
 We use the approach in \S\ref{sec:dataset-contr-exper} to conduct controlled experiments on the malware.
-
 The malware consists of 46 families ranging from backdoors to spyware. 
 Of the 111 apps, 99 (89\%) apps generated network traffic; 37 of the 111 apps targeted earlier versions (below 4.0) of the Android OS and thus did not work to their full potential during our experiments.%\footnote{\meddle supports Android version 4.0 and above because the previous version of Android do not have native VPN support.}
 
 % 24 + 5 + 1 + 6 + 1
 \mypara{Signature-based detection is insufficient} 
 First, we determine whether existing malware hash registries contain signatures for the malicious apps in our dataset. 
-Even in December 2013, 3 months after the malware was identified by Andrubis, we find that only 9 (8.1\%) apps were correctly identified as malware by cymru~\cite{cymru}, a hash registry that internally uses 30 anti-virus software packages~\cite{cymru:hash}; 7 of these 9 apps generated network traffic. 
+Even in December 2013, 3 months after the malware was identified by Andrubis, we find that only 9 (8.1\%) apps were correctly identified as malware by Cymru's Malware Hash Registry that uses 30 anti-virus software packages~\cite{cymru:hash}; 7 of these 9 apps generated network traffic. 
 
 
 \begin{table}
