@@ -75,7 +75,7 @@ def run(pcap_file):
     configs = Configs()
     
     '''Defaults'''
-    interval = 1
+    interval = 0.01
     
 
     p = subprocess.Popen(['tshark', '-qz', ('io,stat,' + str(interval)), '-r', pcap_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -113,8 +113,6 @@ def main():
         filename = os.path.abspath(sys.argv[1])
         xput = run(filename)
         x, y = sorted_list_to_cdf(xput)
-        print x
-        print y
         pylab.plot(x, y)
         pylab.show()
     elif os.path.isdir(os.path.abspath(sys.argv[1])):
