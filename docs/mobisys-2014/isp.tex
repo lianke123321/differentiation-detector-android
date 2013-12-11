@@ -4,7 +4,7 @@ Revealing ISP Behavior}
 
 This section describes how we build two applications atop \meddle to 
 reveal the policies ISPs apply to mobile traffic traversing their networks. 
-Previous work focused on addressing this problem in fixed-line networks; to 
+Previous work addressed this problem in fixed-line networks; to 
 the best of our knowledge we are the first to provide this functionality for 
 mobile systems.
 
@@ -246,13 +246,44 @@ for differentiation due to traffic engineering. We interact with these apps for 
 phase, then replay the traces in each measured network. Note that these apps are intended to demonstrate 
 how our approach works; a complete treatment of service differentiation is beyond the scope of this paper. 
 
-Table~\ref{} shows the average throughput and loss (along with standard deviations) in Verizon's LTE network 
+Table~\ref{tab:svcdiff} shows the average throughput and loss (along with standard deviations) in Verizon's 3G network 
 in Boston. Tests with AT\&T and T-Mobile were similar. The key take-away is that we observe only small 
 differences in performance, and they are not statistically significant -- indicating no service differentiation for 
 these apps. The standard deviations also indicate that detecting differentiation in throughput can be difficult 
 for small changes. On the other hand, small changes in packet loss should be easy to detect.    
  
- 
+ \begin{table}
+\centering
+\begin{small}
+\begin{tabular}{|p{0.1\columnwidth}|c|c|c|c|}
+\hline
+\multirow{2}{*}{\bf App} & \multicolumn{2}{c|}{\bf Throughput (KB/s)} &  \multicolumn{2}{c|}{\bf Loss (\%)} \tabularnewline
+\cline{2-5}
+                              & {\bf No VPN}  & {\bf VPN} & {\bf No VPN} & {\bf VPN}   \tabularnewline
+                              & {\bf (avg, stdev)}  & {\bf (avg, stdev)} & {\bf (avg, stdev)} & {\bf (avg, stdev)}   \tabularnewline
+\hline
+
+YT(DL) & (103.74, 31.16) & (99.85, 35) & (0.81, 0.06) & (0.86, 0.13) \tabularnewline
+\hline
+YT(UL) & (114.52, 6.05) & (117.37, 8.78) & (0.03, 0.01) & (0.05, 0.01) \tabularnewline
+\hline
+DB(DL)  & (155.09, 32.42) & (148.1, 44.95) & (0.79, 0.31) & (0.88, 0.38) \tabularnewline
+\hline
+DB(UL) & (115.07, 7.31) & (120.25, 5.85) & (0.07, 0.02) & (0.09, 0.01) \tabularnewline
+\hline
+SPTFY & (123.91, 40.19) & (127.16, 45.96) & (0.83, 0.08) & (0.73, 0.07) \tabularnewline
+%\hline
+%PNDR & (126.01, 36) & (122.81, 28.42) & (1.08, 0.09) & (1.13, 0.10) \tabularnewline
+\hline
+NFLX & (122.81, 28.42) & (132.26, 33.55) & (0.97, 0.03) & (0.99, 0.15) \tabularnewline
+\hline
+\end{tabular}
+\end{small}
+\caption{ \textbf{Average and standard deviation for 4  apps } \emph{(YT: YouTube, DB: Dropbox, SPTFY: Spotify, NFLX: Netflix) on 
+Verizon, indicating no service differentiation. }}
+\label{tab:svcdiff}
+\vspace{\postfigspace}
+\end{table}
 
 %\textbf{Table}: each row is an app, each column is an ISP, each cell is a marker indicating what kind of 
 %differentiation is happening
