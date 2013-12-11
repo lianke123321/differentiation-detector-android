@@ -17,6 +17,10 @@ then
     fi
 fi
 
+rm -rf ../data/$dir/results/
+
+mkdir ../data/$dir/results/
+
 # Clean the results.
 if [ $sto != 'true' ]; then
 rm -rf ../data/$dir/generated_plots
@@ -36,6 +40,10 @@ make >/dev/null
 cd ..
 
 cd xput
+make >/dev/null
+cd ..
+
+cd ten_ninety
 make >/dev/null
 cd ..
 
@@ -111,8 +119,8 @@ do
     echo 'set title "RTT CDF"
 set style data lines
 set key bottom right
-set xlabel "CDF"
-set ylabel "RTT"
+set ylabel "CDF"
+set xlabel "RTT"
 set yrange [0:1]
 set term postscript color eps enhanced "Helvetica" 16
 set size ratio 0.5
@@ -225,6 +233,40 @@ plot "xput.txt" using 1:($2/1e3) with lines lw 3' >xputplot.gp
     cd ../../../../plot
     echo Done.
 done
+
+cat ../data/$dir/generated_plots/dump_novpn*/rtts/rtts.txt | awk '{if ($1 > 10) print $1}' | sort -n >../data/$dir/results/$dir.rtts.novpn.txt
+cat ../data/$dir/generated_plots/tcpdump*/rtts/rtts.txt | awk '{if ($1 > 10) print $1}' | sort -n >../data/$dir/results/$dir.rtts.vpn.txt
+
+echo 'set title "RTT CDF"
+set style data lines
+set key bottom right
+set ylabel "CDF"
+set xlabel "RTT"
+set yrange [0:1]
+set term postscript color eps enhanced "Helvetica" 16
+set size ratio 0.5
+# Line style for axes
+set style line 80 lt 0
+set grid back linestyle 81
+set border 3 back linestyle 80
+set xtics nomirror
+set ytics nomirror
+set out "'$dir'.cdfrttp.ps"
+a=0
+cumulative_sum(x)=(a=a+x,a)
+countpoints(file) = system( sprintf("grep -v \"^#\" %s| wc -l", file) )
+pointcountvpn = countpoints("'$dir'.rtts.vpn.txt")
+pointcountnovpn = countpoints("'$dir'.rtts.novpn.txt")
+plot "'$dir'.rtts.vpn.txt" using 1:(1/pointcountvpn) smooth cumulative with lines lw 3 linecolor rgb "green" t "With VPN",\
+     "'$dir'.rtts.novpn.txt" using 1:(1/pointcountnovpn) smooth cumulative with lines lw 3 linecolor rgb "green" t "Without VPN"' >../data/$dir/results/$dir.rtts.cdf.gp
+
+cd ../data/$dir/results
+gnuplot $dir.rtts.cdf.gp
+../../../plot/ten_ninety/tn <$dir.rtts.vpn.txt >$dir.rtt.avg_stdev.vpn.txt
+../../../plot/ten_ninety/tn <$dir.rtts.novpn.txt >$dir.rtt.avg_stdev.novpn.txt
+cd ../../../plot
+
+
 echo Mean of maximum throughput for the non-encrypted is: `bc -l <<< "$novpn_xput_max / $novpn_count"` KB/s
 echo Mean of average throughput for the non-encrypted is: `bc -l <<< "$novpn_xput_avg / $novpn_count"` KB/s
 echo Mean of median throughput for the non-encrypted is: `bc -l <<< "$novpn_xput_mdn / $novpn_count"` KB/s
@@ -235,29 +277,29 @@ echo Mean of average throughput for the encrypted is: `bc -l <<< "$vpn_xput_avg 
 echo Mean of median throughput for the encrypted is: `bc -l <<< "$vpn_xput_mdn / $vpn_count"` KB/s
 echo Mean of loss rate for the encrypted is: `bc -l <<< "$vpn_loss_rate / $vpn_count"` \%
 
-echo unencrypted_xput_max: `bc -l <<< "$novpn_xput_max / $novpn_count"` >../data/$dir.stats.txt
-echo unencrypted_xput_avg: `bc -l <<< "$novpn_xput_avg / $novpn_count"` >>../data/$dir.stats.txt
-echo unencrypted_xput_mdn: `bc -l <<< "$novpn_xput_mdn / $novpn_count"` >>../data/$dir.stats.txt
-echo unencrypted_loss_rate: `bc -l <<< "$novpn_loss_rate / $novpn_count"` >>../data/$dir.stats.txt
-echo unencrypted_rtt_ab_min: `bc -l <<< "$novpn_rtt_ab_min / $novpn_rtt_count"` >>../data/$dir.stats.txt
-echo unencrypted_rtt_ba_min: `bc -l <<< "$novpn_rtt_ba_min / $novpn_rtt_count"` >>../data/$dir.stats.txt
-echo unencrypted_rtt_ab_max: `bc -l <<< "$novpn_rtt_ab_max / $novpn_rtt_count"` >>../data/$dir.stats.txt
-echo unencrypted_rtt_ba_max: `bc -l <<< "$novpn_rtt_ba_max / $novpn_rtt_count"` >>../data/$dir.stats.txt
-echo unencrypted_rtt_ab_avg: `bc -l <<< "$novpn_rtt_ab_avg / $novpn_rtt_count"` >>../data/$dir.stats.txt
-echo unencrypted_rtt_ba_avg: `bc -l <<< "$novpn_rtt_ba_avg / $novpn_rtt_count"` >>../data/$dir.stats.txt
-echo unencrypted_rtt_ab_stdev: `bc -l <<< "$novpn_rtt_ab_stdev / $novpn_rtt_count"` >>../data/$dir.stats.txt
-echo unencrypted_rtt_ba_stdev: `bc -l <<< "$novpn_rtt_ba_stdev / $novpn_rtt_count"` >>../data/$dir.stats.txt
+echo unencrypted_xput_max: `bc -l <<< "$novpn_xput_max / $novpn_count"` >../data/$dir/results/$dir.stats.txt
+echo unencrypted_xput_avg: `bc -l <<< "$novpn_xput_avg / $novpn_count"` >>../data/$dir/results/$dir.stats.txt
+echo unencrypted_xput_mdn: `bc -l <<< "$novpn_xput_mdn / $novpn_count"` >>../data/$dir/results/$dir.stats.txt
+echo unencrypted_loss_rate: `bc -l <<< "$novpn_loss_rate / $novpn_count"` >>../data/$dir/results/$dir.stats.txt
+echo unencrypted_rtt_ab_min: `bc -l <<< "$novpn_rtt_ab_min / $novpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo unencrypted_rtt_ba_min: `bc -l <<< "$novpn_rtt_ba_min / $novpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo unencrypted_rtt_ab_max: `bc -l <<< "$novpn_rtt_ab_max / $novpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo unencrypted_rtt_ba_max: `bc -l <<< "$novpn_rtt_ba_max / $novpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo unencrypted_rtt_ab_avg: `bc -l <<< "$novpn_rtt_ab_avg / $novpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo unencrypted_rtt_ba_avg: `bc -l <<< "$novpn_rtt_ba_avg / $novpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo unencrypted_rtt_ab_stdev: `bc -l <<< "$novpn_rtt_ab_stdev / $novpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo unencrypted_rtt_ba_stdev: `bc -l <<< "$novpn_rtt_ba_stdev / $novpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
 
-echo encrypted_xput_max: `bc -l <<< "$vpn_xput_max / $vpn_count"` >>../data/$dir.stats.txt
-echo encrypted_xput_avg: `bc -l <<< "$vpn_xput_avg / $vpn_count"` >>../data/$dir.stats.txt
-echo encrypted_xput_mdn: `bc -l <<< "$vpn_xput_mdn / $vpn_count"` >>../data/$dir.stats.txt
-echo encrypted_loss_rate: `bc -l <<< "$vpn_loss_rate / $vpn_count"` >>../data/$dir.stats.txt
-echo encrypted_rtt_ab_min: `bc -l <<< "$vpn_rtt_ab_min / $vpn_rtt_count"` >>../data/$dir.stats.txt
-echo encrypted_rtt_ba_min: `bc -l <<< "$vpn_rtt_ba_min / $vpn_rtt_count"` >>../data/$dir.stats.txt
-echo encrypted_rtt_ab_max: `bc -l <<< "$vpn_rtt_ab_max / $vpn_rtt_count"` >>../data/$dir.stats.txt
-echo encrypted_rtt_ba_max: `bc -l <<< "$vpn_rtt_ba_max / $vpn_rtt_count"` >>../data/$dir.stats.txt
-echo encrypted_rtt_ab_avg: `bc -l <<< "$vpn_rtt_ab_avg / $vpn_rtt_count"` >>../data/$dir.stats.txt
-echo encrypted_rtt_ba_avg: `bc -l <<< "$vpn_rtt_ba_avg / $vpn_rtt_count"` >>../data/$dir.stats.txt
-echo encrypted_rtt_ab_stdev: `bc -l <<< "$vpn_rtt_ab_stdev / $vpn_rtt_count"` >>../data/$dir.stats.txt
-echo encrypted_rtt_ba_stdev: `bc -l <<< "$vpn_rtt_ba_stdev / $vpn_rtt_count"` >>../data/$dir.stats.txt
+echo encrypted_xput_max: `bc -l <<< "$vpn_xput_max / $vpn_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_xput_avg: `bc -l <<< "$vpn_xput_avg / $vpn_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_xput_mdn: `bc -l <<< "$vpn_xput_mdn / $vpn_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_loss_rate: `bc -l <<< "$vpn_loss_rate / $vpn_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_rtt_ab_min: `bc -l <<< "$vpn_rtt_ab_min / $vpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_rtt_ba_min: `bc -l <<< "$vpn_rtt_ba_min / $vpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_rtt_ab_max: `bc -l <<< "$vpn_rtt_ab_max / $vpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_rtt_ba_max: `bc -l <<< "$vpn_rtt_ba_max / $vpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_rtt_ab_avg: `bc -l <<< "$vpn_rtt_ab_avg / $vpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_rtt_ba_avg: `bc -l <<< "$vpn_rtt_ba_avg / $vpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_rtt_ab_stdev: `bc -l <<< "$vpn_rtt_ab_stdev / $vpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
+echo encrypted_rtt_ba_stdev: `bc -l <<< "$vpn_rtt_ba_stdev / $vpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
 
