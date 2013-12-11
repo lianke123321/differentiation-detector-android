@@ -78,12 +78,10 @@ class Server(object):
                     for i in range(len(response_set.response_list)):
                         res       = response_set.response_list[i].payload
                         timestamp = response_set.response_list[i].timestamp
-#                         if time.time() < time_origin + timestamp:
-#                             time.sleep((time_origin + timestamp) - time.time())
+                        if time.time() < time_origin + timestamp:
+                            time.sleep((time_origin + timestamp) - time.time())
                         connection.sendall(str(res))
                         if DEBUG == 0: print '\tSent\t', i+1, '\t', len(res) 
-#                if len(table) > 0:
-#                    response_set = table.pop(0)
                 if table_pointer < len(table):
                     response_set = table[table_pointer]
                     table_pointer += 1

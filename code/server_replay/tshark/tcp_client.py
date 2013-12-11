@@ -94,8 +94,8 @@ class Queue(object):
         if (len(self.sendlist) == 0):
             q = self.Q[0]
             if (q.c_s_pair not in self.waitlist):
-#                 if time.time() < self.time_origin + q.timestamp:
-#                     time.sleep((self.time_origin + q.timestamp) - time.time())
+                if time.time() < self.time_origin + q.timestamp:
+                    time.sleep((self.time_origin + q.timestamp) - time.time())
                 self.Q.pop(0)
                 self.waitlist.append(q.c_s_pair)
                 self.sendlist.append(q.c_s_pair)
