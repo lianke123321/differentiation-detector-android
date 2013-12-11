@@ -21,6 +21,7 @@ void skipline(istream &inp)
 
 int main(int argc, char **argv)
 {
+    bool newer = false;
     if (argc < 2)
     {
         cerr << "No output file given." << endl;
@@ -33,33 +34,71 @@ int main(int argc, char **argv)
              << "xput --help\t : print this message" << endl << endl;
         return 0;
     }
+    if (argc == 3 && strcmp(argv[2], "n") == 0)
+    {
+	newer = true;
+    }
 
     double xput_interval = 0.1;
     string temp;
     vector<double> xputs;
     ofstream output_file(argv[1]);
+    if (newer)
+    {
+	for (int i = 0; i < 4; i++) skipline(cin);
 
-    for (int i = 0; i < 3; i++) skipline(cin);
+	cin >> temp >> temp >> temp;
+	cin.get();
+	cin >> xput_interval;
 
-    cin >> temp;
-    cin.get();
-    cin >> xput_interval;
+        for (int i = 0; i < 7; i++) skipline(cin);
+    }
+    else
+    {
+	for (int i = 0; i < 3; i++) skipline(cin);
 
-    for (int i = 0; i < 4; i++) skipline(cin);
+	cin >> temp >> xput_interval;
+
+        for (int i = 0; i < 4; i++) skipline(cin);
+    }
 
     double start, end;
     long frames, bytes;
 
     while(!cin.eof())
     {
+//|   0.1 <>   0.2 |      0 |     0 |
         if (cin.peek() == '=') break;
-        cin >> start;
-        cin.get();
-        cin >> end;
-        cin >> frames >> bytes;
-        skipline(cin);
-        output_file << end << "\t" << double(bytes) / xput_interval << endl;
-        xputs.push_back(double(bytes) / xput_interval);
+	if (newer)
+	{
+	    cin.get();
+	    eatspaces(cin);
+            cin >> start;
+	    eatspaces(cin);
+	    cin.get();
+	    cin.get();
+	    eatspaces(cin);
+    	    cin >> end;
+	    eatspaces(cin);
+	    cin.get();
+	    eatspaces(cin);
+	    cin >> frames;
+	    eatspaces(cin);
+	    cin.get();
+	    eatspaces(cin);
+    	    cin >> bytes;
+	}
+	else
+	{
+            cin >> start;
+	    cin.get();
+    	    cin >> end;
+    	    cin >> frames >> bytes;
+	}
+
+    	skipline(cin);
+    	output_file << end << "\t" << double(bytes) / xput_interval << endl;
+    	xputs.push_back(double(bytes) / xput_interval);
     }
     output_file.close();
 
