@@ -28,7 +28,7 @@ Similarly, hovering/tapping on an app highlights all the trackers contacted by t
 
 In addition to revealing privacy leaks, \emph{ReCon} allows users to block them. 
 Specifically, users can click/tap on a link to ``destroy'' it -- installing a  custom (device specific) filter for the corresponding tracker. 
-\tbd{AR: I have replaced pair with tracker. Our filter is DNS based and we cannot block for a specific app because DNS requests are agnostic to the apps.} \drc{This is not how it should be implemented!}
+%\tbd{AR: I have replaced pair with tracker. Our filter is DNS based and we cannot block for a specific app because DNS requests are agnostic to the apps.} \drc{This is not how it should be implemented!}
 To make this approach practical, we are developing an interface to crowdsource block lists, much like how Web browser ad-blocking filters are maintained and distributed. 
 A demo of our tool is located at \url{http://goo.gl/pU689F}. 
 
@@ -98,7 +98,7 @@ The difference in the PII leaks is primarily due to the different privileges tha
        \hline
     \end{tabular}
     \end{small}
-    \caption{\textbf{Top 5 domains that receive PII over SSL ordered according to number of flows leaking PIIs during controlled experiments}. \emph{Two of the top 5 hosts that receive this information is an ads and analytics site.}}
+    \caption{\textbf{Top 5 domains that receive PII over SSL ordered according to number of flows leaking PIIs during controlled experiments}. \emph{Two of the top 5 hosts that receive this information are an ad and analytics sites.}}
     \label{tab:pii-leakage-https-sites}
     \vspace{\postfigspace}
 \end{table}
@@ -157,7 +157,7 @@ Even in December 2013, 3 months after the malware was identified by Andrubis, we
        \hline
     \end{tabular}
     \end{small}
-    \caption{\textbf{Top 5 domains that receive PII, and the number of malwares sending them the PII.} \emph{Two of the top 5 sites that receive PII are stores from which users can download apps.}}
+    \caption{\textbf{Top 5 domains that receive PII, and the number of malwares sending them the PII.} \emph{Two of the top 5 sites that receive PII are third-party app stores.}}
     \label{tab:pii-leakage-malware}
     \vspace{\postfigspace}
 \end{table}
