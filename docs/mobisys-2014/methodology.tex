@@ -303,7 +303,7 @@ In column 6 of Table~\ref{tab:classification-success}, we see that classificatio
 We observe similar results for flows from apps in Google Play.
 However, for the apps from the Third-party store we observe that the \httphost field is less effective. 
 Primarily this is due to the fact that a majority of the apps we tested (about 77\%) were stand-alone services such as games. 
-These apps contacted advertisement or or CDN sites that do not uniquely identify the app.
+These apps contacted advertisement or CDN sites that do not uniquely identify the app.
 Along with the organizations of the apps we tested, we used the Google Play API~\cite{googleplay:api} to extract the names of the creators (organizations) for the 5000 most popular Android apps on the Google Play store. 
 
 \emph{Classifying with \useragent:} 
@@ -316,7 +316,7 @@ To extract the app information, we use regular expressions to filter the auxilia
 Table~\ref{tab:classification-success} shows that 84.6\% of the 176 iOS apps generating HTTP traffic were correctly identified by their \useragent, which we verified by manual inspection.
 In contrast, the \useragent was useful in identifying only 23\% of the Android apps generating HTTP traffic, meaning previous techniques depending solely on the \useragent will fail~\cite{maier:mobtraffic,xu:appusage}. 
 For the 27 iOS apps which we failed to identify, we observed signatures for OS services and libraries.
-Similarly, the majority of Android HTTP traffic contained flows with the default \useragent (\eg, \emph{Dalvik}).
+Similarly, the majority of Android HTTP traffic contained flows with the default \useragent (\eg \emph{Dalvik}).
 %Further, for the apps from the third-party store, we observe that the \useragent for ads and analytics libraries such as \emph{Google Analytics} and \emph{Adsense for Mobile} were the most common \useragent after the default \useragent.
 % such as \emph{Apple Core Media}, \emph{Game Kit}, \emph{Geo Services}, etc. and signatures of third-party libraries and services such as \emph{Google Analytics} and \emph{Adobe Air}.
 %,falaki:mobileusage,falaki:smartphoneusage
@@ -383,7 +383,7 @@ We observe that the \useragent is more effective in identifying iOS apps compare
 %The \emph{word cloud} in Fig.~\ref{fig:http-wordcloud} contains the signatures we extracted from the \useragent; the font size of an app/service name is proportional to the number of users for which it was observed.
 %Text such as \emph{facebook} and \emph{youtube} are useful in identifying the apps, Facebook and YouTube respectively.
 %However, signatures such as \emph{applecoremedia} and \emph{stagefright} represent the OS services provided by iOS and Android to download media content for apps such as Pandora and YouTube.
-Audio and video streaming apps such as Pandora and You\-Tube use the \emph{Apple Core Media} and \emph{Stagefright} services on iOS and Android respectively to download media content, and for other auxiliary content such as list of related videos and recommendations these apps use the \useragent that contains their app signature.
+Audio and video streaming apps such as Pandora and You\-Tube use the \emph{Apple Core Media} and \emph{Stagefright} services on iOS and Android respectively to download media content, and for other auxiliary content, such as list of related videos and recommendations, these apps use the \useragent that contains their app signature.
 We therefore use a combination of \useragent and \httphost field to identify such apps.
 
 In Table~\ref{tab:classify-http}, we observe that media from popular streaming services---Netflix, YouTube, Pandora, Spotify, and Vimeo---contribute to more than 50\% of the traffic volume from iOS and Android devices in the \mobWild dataset.
@@ -401,7 +401,7 @@ However, we did not perform SSL bumping for the devices in the \mobWild dataset,
 map SSL flows \emph{without decryption}. 
 
 \noindent\textbf{Overview of mapping technique.}
-Using port numbers, we observe in that more than 98\% of SSL flows observed in our controlled experiments were due to HTTPS, the rest of the flows were due to email, instant messaging, and OS notification services. 
+Using port numbers, we observe that more than 98\% of SSL flows in our controlled experiments were due to HTTPS, the rest of the flows were due to email, instant messaging, and OS notification services. 
 We therefore focus our attention on identifying the apps responsible for the HTTPS flows.
 We use DNS responses and subsequent SSL handshakes to determine the \emph{hostnames} of the remote hosts contacted by mobile devices.
 After identifying hostnames, we map them to apps using the technique described in the previous section.
@@ -426,7 +426,7 @@ After identifying hostnames, we map them to apps using the technique described i
 
 \noindent\textbf{Identifying hostname using the SSL Handshake.}
 We first use the common name (CN) field of certificates to identify the servers that exchanged data using HTTPS.
-Less than 25\% of the HTTPS traffic from iOS and Android contains the fully qualified domain name (FQDN) in the subject of the certificate; the rest of the traffic either contains regular expressions such as *.google.com or is a continuation of a previous SSL session. 
+Less than 25\% of the HTTPS traffic from iOS and Android contains the fully qualified domain name (FQDN) in the subject of the certificate; the rest of the traffic either contains regular expressions such as \url{*.google.com} or is a continuation of a previous SSL session. 
 To further resolve the hostnames, we rely on the \emph{Server Name Indication} (SNI) used by SSL flows~\cite{rfc:servernametls}.
 Servers that host multiple services use the SNI to distinguish these services.   
 For example, we observe an SNI of \url{plus.google.com} and \url{s.youtube.com} in two flows that used a certificate with a CN \url{*.google.com}.
