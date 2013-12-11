@@ -91,14 +91,11 @@ def run(pcap_file):
     
     return xputs
 def sorted_list_to_cdf(xput, outfile='cdf.txt'):
-#    f = open(outfile, 'w')
     x = []
     y = []
-    for i in xput:
-#        f.write( (str(xput[i]) + '\t' + str(i/len(xput)) + '\n') )
+    for i in range(len(xput)):
         x.append(xput[i])
-        y.append(i/len(xput))
-#    f.close()
+        y.append(float(i)/len(xput))
     return x, y
 def split_list(mylist, *args):
     ilist = map(lambda p : int(p * len(mylist) / 100.0), args) + [len(mylist)]
@@ -114,10 +111,12 @@ def do_dir(dir):
 def main():
     if (sys.argv[1]).endswith(".pcap"):
         filename = os.path.abspath(sys.argv[1])
-        xput = run(['pcap_file='+filename])
+        xput = run(filename)
         x, y = sorted_list_to_cdf(xput)
+        print x
+        print y
         pylab.plot(x, y)
-        show()
+        pylab.show()
     elif os.path.isdir(os.path.abspath(sys.argv[1])):
         dir = sys.argv[1]
         res = do_dir(dir)
