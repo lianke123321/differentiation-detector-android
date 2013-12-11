@@ -54,7 +54,7 @@ relaying the traffic to the Internet.}}
 
 To achieve our goal of visibility, \meddle uses a VPN to direct all of a participating 
 mobile device's Internet traffic to a proxy server (top of the Fig.~\ref{fig:architecture}, 
-describe in \S\ref{subsec:design_visibility}). To achieve our goal of controlling mobile-device traffic, 
+described in \S\ref{subsec:design_visibility}). To achieve our goal of controlling mobile-device traffic, 
 the \meddle proxy directs traffic to a software middlebox, called a \meddlebox (middle of Fig.~\ref{fig:architecture}, described in \S\ref{subsec:design_control}),
 that can record, block, modify and/or otherwise interact with mobile-device flows. 
 Section~\ref{subsec:design_deploy} describes how we designed \meddle to have clear 
@@ -202,14 +202,14 @@ device-wide ad blocking, implemented using a DNS server that returns {\em localh
 requests to names for known ad servers.
 
 \noindent \emph{Privacy revelations~\cite{wetherall:revelations}.} The \emph{ReCon} tool (\S\ref{sec:characterize-app}) allows users to see how they are being 
-tracked by ad and analytic servers, and allows them to create per-connection block lists.  
+tracked by ad and analytic servers, and allows them to customize the list of trackers to block.
 
 \noindent \emph{ISP transparency.} We provide services that allow users to identify cases where 
 ISPs are modifying HTTP content in flight, and when they provide differentiated service to 
 traffic crossing their networks (\S\ref{sec:isp-behavior}).
 
-\noindent \emph{Malware detection.} \meddle uses network signatures to identify malware, block it from 
-communicating and prevent future downloads onto other \meddle-enabled devices (\S\ref{sec:malware}).  
+%\noindent \emph{Malware detection.} \meddle uses network signatures to identify malware, block it from 
+%communicating and prevent future downloads onto other \meddle-enabled devices (\S\ref{subsec:malware}).  
 %\end{packeditemize}
 
 \mypara{Low barrier to entry} 
