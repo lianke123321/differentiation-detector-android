@@ -1,0 +1,66 @@
+\hypertarget{namespacetcp__server}{\section{tcp\-\_\-server Namespace Reference}
+\label{namespacetcp__server}\index{tcp\-\_\-server@{tcp\-\_\-server}}
+}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classtcp__server_1_1_server}{Server}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacetcp__server_a345a4bad31f0a853442880183b510ddc}{read\-\_\-c\-\_\-s\-\_\-pair\-\_\-to\-\_\-port}
+\item 
+def \hyperlink{namespacetcp__server_a9a4d4bee3a12f34288c4cc517ccf9976}{run}
+\item 
+def \hyperlink{namespacetcp__server_ad7647812bebfb857f5c583aad72f6c4f}{main}
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{namespacetcp__server_a50c596f6928f69e658be5f1677233f96}{D\-E\-B\-U\-G} = 2
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}by: Arash Molavi Kakhki (arash@ccs.neu.edu)
+    Northeastern University
+    
+Goal: this is the server side script for our replay system.
+
+Input: a config_file
+
+queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
+
+ps aux | grep "python" |  awk '{ print $2}' | xargs kill -9\end{DoxyVerb}
+ 
+
+\subsection{Function Documentation}
+\hypertarget{namespacetcp__server_ad7647812bebfb857f5c583aad72f6c4f}{\index{tcp\-\_\-server@{tcp\-\_\-server}!main@{main}}
+\index{main@{main}!tcp_server@{tcp\-\_\-server}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}def tcp\-\_\-server.\-main (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacetcp__server_ad7647812bebfb857f5c583aad72f6c4f}
+\hypertarget{namespacetcp__server_a345a4bad31f0a853442880183b510ddc}{\index{tcp\-\_\-server@{tcp\-\_\-server}!read\-\_\-c\-\_\-s\-\_\-pair\-\_\-to\-\_\-port@{read\-\_\-c\-\_\-s\-\_\-pair\-\_\-to\-\_\-port}}
+\index{read\-\_\-c\-\_\-s\-\_\-pair\-\_\-to\-\_\-port@{read\-\_\-c\-\_\-s\-\_\-pair\-\_\-to\-\_\-port}!tcp_server@{tcp\-\_\-server}}
+\subsubsection[{read\-\_\-c\-\_\-s\-\_\-pair\-\_\-to\-\_\-port}]{\setlength{\rightskip}{0pt plus 5cm}def tcp\-\_\-server.\-read\-\_\-c\-\_\-s\-\_\-pair\-\_\-to\-\_\-port (
+\begin{DoxyParamCaption}
+\item[{}]{file}
+\end{DoxyParamCaption}
+)}}\label{namespacetcp__server_a345a4bad31f0a853442880183b510ddc}
+\hypertarget{namespacetcp__server_a9a4d4bee3a12f34288c4cc517ccf9976}{\index{tcp\-\_\-server@{tcp\-\_\-server}!run@{run}}
+\index{run@{run}!tcp_server@{tcp\-\_\-server}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}def tcp\-\_\-server.\-run (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacetcp__server_a9a4d4bee3a12f34288c4cc517ccf9976}
+\begin{DoxyVerb}Defaults\end{DoxyVerb}
+ 
+
+\subsection{Variable Documentation}
+\hypertarget{namespacetcp__server_a50c596f6928f69e658be5f1677233f96}{\index{tcp\-\_\-server@{tcp\-\_\-server}!D\-E\-B\-U\-G@{D\-E\-B\-U\-G}}
+\index{D\-E\-B\-U\-G@{D\-E\-B\-U\-G}!tcp_server@{tcp\-\_\-server}}
+\subsubsection[{D\-E\-B\-U\-G}]{\setlength{\rightskip}{0pt plus 5cm}int tcp\-\_\-server.\-D\-E\-B\-U\-G = 2}}\label{namespacetcp__server_a50c596f6928f69e658be5f1677233f96}

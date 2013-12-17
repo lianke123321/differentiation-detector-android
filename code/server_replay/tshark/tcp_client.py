@@ -1,4 +1,6 @@
-'''
+"""@package docstring
+Documentation for this module.
+ 
 by: Arash Molavi Kakhki (arash@ccs.neu.edu)
     Northeastern University
     
@@ -10,7 +12,7 @@ queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
 
 python tcp_client.py ../data/youtube_d host=ec2-72-44-56-209.compute-1.amazonaws.com ports_file='-i /Users/arash/.ssh/ancsaaa-keypair_ec2.pem ubuntu@72.44.56.209:/home/ubuntu/public_html/free_ports'
 
-'''
+"""
 
 import os, sys, socket, pickle, threading, time, ConfigParser
 import python_lib 
@@ -19,6 +21,11 @@ from python_lib import Configs, PRINT_ACTION
 DEBUG0 = False
 
 def read_ports(host, username, key, ports_file):
+    """
+    If random ports are used on the server side, then the mapping of the ports are
+    written to a file on the server side and client needs to download it before 
+    starting
+    """
     if key is not None:
         command = 'scp -i ' + key + ' '
     if username is not None:
@@ -29,6 +36,9 @@ def read_ports(host, username, key, ports_file):
     os.system(command)
     return pickle.load(open('free_ports', 'rb'))
 class Connections(object):
+    """
+    This class handles connections to servers.
+    """
     def __init__(self):
         self._connections = {}
 
@@ -60,7 +70,10 @@ class Connections(object):
     
     def remove_socket(self, c_s_pair):
         del self._connections[c_s_pair]
-class SendRecv(object):        
+class SendRecv(object):
+    """
+    This class handles a single request-response event.
+    """
     def send_single_request(self, q, waitlist, sendlist, event, connections):
         sock = connections.get_sock(q.c_s_pair)
         if DEBUG0: print 'Sending:', q.c_s_pair, '\t', sock, '\t', len(q.payload)
@@ -83,6 +96,14 @@ class SendRecv(object):
             waitlist.remove(q.c_s_pair)
             event.set()        
 class Queue(object):
+    """
+    This is the class which sends out the packets in the queue one-by-one.
+    Before sending any packets, it makes sure:
+        1- All previous packets are sent
+        2- All previous responses on the same connection are recieved
+        3- Packet time has passed
+    Once all the above are satisfied, it fires of a thread with traget = SendRecv().send_single_request
+    """
     def __init__(self, queue):
         self.Q           = queue
         self.event       = threading.Event()
@@ -108,6 +129,9 @@ class Queue(object):
             self.event.wait()
             self.event.clear()
 def run(argv):
+    '''
+    Fires of the module. This is the fuction called by main().
+    '''
     PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
     configs.set('original_ports', True)

@@ -1,0 +1,92 @@
+\hypertarget{namespacethrouput__tshark}{\section{throuput\-\_\-tshark Namespace Reference}
+\label{namespacethrouput__tshark}\index{throuput\-\_\-tshark@{throuput\-\_\-tshark}}
+}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classthrouput__tshark_1_1_data_point}{Data\-Point}
+\item 
+class \hyperlink{classthrouput__tshark_1_1_dump_stat}{Dump\-Stat}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacethrouput__tshark_a7cf943f2dc4fd029521106818dc6f42c}{dumpstat\-\_\-avg}
+\item 
+def \hyperlink{namespacethrouput__tshark_aadae1a38443951d84893a766c7544c4e}{parse\-\_\-output}
+\item 
+def \hyperlink{namespacethrouput__tshark_ad87e88509990133de6a38df4742dc876}{run}
+\item 
+def \hyperlink{namespacethrouput__tshark_ab46319be4c40947f3596aee776407a83}{split\-\_\-list}
+\item 
+def \hyperlink{namespacethrouput__tshark_a61c2eee9729017b8321509878cca8153}{do\-\_\-dir}
+\item 
+def \hyperlink{namespacethrouput__tshark_a37360c9b79c8d4a0bc29f07bf195a3b2}{main}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}@package docstring
+
+by: Arash Molavi Kakhki (arash@ccs.neu.edu)
+Northeastern University
+Dec 2013
+
+USAGE:  python throughput_tshark.py pcap_file=[] interval=[] outfile=[]
+
+    pcap_file: the file you want to analyze. This input is mandotory
+    interval : the interval size for calculating throughput (in seconds)
+               default: 1 second
+    outfile  : name of the output file. Format is "interval [tab] throughput"
+               default is xput.txt
+               throughput is in bytes/second
+    statsfile
+\end{DoxyVerb}
+ 
+
+\subsection{Function Documentation}
+\hypertarget{namespacethrouput__tshark_a61c2eee9729017b8321509878cca8153}{\index{throuput\-\_\-tshark@{throuput\-\_\-tshark}!do\-\_\-dir@{do\-\_\-dir}}
+\index{do\-\_\-dir@{do\-\_\-dir}!throuput_tshark@{throuput\-\_\-tshark}}
+\subsubsection[{do\-\_\-dir}]{\setlength{\rightskip}{0pt plus 5cm}def throuput\-\_\-tshark.\-do\-\_\-dir (
+\begin{DoxyParamCaption}
+\item[{}]{dir}
+\end{DoxyParamCaption}
+)}}\label{namespacethrouput__tshark_a61c2eee9729017b8321509878cca8153}
+\hypertarget{namespacethrouput__tshark_a7cf943f2dc4fd029521106818dc6f42c}{\index{throuput\-\_\-tshark@{throuput\-\_\-tshark}!dumpstat\-\_\-avg@{dumpstat\-\_\-avg}}
+\index{dumpstat\-\_\-avg@{dumpstat\-\_\-avg}!throuput_tshark@{throuput\-\_\-tshark}}
+\subsubsection[{dumpstat\-\_\-avg}]{\setlength{\rightskip}{0pt plus 5cm}def throuput\-\_\-tshark.\-dumpstat\-\_\-avg (
+\begin{DoxyParamCaption}
+\item[{}]{list\-\_\-of\-\_\-\-Dump\-Stat, }
+\item[{}]{name = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{namespacethrouput__tshark_a7cf943f2dc4fd029521106818dc6f42c}
+\hypertarget{namespacethrouput__tshark_a37360c9b79c8d4a0bc29f07bf195a3b2}{\index{throuput\-\_\-tshark@{throuput\-\_\-tshark}!main@{main}}
+\index{main@{main}!throuput_tshark@{throuput\-\_\-tshark}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}def throuput\-\_\-tshark.\-main (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacethrouput__tshark_a37360c9b79c8d4a0bc29f07bf195a3b2}
+\hypertarget{namespacethrouput__tshark_aadae1a38443951d84893a766c7544c4e}{\index{throuput\-\_\-tshark@{throuput\-\_\-tshark}!parse\-\_\-output@{parse\-\_\-output}}
+\index{parse\-\_\-output@{parse\-\_\-output}!throuput_tshark@{throuput\-\_\-tshark}}
+\subsubsection[{parse\-\_\-output}]{\setlength{\rightskip}{0pt plus 5cm}def throuput\-\_\-tshark.\-parse\-\_\-output (
+\begin{DoxyParamCaption}
+\item[{}]{output}
+\end{DoxyParamCaption}
+)}}\label{namespacethrouput__tshark_aadae1a38443951d84893a766c7544c4e}
+\hypertarget{namespacethrouput__tshark_ad87e88509990133de6a38df4742dc876}{\index{throuput\-\_\-tshark@{throuput\-\_\-tshark}!run@{run}}
+\index{run@{run}!throuput_tshark@{throuput\-\_\-tshark}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}def throuput\-\_\-tshark.\-run (
+\begin{DoxyParamCaption}
+\item[{}]{args, }
+\item[{}]{plot = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}}\label{namespacethrouput__tshark_ad87e88509990133de6a38df4742dc876}
+\hypertarget{namespacethrouput__tshark_ab46319be4c40947f3596aee776407a83}{\index{throuput\-\_\-tshark@{throuput\-\_\-tshark}!split\-\_\-list@{split\-\_\-list}}
+\index{split\-\_\-list@{split\-\_\-list}!throuput_tshark@{throuput\-\_\-tshark}}
+\subsubsection[{split\-\_\-list}]{\setlength{\rightskip}{0pt plus 5cm}def throuput\-\_\-tshark.\-split\-\_\-list (
+\begin{DoxyParamCaption}
+\item[{}]{mylist, }
+\item[{}]{args}
+\end{DoxyParamCaption}
+)}}\label{namespacethrouput__tshark_ab46319be4c40947f3596aee776407a83}

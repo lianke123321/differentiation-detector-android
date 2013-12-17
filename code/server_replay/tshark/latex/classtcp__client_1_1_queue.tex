@@ -1,0 +1,97 @@
+\hypertarget{classtcp__client_1_1_queue}{\section{tcp\-\_\-client.\-Queue Class Reference}
+\label{classtcp__client_1_1_queue}\index{tcp\-\_\-client.\-Queue@{tcp\-\_\-client.\-Queue}}
+}
+Inheritance diagram for tcp\-\_\-client.\-Queue\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classtcp__client_1_1_queue}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classtcp__client_1_1_queue_ab0df6abd257ea9a0ed489b519d0a3be8}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classtcp__client_1_1_queue_ae86fb384d543cc9546ba747033995b8e}{next}
+\item 
+def \hyperlink{classtcp__client_1_1_queue_a0ad188422dd352a1cfecd4b73c63e719}{run}
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtcp__client_1_1_queue_ad1d79a3f78925181c48bae6c7fee899d}{Q}
+\item 
+\hyperlink{classtcp__client_1_1_queue_a0843d2bd2c1a7e5e237c2948fa1247e6}{event}
+\item 
+\hyperlink{classtcp__client_1_1_queue_ad872c06b7212edb7df8adbf02f77eb50}{waitlist}
+\item 
+\hyperlink{classtcp__client_1_1_queue_a7d5e8ff7e6e26fc8a0914872547b6690}{sendlist}
+\item 
+\hyperlink{classtcp__client_1_1_queue_a8030358b15948a4260c5a41661982622}{time\-\_\-origin}
+\item 
+\hyperlink{classtcp__client_1_1_queue_aea5f1243cbc1d111dfa33578426e2591}{connections}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}This is the class which sends out the packets in the queue one-by-one.
+Before sending any packets, it makes sure:
+    1- All previous packets are sent
+    2- All previous responses on the same connection are recieved
+    3- Packet time has passed
+Once all the above are satisfied, it fires of a thread with traget = SendRecv().send_single_request
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtcp__client_1_1_queue_ab0df6abd257ea9a0ed489b519d0a3be8}{\index{tcp\-\_\-client\-::\-Queue@{tcp\-\_\-client\-::\-Queue}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!tcp_client::Queue@{tcp\-\_\-client\-::\-Queue}}
+\subsubsection[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def tcp\-\_\-client.\-Queue.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{queue}
+\end{DoxyParamCaption}
+)}}\label{classtcp__client_1_1_queue_ab0df6abd257ea9a0ed489b519d0a3be8}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtcp__client_1_1_queue_ae86fb384d543cc9546ba747033995b8e}{\index{tcp\-\_\-client\-::\-Queue@{tcp\-\_\-client\-::\-Queue}!next@{next}}
+\index{next@{next}!tcp_client::Queue@{tcp\-\_\-client\-::\-Queue}}
+\subsubsection[{next}]{\setlength{\rightskip}{0pt plus 5cm}def tcp\-\_\-client.\-Queue.\-next (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classtcp__client_1_1_queue_ae86fb384d543cc9546ba747033995b8e}
+\hypertarget{classtcp__client_1_1_queue_a0ad188422dd352a1cfecd4b73c63e719}{\index{tcp\-\_\-client\-::\-Queue@{tcp\-\_\-client\-::\-Queue}!run@{run}}
+\index{run@{run}!tcp_client::Queue@{tcp\-\_\-client\-::\-Queue}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}def tcp\-\_\-client.\-Queue.\-run (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classtcp__client_1_1_queue_a0ad188422dd352a1cfecd4b73c63e719}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classtcp__client_1_1_queue_aea5f1243cbc1d111dfa33578426e2591}{\index{tcp\-\_\-client\-::\-Queue@{tcp\-\_\-client\-::\-Queue}!connections@{connections}}
+\index{connections@{connections}!tcp_client::Queue@{tcp\-\_\-client\-::\-Queue}}
+\subsubsection[{connections}]{\setlength{\rightskip}{0pt plus 5cm}tcp\-\_\-client.\-Queue.\-connections}}\label{classtcp__client_1_1_queue_aea5f1243cbc1d111dfa33578426e2591}
+\hypertarget{classtcp__client_1_1_queue_a0843d2bd2c1a7e5e237c2948fa1247e6}{\index{tcp\-\_\-client\-::\-Queue@{tcp\-\_\-client\-::\-Queue}!event@{event}}
+\index{event@{event}!tcp_client::Queue@{tcp\-\_\-client\-::\-Queue}}
+\subsubsection[{event}]{\setlength{\rightskip}{0pt plus 5cm}tcp\-\_\-client.\-Queue.\-event}}\label{classtcp__client_1_1_queue_a0843d2bd2c1a7e5e237c2948fa1247e6}
+\hypertarget{classtcp__client_1_1_queue_ad1d79a3f78925181c48bae6c7fee899d}{\index{tcp\-\_\-client\-::\-Queue@{tcp\-\_\-client\-::\-Queue}!Q@{Q}}
+\index{Q@{Q}!tcp_client::Queue@{tcp\-\_\-client\-::\-Queue}}
+\subsubsection[{Q}]{\setlength{\rightskip}{0pt plus 5cm}tcp\-\_\-client.\-Queue.\-Q}}\label{classtcp__client_1_1_queue_ad1d79a3f78925181c48bae6c7fee899d}
+\hypertarget{classtcp__client_1_1_queue_a7d5e8ff7e6e26fc8a0914872547b6690}{\index{tcp\-\_\-client\-::\-Queue@{tcp\-\_\-client\-::\-Queue}!sendlist@{sendlist}}
+\index{sendlist@{sendlist}!tcp_client::Queue@{tcp\-\_\-client\-::\-Queue}}
+\subsubsection[{sendlist}]{\setlength{\rightskip}{0pt plus 5cm}tcp\-\_\-client.\-Queue.\-sendlist}}\label{classtcp__client_1_1_queue_a7d5e8ff7e6e26fc8a0914872547b6690}
+\hypertarget{classtcp__client_1_1_queue_a8030358b15948a4260c5a41661982622}{\index{tcp\-\_\-client\-::\-Queue@{tcp\-\_\-client\-::\-Queue}!time\-\_\-origin@{time\-\_\-origin}}
+\index{time\-\_\-origin@{time\-\_\-origin}!tcp_client::Queue@{tcp\-\_\-client\-::\-Queue}}
+\subsubsection[{time\-\_\-origin}]{\setlength{\rightskip}{0pt plus 5cm}tcp\-\_\-client.\-Queue.\-time\-\_\-origin}}\label{classtcp__client_1_1_queue_a8030358b15948a4260c5a41661982622}
+\hypertarget{classtcp__client_1_1_queue_ad872c06b7212edb7df8adbf02f77eb50}{\index{tcp\-\_\-client\-::\-Queue@{tcp\-\_\-client\-::\-Queue}!waitlist@{waitlist}}
+\index{waitlist@{waitlist}!tcp_client::Queue@{tcp\-\_\-client\-::\-Queue}}
+\subsubsection[{waitlist}]{\setlength{\rightskip}{0pt plus 5cm}tcp\-\_\-client.\-Queue.\-waitlist}}\label{classtcp__client_1_1_queue_ad872c06b7212edb7df8adbf02f77eb50}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{tcp__client_8py}{tcp\-\_\-client.\-py}\end{DoxyCompactItemize}
