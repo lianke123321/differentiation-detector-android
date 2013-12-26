@@ -46,11 +46,20 @@ def dumpConfXML(xmlPath, p12Path, clientName, clientPassword, serverHostName, ca
             <array>
             <dict>
             <key>Action</key>
-            <string>Connect</string>
-            <key>InterfaceTypeMatch</key>
-            <string>Ethernet</string>
+            <string>EvaluateConnection</string>
+            <key>ActionParameters</key>
+            <array>
+            <dict>
+            <key>Domains</key>
+            <array>
+            <string>trip.meddle.mobi</string>
+            </array>
+            <key>DomainAction</key>
+            <string>NeverConnect</string>
+            </dict>
+            </array>
             <key>URLStringProbe</key>
-            <string>https://www.apple.com</string>
+            <string>http://trip.meddle.mobi/nosuchpage.html</string>
             </dict>
             <dict>
             <key>Action</key>
