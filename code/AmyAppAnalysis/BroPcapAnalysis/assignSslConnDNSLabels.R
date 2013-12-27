@@ -1,0 +1,142 @@
+# This script is used to assign the signature and the label we can identify based on the user agent field. 
+# This file only annotates the http.log.* file with the signature that we identify based on the user agent. 
+
+baseDir<-"/user/arao/home/controlled_experiments/community_experiments/"
+scriptsDir<-paste(baseDir, "/parsing-scripts/", sep="")
+broLogsDir<-paste(baseDir, "/bro-results/droid-10-min-amy/", sep="")
+miscDir<-paste(baseDir, "/miscData/", sep="")
+setwd(scriptsDir);
+
+
+unknownconnLabel="-"
+
+source(paste(scriptsDir, "readLogFiles.R", sep=""))
+fName <- paste(broLogsDir, "conn.log.pkg", sep="");
+connData <- readConnData(fName)
+
+#### Get the fqdn of the IP based on the dns information in the files
+#fName <- paste(broLogsDir, "conn.log.info", sep="");
+#connData <- readconnData(fName)
+connData <- connData[order(connData$ts),]
+#write.table(connData, paste(broLogsDir, "/filter.conn.mal.", testID, sep=""), 
+#            sep="\t", quote=F, col.names=c(colnames(connData)), row.names=FALSE)
+#connData <- readConnData(paste(broLogsDir, "/filter.conn.mal.", testID, sep=""))
+dnsLookupTable <- readTable(paste(broLogsDir, "/lookup.dns.log.pkg", sep=""))
+print(nrow(dnsLookupTable))
+
+
+# convertion makes sort faster and iteration checks faster
+dnsLookupTable$ts <- convertStringColsToDouble(dnsLookupTable$ts)
+dnsLookupTable$ttl <- convertStringColsToDouble(dnsLookupTable$ttl)
+dnsLookupTable <- dnsLookupTable [order(dnsLookupTable$ts, decreasing=FALSE),]
+connData <- connData[order(connData$ts, decreasing=FALSE),]
+
+connData$dns_latest_fqdn <- "-"
+connData$dns_latest_ttl <- 0
+connData$dns_latest_ts <- 0
+connData$dns_first_fqdn <- "-"
+connData$dns_first_ts <- 0
+connData$dns_first_ttl <- 0
+connData$dns_unique_cnt <- 0
+dnsTtlLimit<-36000 # 10 hours
+
+for(pkgID in sort(unique(connData$pkgID), decreasing=TRUE)) {
+  print(paste("Filtering for user", pkgID))
+  connUserData <- connData[connData$pkgID==pkgID,]
+  dnsUserData <- dnsLookupTable[dnsLookupTable$pkgID == pkgID,] 
+  #print(dnsUserData)
+  ## Creating the vectors for fast iterations
+  dnsTs <- dnsUserData$ts  
+  connTs <- connUserData$ts
+  dnsUserId <- dnsUserData$pkgID
+  connUserId <- connUserData$pkgID
+  dnsClientIP <- dnsUserData$client_ip
+  dnsServerIP <- dnsUserData$server_ip
+  connOrigH <- connUserData$id.orig_h
+  connRespH <- connUserData$id.resp_h
+  dnsFqdn <- dnsUserData$fqdn
+  dnsRespOrder <- dnsUserData$resp_order
+  dnsTTL <- dnsUserData$ttl
+  connFqdnLatest <- c()
+  connFqdnLatestTs <- c()
+  connFqdnLatestTTL <- c()
+  connFqdnFirstResp <- c()
+  connFqdnFirstRespTs <- c()
+  connFqdnFirstRespTTL <- c()
+  connFqdnCnt <- c()
+  numconnRows <- nrow(connUserData)
+  numDnsRows <- nrow(dnsUserData)
+  j<-as.numeric(2)
+  i<-as.numeric(1)
+  k<-as.numeric(j)
+  while (i  <= numconnRows) {
+    while ((j < numDnsRows) & (dnsTs[j] <= (connTs[i]))) {
+      j <- j+1;    
+    }
+    if (j>1) {
+      j <- j-1 
+    }
+    k<-j
+    # Todo:: can optimize by caching last result but its ok for now.
+    latestHostName <- "-"
+    latestHostNameTs <- 0
+    latestHostNameTTL <- 0
+    firstRespHostName <- "-"
+    firstRespHostNameTs <- 0
+    firstRespHostNameTTL <- 0
+    dnsMatches <- c()
+    respOrder <- c(1000)
+    foundFirst <- FALSE
+    while ((k > 1)) {
+      if ((dnsUserId[k] == connUserId[i])
+          & ( ((dnsClientIP[k] == connOrigH[i]) &(dnsServerIP[k] == connRespH[i]))
+              |((dnsClientIP[k] == connRespH[i]) &(dnsServerIP[k] == connOrigH[i])))) {
+        dnsMatches <- c(dnsMatches, dnsFqdn[k])
+        if (latestHostName == "-") {
+          #print(paste("Found Latest", k))
+          latestHostName <- dnsFqdn[k]
+          latestHostNameTs<- dnsTs[k]
+          latestHostNameTTL <- dnsTTL[k]
+        }
+        if ((firstRespHostName == "-") & (dnsRespOrder[k] == 1)) {
+          #print(paste("Found First", k))
+          firstRespHostName <- dnsFqdn[k]
+          firstRespHostNameTs <- dnsTs[k]
+          firstRespHostNameTTL <- dnsTTL[k]
+          break
+        }                
+      }
+      # This logic is incorrect because we do not know for sure if caching is IP specific
+      #if ((!(dnsClientIP[k] == connOrigH[i])) & (!(dnsClientIP[k] == connOrigH[i]))) {
+      #  print("Changing IP")
+      #  break
+      #}      
+      k<-k-1;
+      if (dnsTs[k]+dnsTtlLimit < connTs[i]) {
+        #print("Breaking")
+        break
+      } 
+    }
+    connFqdnLatest <- c(connFqdnLatest, latestHostName)  # pick the latest one
+    connFqdnLatestTs <- c(connFqdnLatestTs, latestHostNameTs)
+    connFqdnLatestTTL <- c(connFqdnLatestTTL, latestHostNameTTL)
+    connFqdnFirstResp <- c(connFqdnFirstResp, firstRespHostName)
+    connFqdnFirstRespTs <- c(connFqdnFirstRespTs, firstRespHostNameTs)
+    connFqdnFirstRespTTL <- c(connFqdnFirstRespTTL, firstRespHostNameTs)
+    connFqdnCnt <- c(connFqdnCnt, length(unique(dnsMatches)))    
+    if (i %% 1000 == 1) {
+      print(paste(i, "of ", numconnRows))
+    }
+    i<-i+1
+  }
+  #print(connFqdnLatest)
+  connData[connData$pkgID==pkgID,]$dns_latest_fqdn <- connFqdnLatest
+  connData[connData$pkgID==pkgID,]$dns_latest_ts <- connFqdnLatestTs
+  connData[connData$pkgID==pkgID,]$dns_latest_ttl <- connFqdnLatestTTL
+  connData[connData$pkgID==pkgID,]$dns_first_fqdn <- connFqdnFirstResp
+  connData[connData$pkgID==pkgID,]$dns_first_ts <- connFqdnFirstRespTs
+  connData[connData$pkgID==pkgID,]$dns_first_ttl <- connFqdnFirstRespTTL
+  connData[connData$pkgID==pkgID,]$dns_unique_cnt <- connFqdnCnt
+}
+write.table(connData, paste(broLogsDir, "/conn.log.dns.pkg", sep=""), 
+            sep="\t", quote=F, col.names=c(colnames(connData)), row.names=FALSE)
