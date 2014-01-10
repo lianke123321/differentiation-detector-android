@@ -84,7 +84,6 @@ class Configs(object):
         for section in self._Config.sections():
             for option in self._Config.options(section):
                 self.set(option, self._Config.get(section, option))
-#                self._configs[option] = self._Config.get(section, option)
     def get(self, key):
         return self._configs[key]
     def set(self, key, value):
