@@ -33,7 +33,7 @@ bool PacketFilterData::__loadConfigs(std::string query)
 	logDebug("Executing query " << query);
 
 	if (false == dbManager.execReadQuery(query, &results)) {
-		logError("Error reading confs");
+		logError("Error reading confs:" << query);
 		return false;
 	}
 
