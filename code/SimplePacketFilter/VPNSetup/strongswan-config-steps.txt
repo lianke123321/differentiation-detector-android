@@ -10,8 +10,8 @@ apt-get remove openswan strongswan
 # Please make sure there is no ipsec in /usr/sbin folder
 
 
-tar -xjvf strongswan-5.0.1.tar.bz2
-cd strongswan-5.0.1 
+tar -xjvf strongswan-5.1.1.tar.bz2
+cd strongswan-5.1.1 
 # MEDDLE_ROOT is the base directory where all Meddle specific files will be installed
 export MEDDLE_ROOT="/opt/meddle/" # Please change this location if you decide to install meddle in another folder. 
 
