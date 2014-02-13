@@ -115,27 +115,20 @@ class Configs(object):
         self._configs['action_count'] = 0
 class Instance(object):
     instance_list = {
-                     'meddle'  : {'host'     : 'ec2-54-243-17-203.compute-1.amazonaws.com',
-                                  'username' : 'ubuntu',
-                                  'ssh_key'  : '~/.ssh/meddle'},
-                     'achtung' : {'host'     :'129.10.115.141',
-                                  'username' : 'arash',
-                                  'ssh_key'  : '~/.ssh/id_rsa'},
-                     'alan-ec2': {'host'     :'ec2-54-204-220-73.compute-1.amazonaws.com',
-                                  'username' : 'ubuntu',
-                                  'ssh_key'  : '~/.ssh/ancsaaa-keypair_ec2.pem'},
-                     }
+        'meddle'  : {'host'     : 'ec2-54-243-17-203.compute-1.amazonaws.com',
+                     'username' : 'ubuntu',
+                     'ssh_key'  : '~/.ssh/meddle'},
+        'achtung' : {'host'     :'129.10.115.141',
+                     'username' : 'arash',
+                     'ssh_key'  : '~/.ssh/id_rsa'},
+        'alan-ec2': {'host'     :'ec2-54-204-220-73.compute-1.amazonaws.com',
+                     'username' : 'ubuntu',
+                     'ssh_key'  : '~/.ssh/ancsaaa-keypair_ec2.pem'},
+    }
     def __init__(self, instance, instances=instance_list):
         self.name     = instance
         self.host     = instances[instance]['host']
         self.username = instances[instance]['username']
         self.ssh_key  = instances[instance]['ssh_key']
-    def show(self):
-        print '\n\tInstance:'
-        print '\t\tname     :', self.name
-        print '\t\thost     :', self.host
-        print '\t\tusername :', self.username
-        print '\t\tssh_key  :', self.ssh_key
-        print '\n'
-    
-        
+    def __str__(self):
+        return '{} -- {} -- {} -- {}'.format(self.name, self.host, self.username, self.ssh_key)

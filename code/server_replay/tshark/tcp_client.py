@@ -182,7 +182,6 @@ def run(argv):
     
     configs.set('instance', python_lib.Instance(configs.get('instance')))
     configs.show_all()
-    configs.get('instance').show()
     
     if not configs.get('original_ports'):
         PRINT_ACTION('Downloading ports file', 0)

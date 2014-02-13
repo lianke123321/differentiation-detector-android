@@ -180,7 +180,6 @@ def run():
     
     configs.set('instance', python_lib.Instance(configs.get('instance')))
     configs.show_all()
-    configs.get('instance').show()
     
     #If vpn-no-vpn is set, each round will be 2 runs, one through the vpn, and one direct 
     if configs.get('vpn-no-vpn'):
