@@ -95,10 +95,15 @@ class Configs(object):
                 self.get(l)
         except:
             print '\nYou should provide \"--{}=[]\"\n'.format(l)
-            
             sys.exit(-1) 
     def get(self, key):
         return self._configs[key]
+    def is_given(self, key):
+        try:
+            self._configs[key]
+            return True
+        except:
+            return False
     def set(self, key, value):
         self._configs[key] = value
         if len(key) > self._maxlen:
