@@ -1,4 +1,7 @@
 '''
+#######################################################################################################
+#######################################################################################################
+
 by: Arash Molavi Kakhki (arash@ccs.neu.edu)
     Northeastern University
     
@@ -6,6 +9,9 @@ Goal: this is the client side script for TCP replay.
 
 Usage:
     python tcp_client.py --pcap_folder=../data/dropbox_d --instance=achtung --original_ports=False
+
+#######################################################################################################
+#######################################################################################################
 '''
 
 import os, sys, socket, pickle, threading, time, ConfigParser

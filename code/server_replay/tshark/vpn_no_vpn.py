@@ -1,8 +1,34 @@
+'''
+#######################################################################################################
+#######################################################################################################
+
+by: Arash Molavi Kakhki (arash@ccs.neu.edu)
+    Northeastern University
+    
+Goal: This runs the tcp_client script "rounds" times.
+      Each round consists of a VPN and a NO VPN test
+
+Inputs:
+    Since this is calling tcp_client.py, all the arguments necessary for that script should be given
+    to this one as well!
+
+Usage:
+    python vpn-no-vpn.py --pcap_folder=../data/dropbox_d --instance=achtung --original_ports=False
+
+#######################################################################################################
+#######################################################################################################
+'''
+
 import sys, commands, time, subprocess, urllib2, threading
 import tcp_client, python_lib
 from python_lib import Configs, PRINT_ACTION
 
 class tcpdump(object):
+    '''
+    Class for taking tcpdump
+    
+    Everything is self-explanatory
+    '''
     def __init__(self, dump_name=None, interface='en0'):
         self._p         = None
         self._interface = interface
@@ -24,16 +50,26 @@ class tcpdump(object):
     def status(self):
         return self._running
 def meddle_vpn(command):
+    '''
+    This function connects/disconnects the VPN
+    
+    NOTE: this is by nature platform dependent!
+          current script is an AppleScript and for Max OS X
+          Need scripts for Linux and maybe Windows (urgh!) too! should be straight forward
+    '''
     if command in ['connect', 'disconnect']:
         print commands.getoutput('./meddle_vpn.sh ' + command)
     else:
         print 'command needs to be "connect" or "disconnect"'
-def run_one(rounds, vpn=False):
+def run_one(round, vpn=False):
+    '''
+    Runs the tcp_client script once. It can do it directly or over VPN
+    '''
     if vpn:
-        dump = tcpdump(dump_name='vpn_'+str(rounds))
+        dump = tcpdump(dump_name='vpn_'+str(round))
         meddle_vpn('connect')
     else:
-        dump = tcpdump(dump_name='novpn_'+str(rounds))
+        dump = tcpdump(dump_name='novpn_'+str(round))
         meddle_vpn('disconnect')
     time.sleep(2)
     dump.start()
@@ -47,20 +83,35 @@ def run_one(rounds, vpn=False):
     time.sleep(2)
 
 def main():
+    '''Make sure the vpn is disconnected before starting'''
     meddle_vpn('disconnect')
     
+    '''
+    ######################################################################################
+    Reading/setting configurations
+    
+    auto-server: This is to automated things more. If true, it sends a request to the machine
+                 that hosting the server to run the server script (needs more work -- don't fully 
+                 rely on it!)
+    server-host: if auto-server is True, there will be a Tornado server running on the server
+                 machine listening for server start up request. This is the ip address of the
+                 Tornado server (basically the ip address of the replay server machine)
+    server-port: the port number that Tornado server is running on
+    rounds: number of rounds we want to run the test (each round is one VPN and one NO VPN run)
+    instance: holds information about the instance the server is running on (see python_lib.py)
+    ######################################################################################
+    '''
     PRINT_ACTION('Creating configs', 0)
     configs = Configs()
+    configs.set('auto-server', False)
     configs.set('server-host', 'ec2-54-204-220-73.compute-1.amazonaws.com')
     configs.set('server-port', 10001)
-    configs.set('auto-server', False)
     configs.set('rounds', 1)
     
-    python_lib.read_args(sys.argv[1:], configs)
+    configs.read_args(sys.argv)
     
     configs.set('instance', python_lib.Instance(configs.get('instance')))
     configs.show_all()
-    configs.get('instance').show()
     
     if configs.get('auto-server'):
         PRINT_ACTION('Sending request to the server', 0)
