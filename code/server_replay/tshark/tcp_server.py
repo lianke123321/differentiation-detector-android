@@ -5,10 +5,9 @@ by: Arash Molavi Kakhki (arash@ccs.neu.edu)
 Goal: this is the server side script for TCP replay.
 
 Usage:
-    python tcp_client.py --pcap_folder=../data/dropbox_d --instance=meddle
+    python tcp_client.py --pcap_folder=../data/dropbox_d --instance=achtung --original_ports=False
 
 ps aux | grep "python" |  awk '{ print $2}' | xargs kill -9
-
 '''
 
 import os, sys, socket, pickle, threading, time, traceback

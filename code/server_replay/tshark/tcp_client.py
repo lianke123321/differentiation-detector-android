@@ -1,14 +1,12 @@
-"""@package docstring
-Documentation for this module.
- 
+'''
 by: Arash Molavi Kakhki (arash@ccs.neu.edu)
     Northeastern University
     
 Goal: this is the client side script for TCP replay.
 
 Usage:
-    python tcp_client.py --pcap_folder=../data/youtube_d --instance=meddle
-"""
+    python tcp_client.py --pcap_folder=../data/dropbox_d --instance=achtung --original_ports=False
+'''
 
 import os, sys, socket, pickle, threading, time, ConfigParser
 import python_lib 
