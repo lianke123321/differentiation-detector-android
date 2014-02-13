@@ -6,18 +6,6 @@ def PRINT_ACTION(string, indent, action=True):
         Configs().set('action_count', Configs().get('action_count') + 1)
     else:
         print ''.join(['\t']*indent) + string
-def read_args(args, configs):
-    for arg in args:
-        a = ((arg.strip()).partition('--')[2]).partition('=')
-        if a[2] in ['True', 'true']:
-            configs.set(a[0], True)
-        elif a[2] in ['False', 'false']:
-            configs.set(a[0], False)
-        else:
-            try:
-                configs.set(a[0], int(a[2]))
-            except ValueError:
-                configs.set(a[0], a[2])
 def append_to_file(line, filename):
     f = open(filename, 'a')
     f.write((line + '\n'))
@@ -89,6 +77,18 @@ class Configs(object):
         for section in self._Config.sections():
             for option in self._Config.options(section):
                 self.set(option, self._Config.get(section, option))
+    def read_args(self, args):
+        for arg in args[1:]:
+            a = ((arg.strip()).partition('--')[2]).partition('=')
+            if a[2] in ['True', 'true']:
+                self.set(a[0], True)
+            elif a[2] in ['False', 'false']:
+                self.set(a[0], False)
+            else:
+                try:
+                    self.set(a[0], int(a[2]))
+                except ValueError:
+                    self.set(a[0], a[2])
     def check_for(self, list_of_mandotary):
         try:
             for l in list_of_mandotary:

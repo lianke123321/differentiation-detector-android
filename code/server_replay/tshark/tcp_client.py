@@ -168,7 +168,7 @@ def run(argv):
     configs.set('original_ports', True)
     configs.set('instance', 'meddle')
     
-    python_lib.read_args(argv, configs)
+    configs.read_args(sys.argv)
     
     try:
         pcap_folder = os.path.abspath(configs.get('pcap_folder'))

@@ -5,9 +5,9 @@ by: Arash Molavi Kakhki (arash@ccs.neu.edu)
 Goal: this is the server side script for TCP replay.
 
 Usage:
-    python tcp_client.py --pcap_folder=../data/dropbox_d --instance=achtung --original_ports=False
+    python tcp_server.py --pcap_folder=../data/dropbox_d --instance=achtung --original_ports=False
 
-ps aux | grep "python" |  awk '{ print $2}' | xargs kill -9
+ps aux | grep "python tcp_server.py" |  awk '{ print $2}' | xargs kill -9
 '''
 
 import os, sys, socket, pickle, threading, time, traceback
@@ -157,6 +157,7 @@ def run():
     instance: holds information about the instance the server is running on (see python_lib.py)
     ######################################################################################
     '''
+    PRINT_ACTION('Reading configs file and args', 0)
     configs = Configs()
     configs.set('rounds', 1)
     configs.set('vpn-no-vpn', False)
@@ -164,8 +165,7 @@ def run():
     configs.set('ports_file', '/tmp/free_ports')
     configs.set('instance', 'meddle')   #Add your instance to Instance class in python_lib.py
     
-    PRINT_ACTION('Reading configs file and args', 0)
-    python_lib.read_args(sys.argv, configs)
+    configs.read_args(sys.argv)
     
     try:
         pcap_folder = os.path.abspath(configs.get('pcap_folder'))
