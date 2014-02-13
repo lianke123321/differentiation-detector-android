@@ -2,11 +2,10 @@
 by: Arash Molavi Kakhki (arash@ccs.neu.edu)
     Northeastern University
     
-Goal: this is the server side script for our replay system.
+Goal: this is the server side script for TCP replay.
 
-Input: a config_file
-
-queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
+Usage:
+    python tcp_client.py --pcap_folder=../data/dropbox_d --instance=meddle
 
 ps aux | grep "python" |  awk '{ print $2}' | xargs kill -9
 
@@ -28,6 +27,9 @@ class Server(object):
     def get_port(self):
         return self._port
     def _create_socket_server(self):
+        '''
+        Creates socket server and starts listening
+        '''
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -39,7 +41,6 @@ class Server(object):
                     break
                 except:
                     port += 1
-#                print port
             self._port = port
         else:
             try:
@@ -52,10 +53,13 @@ class Server(object):
         if DEBUG == 0: print 'Created socket server:', (self._host, self._port)
         sock.listen(1)
     def handle_connection(self, table, connection, client_address):
+        '''
+        table = [ResponseSet, ...]
+        ResponseSet has these attributes: request_len, request_hash, and response_list
+        '''
         table_pointer = 0
         if DEBUG == 1: print '\tGot connection: ', connection, client_address
         try:
-#            response_set = table.pop(0)
             response_set = table[table_pointer]
             table_pointer += 1
         except IndexError:
@@ -65,6 +69,10 @@ class Server(object):
         buffer_len = 0
         while True:
             if DEBUG == 0: print 'waiting for:\t', self._host, ':', self._port, response_set.request_len
+            '''
+            Now the server knows it has to receive "response_set.request_len bytes" before responding.
+            So it keeps reading until it receives that many bytes
+            '''
             if buffer_len >= response_set.request_len:
                 if DEBUG == 0: print '\nReceived\t', self._host, ':', self._port, len(buffer), response_set.request_len, '\n' 
                 buffer_len -= response_set.request_len
@@ -95,49 +103,75 @@ class Server(object):
         connection.shutdown(socket.SHUT_RDWR)
         connection.close()
     def run_socket_server(self, table, expected_conn_num):
+        '''
+        Every time a connection comes in, it dispatches it to a thread to handle the connection
+        
+        The socket server terminates when all experiment rounds are done
+        In each round "expected_conn_num" connections will come in from client  
+        '''
         if expected_conn_num == 0:
             return
-        so_far = 0
-        round  = 1
+        
+        conns_count = 0 #keeps track of number of connections in each round
+        round_count = 1 #keeps track of which round we're in
+        
         while True:
             if DEBUG == 1: print '\nServer waiting for connection: ', self._host, ':', self._port
             connection, client_address = self._socket.accept()
+            '''
+            Every c_s_pair is EXACTLY 43 characters (bytes). 
+            c_s_pair = xxx.xxx.xxx.xxx.xxxxx-xxx.xxx.xxx.xxx.xxxxx
+                     = clientip.clientport-serverip-serverport
+            Since there might be multiple c_s_pairs using the same server port, 
+            every time the client opens a connection to the server, the first thing it sends to 
+            the server is the c_s_pair. The server gets this c_s_pair, and dispatches 
+            a thread with corresponding table, i.e. table[c_s_pair] to handle this connection.
+            '''
             c_s_pair = connection.recv(43)
             t = threading.Thread(target=self.handle_connection, args=[table[c_s_pair], connection, client_address])
             t.start()
-            so_far += 1
-            if DEBUG == 2: print '\t', self._port, ':', so_far, 'out of', expected_conn_num
-            if so_far == expected_conn_num:
-                if round >= int(Configs().get('rounds')):
+            conns_count += 1
+            if DEBUG == 2: print '\t', self._port, ':', conns_count, 'out of', expected_conn_num
+            if conns_count == expected_conn_num:
+                if round_count >= int(Configs().get('rounds')):
                     break
-                round += 1
-                print 'Resetting so_far for:', self._port
-                so_far = 0
-#                if DEBUG == 1: print 'breaking loop for:', self._port
-#                break
-
+                round_count += 1
+                print 'Resetting conns_count for:', self._port
+                conns_count = 0
 
 def read_c_s_pair_to_port(file):
     return pickle.load(open(file, 'rb'))
 
 def run():
-    '''Defaults'''
+    '''
+    ######################################################################################
+    Reading/setting configurations
+    
+    rounds: server needs to know how many rounds we are running the experiment so it can
+            detect the end of experiment and close sockets
+    vpn-no-vpn: if True, we are running vpn and no-vpn experiments back-to-back
+                so each round is actually two runs of the experiment
+    original_ports: if we are using random server ports or original server ports seen in
+                    the original pcap
+    ports_file: if not using original ports, client needs to be informed of the ports socket
+                servers are running on. This file holds this information
+    instance: holds information about the instance the server is running on (see python_lib.py)
+    ######################################################################################
+    '''
     configs = Configs()
     configs.set('rounds', 1)
-    configs.set('vpn-no-vpn', True)
+    configs.set('vpn-no-vpn', False)
     configs.set('original_ports', True)
     configs.set('ports_file', '/tmp/free_ports')
-    #Add your instance to Instance class in python_lib.py
-    configs.set('instance', 'meddle')
+    configs.set('instance', 'meddle')   #Add your instance to Instance class in python_lib.py
     
     PRINT_ACTION('Reading configs file and args', 0)
     python_lib.read_args(sys.argv, configs)
     
-    print configs.get('pcap_folder')
     try:
         pcap_folder = os.path.abspath(configs.get('pcap_folder'))
     except:
-        print 'USAGE: python tcp_server.py pcap_folder=[]'
+        print 'USAGE: python tcp_server.py --pcap_folder=[]'
         print '\tpcap_folder should contain the following files:'
         print '\tconfig_file, client_pickle_dump, server_pickle_dump'
         sys.exit(-1)
@@ -149,22 +183,52 @@ def run():
     configs.show_all()
     configs.get('instance').show()
     
+    #If vpn-no-vpn is set, each round will be 2 runs, one through the vpn, and one direct 
     if configs.get('vpn-no-vpn'):
         configs.set('rounds', 2*configs.get('rounds'))
     
+    
+    '''
+    ######################################################################################
+    Loading the table.
+    
+    Table is a dictionary generated by the parser up front (by scapy_parser.py)
+    
+    Has the following format (see python_lib):
+    
+    table[c_s_pair] = [ResponseSet, ...] --> For every c_s_pair, it's a list of OneRespose objects
+    
+    ######################################################################################
+    '''
     PRINT_ACTION('Loading the tables', 0)
     table   = pickle.load(open(configs.get('pcap_file') +'_server_pickle', 'rb'))
-    ports   = {}
-    threads = {} 
+    
+    
+    '''
+    ######################################################################################
+    Creating and running all socket servers
 
+    c_s_pair is formatted as: "clientip.clientport-serverip.serverport" --> exactly 43 characters
+        
+    ports: if not using original ports, servers are generated on random ports and notifies
+           the client of these ports. In order to do that, we store the mapping of c_s_pair
+           to ports in a dictionary called "ports" where the client downloads before replaying
+    
+    distinct_ports: multiple c_s_pairs using the same server port, so number of distinct ports,
+            hence number of distinct socket servers, could be smaller than number of c_s_pairs.
+            distinct_ports basically tracks how many c_s_pairs use each server port.
+    ######################################################################################
+    '''
     PRINT_ACTION('Creating all socket servers', 0)
+    ports          = {}
+    threads        = {} 
     distinct_ports = {}
     for c_s_pair in table:
         a = c_s_pair.partition('-')
         node0 = a[0]
         node1 = a[2]
         port0 = node0.rpartition('.')[2]
-        port1 = node1.rpartition('.')[2]
+        port1 = node1.rpartition('.')[2]    #This is serverport
         if port1 not in distinct_ports:
             distinct_ports[port1] = 0
             if configs.get('original_ports'):
@@ -174,6 +238,7 @@ def run():
             print '\t', port1, ':', threads[port1].get_port()
         if len(table[c_s_pair]) > 0:
             distinct_ports[port1] += 1
+        
         ports[c_s_pair] = threads[port1].get_port()
     
     PRINT_ACTION('Running servers', 0)

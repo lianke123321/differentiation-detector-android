@@ -8,7 +8,7 @@ def PRINT_ACTION(string, indent, action=True):
         print ''.join(['\t']*indent) + string
 def read_args(args, configs):
     for arg in args:
-        a = (arg.strip()).partition('=')
+        a = ((arg.strip()).partition('--')[2]).partition('=')
         if a[2] in ['True', 'true']:
             configs.set(a[0], True)
         elif a[2] in ['False', 'false']:
@@ -70,6 +70,11 @@ class Singleton(type):
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 class Configs(object):
+    '''
+    This object holds all configs
+    
+    BE CAREFUL: it's a singleton!
+    '''
     __metaclass__ = Singleton
     _Config  = None
     _configs = {}
@@ -84,6 +89,14 @@ class Configs(object):
         for section in self._Config.sections():
             for option in self._Config.options(section):
                 self.set(option, self._Config.get(section, option))
+    def check_for(self, list_of_mandotary):
+        try:
+            for l in list_of_mandotary:
+                self.get(l)
+        except:
+            print '\nYou should provide \"--{}=[]\"\n'.format(l)
+            
+            sys.exit(-1) 
     def get(self, key):
         return self._configs[key]
     def set(self, key, value):

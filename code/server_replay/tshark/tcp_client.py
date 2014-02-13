@@ -4,14 +4,10 @@ Documentation for this module.
 by: Arash Molavi Kakhki (arash@ccs.neu.edu)
     Northeastern University
     
-Goal: this is the client side script for our replay system.
+Goal: this is the client side script for TCP replay.
 
-Input: a config_file
-
-queue = [ [pl, c-s-pair, hash(response), len(response)], ... ]
-
-python tcp_client.py ../data/youtube_d host=ec2-72-44-56-209.compute-1.amazonaws.com ports_file='-i /Users/arash/.ssh/ancsaaa-keypair_ec2.pem ubuntu@72.44.56.209:/home/ubuntu/public_html/free_ports'
-
+Usage:
+    python tcp_client.py --pcap_folder=../data/youtube_d --instance=meddle
 """
 
 import os, sys, socket, pickle, threading, time, ConfigParser
@@ -38,6 +34,8 @@ def read_ports(host, username, key, ports_file):
 class Connections(object):
     """
     This class handles connections to servers.
+    
+    It basically holds a dictionary which maps c_s_pairs to connections.
     """
     def __init__(self):
         self._connections = {}
@@ -46,6 +44,11 @@ class Connections(object):
         return int((c_s_pair.partition('-')[2]).rpartition('.')[2])
     
     def get_sock(self, c_s_pair):
+        '''
+        Every time we want to send out a payload on a c_s_pair, we first query its
+        corresponding connection. If the connection doesn't exist (very first time we
+        are sending a payload on this c_s_pair), it creates the connection.
+        '''
         try:
             return self._connections[c_s_pair]
         except:
@@ -53,13 +56,21 @@ class Connections(object):
                 server_address = (Configs().get('instance').host, self._port_from_c_s_pair(c_s_pair))
             else:
                 server_address = (Configs().get('instance').host, Configs().get('ports')[c_s_pair])
+            
             print '\tStarting:', server_address
             print '           ', c_s_pair
+            
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
             sock.connect(server_address)
+            
+            '''
+            Every time a new connection is establishes, before sending any actual data to
+            the server, we tell the server which c_s_pair this connection was opend for.
+            This is necessary because multiple c_s_pairs might connecto to the same port
+            on the server.
+            '''
             sock.sendall(c_s_pair)
             
             self.set_sock(c_s_pair, sock)
@@ -73,13 +84,15 @@ class Connections(object):
 class SendRecv(object):
     """
     This class handles a single request-response event.
+    It sends a single request and receives the response for that
     """
     def send_single_request(self, q, waitlist, sendlist, event, connections):
         sock = connections.get_sock(q.c_s_pair)
         if DEBUG0: print 'Sending:', q.c_s_pair, '\t', sock, '\t', len(q.payload)
-        sock.sendall(q.payload)
         
+        sock.sendall(q.payload)
         sendlist.pop()
+        
         if q.response_len == 0:
             if DEBUG0: print '\tNoResponse', q.c_s_pair, '\t', len(q.payload)
             waitlist.remove(q.c_s_pair)
@@ -98,13 +111,26 @@ class SendRecv(object):
 class Queue(object):
     """
     This is the class which sends out the packets in the queue one-by-one.
-    Before sending any packets, it makes sure:
-        1- All previous packets are sent
-        2- All previous responses on the same connection are recieved
-        3- Packet time has passed
-    Once all the above are satisfied, it fires of a thread with traget = SendRecv().send_single_request
+    Before sending each packets, it makes sure:
+        1- All previous packets in the queue are sent
+        2- All previous responses on the same connection are received
+        3- Packet timestamp has passed (it's time to send the packet)
+    
+    Once all the above are satisfied, it fires of a thread with target = SendRecv().send_single_request
     """
     def __init__(self, queue):
+        '''
+        sendlist: before sending a payload, we append the corresponding c_s_pair to this list.
+                  Once the payload is fully sent, c_s_pair is poped (happens in send_single_request) 
+                  and sendlist becomes empty. In other words, if sendlist is NOT empty, that means we 
+                  are in the process of sending a payload and next packet needs to wait.
+                  So we use this to satisfy condition "1" mentioned above
+        waitlist: it contains c_s_pairs which are waiting for a response. So whenever we send a
+                  payload, we add the corresponding c_s_pair to this list. Once the response of 
+                  that payload is fully received, c_s_pair is removed from the waitlist.
+                  So we use this to satisfy condition "2" mentioned above
+        
+        '''
         self.Q           = queue
         self.event       = threading.Event()
         self.waitlist    = []
@@ -127,15 +153,21 @@ class Queue(object):
         while self.Q:
             self.next()
             self.event.wait()
-            self.event.clear()
+            self.event.clear()  #The loop pauses here and waits for event.set().
+                                #event.set() will be done inside send_single_request
 def run(argv):
     '''
-    Fires of the module. This is the fuction called by main().
+    ######################################################################################
+    Reading/setting configurations
+    
+    original_ports: if we are using random server ports or original server ports seen in
+                    the original pcap
+    instance: holds information about the instance the server is running on (see python_lib.py)
+    ######################################################################################
     '''
     PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
     configs.set('original_ports', True)
-    #Add your instance to Instance class in python_lib.py
     configs.set('instance', 'meddle')
     
     python_lib.read_args(argv, configs)

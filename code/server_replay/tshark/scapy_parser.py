@@ -135,7 +135,7 @@ def stream_to_queue(stream_file, packet_dic):
 #        queue.append([pl1.decode("hex"), c_s_pair, hash(res), len(res), pl1_timestamp])
 #        table.append([len(req), hash(req), res_list])
         queue.append( RequestSet(pl1.decode("hex"), c_s_pair, res, pl1_timestamp) )
-        table.append(ResponseSet(req, res_list))
+        table.append( ResponseSet(req, res_list) )
 
         if pl2[0] == '=':
             break
@@ -180,7 +180,7 @@ def convert_ip(ip):
     '''
     converts ip.port to tcpflow format
     ip.port = 1.2.3.4.1234
-    tcpflow format = 001.002.003.00.4.01234
+    tcpflow format = 001.002.003.004.01234
     '''
     l     = ip.split('.')
     l[:4] = map(lambda x : x.zfill(3), l[:4])
