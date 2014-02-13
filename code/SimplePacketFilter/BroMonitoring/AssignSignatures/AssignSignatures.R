@@ -82,6 +82,7 @@ readUserIpMap <- function(dbConn, startTime, stopTime) {
                           tunnel_ip = tmpIpMap$clientTunnelIpAddress, 
                           user_id = tmpIpMap$userID, 
                           stringsAsFactors=FALSE)  
+  UserIpMap$timestamp <- as.numeric(UserIpMap$timestamp)
   UserIpMap <- UserIpMap[order(UserIpMap$timestamp, decreasing=FALSE), ];  
   #print(UserIpMap)
   return (UserIpMap)
@@ -90,13 +91,15 @@ readUserIpMap <- function(dbConn, startTime, stopTime) {
 # Again assuming a small file
 readHttpLogSignatureElems <- function(httpLogName) {
   # 5*6 + 1 = 31 columns
-  colNames <- c("ts", "uid","orig_h", "orig_p", "resp_h", 
-                "resp_p", "trans_depth", "method", "host", "uri", 
-                "referrer", "user_agent", "request_body_len", "response_body_len", "status_code", 
-                "status_msg", "info_code", "info_msg", "filename", "tags", 
-                "username", "password", "proxied", "mime_type", "md5",
-                "extraction_file", "content_length", "content_encoding", "content_type", "transfer_encoding", 
-                "post_body")
+# colNames <- c("ts", "uid","orig_h", "orig_p", "resp_h", 
+#               "resp_p", "trans_depth", "method", "host", "uri", 
+#               "referrer", "user_agent", "request_body_len", "response_body_len", "status_code", 
+#               "status_msg", "info_code", "info_msg", "filename", "tags", 
+#               "username", "password", "proxied", "mime_type", "md5",
+#               "extraction_file", "content_length", "content_encoding", "content_type", "transfer_encoding", 
+#               "post_body")
+#  colNames <- c("ts","uid","orig_h", "orig_p", "resp_h", "resp_p", "trans_depth", "method", "host", "uri", "referrer", "user_agent", "request_body_length", "response_body_len", "status_code", "status_msg", "info_code", "info_msg", "filename", "tags", "username", "password", "proxied orig_fuids")
+   colNames <- c("ts","uid","orig_h","orig_p","resp_h","resp_p","trans_depth","method","host","uri","referrer","user_agent","request_body_len","response_body_len","status_code","status_msg","info_code","info_msg","filename","tags","username","password","proxied orig_fuids","orig_mime_types","resp_fuids","resp_mime_types","content_length","content_encoding","content_type","transfer_encoding","post_body","client_header_names","client_header_values","server_header_names","server_header_values")
   tmpHttpData <- read.table(httpLogName, header=FALSE, sep="\t", fill=TRUE, stringsAsFactors=FALSE, 
                          quote="", row.names=NULL, comment.char="#");  
   colnames(tmpHttpData) <- colNames
@@ -121,7 +124,15 @@ readHttpLogSignatureElems <- function(httpLogName) {
 ### Helper functions for assigning signatures
 # * handle encoding
 handleUserAgentEncoding <- function(signatureList) {  
-  ret_val <- unlist(lapply(signatureList, function(x) { y <- URLdecode(x); y<-enc2utf8(y); return(y)}));
+  ret_val <- unlist(lapply(signatureList, function(x) { y <- try(URLdecode(x));  
+                                                        if(class(y) == "try-error") {
+                                                           y <- x;
+                                                        }
+                                                        y <- try(enc2utf8(y)) 
+                                                        if(class(y) == "try-error") {
+                                                           y <- x;                       
+                                                        }
+                                                        return(y)}));
   return(ret_val)
 }
 
@@ -305,11 +316,12 @@ assignUserId <- function (httpData, UserIpMap) {
   httpData$user_id <- -1;  
   j<-1;
   i<-1;
-  ipAddresses <- c(unique(httpData$orig_h), unique(httpData$resp_h))
+  #ipAddresses <- c(unique(httpData$orig_h), unique(httpData$resp_h))
 
-  UserIpMap <- UserIpMap[UserIpMap$tunnel_ip %in% ipAddresses, ]
+  #UserIpMap <- UserIpMap[UserIpMap$tunnel_ip %in% ipAddresses, ]
   UserIpMap <- UserIpMap[order(UserIpMap$timestamp, decreasing=FALSE), ];  
   httpData <- httpData[order(httpData$ts, decreasing=FALSE),] 
+  CurrentIpMapTable$user_id <- -1;
   if (nrow(UserIpMap) < 1) {
     print("No IP addresses found in DB");
     return(httpData);
@@ -320,8 +332,8 @@ assignUserId <- function (httpData, UserIpMap) {
     if (i %% 500 == 0) {
       print(paste("Done", i, "rows of http out of", nrow(httpData)))
     }
-    while ((j <= nrow(UserIpMap)) & (UserIpMap[j, ]$timestamp < currTs )) {      
-      # Update the Mapping Table
+    while ((j <= nrow(UserIpMap)) & (UserIpMap[j, ]$timestamp <= currTs )) {      
+      # Update the Mapping Table because user can have at most one entry 
       # First invalidate the current entry if an entry exists
       if (UserIpMap[j,]$user_id %in% CurrentIpMapTable$user_id) {
         CurrentIpMapTable[CurrentIpMapTable$user_id == UserIpMap[j,]$user_id,]$user_id <- -1;
@@ -337,11 +349,16 @@ assignUserId <- function (httpData, UserIpMap) {
     resp_h <- httpData[i,]$resp_h
     if (orig_h %in% CurrentIpMapTable$ip_address) {
       httpData[i, ]$user_id <- CurrentIpMapTable[CurrentIpMapTable$ip_address==orig_h,]$user_id
-    } else{
+    } else {
       if (resp_h %in% CurrentIpMapTable$ip_address) {
         httpData[i, ]$user_id <- CurrentIpMapTable[CurrentIpMapTable$ip_address==resp_h,]$user_id
+      } else {
+          print(paste(orig_h, "and", resp_h, "not found in ip map table"));
       }
     }
+    if (httpData[i,]$user_id == -1) {
+       print(paste("At ",currTs, "ip was ", orig_h, "or", resp_h, " yet user_id = -1"));
+    }	
   }
   print("Assigned Device Id");
   return (httpData)
@@ -504,6 +521,7 @@ if (length(newUserAgents) > 0) {
 startTime <- min(httpData[(httpData$ts) > 0, ]$ts)
 startTime <- startTime - 500;
 stopTime <-  max(httpData$ts)
+stopTime <- stopTime + 500;
 print(paste("Checking the Logins from", startTime, "to", stopTime))
 UserIpMap <- readUserIpMap (dbConn, startTime, stopTime);
 httpData <- assignUserId(httpData, UserIpMap)

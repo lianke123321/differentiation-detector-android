@@ -11,11 +11,15 @@ clientName="$1"
 clientPassword="$2"
 echo "Creating account for ${clientName} ${clientPassword}"
 set -a
+
 source ./certificate.config
+export clientCertsPath="${clientCertsPath}/${clientName}/"
+echo ${clientCertsPath}
 mkdir -p ${clientCertsPath}
 ./genClientP12.sh ${clientName} ${clientPassword}
 
-python genIOSConfigXML.py "${clientName}" "${clientPassword}" "${mobileConfigOrgName}" "${mobileConfigConDisplayName}" "${caName}" "${mobileConfigServerHostname}" "${signingCertsPath}${caCertName}" "${clientCertsPath}" 
+python genIOSConfigXML.py "${clientName}" "${clientPassword}" "${mobileConfigOrgName}" "${mobileConfigConDisplayName}" "${caName}" "${mobileConfigServerHostname}" "${signingCertsPath}${caCertName}" "${clientCertsPath}"
+python genIOS7ConfigXML.py "${clientName}" "${clientPassword}" "${mobileConfigOrgName}" "${mobileConfigConDisplayName}" "${caName}" "${mobileConfigServerHostname}" "${signingCertsPath}${caCertName}" "${clientCertsPath}"
 
 query="INSERT INTO UserConfigs VALUES (0, '${clientName}', 0);"
 echo "${query}"

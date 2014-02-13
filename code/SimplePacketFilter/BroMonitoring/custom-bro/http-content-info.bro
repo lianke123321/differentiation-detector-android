@@ -11,6 +11,10 @@ export {
 		content_type:	string	&log	&optional;
 		transfer_encoding:	string	&log	&optional;
 		post_body: string &log &optional;
+                client_header_names:  vector of string &log &optional;
+                client_header_values:  vector of string &log &optional;
+                server_header_names:  vector of string &log &optional;
+                server_header_values:  vector of string &log &optional;
 	};
 	
 }
@@ -28,23 +32,41 @@ event http_entity_data(c: connection, is_orig: bool, length: count, data: string
 
 event http_header(c: connection, is_orig: bool, name: string, value: string)
 	{
-	if ( ! is_orig ) 
+	if ( name == "CONTENT-LENGTH" )
 		{
-		if ( name == "CONTENT-LENGTH" )
-			{
-				c$http$content_length = value;
-			}
-		else if ( name == "CONTENT-TYPE" ) 
-			{
-				c$http$content_type = value;
-			}
-		else if ( name == "CONTENT-ENCODING" ) 
-			{
-				c$http$content_encoding = value;
-			}
-		else if ( name == "TRANSFER-ENCODING" )
-			{
-				c$http$transfer_encoding = value;
-			}
+		c$http$content_length = value;
+		}
+	else if ( name == "CONTENT-TYPE" ) 
+		{
+			c$http$content_type = value;
+		}
+	else if ( name == "CONTENT-ENCODING" ) 
+		{
+			c$http$content_encoding = value;
+		}
+	else if ( name == "TRANSFER-ENCODING" )
+		{
+			c$http$transfer_encoding = value;
+		}
+	## Log all headers
+	if ( is_orig ) 
+		{		
+			if ( ! c$http?$client_header_names )
+				c$http$client_header_names = vector();
+			c$http$client_header_names[|c$http$client_header_names|] = name;
+			if ( ! c$http?$client_header_values )
+				c$http$client_header_values = vector();
+			c$http$client_header_values[|c$http$client_header_values|] = value;
+
+		}
+	else
+		{
+			if ( ! c$http?$server_header_names )
+				c$http$server_header_names = vector();
+			c$http$server_header_names[|c$http$server_header_names|] = name;
+			if ( ! c$http?$server_header_values )
+				c$http$server_header_values = vector();
+			c$http$server_header_values[|c$http$server_header_values|] = value;
+
 		}
 	}

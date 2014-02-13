@@ -57,7 +57,7 @@ bool MessageHandler::setupMessageHandler(uint16_t sock_port, in_addr_t serverAdd
 		sockFD = -1;
 		return false;
 	}
-	if (listen(sockFD, 5) == -1) {
+	if (listen(sockFD, 100) == -1) {
 		logError("Error listen");
 		close(sockFD);
 		sockFD = -1;
@@ -144,6 +144,7 @@ bool MessageHandler::processCloseTunnelCommand()
 	std::string serverIPStr((char *)cmd->cmdTunnel->meddleServerIpAddress);
 	uint32_t userID;
 	user_config_entry_t entry;
+	logInfo("Closing tunnel for " << userName << " at IP " << clientTunnelIPStr << " from " << clientRemoteIPStr);
 	// TODO:: assuming IPv4 here and not performing any sanity checks
 	in_addr_t ipAddress;
 	if (inet_pton(AF_INET, (const char *)(cmd->cmdTunnel->clientTunnelIpAddress), (void *) &ipAddress) < 0) {
@@ -184,6 +185,7 @@ bool MessageHandler::processCreateTunnelCommand()
 	uint32_t userID;
 	user_config_entry_t entry;
 	// TODO:: assuming IPv4 here and not performing any sanity checks
+	logInfo("Creating tunnel for " << userName << " at IP " << clientTunnelIPStr << " from " << clientRemoteIPStr)
 	in_addr_t ipAddress;
 	if (inet_pton(AF_INET, (const char *)(cmd->cmdTunnel->clientTunnelIpAddress), (void *) &ipAddress) < 0) {
 		logError("Error parsing the IP address");
@@ -192,6 +194,7 @@ bool MessageHandler::processCreateTunnelCommand()
 	if (false == mainPktFilter.loadUserConfigs(userName)) {
 		logError("Error in reading the configs for the user " << userName);
 		return false;
+
 	}
 	logInfo("Prev Table" << mainPktFilter.getIPMap());
 	if (false == mainPktFilter.associateUserToIp(userName, ipAddress)) {
@@ -260,11 +263,11 @@ bool MessageHandler::processCommand()
 	}
 	switch(cmd->cmdHeader->cmdType) {
 	case MSG_CREATETUNNEL:
-		logInfo("Processing the Tunnel command now");
+		logInfo("Processing the Create Tunnel command now");
 		ret = processCreateTunnelCommand();
 		break;
 	case MSG_CLOSETUNNEL:
-		logInfo("Processing the Tunnel command now");
+		logInfo("Processing the Close Tunnel command now");
 		ret = processCloseTunnelCommand();
 		break;
 	case MSG_LOADALLCONFS:

@@ -615,6 +615,6 @@ int main(int argc, char ** argv)
     // Draw the plot.
     system("gnuplot plot.gp");
     // Convert it to JPEG for convenience.
-    system("convert -density 1000 p.ps -scale 2000x1000 p.jpg");
+    //system("convert -density 1000 p.ps -scale 2000x1000 p.jpg");
     return 0;
 }

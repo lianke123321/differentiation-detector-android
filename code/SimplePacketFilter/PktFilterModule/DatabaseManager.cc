@@ -43,16 +43,26 @@ bool DatabaseManager::flushDB()
 
 bool DatabaseManager::execReadQuery(std::string query, MYSQL_RES **results)
 {
+	uint32_t cnt = 0;
 	logDebug("Executing the query"<<query);
-	if (0 != mysql_real_query(mysql, query.c_str(), query.length())) {
-		logError("Error executing the query");
+	while(cnt < 5) {
+		cnt = cnt + 1;
+		if (0 != mysql_real_query(mysql, query.c_str(), query.length())) {
+			logError("Error executing the query" << query << ". Trying again " << cnt);
+		} else {
+			cnt = 0;
+			break;
+		}
+	}
+	if (0 != cnt ) {
+		logError("Error executing the query hence returning false");
 		return false;
 	}
 	logDebug("Now Fetching the results");
 	// mysql_use_result if you want to do per row fetch. This one is a bit slower;
 	*results = mysql_store_result(mysql);
 	if (*results == NULL) {
-		logDebug("No results");
+		logDebug("No results for query" << query);
 		return false;
 	}
 	logDebug("Fetched results with " << (*results)->row_count << " counts");
@@ -67,7 +77,7 @@ bool DatabaseManager::execWriteQuery(std::string query)
 		if (0 == mysql_real_query(mysql, query.c_str(), query.length())) {
 			return true;
 		}
-		logError("Error executing the query; Retyring again" << query);
+		logError("Error executing the query; Retrying again" << query);
 		cnt = cnt + 1;
 	}
 	return false;
