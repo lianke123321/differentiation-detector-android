@@ -126,10 +126,10 @@ Service differentiation might be done for a variety of reasons. As an example, a
 
 These policies are often not disclosed with users or buried deep within fair usage policy sections of service contracts. T-Mobile UK state in their data plan's fine print that VoIP is not allowed on their monthly cellular data plan \cite{tmobuk}, Straight Talk does not allow streaming, downloading, or uploading of uninterrupted videos as well as peer-to-peer (P2P) file sharing \cite{straighttalk}. Our goal is to perform a number of tests on cellular networks to determine if they differentiate services.
 
-Service differentiation can be done based on host, port, and/or packet payload. As an example, an ISP could block all the connections that use port \texttt{4070} to block Spotify, reduce bandwidth for all traffic to and from \texttt{*.dropbox.com} for Dropbox, and block all the packets that look like BitTorrent traffic (regardless of host/port). Due to the approach of this research, the latter two can be detected using this method.
+Service differentiation can be done based on host, port, and/or packet payload. As an example, an ISP could block all the connections that use port \texttt{4070} to block Spotify, reduce bandwidth for all traffic to and from \texttt{*.dropbox.com} for Dropbox, and block all the packets that look like BitTorrent traffic (regardless of host/port).
 
-Previous work on detecting service differentiation worked on home ISPs and not mobile networks, this is covered in Section~\ref{sec:prevwork}. The Glasnost project worked on detecting differentiation of BitTorrent traffic in home ISPs using a browser applet. Our approach will test cellular networks for differentiation on a set of suspected services using Meddle VPN. Our methodology is explained in section~\ref{sec:method}.
-
+%Previous work on detecting service differentiation worked on home ISPs and not mobile networks, this is covered in Section~\ref{sec:prevwork}. The Glasnost project worked on detecting differentiation of BitTorrent traffic in home ISPs using a browser applet. Our approach will test cellular networks for differentiation on a set of suspected services using Meddle VPN. Our methodology is explained in section~\ref{sec:method}.
+%
 \section{Previous Work}
 \label{sec:prevwork}
 
@@ -145,7 +145,7 @@ Glasnost makes a connection to a measurement server's BitTorrent port and sends 
 \label{fig:glasnost}
 \end{figure}
 
-This measurement can be performed by logging into Glasnost test page and loading the Java\texttrademark applet. This design will not allow mobile devices to run the test as mobile devices can not run Java applets in their web browsers. Additionally, Glasnost is designed only to detect BitTorrent traffic differentiation.
+%This measurement can be performed by logging into Glasnost test page and loading the Java\texttrademark applet. This design will not allow mobile devices to run the test as mobile devices can not run Java applets in their web browsers. Additionally, Glasnost is designed only to detect BitTorrent traffic differentiation.
 
 \section{Methodology}
 \label{sec:method}
@@ -171,14 +171,14 @@ For the VoIP category, Skype was chosen because it is a widely used service. For
 
 Packet traces for sample sessions for each service had to be recorded first in order to be replayed later over a cellular network. In order to do so, a mobile phone was connected to a VPN (in WiFi mode) server that recorded all of the packets in pcap format using \texttt{tcpdump}. When connected to the VPN, an action that required network interaction on the phone would be initiated and after enough data was transferred, the action would be interrupted and the VPN connection would be disconnected.
 
-A few qualities had to be verified about reference service trace: the reference WiFi network on which the packets were recorded should be well provisioned itself (i.e. no service differentiation mechanism should be in place), so the traces were recorded on campus WiFi network. Additionally, tested applications shouldn't behave differently on WiFi compared to when they are on cellular network. This was confirmed for all tested applications by recording traces once on a WiFi network and an HSDPA+ network with roughly the same bandwidth.
+%A few qualities had to be verified about reference service trace: the reference WiFi network on which the packets were recorded should be well provisioned itself (i.e. no service differentiation mechanism should be in place), so the traces were recorded on campus WiFi network. Additionally, tested applications shouldn't behave differently on WiFi compared to when they are on cellular network. This was confirmed for all tested applications by recording traces once on a WiFi network and an HSDPA+ network with roughly the same bandwidth.
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=3.3in]{figures/netflix_seqnum_wifi_vs_cell}
-\caption{Sequence number plots for connections made during Netflix two sessions on WiFi (solid) and HSDPA+ (dashed) look similar.}
-\label{fig:nfx_double}
-\end{figure}
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[width=3.3in]{figures/netflix_seqnum_wifi_vs_cell}
+%\caption{Sequence number plots for connections made during Netflix two sessions on WiFi (solid) and HSDPA+ (dashed) look similar.}
+%\label{fig:nfx_double}
+%\end{figure}
 
 \subsection{Replay}
 
@@ -194,26 +194,26 @@ For the replay we needed to decide if we wanted to preserve the inter-packet tim
 \end{figure}
 
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=3.3in]{figures/ytd}
-\caption{Sequence number plot for a connection made during a YouTube video session on WiFi showing application-level flow control.}
-\label{fig:dbu}
-\end{figure}
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[width=3.3in]{figures/ytd}
+%\caption{Sequence number plot for a connection made during a YouTube video session on WiFi showing application-level flow control.}
+%\label{fig:dbu}
+%\end{figure}
 
-\subsection{Noise Packets}
+%\subsection{Noise Packets}
 
-A smartphone that is connected to the Internet will always send and receive packets due to the services and applications that are running in the background (e.g. mail clients, update agents) so it was decided not to eliminate those packets because they were a natural part of what happens during a session.
+%A smartphone that is connected to the Internet will always send and receive packets due to the services and applications that are running in the background (e.g. mail clients, update agents) so it was decided not to eliminate those packets because they were a natural part of what happens during a session.
 
-Although for the plots, the connections shown are the ones with the largest amount of transferred bytes. If the connection's total bytes transferred during a session multiplied by a threshold is larger than or equal to the connection with largest number of bytes transferred in that session, it will be in the plot. Figure~\ref{fig:tors} demonstrates this method.
+%Although for the plots, the connections shown are the ones with the largest amount of transferred bytes. If the connection's total bytes transferred during a session multiplied by a threshold is larger than or equal to the connection with largest number of bytes transferred in that session, it will be in the plot. Figure~\ref{fig:tors} demonstrates this method.
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=3.3in]{figures/tor_nothr}
-\includegraphics[width=3.3in]{figures/tor_thr}
-\caption{Sequence number plot for connections made during a BitTorrent session on WiFi. Top: without a cut-off threshold, Bottom: With a cut-off threshold of 4}
-\label{fig:tors}
-\end{figure}
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[width=3.3in]{figures/tor_nothr}
+%\includegraphics[width=3.3in]{figures/tor_thr}
+%\caption{Sequence number plot for connections made during a BitTorrent session on WiFi. Top: without a cut-off threshold, Bottom: With a cut-off threshold of 4}
+%\label{fig:tors}
+%\end{figure}
 
 \subsection{Metrics}
 
@@ -221,21 +221,21 @@ Metrics that are calculated include round-trip times (RTT), throughput, and loss
 
 In cases that there are statistically significant differences between the metrics for a service, a differentiation mechanism is suspected to exist. This can be further investigated by other methods (e.g. repeating the test). Figure~\ref{fig:att_dbu} shows an example of this.
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=3.3in]{figures/att_dbu_cdfrttp}
-\caption{CDF for RTT samples of YouTube upload sessions on AT\&T network show higher RTTs when not encrypted.}
-\label{fig:att_dbu}
-\end{figure}
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[width=3.3in]{figures/att_dbu_cdfrttp}
+%\caption{CDF for RTT samples of YouTube upload sessions on AT\&T network show higher RTTs when not encrypted.}
+%\label{fig:att_dbu}
+%\end{figure}
 
 Note that some difference in throughput between encrypted and unencrypted replays is expected (and observed, Figure~\ref{fig:xputs}) because at the same bandwidth, a VPN connection will add overhead to the packets. Another reason for this maybe the processing carried out by the replay scripts to verify packets using hash functions.
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=3.3in]{figures/xp}
-\caption{Throughput calculated over 0.1 second intervals for a Spotify session on AT\&T. Throughput for the VPN connection is generally lower than that of the unencrypted connection.}
-\label{fig:xputs}
-\end{figure}
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[width=3.3in]{figures/xp}
+%\caption{Throughput calculated over 0.1 second intervals for a Spotify session on AT\&T. Throughput for the VPN connection is generally lower than that of the unencrypted connection.}
+%\label{fig:xputs}
+%\end{figure}
 
 \section{Results}
 
