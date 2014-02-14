@@ -22,13 +22,16 @@ mount -t ramfs -o size=64m ramfs ${MEDDLE_BRO_HOME}/spool/
 cp -v ${MEDDLE_BRO_HOME}/share/broctl/scripts/archive-log ${MEDDLE_BRO_HOME}/share/broctl/scripts/archive-log.old
 cp -vf archive-log ${MEDDLE_BRO_HOME}/share/broctl/scripts/
 cp -vf logencryptor.sh ${MEDDLE_BRO_HOME}/bin/
+cp -vf AssignSignatures.R ${MEDDLE_BRO_HOME}/bin/
 
 #Check the path in broctl.cfg for the variables CfgDir, SpoolDir, LogDir, meddleconfig, logencryptor
 cp -vf ${MEDDLE_BRO_HOME}/etc/broctl.cfg ${MEDDLE_BRO_HOME}/etc/broctl.cfg.old
 cp -vf broctl.cfg ${MEDDLE_BRO_HOME}/etc/broctl.cfg
 
+# Set the log rotation interval to desired value -- change from 120 seconds to 3600 second
+
 # Copy the custom scripts to misc
-cp custom-scripts/* ${MEDDLE_BRO_HOME}/share/bro/policy/misc/
+cp -vf custom-scripts/* ${MEDDLE_BRO_HOME}/share/bro/policy/misc/
 
 #Edit ${MEDDLE_BRO_HOME}/etc/node.cfg to scan interface tun0. Have a look at node.cfg as an example
 cat node.cfg 
@@ -40,9 +43,6 @@ cat node.cfg
 
 # Take a diff of local.bro and ${MEDDLE_BRO_HOME}/share/bro/site/local.bro
 # Add the appropriate lines that have the comment Arao around them
-
-# Take a diff of file-hash.bro with ${MEDDLE_BRO_HOME}/share/bro/base/protocols/http/file-hash.bro
-# Some default variables have been changed and the condition to compute the hash has been modified
 
 # Start broctl
 ${MEDDLE_BRO_HOME}/bin/broctl

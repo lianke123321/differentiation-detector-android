@@ -9,7 +9,6 @@ CREATE TABLE `AppMetaData` (
 CREATE TABLE `CDNAppMap` (
   `appID` int(11) NOT NULL,
   `cdnHostSignature` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`appID`),
   UNIQUE KEY `cdnHostSignature_UNIQUE` (`cdnHostSignature`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -80,7 +79,7 @@ CREATE TABLE `UserConfigs` (
   `filterAdsAnalytics` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`userID`),
   UNIQUE KEY `userName` (`userName`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `UserTunnelInfo` (
   `rowID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,

@@ -8,18 +8,21 @@
 # Apply the default tuning scripts for common tuning settings.
 @load tuning/defaults
 
+# Load the scan detection script.
+@load misc/scan
+
+# Log some information about web applications being used by users 
+# on your network.
+@load misc/app-stats
+
+# Detect traceroute being run on the network.  
+@load misc/detect-traceroute
+
 # Generate notices when vulnerable versions of software are discovered.
 # The default is to only monitor software found in the address space defined
 # as "local".  Refer to the software framework's documentation for more 
 # information.
 @load frameworks/software/vulnerable
-
-# Example vulnerable software.  This needs to be updated and maintained over
-# time as new vulnerabilities are discovered.
-redef Software::vulnerable_versions += {
-	["Flash"] = [$major=10,$minor=2,$minor2=153,$addl="1"],
-	["Java"] = [$major=1,$minor=6,$minor2=0,$addl="22"],
-};
 
 # Detect software changing (e.g. attacker installing hacked SSHD).
 @load frameworks/software/version-changes
@@ -56,6 +59,10 @@ redef Software::vulnerable_versions += {
 # This script enables SSL/TLS certificate validation.
 @load protocols/ssl/validate-certs
 
+# Uncomment the following line to check each SSL certificate hash against the ICSI
+# certificate notary service; see http://notary.icsi.berkeley.edu .
+# @load protocols/ssl/notary
+
 # If you have libGeoIP support built in, do some geographic detections and 
 # logging for SSH traffic.
 @load protocols/ssh/geo-data
@@ -64,11 +71,18 @@ redef Software::vulnerable_versions += {
 # Detect logins using "interesting" hostnames.
 @load protocols/ssh/interesting-hostnames
 
-# Detect MD5 sums in Team Cymru's Malware Hash Registry.
-# MHR commented by Arao because we are going to batch request the checksum
-# @load protocols/http/detect-MHR
 # Detect SQL injection attacks.
 @load protocols/http/detect-sqli
+
+#### Network File Handling ####
+
+# Enable MD5 and SHA1 hashing for all files.
+@load frameworks/files/hash-all-files
+
+# Arao commented MHR for batch checks
+# Detect SHA1 sums in Team Cymru's Malware Hash Registry.
+#@load frameworks/files/detect-MHR
+
 
 # Added by Arao
 # https://github.com/bro/bro/blob/master/doc/logging.rst
@@ -80,11 +94,9 @@ redef ignore_checksums = T;
 #
 @load misc/stats
 redef Stats::stats_report_interval = 10min;
-#redef Http::Info::calc_md5 = T;
 @load frameworks/dpd/detect-protocols
 @load misc/http-content-info.bro
 @load misc/rtt-estimate.bro
-@load base/protocols/http/file-hash.bro
-@load base/protocols/http/file-ident.bro
-redef PacketFilter::all_packets = F;
+#redef PacketFilter::all_packets = F;
 redef capture_filters = { ["meddlenet"] = "net 10.11.0.0/16"};
+

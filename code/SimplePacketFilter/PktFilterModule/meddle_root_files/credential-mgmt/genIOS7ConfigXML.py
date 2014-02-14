@@ -138,7 +138,7 @@ def dumpConfXML(xmlPath, p12Path, clientName, clientPassword, serverHostName, ca
             <key>XAuthName</key>
             <string>${clientName}</string>
             <key>XAuthPassword</key>
-            <string>${clientName}</string>
+            <string>${clientPassword}</string>
             </dict>
             <key>IPv4</key>
             <dict>
