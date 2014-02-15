@@ -31,10 +31,20 @@ def dir_list(dir_name, subdir, *args):
             # print "Accessing directory:", dirfile
             fileList += dir_list(dirfile, subdir, *args)
     return fileList
-class UDPset():
+
+class UDPQueue(object):
+    def __init__(self, starttime):
+        self.starttime = starttime
+        self.Q = []
+    def add_UDPset(self, udp_set):
+        self.Q.appen(udp_set)
+    
+class UDPset(object):
     def __init__(self, payload, timestamp):
         self.payload   = payload
         self.timestamp = timestamp
+    def __str__(self):
+        return '{}:{}'.format(self.payload, self.timestamp)
 
 class ServerInstance():
     def __init__(self, ip, port, c_s_pair):
