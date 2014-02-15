@@ -242,38 +242,46 @@ Tests were performed on a number of well-known wireless providers in north Ameri
 Also, as mentioned before, significantly different metrics in a network, while rising suspicion about its treatment of a certain type of traffic, will be inconclusive until complemented by further testing.
 
 Table~\ref{tab:svcdiff} shows test results from Verizon. These results show that in fact there isn't a differentiation mechanism in their network for any of the tested services. Loss rates for all of the tests were within error margins.
-\begin{table}
-\centering
-\begin{small}
-\setlength{\tabcolsep}{.01em}
-\begin{tabular}{|c|c|c|c|c|}
-\hline
-\multirow{2}{*}{\bf App}&\multicolumn{2}{c|}{\bf Throughput (KB/s)}& \multicolumn{2}{c|}{\bf Loss (\%)} \tabularnewline
-\cline{2-5}
-                             &{\bf No VPN} &{\bf VPN}&{\bf No VPN}&{\bf VPN}   \tabularnewline
-                             &{\bf (avg, stdev)} &{\bf (avg, stdev)}&{\bf (avg, stdev)}&{\bf (avg, stdev)}   \tabularnewline
-\hline
-
-YT(DL)&(103.74, 31.16)&(99.85, 35)&(0.81, 0.06)&(0.86, 0.13) \tabularnewline
-\hline
-YT(UL)&(114.52, 6.05)&(117.37, 8.78)&(0.03, 0.01)&(0.05, 0.01) \tabularnewline
-\hline
-DB(DL) &(155.09, 32.42)&(148.1, 44.95)&(0.79, 0.31)&(0.88, 0.38) \tabularnewline
-\hline
-DB(UL)&(115.07, 7.31)&(120.25, 5.85)&(0.07, 0.02)&(0.09, 0.01) \tabularnewline
-\hline
-SPTFY&(123.91, 40.19)&(127.16, 45.96)&(0.83, 0.08)&(0.73, 0.07) \tabularnewline
+%\begin{table}
+%\centering
+%\begin{small}
+%\setlength{\tabcolsep}{.01em}
+%\begin{tabular}{|c|c|c|c|c|}
 %\hline
-%PNDR&(126.01, 36)&(122.81, 28.42)&(1.08, 0.09)&(1.13, 0.10) \tabularnewline
-\hline
-NFLX&(122.81, 28.42)&(132.26, 33.55)&(0.97, 0.03)&(0.99, 0.15) \tabularnewline
-\hline
-\end{tabular}
-\end{small}
-\caption{ \textbf{Average and standard deviation for 4  apps } \emph{(YT: YouTube, DB: Dropbox, SPTFY: Spotify, NFLX: Netflix; UL=Upload, DL=Download) on 
-Verizon. The differences in performance are within the noise, indicating no service differentiation. }}
-\label{tab:svcdiff}
-\end{table}
+%\multirow{2}{*}{\bf App}&\multicolumn{2}{c|}{\bf Throughput (KB/s)}& \multicolumn{2}{c|}{\bf Loss (\%)} \tabularnewline
+%\cline{2-5}
+%                             &{\bf No VPN} &{\bf VPN}&{\bf No VPN}&{\bf VPN}   \tabularnewline
+%                             &{\bf (avg, stdev)} &{\bf (avg, stdev)}&{\bf (avg, stdev)}&{\bf (avg, stdev)}   \tabularnewline
+%\hline
+%
+%YT(DL)&(103.74, 31.16)&(99.85, 35)&(0.81, 0.06)&(0.86, 0.13) \tabularnewline
+%\hline
+%YT(UL)&(114.52, 6.05)&(117.37, 8.78)&(0.03, 0.01)&(0.05, 0.01) \tabularnewline
+%\hline
+%DB(DL) &(155.09, 32.42)&(148.1, 44.95)&(0.79, 0.31)&(0.88, 0.38) \tabularnewline
+%\hline
+%DB(UL)&(115.07, 7.31)&(120.25, 5.85)&(0.07, 0.02)&(0.09, 0.01) \tabularnewline
+%\hline
+%SPTFY&(123.91, 40.19)&(127.16, 45.96)&(0.83, 0.08)&(0.73, 0.07) \tabularnewline
+%%\hline
+%%PNDR&(126.01, 36)&(122.81, 28.42)&(1.08, 0.09)&(1.13, 0.10) \tabularnewline
+%\hline
+%NFLX&(122.81, 28.42)&(132.26, 33.55)&(0.97, 0.03)&(0.99, 0.15) \tabularnewline
+%\hline
+%\end{tabular}
+%\end{small}
+%\caption{ \textbf{Average and standard deviation for 4  apps } \emph{(YT: YouTube, DB: Dropbox, SPTFY: Spotify, NFLX: Netflix; UL=Upload, DL=Download) on 
+%Verizon. The differences in performance are within the noise, indicating no service differentiation. }}
+%\label{tab:svcdiff}
+%\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=3.3in]{figures/results}
+\caption{YT: YouTube, DB: Dropbox, SPTFY: Spotify, PNDRA: Pandora, NFLX: Netflix; UL=Upload, DL=Download) on Verizon. The differences in performance are within the noise, indicating no service differentiation.}
+\label{fig:dbu}
+\end{figure}
+
 
 \section{Future Work}
 
