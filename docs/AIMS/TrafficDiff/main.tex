@@ -125,7 +125,7 @@ The goal of this research is to detect traffic differentiation in cellular data 
 
 Service differentiation might be done for a variety of reasons. As an example, a wireless provider might limit the performance of third-party VoIP or video calling services (or any other competing product or service) by introducing delays or reducing transfer rates to discourage users from using them instead of the ones provided by the wireless provider. Also, a wireless provider might limit or disable traffic flow for file sharing applications, video streaming services, or other kinds of relatively "network-intensive" applications.
 
-These policies are often not disclosed with users or buried deep within fair usage policy sections of service contracts. T-Mobile UK state in their data plan's fine print that VoIP is not allowed on their monthly cellular data plan, Straight Talk does not allow streaming, downloading, or uploading of uninterrupted videos as well as peer-to-peer (P2P) file sharing. Our goal is to perform a number of tests on cellular networks to determine if they differentiate services.
+These policies are often not disclosed with users or buried deep within fair usage policy sections of service contracts. For example, T-Mobile UK state in their data plan's fine print that VoIP is not allowed on their monthly cellular data plan.
 
 Service differentiation can be done based on host, port, and/or packet payload. As an example, an ISP could block all the connections that use port \texttt{4070} to block Spotify, reduce bandwidth for all traffic to and from \texttt{*.dropbox.com} for Dropbox, and block all the packets that look like BitTorrent traffic (regardless of host/port). In this work, we use Meddle to identify service differentiation in mobile networks~\footnote{http://meddle.mobi}.
 
@@ -219,7 +219,7 @@ For the replay we needed to decide if we wanted to preserve the inter-packet tim
 \noindent\textbf{Metrics.}
 Metrics that are calculated include round-trip times (RTT), throughput, and loss rate. These metrics are calculated for both channels (encrypted and unencrypted) and compared to detect differences.
 
-In cases that there are statistically significant differences between the metrics for a service, a differentiation mechanism is suspected to exist. This can be further investigated by other methods (e.g. repeating the test). Figure~\ref{fig:att_dbu} shows an example of this.
+In cases that there are statistically significant differences between the metrics for a service, a differentiation mechanism is suspected to exist. This can be further investigated by other methods.
 
 %\begin{figure}[ht]
 %\centering
@@ -228,7 +228,7 @@ In cases that there are statistically significant differences between the metric
 %\label{fig:att_dbu}
 %\end{figure}
 
-Note that some difference in throughput between encrypted and unencrypted replays is expected (and observed, Figure~\ref{fig:xputs}) because at the same bandwidth, a VPN connection will add overhead to the packets. Another reason for this maybe the processing carried out by the replay scripts to verify packets using hash functions.
+Note that some difference in throughput between encrypted and unencrypted replays is expected (and observed) because at the same bandwidth, a VPN connection will add overhead to the packets. Another reason for this maybe the processing carried out by the replay scripts to verify packets using hash functions.
 
 %\begin{figure}[ht]
 %\centering
@@ -243,7 +243,7 @@ Tests were performed on a number of well-known wireless providers in north Ameri
 
 Also, as mentioned before, significantly different metrics in a network, while rising suspicion about its treatment of a certain type of traffic, will be inconclusive until complemented by further testing.
 
-Table~\ref{tab:svcdiff} shows test results from Verizon. These results show that in fact there isn't a differentiation mechanism in their network for any of the tested services. Loss rates for all of the tests were within error margins.
+Figure~\ref{fig:res_bar} shows test results from Verizon. These results show that in fact there isn't a differentiation mechanism in their network for any of the tested services. Loss rates for all of the tests were within error margins.
 %\begin{table}
 %\centering
 %\begin{small}
@@ -281,7 +281,7 @@ Table~\ref{tab:svcdiff} shows test results from Verizon. These results show that
 \centering
 \includegraphics[width=3.3in]{figures/results}
 \caption{YT: YouTube, DB: Dropbox, SPTFY: Spotify, PNDRA: Pandora, NFLX: Netflix; UL=Upload, DL=Download) on Verizon. The differences in performance are within the noise, indicating no service differentiation.}
-\label{fig:dbu}
+\label{fig:res_bar}
 \end{figure}
 
 
