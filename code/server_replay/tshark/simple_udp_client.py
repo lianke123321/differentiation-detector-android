@@ -5,7 +5,7 @@
 by: Arash Molavi Kakhki (arash@ccs.neu.edu)
     Northeastern University
     
-Goal: this is a simple UDP server-client script for UDP testing
+Goal: this is a simple UDP client script for UDP testing
 
 Usage:
     
@@ -13,65 +13,68 @@ Usage:
 #######################################################################################################
 #######################################################################################################
 '''
-import sys, socket
-from python_lib import Configs, PRINT_ACTION
-
-class Instance():
-    def __init__(self, ip, port):
-        self.ip   = ip
-        self.port = port
-    def __str__(self):
-        return '\tInstance: {}-{}'.format(self.ip, self.port)
+import sys, socket, time, random, numpy
+from python_lib import Configs, PRINT_ACTION, UDPset
+from vpn_no_vpn import tcpdump
 
 def client(instance, message):
     print "Sending:", message
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.sendto(message, (instance.ip, instance.port))
 
-def server(instance):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind((instance.ip, instance.port))
+class SideChannel(object):
+    def __init__(self, instance):
+        self.ip   = instance.ip
+        self.port = instance.port
+        self.sock = None
+        
+    def _connect(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self.sock.connect((self.ip, self.port))
     
-    while True:
-        data, addr = sock.recvfrom(4096)
-        print "received message:", data
-        if data == 'CloseTheSocket':
-            sock.close()
-            break
+    def sync(self):
+        self._connect()
+        return self.sock.sendall('Sync')
+    
+    def terminate(self):
+        self._connect()
+        return self.sock.sendall('Terminate')
 
 def main():
     ip = '129.10.115.141'
     ports = [55055, 55056, 55057]
+    sync_port = 55555
     
-    PRINT_ACTION('Reading/setting configs', 0)
-    configs = Configs()
-    configs.set('message', 'Hello world!')
-    configs.read_args(sys.argv)
-    
-    configs.check_for(['role'])
-    
-    configs.show_all()
-    print instance
-
-    if configs.get('role') == 'server':
-        for port in ports:
-            instance = Instance(ip, port)
-            server(instance)
-            instances.append(instance)
-    elif configs.get('role') == 'client':
-        client(instances[0], '1')
-        client(instances[0], '2')
-        client(instances[1], '1')
-        client(instances[0], '3')
-        client(instances[2], '1')
-        client(instances[1], '2')
-        client(instances[2], '2')
-        client(instances[0], '4')
-        client(instances[1], '3')
+    instances = []
+    Q = {}
+    for port in ports:
+        instances.append(ServerInstance(ip, port, c_s_pair))
         
-        client(instances[0], 'CloseTheSocket')
-        client(instances[1], 'CloseTheSocket')
-        client(instances[2], 'CloseTheSocket')
+#        for i in range(5):
+#            delay = abs(numpy.random.normal(loc=0.01, scale=0.1, size=None))
+#            UDPset()
+    
+#    dump = tcpdump(dump_name='kir')
+#    dump.start()
+#    time.sleep(2)
+
+    side_channel = SideChannel(ServerInstance(ip, sync_port))
+    print side_channel.sync()
+    
+    
+    for i in range(5):
+        client( instances[random.randrange(3)], 'c-'+str(i) )
+        delay = abs(numpy.random.normal(loc=0.01, scale=0.1, size=None))
+        time.sleep(delay)
+    
+    client(instances[0], 'CloseTheSocket')
+    client(instances[1], 'CloseTheSocket')
+    client(instances[2], 'CloseTheSocket')
+    
+    side_channel.terminate()
+    
+#    dump.stop()
     
 if __name__=="__main__":
     main()

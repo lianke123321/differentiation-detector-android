@@ -31,6 +31,19 @@ def dir_list(dir_name, subdir, *args):
             # print "Accessing directory:", dirfile
             fileList += dir_list(dirfile, subdir, *args)
     return fileList
+class UDPset():
+    def __init__(self, payload, timestamp):
+        self.payload   = payload
+        self.timestamp = timestamp
+
+class ServerInstance():
+    def __init__(self, ip, port, c_s_pair):
+        self.ip   = ip
+        self.port = port
+        self.c_s_pair = c_s_pair
+    def __str__(self):
+        return '\tInstance: {}-{}'.format(self.ip, self.port)
+
 class RequestSet(object):
     def __init__(self, payload, c_s_pair, response, timestamp):
         self.payload  = payload
@@ -42,11 +55,13 @@ class RequestSet(object):
             self.response_hash = hash(response)
             self.response_len  = len(response)
         self.timestamp = timestamp
+
 class ResponseSet(object):
     def __init__(self, request, response_list):
         self.request_len   = len(request)
         self.request_hash  = hash(request)
         self.response_list = response_list
+
 class OneResponse(object):
     def __init__(self, payload, timestamp):
         self.payload   = payload
@@ -118,6 +133,7 @@ class Configs(object):
     def reset(self):
         _configs = {}
         self._configs['action_count'] = 0
+
 class Instance(object):
     instance_list = {
         'meddle'  : {'host'     : 'ec2-54-243-17-203.compute-1.amazonaws.com',
