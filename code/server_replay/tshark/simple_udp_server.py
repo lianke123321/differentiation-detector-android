@@ -13,9 +13,9 @@ ps aux | grep "python simple_udp_server.py" |  awk '{ print $2}' | xargs kill -9
 #######################################################################################################
 #######################################################################################################
 '''
-import sys, socket, threading
+import sys, socket, threading, time
 
-from python_lib import Configs, PRINT_ACTION, UDPset, ServerInstance
+from python_lib import *
 
 class Server(object):
     def __init__(self, instance):
@@ -38,34 +38,35 @@ class Server(object):
 
 class SideChannel(object):
     def __init__(self, instance):
+        self.connection = None
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.sock.bind((instance.ip, instance.port))
         self.sock.listen(1)
-
+        
     def wait_for_sync(self):
         connection, client_address = self.sock.accept()
+        self.connection = connection
         while True:
             data = connection.recv(4096)
             if data == 'Sync':
-                connection.close()
                 break
-            
+    
     def wait_for_termination(self, servers=[]):
-        connection, client_address = self.sock.accept()
         while True:
-            data = connection.recv(4096)
+            data = self.connection.recv(4096)
             if data == 'Terminate':
-                print 'Got termination signal. Closing the socket.'
-                connection.close()
-                self.sock.close()
+                PRINT_ACTION('Got termination signal.', 1, action=False)
                 break
+        time.sleep(2)
     
 def main():
     ip = '129.10.115.141'
     ports = [55055, 55056, 55057]
-    sync_port = 55556
+    sync_port = 55555
     
-    side_channel = SideChannel(ServerInstance(ip, sync_port, 'SideChannel'))
+    side_channel = SideChannel(SocketInstance(ip, sync_port, 'SideChannel'))
     
     event   = threading.Event()
     inQ     = []
@@ -73,26 +74,19 @@ def main():
     servers = []
     
     for port in ports:
-        servers.append(Server(ServerInstance(ip, port, str(port))))
+        servers.append(Server(SocketInstance(ip, port, str(port))))
         t = threading.Thread(target=servers[-1].listen)
         threads.append(t)
     
     PRINT_ACTION('Waiting for sync signal...', 0)
     side_channel.wait_for_sync()
-    PRINT_ACTION('Got it!', 1)
+    PRINT_ACTION('Got it!', 1, action=False)
     
     for t in threads:
         t.start()
-
-    PRINT_ACTION('Waiting for termination signal...', 0)
-    t = threading.Thread(target=side_channel.wait_for_termination, args=[servers])
-    t.start()
-    t.join()
     
-#    while inQ:
-#        print '\t', inQ[0][0], 'at', inQ[0][1]
-#        inQ.pop(0)
-#        print inQ.pop(0)
+    PRINT_ACTION('Waiting for termination signal...', 0)
+    side_channel.wait_for_termination()
     
 if __name__=="__main__":
     main()
