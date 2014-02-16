@@ -34,7 +34,7 @@ def dir_list(dir_name, subdir, *args):
 
 class UDPQueue(object):
     def __init__(self, starttime=None, dst_socket=None, c_s_pair=None):
-        self.Q           = []
+        self.Q          = []
         self.c_s_pair   = c_s_pair
         self.starttime  = starttime
         self.dst_socket = dst_socket
@@ -54,10 +54,10 @@ class UDPset(object):
         return '{}:{}'.format(self.payload, self.timestamp)
 
 class SocketInstance():
-    def __init__(self, ip, port, c_s_pair):
+    def __init__(self, ip, port, name):
         self.ip   = ip
         self.port = port
-        self.c_s_pair = c_s_pair
+        self.name = name
     def __str__(self):
         return '{}-{}'.format(self.ip, self.port)
 
