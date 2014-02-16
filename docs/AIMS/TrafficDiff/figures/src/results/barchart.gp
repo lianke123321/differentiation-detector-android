@@ -20,5 +20,5 @@ set boxwidth 0.3/num_of_categories
 dx=0.5/num_of_categories
 offset=-0.1
 
-plot 'results.txt' using ($0+1):2:3:xtic(1) title "Average (VPN)" linecolor rgb "#3CB0D6" linetype 1 with boxerrorbars, \
+plot 'results.txt' using ($0+1):2:3:xtic(1) title "Average (VPN)" linecolor rgb "#ff0000" linetype 1 with boxerrorbars, \
      'results.txt' using ($0+1)+dx:4:5 title "Average (No VPN)" linecolor rgb "#00cc00" linetype 1 with boxerrorbars

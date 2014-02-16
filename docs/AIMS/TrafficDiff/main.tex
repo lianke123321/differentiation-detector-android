@@ -127,9 +127,9 @@ Service differentiation might be done for a variety of reasons. As an example, a
 
 These policies are often not disclosed with users or buried deep within fair usage policy sections of service contracts. For example, T-Mobile UK state in their data plan's fine print that VoIP is not allowed on their monthly cellular data plan.
 
-Service differentiation can be done based on host, port, and/or packet payload. As an example, an ISP could block all the connections that use port \texttt{4070} to block Spotify, reduce bandwidth for all traffic to and from \texttt{*.dropbox.com} for Dropbox, and block all the packets that look like BitTorrent traffic (regardless of host/port). In this work, we use Meddle to identify service differentiation in mobile networks~\footnote{http://meddle.mobi}.
+Service differentiation can be done based on host, port, and/or packet payload. As an example, an ISP could block all the connections that use port \texttt{4070} to block Spotify, reduce bandwidth for all traffic to and from \texttt{*.dropbox.com} for Dropbox, and block all the packets that look like BitTorrent traffic (regardless of host/port). In this work, we use Meddle to identify service differentiation in mobile networks\cite{meddle}.
 
-Previous efforts for detecting traffic differentiation include the Glasnost project (BitTorrent differentiation detection) ~\footnote{http://broadband.mpi-sws.org/transparency} which compared performance metrics on a reference flow and a BitTorrent flow.
+Previous efforts for detecting traffic differentiation include the Glasnost project (BitTorrent differentiation detection) ~\cite{glasnost} which compared performance metrics on a reference flow and a BitTorrent flow.
 
 %Previous work on detecting service differentiation worked on home ISPs and not mobile networks, this is covered in Section~\ref{sec:prevwork}. The Glasnost project worked on detecting differentiation of BitTorrent traffic in home ISPs using a browser applet. Our approach will test cellular networks for differentiation on a set of suspected services using Meddle VPN. Our methodology is explained in section~\ref{sec:method}.
 %
@@ -141,19 +141,19 @@ Previous efforts for detecting traffic differentiation include the Glasnost proj
 
 %Glasnost makes a connection to a measurement server's BitTorrent port and sends BitTorrent traffic, then it sends the same amount of data to the same server, only this time the data does not look like BitTorrent data. This process is repeated many times both on on BitTorrent ports and on other ports. Then the metrics calculated are compared to see if BitTorrent flow is being treated differently. This way, Glasnost can identify differentiation based on port and/or content.
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=3.3in]{figures/glasnost}
-\caption{Schematic view of how glasnost works.}
-\label{fig:glasnost}
-\end{figure}
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[width=3.3in]{figures/glasnost}
+%\caption{Schematic view of how glasnost works.}
+%\label{fig:glasnost}
+%\end{figure}
 
 %This measurement can be performed by logging into Glasnost test page and loading the Java\texttrademark applet. This design will not allow mobile devices to run the test as mobile devices can not run Java applets in their web browsers. Additionally, Glasnost is designed only to detect BitTorrent traffic differentiation.
 
 \section{Methodology}
 \label{sec:method}
 
-To see if an ISP treats a certain type of traffic differently, we first record all packets transmitted/received during a sample run of that service, replay it on the cell network using a controlled server and then repeat this process (replaying the recorded trace) on an encrypted channel. This process is repeated 5 times for each channel (encrypted and unencrypted). Finally, if the ISP treats traffic differently, metrics calculated for each channel should be significantly different (i.e. significantly more delay on 
+To see if an ISP treats a certain type of traffic differently, we first record all packets transmitted/received during a sample run of that service, replay it on the cell network using a controlled server and then repeat this process (replaying the recorded trace) over the Meddle encrypted VPN channel~\cite{meddle}. This process is repeated 5 times for each channel (encrypted and unencrypted). Finally, if the ISP treats traffic differently, metrics calculated for each channel should be significantly different (i.e. significantly more delay on 
 Skype traffic when replaying on an unencrypted channel). Figure~\ref{fig:meddle} is a rough sketch of what happens during a test.
 
 Our approach detects differentiation based on port/packet payload. The reason for this is that it is not possible to send/receive recorded data to/from the original servers (e.g. Skype servers). As part of our future work, we are investigating source spoofing from the server to ensure that the only different in the five-tuple is from the client to the server. So if the ISP differentiates based on flows from the client to the server, it will go undetected. Previous work showed that ISPs differentiate based on port/packet payload \cite{glasnost}, making our current approach a viable first step.
@@ -185,22 +185,22 @@ Packet traces for sample sessions for each service had to be recorded first in o
 \noindent\textbf{Replay.}
 To replay the trace, a copy of the pcap file is sent to the server and a copy is kept on the client. The client will establish each connection to the server on the same port. The server will do the same and only sends packets once it has seen the packets it expects to have seen based on the pcap file it has. A pcap of this replay will be kept on the client for analysis.
 
-For the replay we needed to decide if we wanted to preserve the inter-packet timing that would reflect application level flow control. Because the reference packet traces were recorded on a WiFi network with significantly higher bandwidth, this would have no effect on the outcome of the tests because this wouldn't affect the differentiation.
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=3.3in]{figures/db_big_u}
-\caption{Sequence number plot for a connection made during a Dropbox upload session on WiFi showing application-level flow control.}
-\label{fig:dbu}
-\end{figure}
-
+For the replay we needed to decide if we wanted to preserve the inter-packet timing that would reflect application level flow control (Figure~\ref{fig:youtube}). Because the reference packet traces were recorded on a WiFi network with significantly higher bandwidth, this would have no effect on the outcome of the tests because this wouldn't affect the differentiation.
 
 %\begin{figure}[ht]
 %\centering
-%\includegraphics[width=3.3in]{figures/ytd}
-%\caption{Sequence number plot for a connection made during a YouTube video session on WiFi showing application-level flow control.}
+%\includegraphics[width=3.3in]{figures/db_big_u}
+%\caption{Sequence number plot for a connection made during a Dropbox upload session on WiFi showing application-level flow control.}
 %\label{fig:dbu}
 %\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=3.3in]{figures/ytd}
+\caption{Sequence number plot for a connection made during a YouTube video session on WiFi showing application-level flow control.}
+\label{fig:youtube}
+\end{figure}
 
 %\subsection{Noise Packets}
 
@@ -239,7 +239,7 @@ Note that some difference in throughput between encrypted and unencrypted replay
 
 \section{Preliminary Results}
 
-Tests were performed on a number of well-known wireless providers in north America and results indicated that differentiation mechanisms are not in fact present in those networks.
+Tests were performed on a number of well-known wireless providers in North America and results indicated that differentiation mechanisms are not in fact present in those networks.
 
 Also, as mentioned before, significantly different metrics in a network, while rising suspicion about its treatment of a certain type of traffic, will be inconclusive until complemented by further testing.
 
