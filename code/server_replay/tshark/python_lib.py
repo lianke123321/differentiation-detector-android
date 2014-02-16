@@ -40,6 +40,9 @@ class UDPQueue(object):
         self.destination = destination
     def add_UDPset(self, udp_set):
         self.Q.append(udp_set)
+    def __str__(self):
+        return (' -- '.join([self.c_s_pair, str(self.starttime), str(self.destination), '\n\t']) +
+                '\n\t'.join([(udp_set.payload + '\t' + str(udp_set.timestamp)) for udp_set in self.Q]))
 
 class UDPset(object):
     def __init__(self, payload, timestamp):

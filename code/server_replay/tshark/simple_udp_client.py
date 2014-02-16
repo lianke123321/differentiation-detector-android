@@ -52,10 +52,10 @@ class SideChannel(object):
         self.sock.connect((self.instance.ip, self.instance.port))
     
     def sync(self):
-#        self._connect()
         return self.sock.sendall('Sync')
     
     def terminate(self):
+        self.sock.sendall('Terminate')
         self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
 
@@ -67,6 +67,12 @@ def main():
     instances = {}
     Qs = []
     
+    
+    '''
+    ###########################################################################
+    Making a test random Q
+    self.connection = 
+    '''
     for i in range(len(ports)):
         c_s_pair = ''.join(['c_s_pair_' , str(i)])
         port = ports[i]
@@ -80,10 +86,9 @@ def main():
         Qs.append(queue)
     
     for q in Qs:
-        print '{} -- {} -- {}'.format(q.c_s_pair, q.starttime, q.destination)
-        for pl in q.Q:
-            print '\t{}'.format(pl)
+        print q
 
+    
     side_channel = SideChannel(SocketInstance(ip, sync_port, 'SideChannel'))
     origin_time = time.time()
     side_channel.sync()
