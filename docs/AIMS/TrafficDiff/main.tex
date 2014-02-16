@@ -119,17 +119,13 @@
 
 \section{Introduction}
 
-As wireless providers offer faster and more widely available cellular data to their customers, more mobile applications emerge that utilize this to add more services to the mobile platform or just simply improve on the quality of existing ones. It is often not clear how traffic from said services is treated while traversing boundaries of these networks.
+As wireless providers offer faster and more widely available cellular data to their customers, more mobile applications emerge that utilize this additional capacity to add more services to the mobile platform or improve on the quality of service for existing services. However, it is often unclear how traffic from mobile services is treated while traversing boundaries of these networks. 
 
-The goal of this research is to detect traffic differentiation in cellular data networks. Traffic differentiation is defined as tampering with the performance of the network done by the ISP in any shape or form.
+The goal of this research is to detect traffic differentiation in cellular data networks. Traffic differentiation is defined as tampering with the performance of the network done by the ISP in any shape or form. Service differentiation might be done for a variety of reasons. As an example, a wireless provider might limit the performance of third-party VoIP or video calling services (or any other competing services) by introducing delays or reducing transfer rates to encourage users to use services provided by the wireless provider. Also, a wireless provider might limit or disable traffic flow for file sharing applications, video streaming services, or other kinds of  "network-intensive" applications. These policies are often not disclosed to users or buried deep within fair usage policy sections of service contracts. For example, T-Mobile UK state in their data plan's fine print that VoIP is not allowed on their monthly cellular data plan.
 
-Service differentiation might be done for a variety of reasons. As an example, a wireless provider might limit the performance of third-party VoIP or video calling services (or any other competing product or service) by introducing delays or reducing transfer rates to discourage users from using them instead of the ones provided by the wireless provider. Also, a wireless provider might limit or disable traffic flow for file sharing applications, video streaming services, or other kinds of relatively "network-intensive" applications.
+Service differentiation can be done based on host, port, and/or packet payload. As an example, an ISP could block all the connections that use port \texttt{4070} to block Spotify, reduce bandwidth for all traffic to and from \texttt{*.dropbox.com} for Dropbox, and block all the packets that appear to contain BitTorrent payloads (regardless of host/port). In this work, we use Meddle and develop an \emph{application agnostic} method for recording and replaying network traces to identify service differentiation in mobile networks\cite{meddle}.
 
-These policies are often not disclosed with users or buried deep within fair usage policy sections of service contracts. For example, T-Mobile UK state in their data plan's fine print that VoIP is not allowed on their monthly cellular data plan.
-
-Service differentiation can be done based on host, port, and/or packet payload. As an example, an ISP could block all the connections that use port \texttt{4070} to block Spotify, reduce bandwidth for all traffic to and from \texttt{*.dropbox.com} for Dropbox, and block all the packets that look like BitTorrent traffic (regardless of host/port). In this work, we use Meddle to identify service differentiation in mobile networks\cite{meddle}.
-
-Previous efforts for detecting traffic differentiation include the Glasnost project (BitTorrent differentiation detection) ~\cite{glasnost} which compared performance metrics on a reference flow and a BitTorrent flow.
+Previous efforts for detecting traffic differentiation include the Glasnost project, which focuses on identifying BitTorrent differentiation on broadband connections~\cite{glasnost}. However, Glasnost assumed a fairly stable underlying connection (broadband) and focused on a single application: BitTorrent, which required hand-tuning of the differentiation tests. In contrast, our approach aims to provide traffic differentiation testing regardless of the application being tested via a ``record-and-replay'' functionality. Further, our tool is designed with the high variability of mobile networks in mind when designing statistical measures to identify differentiation.
 
 %Previous work on detecting service differentiation worked on home ISPs and not mobile networks, this is covered in Section~\ref{sec:prevwork}. The Glasnost project worked on detecting differentiation of BitTorrent traffic in home ISPs using a browser applet. Our approach will test cellular networks for differentiation on a set of suspected services using Meddle VPN. Our methodology is explained in section~\ref{sec:method}.
 %
@@ -153,25 +149,27 @@ Previous efforts for detecting traffic differentiation include the Glasnost proj
 \section{Methodology}
 \label{sec:method}
 
-To see if an ISP treats a certain type of traffic differently, we first record all packets transmitted/received during a sample run of that service, replay it on the cell network using a controlled server and then repeat this process (replaying the recorded trace) over the Meddle encrypted VPN channel~\cite{meddle}. This process is repeated 5 times for each channel (encrypted and unencrypted). Finally, if the ISP treats traffic differently, metrics calculated for each channel should be significantly different (i.e. significantly more delay on 
-Skype traffic when replaying on an unencrypted channel). Figure~\ref{fig:meddle} is a rough sketch of what happens during a test.
+To see if an ISP treats a certain type of traffic differently, we first record all packets transmitted/received during a sample run of that service and then replay it, first on the cell network using a controlled server and then over the Meddle encrypted VPN channel~\cite{meddle}. This process is currently repeated 5 times for each channel (encrypted and unencrypted). If the ISP treats traffic differently, metrics calculated for each channel should be significantly different (i.e. significantly more delay on 
+Skype traffic when replaying on an unencrypted channel). Figure~\ref{fig:meddle} gives a sketch of this process.
 
-Our approach detects differentiation based on port/packet payload. The reason for this is that it is not possible to send/receive recorded data to/from the original servers (e.g. Skype servers). As part of our future work, we are investigating source spoofing from the server to ensure that the only different in the five-tuple is from the client to the server. So if the ISP differentiates based on flows from the client to the server, it will go undetected. Previous work showed that ISPs differentiate based on port/packet payload \cite{glasnost}, making our current approach a viable first step.
+Our approach detects differentiation based on port or packet payload, but not destination IP. The reason for this is that it is not possible to send/receive recorded data to/from the original servers (e.g. Skype servers). As part of our future work, we are investigating source spoofing from the server to ensure that the only difference in the five-tuple is the client IP. So if the ISP differentiates based on server IP, it will go undetected. Previous work shows that ISPs often differentiate based on port/packet payload \cite{glasnost}, making our current approach a viable first step.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=3.5in]{figures/meddle}
-\caption{Schematic view of how our project works.}
+\vspace{-0.5cm}
+\caption{Schematic view of how our project works. Traffic is sent unencrypted and through the Meddle VPN tunnel between the mobile client and a control server.}
 \label{fig:meddle}
 \end{figure}
 
-\noindent\textbf{Services.}
-A number of services were selected to test for differentiation on wireless networks. These tests each represented a category that was suspected to be differentiated by wireless providers.
 
-For the VoIP category, Skype was chosen because it is a widely used service. For file sharing and P2P, Dropbox (upload and download) and BitTorrent were chosen respectively. Netflix, Hulu+ and YouTube (upload and download) represent video, and Spotify and Pandora represent audio in the streaming category.
+\noindent\textbf{Services.}
+A number of services were selected to test for differentiation of different classes of applications on wireless networks.  We consider VoIP (Skype), file sharing (Dropbox), peer-to-peer (BitTorrent), streaming video (Netflix, Hulu+, and YouTube), and streaming audio (Spotify and Pandora).
+
+%For the VoIP category, Skype was chosen because it is a widely used service. For file sharing and P2P, Dropbox (upload and download) and BitTorrent were chosen respectively. Netflix, Hulu+ and YouTube (upload and download) represent video, and Spotify and Pandora represent audio in the streaming category.
 
 \noindent\textbf{Recording Traces.}
-Packet traces for sample sessions for each service had to be recorded first in order to be replayed later over a cellular network. In order to do so, a mobile phone was connected to a VPN (in WiFi mode) server that recorded all of the packets in pcap format using \texttt{tcpdump}. When connected to the VPN, an action that required network interaction on the phone would be initiated and after enough data was transferred, the action would be interrupted and the VPN connection would be disconnected.
+Packet traces for each service had to be recorded first in order to be replayed later over a cellular network. In order to do so, a mobile phone was connected to the Meddle VPN (in WiFi mode) server that recorded all of the packets in pcap format using \texttt{tcpdump}. When connected to the VPN, an action that required network interaction on the phone would be initiated and after enough data was transferred, the action would be interrupted and the VPN connection would be disconnected to terminate the network trace.
 
 %A few qualities had to be verified about reference service trace: the reference WiFi network on which the packets were recorded should be well provisioned itself (i.e. no service differentiation mechanism should be in place), so the traces were recorded on campus WiFi network. Additionally, tested applications shouldn't behave differently on WiFi compared to when they are on cellular network. This was confirmed for all tested applications by recording traces once on a WiFi network and an HSDPA+ network with roughly the same bandwidth.
 
@@ -183,9 +181,11 @@ Packet traces for sample sessions for each service had to be recorded first in o
 %\end{figure}
 
 \noindent\textbf{Replay.}
-To replay the trace, a copy of the pcap file is sent to the server and a copy is kept on the client. The client will establish each connection to the server on the same port. The server will do the same and only sends packets once it has seen the packets it expects to have seen based on the pcap file it has. A pcap of this replay will be kept on the client for analysis.
+To replay the trace, a copy of the pcap file is sent to the server and a copy is kept on the client. The client will establish each connection to the server on the same port. The server will do the same and only sends replay packets once it has seen the replayed packets from the client that it expects based on the pcap file. A pcap of this replay is recorded for analysis.
 
-For the replay we needed to decide if we wanted to preserve the inter-packet timing that would reflect application level flow control (Figure~\ref{fig:youtube}). Because the reference packet traces were recorded on a WiFi network with significantly higher bandwidth, this would have no effect on the outcome of the tests because this wouldn't affect the differentiation.
+For the replay we needed to decide if we wanted to preserve the inter-packet timing that would reflect application level flow control (\eg YouTube application layer flow control as illustrated in Figure~\ref{fig:youtube}). We have implemented replay that accounts for application flow-control and are investigating its impact differentiation.
+
+%Because the reference packet traces were recorded on a WiFi network with significantly higher bandwidth, this would have no effect on the outcome of the tests because this wouldn't affect the differentiation.
 
 %\begin{figure}[ht]
 %\centering
@@ -195,9 +195,10 @@ For the replay we needed to decide if we wanted to preserve the inter-packet tim
 %\end{figure}
 
 
-\begin{figure}[ht]
+\begin{figure}[t]
 \centering
-\includegraphics[width=3.3in]{figures/ytd}
+\includegraphics[width=0.45\textwidth]{figures/ytd}
+\vspace{-0.8cm}
 \caption{Sequence number plot for a connection made during a YouTube video session on WiFi showing application-level flow control.}
 \label{fig:youtube}
 \end{figure}
@@ -217,7 +218,7 @@ For the replay we needed to decide if we wanted to preserve the inter-packet tim
 %\end{figure}
 
 \noindent\textbf{Metrics.}
-Metrics that are calculated include round-trip times (RTT), throughput, and loss rate. These metrics are calculated for both channels (encrypted and unencrypted) and compared to detect differences.
+Metrics calculated include, round-trip times (RTT), throughput, and loss rate. These metrics are calculated for both replays over both channels (encrypted (VPN) and unencrypted (no VPN)) and compared.% to detect differences.
 
 In cases that there are statistically significant differences between the metrics for a service, a differentiation mechanism is suspected to exist. This can be further investigated by other methods.
 
@@ -228,7 +229,10 @@ In cases that there are statistically significant differences between the metric
 %\label{fig:att_dbu}
 %\end{figure}
 
-Note that some difference in throughput between encrypted and unencrypted replays is expected (and observed) because at the same bandwidth, a VPN connection will add overhead to the packets. Another reason for this maybe the processing carried out by the replay scripts to verify packets using hash functions.
+Note that some difference in throughput between encrypted and unencrypted replays is expected (and observed) because at the same bandwidth, a VPN connection will add overhead to the packets. But since this should decrease performance of the encrypted channel, it means that our differentiation detection will behave in a conservative manner.
+
+%%PG: we fixed this ...
+%Another reason for this maybe the processing carried out by the replay scripts to verify packets using hash functions.
 
 %\begin{figure}[ht]
 %\centering
@@ -238,12 +242,14 @@ Note that some difference in throughput between encrypted and unencrypted replay
 %\end{figure}
 
 \section{Preliminary Results}
+To evaluate our record and replay mechanism, tests were performed on a number of well-known wireless providers in North America. Figure~\ref{fig:res_bar} shows average throughput (with error bars indicating the standard deviation) from tests performed on Verizon's network. Based on these results, we cannot conclude that differentiation takes place in Verizon's network. We made similar observations in other networks measured in our preliminary study. Figure~\ref{fig:res_bar} also serves to highlight the challenge that network variability poses when detecting traffic differentiation in mobile networks. 
 
-Tests were performed on a number of well-known wireless providers in North America and results indicated that differentiation mechanisms are not in fact present in those networks.
+% These initial results do serve to highlight the challenges faced wh
+%These results show that in fact there isn't a differentiation mechanism in their network for any of the tested services. Loss rates for all of the tests were within error margins.
+% and results indicated that differentiation mechanisms are not in fact present in those networks.
+%Also, as mentioned before, significantly different metrics in a network, while rising suspicion about its treatment of a certain type of traffic, will be inconclusive until complemented by further testing.
 
-Also, as mentioned before, significantly different metrics in a network, while rising suspicion about its treatment of a certain type of traffic, will be inconclusive until complemented by further testing.
 
-Figure~\ref{fig:res_bar} shows test results from Verizon. These results show that in fact there isn't a differentiation mechanism in their network for any of the tested services. Loss rates for all of the tests were within error margins.
 %\begin{table}
 %\centering
 %\begin{small}
@@ -277,9 +283,9 @@ Figure~\ref{fig:res_bar} shows test results from Verizon. These results show tha
 %\label{tab:svcdiff}
 %\end{table}
 
-\begin{figure}[ht]
+\begin{figure}[t]
 \centering
-\includegraphics[width=3.3in]{figures/results}
+\includegraphics[width=0.45\textwidth]{figures/results}
 \caption{YT: YouTube, DB: Dropbox, SPTFY: Spotify, PNDRA: Pandora, NFLX: Netflix; UL=Upload, DL=Download) on Verizon. The differences in performance are within the noise, indicating no service differentiation.}
 \label{fig:res_bar}
 \end{figure}
@@ -287,9 +293,9 @@ Figure~\ref{fig:res_bar} shows test results from Verizon. These results show tha
 
 \section{Future Work}
 
-Currently, the testing and measurement is done on a laptop tethered to a phone by a researcher. The next step is to implement a cell phone application that does this experiment automatically so that people can freely download the app and perform measurements themselves. This way, more data will become available and the results would be more dependable for the existing cellular networks, as well as giving data to detect differentiation on newer ones.
-
-Additionally, such platform will reveal possible differentiation variations on the same network in different regions.
+Currently, the testing and measurement is done on a laptop tethered to a phone by a researcher. The next step is to implement a cell phone application that does this experiment automatically so that people can freely download the app and perform measurements themselves. This way, more data will become available and the results would be more dependable for the existing cellular networks.
+%, as well as giving data to detect differentiation on newer ones.
+Additionally, our platform will reveal possible differentiation variations on the same network in different regions.
 
 %% sample bib file with references.
 \begin{small}
