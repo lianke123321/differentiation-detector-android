@@ -33,15 +33,17 @@ def dir_list(dir_name, subdir, *args):
     return fileList
 
 class UDPQueue(object):
-    def __init__(self, starttime=None, destination=None, c_s_pair=None):
+    def __init__(self, starttime=None, dst_socket=None, c_s_pair=None):
         self.Q           = []
-        self.c_s_pair    = c_s_pair
-        self.starttime   = starttime
-        self.destination = destination
+        self.c_s_pair   = c_s_pair
+        self.starttime  = starttime
+        self.dst_socket = dst_socket
+        
     def add_UDPset(self, udp_set):
         self.Q.append(udp_set)
+        
     def __str__(self):
-        return (' -- '.join([self.c_s_pair, str(self.starttime), str(self.destination), '\n\t']) +
+        return (' -- '.join([self.c_s_pair, str(self.starttime), str(self.dst_socket), '\n\t']) +
                 '\n\t'.join([(udp_set.payload + '\t' + str(udp_set.timestamp)) for udp_set in self.Q]))
 
 class UDPset(object):
