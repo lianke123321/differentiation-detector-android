@@ -54,7 +54,7 @@ class UDPset(object):
         return '{}:{}'.format(self.payload, self.timestamp)
 
 class SocketInstance():
-    def __init__(self, ip, port, name):
+    def __init__(self, ip, port, name=None):
         self.ip   = ip
         self.port = port
         self.name = name
