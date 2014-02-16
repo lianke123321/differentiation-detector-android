@@ -33,12 +33,14 @@ def dir_list(dir_name, subdir, *args):
     return fileList
 
 class UDPQueue(object):
-    def __init__(self, starttime):
-        self.starttime = starttime
-        self.Q = []
+    def __init__(self, starttime=None, destination=None, c_s_pair=None):
+        self.Q           = []
+        self.c_s_pair    = c_s_pair
+        self.starttime   = starttime
+        self.destination = destination
     def add_UDPset(self, udp_set):
-        self.Q.appen(udp_set)
-    
+        self.Q.append(udp_set)
+
 class UDPset(object):
     def __init__(self, payload, timestamp):
         self.payload   = payload
@@ -46,13 +48,13 @@ class UDPset(object):
     def __str__(self):
         return '{}:{}'.format(self.payload, self.timestamp)
 
-class ServerInstance():
+class SocketInstance():
     def __init__(self, ip, port, c_s_pair):
         self.ip   = ip
         self.port = port
         self.c_s_pair = c_s_pair
     def __str__(self):
-        return '\tInstance: {}-{}'.format(self.ip, self.port)
+        return '{}-{}'.format(self.ip, self.port)
 
 class RequestSet(object):
     def __init__(self, payload, c_s_pair, response, timestamp):
