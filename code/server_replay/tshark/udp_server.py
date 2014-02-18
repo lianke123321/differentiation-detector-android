@@ -71,7 +71,6 @@ class SideChannel(object):
         self.sock.bind((instance.ip, instance.port))
         self.sock.listen(1)
         self.connection_map = {}
-        self.live = True
         
     def wait_for_mapping(self, mapping):
         while True:
@@ -110,30 +109,31 @@ class SideChannel(object):
             mapping[client_ip][port] = c_s_pair
         print mapping
     
+    def check_pipes(self, pipe_list, event):
+        '''
+        Every time send_Q is done, the respective client needs to be notified
+        so it can close the process which is receiving data. To do so:
+        
+        When send_Q() is done, it sends the client_address = (ip, port) into
+        a pipe and sets an event. The event causes this method to wake up, select
+        ready pipes, and notify respective client[s] to terminate corresponding 
+        receiving processes. 
+        '''
+        while True:
+            event.wait()
+            r, w, e = select.select(pipe_list, [], [])
+            for pipe in r:
+                client_address = pipe.recv()
+                self.notify_send_done(client_address)
+                pipe.close()
+                pipe_list.remove(pipe)
+            event.clear()
+    
     def terminate(self):
         self.live = False
         self.sock.close()
 
-def check_pipes(pipe_list, event, side_channel):
-    while True:
-        event.wait()
-        r, w, e = select.select(pipe_list, [], [])
-        for pipe in r:
-            client_address = pipe.recv()
-            side_channel.notify_send_done(client_address)
-            pipe.close()
-            pipe_list.remove(pipe)
-        event.clear()
-    
-def main():
-    ip = '129.10.115.141'
-    ip = '127.0.0.1'
-    
-    ports     = [55055, 55056, 55057]
-    sidechannel_port = 55555
-    
-    mapping = {}
-    
+def create_test_Qs(ports):
     '''
     ###########################################################################
     Making a test random Q
@@ -145,8 +145,10 @@ def main():
                  UDPset --> payload, timestamp
     ########################################################################### 
     '''
-    Qs = {}
+    Qs         = {}
     test_count = 5
+    ports      = [55055, 55056, 55057]
+    
     for i in range(len(ports)):
         c_s_pair = ''.join(['c_s_pair_' , str(i)])
         port = ports[i]
@@ -163,18 +165,35 @@ def main():
     
     for c_s_pair in Qs:
         print Qs[c_s_pair]
+    
+    return Qs, ports
+
+def main():
+    PRINT_ACTION('Creating test Qs', 0)
+    ip = '129.10.115.141'
+    ip = '127.0.0.1'
+    sidechannel_port = 55555
+    
+    Qs, ports = create_test_Qs(ip)
+    
     '''
     ###########################################################################
+    mapping: mapping[client_ip][port] = c_s_pair
+             Gets populated in SideChannel.handle_connection()
+             Every time a connection comes in, mapping[client_ip] is set to {},
+             then the client keeps identifying what port is for what c_s_pair
+    ########################################################################### 
     '''
     PRINT_ACTION('Creating side-channel', 0)
-    event = threading.Event()
+    mapping   = {}
+    event     = threading.Event()
     pipe_list = []
+    
     side_channel = SideChannel(SocketInstance(ip, sidechannel_port))
     t1 = threading.Thread(target=side_channel.wait_for_mapping, args=[mapping])
-    t2 = threading.Thread(target=check_pipes, args=[pipe_list, event, side_channel])
+    t2 = threading.Thread(target=side_channel.check_pipes, args=[pipe_list, event])
     t1.start()
     t2.start()
-
 
     PRINT_ACTION('Creating servers', 0)
     threads   = []
@@ -185,8 +204,6 @@ def main():
         t = threading.Thread(target=servers[-1].wait_for_client, args=[mapping, Qs, event, pipe_list])
         t.start()
         threads.append(t)
-    
-
     
 if __name__=="__main__":
     main()

@@ -13,7 +13,7 @@ Usage:
 #######################################################################################################
 #######################################################################################################
 '''
-import sys, socket, time, random, numpy, threading, multiprocessing
+import sys, socket, time, random, numpy, multiprocessing
 from python_lib import *
 from vpn_no_vpn import tcpdump
 
@@ -58,7 +58,6 @@ class SideChannel(object):
     
     def identify_client(self, client):
         message = ';'.join([client.c_s_pair, client.port])
-        print message, len(message)
         self.send(message)
     
     def send(self, message):
