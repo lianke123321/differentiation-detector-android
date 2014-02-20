@@ -13,9 +13,8 @@ Usage:
 #######################################################################################################
 #######################################################################################################
 '''
-import sys, socket, time, random, numpy, multiprocessing
+import sys, socket, time, random, numpy, multiprocessing, threading, select
 from python_lib import *
-from vpn_no_vpn import tcpdump
 
 class Client(object):
     def __init__(self, dst_ip, dst_port, c_s_pair):
@@ -46,6 +45,17 @@ class Client(object):
             data = self.sock.recv(4096)
             print '\tGot: ', data
     
+    def identify(self, side_channel, NAT_map):
+        while True:
+            print '\tIdentifying:', self.port, '...',; sys.stdout.flush()
+            self.sock.sendto(self.c_s_pair, (self.dst_ip, self.dst_port))
+            r, w, e = select.select([side_channel.sock], [], [], 1)
+            if r:
+                NAT_port = r[0].recv(5)
+                NAT_map[NAT_port] = self.port
+                print 'mapped to:', NAT_port
+                break
+    
     def close(self):
         self.sock.close()
 
@@ -63,26 +73,25 @@ class SideChannel(object):
     def send(self, message):
         return self.sock.sendall(message)
         
-    def sync(self):
-        return self.send('Sync')
-    
-    def wait_for_fin(self, event, port_map):
+    def wait_for_fin(self, port_map, NAT_map):
         while True:
-            port = self.sock.recv(5)
-            port_map[port][0].close()
-            port_map[port][1].terminate()
-            del port_map[port]
-            if len(port_map) == 0:
-                break
+            port = str(NAT_map[self.sock.recv(5)])
+            try:
+                port_map[port][0].close()
+                port_map[port][1].terminate()
+                del port_map[port]
+                if len(port_map) == 0:
+                    break
+            except:
+                pass
     
     def terminate(self):
-        self.send('Done')
         self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
 
 def main():
-#    ip = '129.10.115.141'
     ip = '127.0.0.1'
+    ip = '129.10.115.141'
     ports = [55055, 55056, 55057]
     side_channel_port = 55555
     
@@ -120,20 +129,21 @@ def main():
     '''
     ###########################################################################
     '''
+    clients  = []
+    port_map = {}
+    NAT_map  = {}
+
     PRINT_ACTION('Opening side-channel', 0)
     side_channel = SideChannel(SocketInstance(ip, side_channel_port))
-    side_channel.send('New')
-    
-    clients   = []
-    port_map  = {}
     
     PRINT_ACTION('Creating all client sockets', 0)
     for i in range(len(Qs)):
         q = Qs[i]
         client = Client(q.dst_socket.ip, q.dst_socket.port, q.c_s_pair)
-        side_channel.identify_client(client)
         port_map[client.port] = [client]
+        client.identify(side_channel, NAT_map)
         clients.append(client)
+        
     side_channel.send('Done')
     time.sleep(2)
     
@@ -147,8 +157,7 @@ def main():
         p_send.start()
         p_recv.start()
     
-    event = multiprocessing.Event()
-    side_channel.wait_for_fin(event, port_map)
+    side_channel.wait_for_fin(port_map, NAT_map)
     side_channel.terminate()
 
 if __name__=="__main__":
