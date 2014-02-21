@@ -45,33 +45,34 @@ class UDPServer(object):
             client_ip   = client_address[0]
             client_port = client_address[1]
             
-#            print 'mapping'
-#            for ip in mapping:
-#                print '\t', ip
-#                for port in mapping[ip]:
-#                    print '\t\t', port, '\t', mapping[ip][port]
-            
             if client_ip not in mapping:
 #                print 'NEW IP:', client_ip
                 mapping[client_ip] = {}
             
             try:
-                c_s_pair = mapping[client_ip][client_port]
+                (id, c_s_pair) = mapping[client_ip][client_port]
                 if c_s_pair is None:
                     continue
-                mapping[client_ip][client_port] = None
-                p = multiprocessing.Process(target=self.send_Q(Qs[c_s_pair], time.time(), client_address, queue))
+                mapping[client_ip][client_port] = (None, None)
+                p = multiprocessing.Process(target=self.send_Q(Qs[c_s_pair], time.time(), client_address, queue, id))
                 p.start()
             
             except KeyError:
                 print 'New port:', client_address, data
-                data = data.split(';')
-                port = data[0]
+                data     = data.split(';')
+                id       = data[0]
                 c_s_pair = data[1]
-                mapping[client_ip][client_port] = c_s_pair
-                queue.put(client_address)
+                mapping[client_ip][client_port] = (id, c_s_pair)
+                queue.put((id, client_port))
+                
+                print 'mapping'
+                for ip in mapping:
+                    print '\t', ip
+                    for port in mapping[ip]:
+                        print '\t\t', port, '\t', mapping[ip][port]
+                
                         
-    def send_Q(self, Q, time_origin, client_address, queue):
+    def send_Q(self, Q, time_origin, client_address, queue, id):
         '''
         sends a queue of UDP packets, i.e. Q to client_address
         Once done, put on queue to notify client
@@ -87,7 +88,7 @@ class UDPServer(object):
 #            print '\tSent', udp_set.payload, 'to', client_address
         
 #        print '\n\nDONE WITH:', client_address, '\n\n'
-        queue.put(client_address)
+        queue.put((id, client_address[1]))
         
     def terminate(self):
         self.sock.close()
@@ -117,23 +118,34 @@ class SideChannel(object):
         '''
         t1 = threading.Thread(target=self.wait_for_connections)
         t2 = threading.Thread(target=self.notify, args=(queue,))
-        t1.start()
-        t2.start()
+#        t3 = threading.Thread(target=self.clean_map, args=(queue,))
+        
+        map(lambda t: t.start(), [t1, t2, t3])
+        
+        
+#    def clean_map(self):
     
     def notify(self, queue):
         while True:
-            data      = queue.get()
-            client_ip = data[0]
-            port      = data[1]
+            data = queue.get()
+            id   = data[0]
+            port = data[1]
             print '\tNOTIFYING:', data, str(port).zfill(5)
-            self.connection_map[client_ip].sendall(str(port).zfill(5))
+            self.connection_map[id].sendall(str(port).zfill(5))
             
     def wait_for_connections(self):
         while True:
             connection, client_address = self.sock.accept()
-            self.connection_map[client_address[0]] = connection
-#            print 'connection:', connection, hash(connection)
-            
+            t = threading.Thread(target=self.handle_connection, args=(connection,))
+            t.start()
+    
+    def handle_connection(self, connection):
+        id = connection.recv(10)
+        self.connection_map[id] = connection
+        print 'self.connection_map:'
+        for id in self.connection_map:
+            print '\t', id, self.connection_map[id]
+    
     def terminate(self):
         self.sock.close()
 
