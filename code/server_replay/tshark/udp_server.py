@@ -24,39 +24,58 @@ class UDPServer(object):
         self.sock.bind((self.instance.ip, self.instance.port))
         print 'Created server at:', instance
             
-    def wait_for_client(self, mapping, Qs, queue):
+    def run(self, mapping, Qs, queue):
+        '''
+        Receives UDP packets.
+        
+        Every time a packet comes in:
+            - If the IP is not in mapping --> it's a new client, add it to mapping
+            - mapping[client_ip][client_port] doesn't exist --> New port, add it to mapping 
+              and put on the queue to acknowledge the client
+            - if mapping[client_ip][client_port] == None --> Already started sending packets to this
+              client:port
+            - else fire off send_Q to send packets to this client:port
+            
+        mapping[client_ip][client_port] = c_s_pair (or None if already taken care of)
+        '''
         while True:
             data, client_address = self.sock.recvfrom(4096)
-            print "{} from {} @ {}".format(data, client_address, self.instance.port)
+#            print "{} from {} @ {}".format(data, client_address, self.instance.port)
             
             client_ip   = client_address[0]
             client_port = client_address[1]
             
+#            print 'mapping'
+#            for ip in mapping:
+#                print '\t', ip
+#                for port in mapping[ip]:
+#                    print '\t\t', port, '\t', mapping[ip][port]
+            
             if client_ip not in mapping:
-                print 'NEW IP:', client_ip
+#                print 'NEW IP:', client_ip
                 mapping[client_ip] = {}
             
             try:
                 c_s_pair = mapping[client_ip][client_port]
                 if c_s_pair is None:
-                    pass
+                    continue
                 mapping[client_ip][client_port] = None
                 p = multiprocessing.Process(target=self.send_Q(Qs[c_s_pair], time.time(), client_address, queue))
                 p.start()
+            
             except KeyError:
-                print 'New port:', client_address
-                mapping[client_ip][client_port] = data
+                print 'New port:', client_address, data
+                data = data.split(';')
+                port = data[0]
+                c_s_pair = data[1]
+                mapping[client_ip][client_port] = c_s_pair
                 queue.put(client_address)
-                print  queue.qsize()
                         
-    def receive(self):
-        while True:
-            data, client_address = self.sock.recvfrom(4096)
-            print data, 'from', client_address, 'at', self.instance.port
-            if data == 'CloseTheSocket':
-                break
-    
     def send_Q(self, Q, time_origin, client_address, queue):
+        '''
+        sends a queue of UDP packets, i.e. Q to client_address
+        Once done, put on queue to notify client
+        '''
         if time.time() < time_origin + Q.starttime:
             time.sleep((time_origin + Q.starttime) - time.time())
         
@@ -65,9 +84,9 @@ class UDPServer(object):
             if time.time() < time_origin + udp_set.timestamp:
                 time.sleep((time_origin + udp_set.timestamp) - time.time())
             self.sock.sendto(udp_set.payload, client_address)
-            print '\tSent', udp_set.payload, 'to', client_address
+#            print '\tSent', udp_set.payload, 'to', client_address
         
-        print '\n\nDONE WITH:', client_address, '\n\n'
+#        print '\n\nDONE WITH:', client_address, '\n\n'
         queue.put(client_address)
         
     def terminate(self):
@@ -75,15 +94,27 @@ class UDPServer(object):
 
 class SideChannel(object):
     def __init__(self, instance):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        self.sock.bind((instance.ip, instance.port))
-        self.sock.listen(1)
         self.connection_map = {}
-        self.queue = None
+        self.sock = self.create_socket(instance)
+    
+    def create_socket(self, instance):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        sock.bind((instance.ip, instance.port))
+        sock.listen(1)
+        return sock
     
     def run(self, queue):
+        '''
+        SideChannel has two main method that should be always running
+        
+            1- wait_for_connections: every time a new connection comes in, it stores/updates
+               connection_map for future conversations with the client
+            2- notify: constantly gets jobs from a queue and notifies clients.
+               This could be acknowledgment of new port or notifying of a send_Q end so
+               the client can stop the receiving thread on the socket.
+        '''
         t1 = threading.Thread(target=self.wait_for_connections)
         t2 = threading.Thread(target=self.notify, args=(queue,))
         t1.start()
@@ -91,20 +122,19 @@ class SideChannel(object):
     
     def notify(self, queue):
         while True:
-            print 'Waiting to read from queue...'
             data      = queue.get()
             client_ip = data[0]
             port      = data[1]
-            print 'Sending', port, 'TO', client_ip
-            self.connection_map[client_ip].sendall(str(port))
+            print '\tNOTIFYING:', data, str(port).zfill(5)
+            self.connection_map[client_ip].sendall(str(port).zfill(5))
             
     def wait_for_connections(self):
         while True:
             connection, client_address = self.sock.accept()
             self.connection_map[client_address[0]] = connection
+#            print 'connection:', connection, hash(connection)
             
     def terminate(self):
-        self.live = False
         self.sock.close()
 
 def create_test_Qs(ports):
@@ -144,8 +174,6 @@ def create_test_Qs(ports):
 
 def main():
     PRINT_ACTION('Creating test Qs', 0)
-    ip = '127.0.0.1'
-    ip = '129.10.115.141'
     ip = ''
     sidechannel_port = 55555
     
@@ -154,12 +182,10 @@ def main():
     '''
     ###########################################################################
     mapping: mapping[client_ip][port] = c_s_pair
-             Gets populated in SideChannel.handle_connection()
-             Every time a connection comes in, mapping[client_ip] is set to {},
-             then the client keeps identifying what port is for what c_s_pair
-    ########################################################################### 
+             Gets populated by servers is UDPServer.run (see description of run())
+    ###########################################################################
     '''    
-    PRINT_ACTION('Creating servers', 0)
+    PRINT_ACTION('Creating servers for all ports', 0)
     threads = []
     servers = []
     mapping = {}
@@ -167,12 +193,11 @@ def main():
     
     for port in ports:
         servers.append(UDPServer(SocketInstance(ip, port)))
-        t = threading.Thread(target=servers[-1].wait_for_client, args=[mapping, Qs, queue])
+        t = threading.Thread(target=servers[-1].run, args=[mapping, Qs, queue])
         t.start()
         threads.append(t)
     
-    PRINT_ACTION('Creating side-channel', 0)
-    
+    PRINT_ACTION('Creating and running the side channel', 0)
     side_channel = SideChannel(SocketInstance(ip, sidechannel_port))
     side_channel.run(queue)
     

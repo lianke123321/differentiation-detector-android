@@ -102,7 +102,7 @@ class SendRecv(object):
             waitlist.remove(q.c_s_pair)
             event.set()
         else:
-            if DEBUG0: print '\tWaiting for responce', q.c_s_pair, q.response_len
+            if DEBUG0: print '\tWaiting for response', q.c_s_pair, q.response_len
             event.set()
             buffer_len = 0
             while True:
