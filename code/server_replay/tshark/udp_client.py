@@ -18,15 +18,22 @@ from python_lib import *
 
 class Client(object):
     def __init__(self, dst_ip, dst_port, c_s_pair):
+        self.c_s_pair = c_s_pair
         self.dst_ip   = dst_ip
         self.dst_port = dst_port
-        self.c_s_pair = c_s_pair
-        self.sock     = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        '''This is to force the socket to bind to a port'''
-        self.sock.sendto('', ('127.0.0.1', 100))
-        self.port = str(self.sock.getsockname()[1]).zfill(5)
-        
+        self.sock, self.port = self.create_socket()
+    
+    def create_socket(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        '''Following line is a dummy send in order to force the socket to bind to a port'''
+        sock.sendto('', ('127.0.0.1', 100))
+        port = str(sock.getsockname()[1]).zfill(5)
+        return sock, port
+    
     def send_Q(self, Q, time_origin, side_channel):
+        '''
+        sends a queue of UDP packets, i.e. Q to server
+        '''
         if time.time() < time_origin + Q.starttime:
             time.sleep((time_origin + Q.starttime) - time.time())
 
@@ -36,19 +43,30 @@ class Client(object):
                 time.sleep((time_origin + udp_set.timestamp) - time.time())
             self.sock.sendto(udp_set.payload, (self.dst_ip, self.dst_port))
             print "sent:", udp_set.payload
-        
-        self.sock.sendto('CloseTheSocket', (self.dst_ip, self.dst_port))
-        self.close()
     
     def receive(self):
+        '''
+        Keeps receiving on the socket.
+        It will be terminated by the side channel when a send done cofirmation
+        is received from the server.
+        '''
         while True:
             data = self.sock.recv(4096)
             print '\tGot: ', data
     
     def identify(self, side_channel, NAT_map):
+        '''
+        Before anything, client needs to identify itself to the server and tell
+        which c_s_pair it will be replaying.
+        To do so, it sends the c_s_pair to server, waits for 1 second, and checks
+        if side channel has received a confirmation. It keeps identifying until 
+        acknowledgment is received from server.
+        '''
         while True:
             print '\tIdentifying:', self.port, '...',; sys.stdout.flush()
-            self.sock.sendto(self.c_s_pair, (self.dst_ip, self.dst_port))
+            message = ';'.join([str(self.port).zfill(5), self.c_s_pair])
+            self.sock.sendto(message, (self.dst_ip, self.dst_port))
+#            self.sock.sendto(self.c_s_pair, (self.dst_ip, self.dst_port))
             r, w, e = select.select([side_channel.sock], [], [], 1)
             if r:
                 NAT_port = r[0].recv(5)
@@ -76,14 +94,11 @@ class SideChannel(object):
     def wait_for_fin(self, port_map, NAT_map):
         while True:
             port = str(NAT_map[self.sock.recv(5)])
-            try:
-                port_map[port][0].close()
-                port_map[port][1].terminate()
-                del port_map[port]
-                if len(port_map) == 0:
-                    break
-            except:
-                pass
+            port_map[port][0].close()
+            port_map[port][1].terminate()
+            del port_map[port]
+            if len(port_map) == 0:
+                break
     
     def terminate(self):
         self.sock.shutdown(socket.SHUT_RDWR)
@@ -144,9 +159,6 @@ def main():
         client.identify(side_channel, NAT_map)
         clients.append(client)
         
-    side_channel.send('Done')
-    time.sleep(2)
-    
     PRINT_ACTION('Firing off all client sockets', 0)
     origin_time  = time.time()
     for i in range(len(Qs)):
