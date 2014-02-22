@@ -13,7 +13,7 @@ Usage:
 #######################################################################################################
 #######################################################################################################
 '''
-import sys, socket, time, random, numpy, multiprocessing, threading, select
+import sys, socket, time, random, numpy, multiprocessing, threading, select, string
 from python_lib import *
 
 class Client(object):
@@ -54,7 +54,7 @@ class Client(object):
             data = self.sock.recv(4096)
             print '\tGot: ', data
     
-    def identify(self, side_channel, NAT_map):
+    def identify(self, side_channel, NAT_map, id):
         '''
         Before anything, client needs to identify itself to the server and tell
         which c_s_pair it will be replaying.
@@ -64,7 +64,7 @@ class Client(object):
         '''
         while True:
             print '\tIdentifying:', self.port, '...',; sys.stdout.flush()
-            message = ';'.join([str(self.port).zfill(5), self.c_s_pair])
+            message = ';'.join([id, self.c_s_pair])
             self.sock.sendto(message, (self.dst_ip, self.dst_port))
 #            self.sock.sendto(self.c_s_pair, (self.dst_ip, self.dst_port))
             r, w, e = select.select([side_channel.sock], [], [], 1)
@@ -78,19 +78,13 @@ class Client(object):
         self.sock.close()
 
 class SideChannel(object):
-    def __init__(self, instance):
+    def __init__(self, instance, id):
+        self.id       = id
         self.instance = instance
         self.sock     = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.sock.connect((self.instance.ip, self.instance.port))
     
-    def identify_client(self, client):
-        message = ';'.join([client.c_s_pair, client.port])
-        self.send(message)
-    
-    def send(self, message):
-        return self.sock.sendall(message)
-        
     def wait_for_fin(self, port_map, NAT_map):
         while True:
             port = str(NAT_map[self.sock.recv(5)])
@@ -100,9 +94,19 @@ class SideChannel(object):
             if len(port_map) == 0:
                 break
     
+    def declare_id(self):
+        self.send(self.id)
+    
+    def send(self, message):
+        return self.sock.sendall(message)
+        
     def terminate(self):
+        self.sock.sendall(self.id)
         self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
+
+def id_generator(size=10, chars=string.ascii_letters + string.digits):
+    return ''.join(random.choice(chars) for x in range(size))
 
 def main():
     ip = '127.0.0.1'
@@ -144,22 +148,25 @@ def main():
     '''
     ###########################################################################
     '''
+    id = id_generator()
     clients  = []
     port_map = {}
     NAT_map  = {}
 
     PRINT_ACTION('Opening side-channel', 0)
-    side_channel = SideChannel(SocketInstance(ip, side_channel_port))
+    side_channel = SideChannel(SocketInstance(ip, side_channel_port), id)
+    side_channel.declare_id()
     
     PRINT_ACTION('Creating all client sockets', 0)
     for i in range(len(Qs)):
         q = Qs[i]
         client = Client(q.dst_socket.ip, q.dst_socket.port, q.c_s_pair)
         port_map[client.port] = [client]
-        client.identify(side_channel, NAT_map)
+        client.identify(side_channel, NAT_map, id)
         clients.append(client)
         
     PRINT_ACTION('Firing off all client sockets', 0)
+    send_processes = []
     origin_time  = time.time()
     for i in range(len(Qs)):
         client = clients[i]
@@ -168,8 +175,11 @@ def main():
         port_map[client.port].append(p_recv)
         p_send.start()
         p_recv.start()
+        send_processes.append(p_send)
     
     side_channel.wait_for_fin(port_map, NAT_map)
+    for p in send_processes:
+        p.join()
     side_channel.terminate()
 
 if __name__=="__main__":
