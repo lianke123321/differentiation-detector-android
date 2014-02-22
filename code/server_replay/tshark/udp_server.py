@@ -17,6 +17,8 @@ import sys, socket, threading, time, multiprocessing, numpy, select
 
 from python_lib import *
 
+DEBUG = 2
+
 class UDPServer(object):
     def __init__(self, instance):
         self.instance = instance
@@ -40,13 +42,11 @@ class UDPServer(object):
         '''
         while True:
             data, client_address = self.sock.recvfrom(4096)
-#            print "{} from {} @ {}".format(data, client_address, self.instance.port)
             
             client_ip   = client_address[0]
             client_port = client_address[1]
             
             if client_ip not in mapping:
-#                print 'NEW IP:', client_ip
                 mapping[client_ip] = {}
             
             try:
@@ -58,18 +58,19 @@ class UDPServer(object):
                 p.start()
             
             except KeyError:
-                print 'New port:', client_address, data
+                if DEBUG == 1: print 'New port:', client_address, data
                 data     = data.split(';')
                 id       = data[0]
                 c_s_pair = data[1]
                 mapping[client_ip][client_port] = (id, c_s_pair)
                 queue.put((id, client_port))
                 
-                print 'mapping'
-                for ip in mapping:
-                    print '\t', ip
-                    for port in mapping[ip]:
-                        print '\t\t', port, '\t', mapping[ip][port]
+                if DEBUG == 2:
+                    print 'mapping'
+                    for ip in mapping:
+                        print '\t', ip
+                        for port in mapping[ip]:
+                            print '\t\t', port, '\t', mapping[ip][port]
                 
                         
     def send_Q(self, Q, time_origin, client_address, queue, id):
@@ -85,9 +86,7 @@ class UDPServer(object):
             if time.time() < time_origin + udp_set.timestamp:
                 time.sleep((time_origin + udp_set.timestamp) - time.time())
             self.sock.sendto(udp_set.payload, client_address)
-#            print '\tSent', udp_set.payload, 'to', client_address
         
-#        print '\n\nDONE WITH:', client_address, '\n\n'
         queue.put((id, client_address[1]))
         
     def terminate(self):
@@ -95,7 +94,8 @@ class UDPServer(object):
 
 class SideChannel(object):
     def __init__(self, instance):
-        self.connection_map = {}
+        self.connection_map  = {}
+        self.connection_list = []
         self.sock = self.create_socket(instance)
     
     def create_socket(self, instance):
@@ -116,21 +116,17 @@ class SideChannel(object):
                This could be acknowledgment of new port or notifying of a send_Q end so
                the client can stop the receiving thread on the socket.
         '''
+        
         t1 = threading.Thread(target=self.wait_for_connections)
-        t2 = threading.Thread(target=self.notify, args=(queue,))
-#        t3 = threading.Thread(target=self.clean_map, args=(queue,))
+        t2 = threading.Thread(target=self.notify, args=(queue,))        
+        map(lambda t: t.start(), [t1, t2])
         
-        map(lambda t: t.start(), [t1, t2, t3])
-        
-        
-#    def clean_map(self):
-    
     def notify(self, queue):
         while True:
             data = queue.get()
             id   = data[0]
             port = data[1]
-            print '\tNOTIFYING:', data, str(port).zfill(5)
+            if DEBUG==1: print '\tNOTIFYING:', data, str(port).zfill(5)
             self.connection_map[id].sendall(str(port).zfill(5))
             
     def wait_for_connections(self):
@@ -142,9 +138,12 @@ class SideChannel(object):
     def handle_connection(self, connection):
         id = connection.recv(10)
         self.connection_map[id] = connection
-        print 'self.connection_map:'
-        for id in self.connection_map:
-            print '\t', id, self.connection_map[id]
+        self.connection_list.append(connection)
+#        print 'self.connection_map:'
+#        for id in self.connection_map:
+#            print '\t', id, self.connection_map[id]
+        id = connection.recv(10)
+        del self.connection_map[id]
     
     def terminate(self):
         self.sock.close()
