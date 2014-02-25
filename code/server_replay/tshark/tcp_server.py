@@ -57,7 +57,7 @@ class Server(object):
         self._socket = sock
         if DEBUG == 0: print 'Created socket server:', (self._host, self._port)
         sock.listen(1)
-    def handle_connection(self, table, connection, client_address):
+    def handle_connection(self, table, connection, client_address, timing):
         '''
         table = [ResponseSet, ...]
         ResponseSet has these attributes: request_len, request_hash, and response_list
@@ -91,8 +91,9 @@ class Server(object):
                     for i in range(len(response_set.response_list)):
                         res       = response_set.response_list[i].payload
                         timestamp = response_set.response_list[i].timestamp
-                        if time.time() < time_origin + timestamp:
-                            time.sleep((time_origin + timestamp) - time.time())
+                        if timing:
+                            if time.time() < time_origin + timestamp:
+                                time.sleep((time_origin + timestamp) - time.time())
                         connection.sendall(str(res))
                         if DEBUG == 0: print '\tSent\t', i+1, '\t', len(res) 
                 if table_pointer < len(table):
@@ -107,7 +108,7 @@ class Server(object):
         time.sleep(2)
         connection.shutdown(socket.SHUT_RDWR)
         connection.close()
-    def run_socket_server(self, table, expected_conn_num):
+    def run_socket_server(self, table, expected_conn_num, timing):
         '''
         Every time a connection comes in, it dispatches it to a thread to handle the connection
         
@@ -133,7 +134,7 @@ class Server(object):
             a thread with corresponding table, i.e. table[c_s_pair] to handle this connection.
             '''
             c_s_pair = connection.recv(43)
-            t = threading.Thread(target=self.handle_connection, args=[table[c_s_pair], connection, client_address])
+            t = threading.Thread(target=self.handle_connection, args=[table[c_s_pair], connection, client_address, timing])
             t.start()
             conns_count += 1
             if DEBUG == 2: print '\t', self._port, ':', conns_count, 'out of', expected_conn_num
@@ -168,6 +169,7 @@ def run():
     configs.set('rounds', 1)
     configs.set('vpn-no-vpn', False)
     configs.set('original_ports', True)
+    configs.set('timing', True)
     configs.set('ports_file', '/tmp/free_ports')
     configs.set('instance', 'meddle')   #Add your instance to Instance class in python_lib.py
     
@@ -247,7 +249,7 @@ def run():
     
     PRINT_ACTION('Running servers', 0)
     for port in distinct_ports:
-        t = threading.Thread(target=threads[port].run_socket_server, args=[table, distinct_ports[port]])
+        t = threading.Thread(target=threads[port].run_socket_server, args=[table, distinct_ports[port], configs.get('timing')])
         t.start()
     
     if not configs.get('original_ports'):
