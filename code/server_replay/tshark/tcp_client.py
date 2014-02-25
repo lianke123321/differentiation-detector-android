@@ -141,21 +141,22 @@ class Queue(object):
         self.sendlist    = []
         self.time_origin = 0
         self.connections = Connections()
-    def next(self):
+    def next(self, timing):
         if (len(self.sendlist) == 0):
             q = self.Q[0]
             if (q.c_s_pair not in self.waitlist):
-                if time.time() < self.time_origin + q.timestamp:
-                    time.sleep((self.time_origin + q.timestamp) - time.time())
+                if timing:
+                    if time.time() < self.time_origin + q.timestamp:
+                        time.sleep((self.time_origin + q.timestamp) - time.time())
                 self.Q.pop(0)
                 self.waitlist.append(q.c_s_pair)
                 self.sendlist.append(q.c_s_pair)
                 t = threading.Thread(target=SendRecv().send_single_request, args=[q, self.waitlist, self.sendlist, self.event, self.connections])
                 t.start()
-    def run(self):
+    def run(self, timing):
         self.time_origin = time.time()
         while self.Q:
-            self.next()
+            self.next(timing)
             self.event.wait()
             self.event.clear()  #The loop pauses here and waits for event.set().
                                 #event.set() will be done inside send_single_request
@@ -173,6 +174,7 @@ def run(argv):
     configs = Configs()
     configs.set('original_ports', True)
     configs.set('instance', 'meddle')
+    configs.set('timing', True)
     
     configs.read_args(sys.argv)
     
@@ -199,7 +201,7 @@ def run(argv):
     queue = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
 
     PRINT_ACTION('Firing off ...', 0)
-    Queue(queue).run()
+    Queue(queue).run(configs.get('timing'))
     configs.reset()
     
 def main():
