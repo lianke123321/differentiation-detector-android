@@ -14,7 +14,7 @@ ps aux | grep "python udp_server.py" |  awk '{ print $2}' | xargs kill -9
 #######################################################################################################
 #######################################################################################################
 '''
-import sys, socket, threading, time, multiprocessing, numpy, select, traceback
+import sys, socket, threading, time, multiprocessing, numpy, select, traceback, pickle
 
 from python_lib import *
 
@@ -51,7 +51,7 @@ class UDPServer(object):
             client_ip   = client_address[0]
             client_port = str(client_address[1]).zfill(5)
             
-            print 'got:', data
+            print 'got:', data, client_ip, client_port
             
             if client_ip not in mapping:
                 mapping[client_ip] = {}
@@ -77,12 +77,7 @@ class UDPServer(object):
         Sends a queue of UDP packets to client socket
         Once done, put on queue to notify client
         '''
-        if timing:
-            if time.time() < time_origin + Q.starttime:
-                time.sleep((time_origin + Q.starttime) - time.time())
-        
-        for i in range(len(Q.Q)):
-            udp_set = Q.Q[i]
+        for udp_set in Q:
             if timing:
                 if time.time() < time_origin + udp_set.timestamp:
                     time.sleep((time_origin + udp_set.timestamp) - time.time())
@@ -177,11 +172,9 @@ def create_test_Qs(ports):
     ###########################################################################
     Making a test random Q
     
-    Qs[c_s_pair] = UDPQueue
-    
-    UDPQueue --> Q, c_s_pair, starttime, dst_socket
-                 Q = [UDPset]
-                 UDPset --> payload, timestamp
+    Qs[c_s_pair] = [UDPset, UDPset, ...]
+
+    UDPset --> payload, timestamp
     ########################################################################### 
     '''
     Qs         = {}
@@ -191,16 +184,12 @@ def create_test_Qs(ports):
     for i in range(len(ports)):
         port = ports[i]
         c_s_pair = 'XXX.XXX.XXX.XXX.XXXXX-XXX.XXX.XXX.XXX.' + str(port)
-        timestamps = sorted([abs(numpy.random.normal(loc=1, scale=1, size=None)) for i in range(test_count+1)])
-        
-        queue = UDPQueue(starttime  = timestamps[0],
-                         dst_socket = None,
-                         c_s_pair   = c_s_pair)
+        timestamps = sorted([abs(numpy.random.normal(loc=1, scale=1, size=None)) for k in range(test_count)])
+        Qs[c_s_pair] = []
         
         for j in range(test_count):
-            payload   = ''.join([c_s_pair , '_SERVER_' , str(j)])
-            queue.Q.append(UDPset(payload, timestamps[j+1], c_s_pair))
-        Qs[c_s_pair.ljust(43)] = queue
+            payload = str(i) + '-' + str(j)
+            Qs[c_s_pair].append(UDPset(payload, timestamps[j], c_s_pair))
     
     for c_s_pair in Qs:
         print '\t', Qs[c_s_pair]
@@ -212,8 +201,6 @@ def main():
     PRINT_ACTION('Creating test Qs', 0)
     ip = ''
     sidechannel_port = 55555
-    
-    Qs, ports = create_test_Qs(ip)
     
     '''
     ###########################################################################
@@ -236,12 +223,17 @@ def main():
     notify_queue      = multiprocessing.Queue()
     map_cleaner_queue = multiprocessing.Queue()
     
+    PRINT_ACTION('Loading server queues', 0)
+    Qs = pickle.load(open(configs.get('pcap_file') +'_server_pickle', 'rb'))
+#    Qs, ports = create_test_Qs(ip)
+    
     PRINT_ACTION('Firing off map_cleaner', 0)
     t = threading.Thread(target=map_cleaner, args=[mapping, map_cleaner_queue])
     t.start()
     
     PRINT_ACTION('Creating and running UDP servers', 0)
-    for port in ports:
+    for c_s_pair in Qs:
+        port = int(c_s_pair[-5:])
         servers.append(UDPServer(SocketInstance(ip, port)))
         t = threading.Thread(target=servers[-1].run, args=[mapping, Qs, notify_queue, configs.get('timing')])
         t.start()
