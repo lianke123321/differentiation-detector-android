@@ -47,11 +47,12 @@ class UDPQueue(object):
                 '\n\t'.join([(udp_set.payload + '\t' + str(udp_set.timestamp)) for udp_set in self.Q]))
 
 class UDPset(object):
-    def __init__(self, payload, timestamp):
+    def __init__(self, payload, timestamp, c_s_pair):
         self.payload   = payload
         self.timestamp = timestamp
+        self.c_s_pair  = c_s_pair
     def __str__(self):
-        return '{}:{}'.format(self.payload, self.timestamp)
+        return '{}--{}--{}'.format(self.payload, self.timestamp, self.c_s_pair)
 
 class SocketInstance():
     def __init__(self, ip, port, name=None):
