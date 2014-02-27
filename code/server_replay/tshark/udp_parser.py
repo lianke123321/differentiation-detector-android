@@ -7,7 +7,13 @@ def parse(pcap_file, client_ip):
     This function parses a UDP pcap file (main traffic over UDP) and creates pickle dumps of
     following objects:
     
-        clinet_dump : 
+        1) server_Q[c_s_pair] = [UDPSet, UDPSet, ...]
+        2) client_Q = [UDPSet, UDPSet, ...]
+        3) c_s_pairs = [c_s_pair, c_s_pair, ...]
+
+
+    NOTE: we assume a request-response setting, meaning the traffic ALWAYS starts
+          with a packed from client (will be validated once parsing more real traffic pcaps)
     '''
     
     udp_counter = 0
@@ -33,6 +39,15 @@ def parse(pcap_file, client_ip):
         src_ip = p['IP'].src
         dst_ip = p['IP'].dst
         
+        '''
+        time_origin is the time of the very first client udp packet
+        
+        server_time_origins[c_s_pair] is the very first time we see a client udp
+        packet on that c_s_pair, so it serves as the time origin for server packets 
+        
+        NOTE: we assume a request-response setting, meaning the traffic ALWAYS starts
+              with a packed from client
+        '''
         if time_origin == None:
             time_origin = p.time
         
