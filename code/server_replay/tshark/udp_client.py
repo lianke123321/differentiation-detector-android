@@ -13,7 +13,7 @@ Usage:
 #######################################################################################################
 #######################################################################################################
 '''
-import sys, socket, time, random, numpy, multiprocessing, threading, select, string
+import sys, socket, time, random, numpy, multiprocessing, threading, select, string, pickle
 from python_lib import *
 
 class Client(object):
@@ -43,7 +43,7 @@ class Client(object):
         The ack contains clients external port (NAT port) which is stored for later use.
         '''
         while True:
-            print '\tIdentifying:', self.port, '...',; sys.stdout.flush()
+            print '\tIdentifying:', id, self.port, '...',; sys.stdout.flush()
             message = ';'.join([id, self.c_s_pair])
             self.sock.sendto(message, (self.dst_ip, self.dst_port))
             r, w, e = select.select([side_channel.sock], [], [], 1)
@@ -194,7 +194,10 @@ def main():
     clients           = []
     port_map          = {}
     NAT_map           = {}
-    Q, c_s_pairs      = create_test_Q()
+    
+    PRINT_ACTION('Loading the queue', 0)
+#    Q, c_s_pairs      = create_test_Q()
+    Q, c_s_pairs = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
     
     PRINT_ACTION('Creating side channel and declaring client id', 0)
     side_channel = SideChannel(SocketInstance(configs.get('instance').host, side_channel_port), id)
@@ -213,9 +216,11 @@ def main():
         c_s_pair_mapping[c_s_pair] = client
         clients.append(client)
     
-    send_proccess = multiprocessing.Process(target=Queue(Q).run(c_s_pair_mapping, configs.get('timing')))
-
+    send_proccess = multiprocessing.Process(target=Queue(Q).run, args=(c_s_pair_mapping, configs.get('timing'),))
+    send_proccess.start()
+    
     side_channel.wait_for_fin(port_map, NAT_map)
+    send_proccess.join()
     side_channel.terminate(clients)
 
 if __name__=="__main__":

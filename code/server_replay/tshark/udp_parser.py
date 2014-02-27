@@ -3,6 +3,13 @@ from python_lib import *
 from scapy.all import *
 
 def parse(pcap_file, client_ip):
+    '''
+    This function parses a UDP pcap file (main traffic over UDP) and creates pickle dumps of
+    following objects:
+    
+        clinet_dump : 
+    '''
+    
     udp_counter = 0
     client_Q  = []
     server_Q  = {}
@@ -59,9 +66,8 @@ def parse(pcap_file, client_ip):
     print c_s_pairs
     print udp_counter
     
-    pickle.dump(client_Q , open((pcap_file+'_client_pickle'), "wb" ))
-    pickle.dump(server_Q , open((pcap_file+'_server_pickle'), "wb" ))
-    pickle.dump(c_s_pairs, open((pcap_file+'_c_s_pairs')    , "wb" ))
+    pickle.dump((client_Q, c_s_pairs) , open((pcap_file+'_client_pickle'), "wb" ), 3)
+    pickle.dump(server_Q , open((pcap_file+'_server_pickle'), "wb" ), 3)
     
 def main():
     pcap = sys.argv[1]
