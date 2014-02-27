@@ -22,6 +22,11 @@ echo "${query}"
 mysql -u "${dbUserName}" --password="${dbPassword}" -D "${dbName}" -e "${query}"
 echo "${clientName} : XAUTH \"${clientPassword}\"" >> ${MEDDLE_ETC}/ipsec.secrets
 
+authCode=`date +%s``uptime``free`${clientName}
+authCode=`echo ${authCode}| md5sum | cut -d ' ' -f 1`
+query="insert Into UserAuthMap  SELECT max(userID)+1, '${authCode}' FROM UserAuthMap;"
+mysql -u "${dbUserName}" --password="${dbPassword}" -D "${dbName}" -e "${query}"
+
 echo "Making strongswan load the new credentials"
 ${MEDDLE_ROOT}/usr/sbin/ipsec rereadall 
 
