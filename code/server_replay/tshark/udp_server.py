@@ -48,10 +48,10 @@ class UDPServer(object):
         while True:
             data, client_address = self.sock.recvfrom(4096)
             
-            print 'got:', data
-            
             client_ip   = client_address[0]
             client_port = str(client_address[1]).zfill(5)
+            
+            print 'got:', data
             
             if client_ip not in mapping:
                 mapping[client_ip] = {}
@@ -189,8 +189,8 @@ def create_test_Qs(ports):
     ports      = [55055, 55056, 55057]
     
     for i in range(len(ports)):
-        c_s_pair = ''.join(['c_s_pair_' , str(i)])
         port = ports[i]
+        c_s_pair = 'XXX.XXX.XXX.XXX.XXXXX-XXX.XXX.XXX.XXX.' + str(port)
         timestamps = sorted([abs(numpy.random.normal(loc=1, scale=1, size=None)) for i in range(test_count+1)])
         
         queue = UDPQueue(starttime  = timestamps[0],
@@ -198,8 +198,8 @@ def create_test_Qs(ports):
                          c_s_pair   = c_s_pair)
         
         for j in range(test_count):
-            payload   = ''.join([c_s_pair , '_' , str(j)])
-            queue.Q.append(UDPset(payload, timestamps[j+1]))
+            payload   = ''.join([c_s_pair , '_SERVER_' , str(j)])
+            queue.Q.append(UDPset(payload, timestamps[j+1], c_s_pair))
         Qs[c_s_pair.ljust(43)] = queue
     
     for c_s_pair in Qs:
