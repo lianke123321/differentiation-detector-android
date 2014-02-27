@@ -11,7 +11,7 @@ packet_dic:
 
 import pickle, copy, os, sys, linecache, ConfigParser
 import python_lib
-from python_lib import RequestSet, ResponseSet, OneResponse
+from python_lib import RequestSet, ResponseSet, OneResponse, convert_ip
 from scapy.all import *
 from scapy.error import Scapy_Exception
 
@@ -176,16 +176,6 @@ def map_follows(follows_dir, client_ip):
             os.system(('cp ' + file + ' ' + outfile))
     print 'map_follows Done:', len(follow_files)  
     return follow_files
-def convert_ip(ip):
-    '''
-    converts ip.port to tcpflow format
-    ip.port = 1.2.3.4.1234
-    tcpflow format = 001.002.003.004.01234
-    '''
-    l     = ip.split('.')
-    l[:4] = map(lambda x : x.zfill(3), l[:4])
-    l[4]  = l[4].zfill(5)
-    return '.'.join(l)
 def read_payload(c_s_pair, talking, where_in_file, file):
     node0 = convert_ip(((linecache.getline(file, 5)).split()[2]).replace(':', '.'))
     node1 = convert_ip(((linecache.getline(file, 6)).split()[2]).replace(':', '.'))
