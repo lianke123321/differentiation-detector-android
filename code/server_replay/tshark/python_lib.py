@@ -32,6 +32,18 @@ def dir_list(dir_name, subdir, *args):
             fileList += dir_list(dirfile, subdir, *args)
     return fileList
 
+
+def convert_ip(ip):
+    '''
+    converts ip.port to tcpflow format
+    ip.port = 1.2.3.4.1234
+    tcpflow format = 001.002.003.004.01234
+    '''
+    l     = ip.split('.')
+    l[:4] = map(lambda x : x.zfill(3), l[:4])
+    l[4]  = l[4].zfill(5)
+    return '.'.join(l)
+
 class UDPQueue(object):
     def __init__(self, starttime=None, dst_socket=None, c_s_pair=None):
         self.Q          = []

@@ -2,6 +2,10 @@
 #######################################################################################################
 #######################################################################################################
 
+JUST FOR REFERENCE
+
+CLIENTS ARE INDEPENDENT INSTEAD OF ONE QUEUE
+
 by: Arash Molavi Kakhki (arash@ccs.neu.edu)
     Northeastern University
     
@@ -21,10 +25,10 @@ class Client(object):
         self.c_s_pair = c_s_pair
         self.dst_ip   = dst_ip
         self.dst_port = dst_port
-        self.sock, self.port = self._create_socket()
+        self.sock, self.port = self.create_socket()
         self.NAT_port = None
     
-    def _create_socket(self):
+    def create_socket(self):
         '''
         Creates UDP socket and force it to bind to a port by sending a dummpy packet
         '''
@@ -33,9 +37,21 @@ class Client(object):
         port = str(sock.getsockname()[1]).zfill(5)
         return sock, port
     
-    def send_udp_packet(self, udp_payload):
-        self.sock.sendto(udp_payload, (self.dst_ip, self.dst_port))
-        print "sent:", udp_set.payload
+    def send_Q(self, Q, time_origin, timing):
+        '''
+        sends a queue of UDP packets to a socket server
+        '''
+        if timing:
+            if time.time() < time_origin + Q.starttime:
+                time.sleep((time_origin + Q.starttime) - time.time())
+
+        for i in range(len(Q.Q)):
+            udp_set = Q.Q[i]
+            if timing:
+                if time.time() < time_origin + udp_set.timestamp:
+                    time.sleep((time_origin + udp_set.timestamp) - time.time())
+            self.sock.sendto(udp_set.payload, (self.dst_ip, self.dst_port))
+            print "sent:", udp_set.payload
         
     def receive(self):
         '''
@@ -70,19 +86,6 @@ class Client(object):
     def close(self):
         self.sock.close()
 
-class Queue(object):
-    def __init__(self, udp_queue):
-        self.Q = udp_queue
-        
-    def run(self, c_s_pair_mapping, timing):
-        time_origin = time.time()
-        for udp in self.Q:
-            if timing:
-                if time.time() < time_origin + udp.timestamp:
-                    time.sleep((time_origin + udp.timestamp) - time.time())
-        
-            c_s_pair_mapping[udp.c_s_pair].send_send_udp_packet(udp.payload)
-    
 class SideChannel(object):
     def __init__(self, instance, id):
         self.id       = id
@@ -131,33 +134,37 @@ class SideChannel(object):
 def id_generator(size=10, chars=string.ascii_letters + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
 
-def create_test_Q():
+def create_test_Qs():
     '''
     Making a test random Q
     
-    Q = [UDPset, UDPset, ...]
-        
-        UDPset --> payload, timestamp, c_s_pair
+    Qs[c_s_pair] = UDPQueue
+    
+    UDPQueue --> Q, c_s_pair, starttime, dst_socket
+                 Q = [UDPset]
+                 UDPset --> payload, timestamp
     '''
     ports = [55055, 55056, 55057]
-    Q = []
-    test_count = 20
-    timestamps = sorted([abs(numpy.random.normal(loc=1, scale=1, size=None)) for j in range(test_count)])
-    
-    for i in range(test_count):
-        n        = random.randrange(len(ports))
-        port     = ports[n]
-        c_s_pair = 'XXX.XXX.XXX.XXX.XXXXX-XXX.XXX.XXX.XXX.' + str(port) 
+    Qs = []
+    test_count = 5
+    for i in range(len(ports)):
+        c_s_pair = ''.join(['c_s_pair_' , str(i)])
+        port = ports[i]
+        timestamps = sorted([abs(numpy.random.normal(loc=1, scale=1, size=None)) for i in range(test_count+1)])
         
-        Q.append(UDPset(str(i), timestamps[i], c_s_pair))
+        queue = UDPQueue(starttime  = timestamps[0],
+                         dst_socket = SocketInstance(Configs().get('instance').host, port),
+                         c_s_pair   = c_s_pair.ljust(43))
         
-        if c_s_pair not in c_s_pairs:
-            c_s_pairs.append(c_s_pair)
-            
-    for udp in Q:
-        print udp
+        for j in range(test_count):
+            payload   = ''.join([c_s_pair , '_CLIENT_' , str(j)])
+            queue.Q.append(UDPset(payload, timestamps[j+1]))
+        Qs.append(queue)
     
-    return Q, c_s_pairs
+    for q in Qs:
+        print q
+    
+    return Qs
 
 def main():
     '''
@@ -193,34 +200,36 @@ def main():
     clients           = []
     port_map          = {}
     NAT_map           = {}
-    Q, c_s_pairs      = create_test_Q()
-    
+    Qs                = create_test_Qs()
+        
     PRINT_ACTION('Creating side channel and declaring client id', 0)
     side_channel = SideChannel(SocketInstance(configs.get('instance').host, side_channel_port), id)
     side_channel.declare_id()
     
     PRINT_ACTION('Creating all client sockets', 0)
-    c_s_pair_mapping = {}
-    
-    for c_s_pair in c_s_pairs:
-        dst_port = c_s_pair[-5:]
-        client = Client(configs.get('instance').host, dst_port, c_s_pair)
-        c_s_pair_mapping[c_s_pair] = client
+    for i in range(len(Qs)):
+        q = Qs[i]
+        client = Client(configs.get('instance').host, q.dst_socket.port, q.c_s_pair)
         port_map[client.port] = [client]
         client.identify(side_channel, NAT_map, id)
         clients.append(client)
         
     PRINT_ACTION('Firing off all client sockets', 0)
+    send_processes = []
     origin_time  = time.time()
     for i in range(len(Qs)):
         client = clients[i]
+        p_send = multiprocessing.Process(target=client.send_Q, args=(Qs[i], origin_time, configs.get('timing')))
         p_recv = multiprocessing.Process(target=client.receive)
-        p_recv.start()
         port_map[client.port].append(p_recv)
+        p_send.start()
+        p_recv.start()
+        send_processes.append(p_send)
     
     side_channel.wait_for_fin(port_map, NAT_map)
     
-    send_proccess = multiprocessing.Process(target=Queue(Q).run(c_s_pair_mapping, configs.set('timing')))
+    for p in send_processes:
+        p.join()
     
     side_channel.terminate(clients)
 
