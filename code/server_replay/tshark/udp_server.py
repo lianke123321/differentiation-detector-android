@@ -18,14 +18,28 @@ import sys, socket, threading, time, multiprocessing, numpy, select, traceback, 
 
 from python_lib import *
 
-DEBUG = 2
+DEBUG = 3
 
 class UDPServer(object):
-    def __init__(self, instance):
+    def __init__(self, instance, original_ports):
         self.instance = instance
+        self.original_port = self.instance.port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind((self.instance.ip, self.instance.port))
-        print '\tCreated server at:', instance
+        
+        if not original_ports:
+            port = 7600
+            while True:
+                try:
+                    self.sock.bind((self.instance.ip, port))
+                    break
+                except:
+                    port += 1
+            self.instance.port = port
+            
+        else:
+            self.sock.bind((self.instance.ip, self.instance.port))
+
+        print '\tCreated server at: {} (original port: {})'.format(instance, self.original_port)
             
     def run(self, mapping, Qs, queue, timing):
         '''
@@ -51,7 +65,8 @@ class UDPServer(object):
             client_ip   = client_address[0]
             client_port = str(client_address[1]).zfill(5)
             
-            print 'got:', data, client_ip, client_port
+            if DEBUG == 1: print 'got:', data, client_ip, client_port
+            if DEBUG == 3: print 'got:', len(data), 'from', client_ip, client_port
             
             if client_ip not in mapping:
                 mapping[client_ip] = {}
@@ -64,7 +79,8 @@ class UDPServer(object):
                 p = multiprocessing.Process(target=self.send_Q(Qs[c_s_pair], time.time(), client_address, queue, id, timing))
                 p.start()
             
-            except KeyError:
+            except KeyError, e:
+                print e
                 if DEBUG == 1: print 'New port:', client_address, data
                 data     = data.split(';')
                 id       = data[0]
@@ -80,9 +96,13 @@ class UDPServer(object):
         for udp_set in Q:
             if timing:
                 if time.time() < time_origin + udp_set.timestamp:
-                    time.sleep((time_origin + udp_set.timestamp) - time.time())
+                    try:
+                        time.sleep((time_origin + udp_set.timestamp) - time.time())
+                    except:
+                        pass
             self.sock.sendto(udp_set.payload, client_address)
-            print '\tsent:', udp_set.payload
+            if DEBUG == 1: print '\tsent:', udp_set.payload, 'to', client_address
+            if DEBUG == 3: print '\tsent:', len(udp_set.payload), 'to', client_address
         
         queue.put((id, client_address[1]))
         
@@ -90,9 +110,10 @@ class UDPServer(object):
         self.sock.close()
 
 class SideChannel(object):
-    def __init__(self, instance):
+    def __init__(self, instance, port_map):
         self.connection_map  = {}
         self.sock = self.create_socket(instance)
+        self.port_map_pickle = pickle.dumps(port_map, 2)
     
     def create_socket(self, instance):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -132,8 +153,22 @@ class SideChannel(object):
             t.start()
     
     def handle_connection(self, connection, map_cleaner_queue):
+        '''
+        STEP1: receive client id (10 bytes) and updatede connection_map
+        STEP2: send port mapping to client (if not using original ports)
+        '''
         id = connection.recv(10)
         self.connection_map[id] = connection
+        
+        if Configs().get('original_ports'):
+            pickle_size = '0'.ljust(10)
+            connection.sendall(pickle_size)
+        else:
+            pickle_size = str(len(self.port_map_pickle)).ljust(10)
+            connection.sendall(pickle_size)
+            connection.sendall(self.port_map_pickle)
+        
+        
         data = ''
         while True:
             data += connection.recv(4096)
@@ -211,20 +246,25 @@ def main():
     
     PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
-    configs.set('original_ports', True)
+    configs.set('original_ports', False)
     configs.set('timing', True)
     configs.read_args(sys.argv)
     configs.show_all()
 
     PRINT_ACTION('Creating variables', 0)
     threads = []
-    servers = []
     mapping = {}
+    port_map = {}
     notify_queue      = multiprocessing.Queue()
     map_cleaner_queue = multiprocessing.Queue()
     
+        
     PRINT_ACTION('Loading server queues', 0)
-    Qs = pickle.load(open(configs.get('pcap_file') +'_server_pickle', 'rb'))
+    for file in os.listdir(configs.get('pcap_folder')):
+        if file.endswith('_server_pickle'):
+            pickle_file = os.path.abspath(configs.get('pcap_folder')) + '/' + file
+            break
+    Qs, server_ports = pickle.load(open(pickle_file, 'rb'))
 #    Qs, ports = create_test_Qs(ip)
     
     PRINT_ACTION('Firing off map_cleaner', 0)
@@ -232,15 +272,15 @@ def main():
     t.start()
     
     PRINT_ACTION('Creating and running UDP servers', 0)
-    for c_s_pair in Qs:
-        port = int(c_s_pair[-5:])
-        servers.append(UDPServer(SocketInstance(ip, port)))
-        t = threading.Thread(target=servers[-1].run, args=[mapping, Qs, notify_queue, configs.get('timing')])
+    for port in server_ports:
+        server = UDPServer(SocketInstance(ip, int(port)), configs.get('original_ports'))
+        port_map[server.original_port] = server.instance.port
+        t = threading.Thread(target=server.run, args=[mapping, Qs, notify_queue, configs.get('timing')])
         t.start()
         threads.append(t)
-    
+
     PRINT_ACTION('Creating and running the side channel', 0)
-    side_channel = SideChannel(SocketInstance(ip, sidechannel_port))
+    side_channel = SideChannel(SocketInstance(ip, sidechannel_port), port_map)
     side_channel.run(notify_queue, map_cleaner_queue)
     
 if __name__=="__main__":
