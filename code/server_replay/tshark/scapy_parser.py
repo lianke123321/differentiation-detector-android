@@ -11,7 +11,7 @@ packet_dic:
 
 import pickle, copy, os, sys, linecache, ConfigParser
 import python_lib
-from python_lib import RequestSet, ResponseSet, OneResponse, convert_ip
+from python_lib import *
 from scapy.all import *
 from scapy.error import Scapy_Exception
 
@@ -322,12 +322,6 @@ def do_tshark_follows(pcap_file, follow_folder):
                "done"
               )
     os.system(command)
-def read_client_ip(client_ip_file, follows = False):
-    if follows:
-        l = linecache.getline((client_ip_file + '/follow-stream-0.txt'), 5)
-        return (l.split()[2]).partition(':')[0]
-    f = open(client_ip_file, 'r')
-    return (f.readline()).strip()
 def main():
     
     All_Hash = False
