@@ -13,8 +13,10 @@ Usage:
 #######################################################################################################
 #######################################################################################################
 '''
-import sys, socket, time, random, numpy, multiprocessing, threading, select, string
+import sys, socket, time, random, numpy, multiprocessing, threading, select, string, pickle
 from python_lib import *
+
+DEBUG = 4
 
 class Client(object):
     def __init__(self, dst_ip, dst_port, c_s_pair):
@@ -43,7 +45,7 @@ class Client(object):
         The ack contains clients external port (NAT port) which is stored for later use.
         '''
         while True:
-            print '\tIdentifying:', self.port, '...',; sys.stdout.flush()
+            print '\tIdentifying: {}--{} for {} to {} ...'.format(id, self.port, self.c_s_pair, (self.dst_ip, self.dst_port)),; sys.stdout.flush()
             message = ';'.join([id, self.c_s_pair])
             self.sock.sendto(message, (self.dst_ip, self.dst_port))
             r, w, e = select.select([side_channel.sock], [], [], 1)
@@ -56,7 +58,8 @@ class Client(object):
     
     def send_udp_packet(self, udp_payload):
         self.sock.sendto(udp_payload, (self.dst_ip, self.dst_port))
-        print "sent:", udp_payload
+        if DEBUG == 2: print "sent:", udp_payload
+        if DEBUG == 3: print "sent:", len(udp_payload), 'to', (self.dst_ip, self.dst_port)  
         
     def receive(self):
         '''
@@ -65,7 +68,8 @@ class Client(object):
         '''
         while True:
             data = self.sock.recv(4096)
-            print '\tGot: ', data
+            if DEBUG == 2: print '\tGot: ', data
+            if DEBUG == 3: print '\tGot: ', len(data), 'on', self.sock
     
     def close(self):
         self.sock.close()
@@ -76,10 +80,16 @@ class Queue(object):
         
     def run(self, c_s_pair_mapping, timing):
         time_origin = time.time()
+        i = 1
         for udp in self.Q:
+            print_progress(i, len(self.Q))
+            i += 1
             if timing:
                 if time.time() < time_origin + udp.timestamp:
-                    time.sleep((time_origin + udp.timestamp) - time.time())
+                    try:
+                        time.sleep((time_origin + udp.timestamp) - time.time())
+                    except:
+                        pass
         
             c_s_pair_mapping[udp.c_s_pair].send_udp_packet(udp.payload)
     
@@ -107,6 +117,17 @@ class SideChannel(object):
             if len(port_map) == 0:
                 break
     
+    def receive_server_port_mapping(self):
+        pickle_len = int(self.sock.recv(10))
+        if pickle_len == 0:
+            return {}
+        
+        data = ''
+        while len(data) < pickle_len:
+            data += self.sock.recv(pickle_len-len(data))
+        
+        return pickle.loads(data)
+        
     def ports_done_sending(self, clients):
         '''
         One replay is done, we send all NAT ports to server so it can clean up
@@ -181,7 +202,6 @@ def main():
     
     PRINT_ACTION('Reading configs file and args)', 0)
     configs = Configs()
-    configs.set('original_ports', True)
     configs.set('timing', True)
     configs.set('instance', 'achtung')
     configs.read_args(sys.argv)
@@ -194,17 +214,27 @@ def main():
     clients           = []
     port_map          = {}
     NAT_map           = {}
-    Q, c_s_pairs      = create_test_Q()
+    
+    PRINT_ACTION('Loading the queue', 0)
+    for file in os.listdir(configs.get('pcap_folder')):
+        if file.endswith('_client_pickle'):
+            pickle_file = os.path.abspath(configs.get('pcap_folder')) + '/' + file
+            break
+    Q, c_s_pairs = pickle.load(open(pickle_file, 'rb'))
+#    Q, c_s_pairs      = create_test_Q()
     
     PRINT_ACTION('Creating side channel and declaring client id', 0)
     side_channel = SideChannel(SocketInstance(configs.get('instance').host, side_channel_port), id)
     side_channel.declare_id()
+    server_port_maps = side_channel.receive_server_port_mapping()
     
     PRINT_ACTION('Creating all client sockets', 0)
     c_s_pair_mapping = {}
     
     for c_s_pair in c_s_pairs:
         dst_port = int(c_s_pair[-5:])
+        if server_port_maps:
+            dst_port = server_port_maps[dst_port]
         client = Client(configs.get('instance').host, dst_port, c_s_pair)
         client.identify(side_channel, NAT_map, id)
         p_recv = multiprocessing.Process(target=client.receive)
@@ -213,9 +243,11 @@ def main():
         c_s_pair_mapping[c_s_pair] = client
         clients.append(client)
     
-    send_proccess = multiprocessing.Process(target=Queue(Q).run(c_s_pair_mapping, configs.get('timing')))
-
+    send_proccess = multiprocessing.Process(target=Queue(Q).run, args=(c_s_pair_mapping, configs.get('timing'),))
+    send_proccess.start()
+    
     side_channel.wait_for_fin(port_map, NAT_map)
+    send_proccess.join()
     side_channel.terminate(clients)
 
 if __name__=="__main__":

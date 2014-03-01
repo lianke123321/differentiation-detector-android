@@ -15,6 +15,13 @@ class DatabaseManager
 {
 private:
 	MYSQL *mysql;
+	std::string dbManHostname;
+	std::string dbManUser;
+	std::string dbManPassword;
+	std::string dbManName;
+	bool execReadQueryInternal(std::string Query, MYSQL_RES **results);
+	bool execWriteQueryInternal(std::string Query);
+	bool reconnectDB();
 public:
 	DatabaseManager();
 	~DatabaseManager();

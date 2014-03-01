@@ -1,4 +1,4 @@
-import socket, sys, subprocess, commands, os, ConfigParser
+import socket, sys, subprocess, commands, os, ConfigParser, math
 
 def PRINT_ACTION(string, indent, action=True):
     if action:
@@ -10,6 +10,22 @@ def append_to_file(line, filename):
     f = open(filename, 'a')
     f.write((line + '\n'))
     f.close()
+
+def print_progress(current_step, total_number_of_steps, extra_print=None, width=50):
+    '''
+    Prints progress bar.
+    '''
+    sys.stdout.write('\r')
+    sys.stdout.write("\t[{}] {}% ({}/{})".format(('='*(current_step*width/total_number_of_steps)).ljust(width)
+                                               , int(math.ceil(100*current_step/float(total_number_of_steps)))
+                                               , current_step
+                                               , total_number_of_steps))
+    if extra_print:
+        sys.stdout.write(extra_print)
+    sys.stdout.flush()
+    if current_step == total_number_of_steps:
+        print '\n'
+
 def dir_list(dir_name, subdir, *args):
     '''
     Return a list of file names in directory 'dir_name'
@@ -32,6 +48,12 @@ def dir_list(dir_name, subdir, *args):
             fileList += dir_list(dirfile, subdir, *args)
     return fileList
 
+def read_client_ip(client_ip_file, follows = False):
+    if follows:
+        l = linecache.getline((client_ip_file + '/follow-stream-0.txt'), 5)
+        return (l.split()[2]).partition(':')[0]
+    f = open(client_ip_file, 'r')
+    return (f.readline()).strip()
 
 def convert_ip(ip):
     '''
