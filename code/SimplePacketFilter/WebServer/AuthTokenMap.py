@@ -55,6 +55,7 @@ class AuthTokenMap:
         authToken = self.userAuthMap.get(userID, 0)
         if authToken == 0:
             self.populateMap()           
+        authToken = self.userAuthMap.get(userID, 0)
         return authToken
         
 gAuthTokenMap = AuthTokenMap()
