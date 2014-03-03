@@ -156,6 +156,8 @@ class SideChannel(object):
         '''
         STEP1: receive client id (10 bytes) and updatede connection_map
         STEP2: send port mapping to client (if not using original ports)
+        STEP3: receives the list of ports that client is done with so it can close them
+        STEP4: cleans connection_map and mapping (using the queue)
         '''
         id = connection.recv(10)
         self.connection_map[id] = connection
@@ -167,7 +169,6 @@ class SideChannel(object):
             pickle_size = str(len(self.port_map_pickle)).ljust(10)
             connection.sendall(pickle_size)
             connection.sendall(self.port_map_pickle)
-        
         
         data = ''
         while True:
