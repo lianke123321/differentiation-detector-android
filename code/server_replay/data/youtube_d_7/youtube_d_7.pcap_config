@@ -1,5 +1,0 @@
-[Section1]
-all_hash = False
-pcap_file = ../data/youtube_d_7/youtube_d_7.pcap
-number_of_servers = 10
-

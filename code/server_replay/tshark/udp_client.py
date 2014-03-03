@@ -13,6 +13,7 @@ Usage:
 #######################################################################################################
 #######################################################################################################
 '''
+
 import sys, socket, time, random, numpy, multiprocessing, threading, select, string, pickle
 from python_lib import *
 
@@ -187,17 +188,19 @@ def main():
     
         1- Client creates side channel and connects to server
         2- Client sends its randomly generated ID (10 bytes) to server, side_channel.declare_id()
-        3- Every client socket sends (id, c_s_pair) to corresponding socket server and receives
+        3- Client receives port mapping from server, SideChannel().receive_server_port_mapping().
+           This is necessary because server may choose no to use original ports.
+        4- Every client socket sends (id, c_s_pair) to corresponding socket server and receives
            acknowledgement on the side channel (this is repeated every 1 second until ack is 
            received), client.identify(side_channel, NAT_map, id)
            The acknowledgment/response from server is the client's port, so at this point client
            knows its NAT port
-        4- Now client sockets start sending and receiving.
-        5- Side channel listens for FIN confirmations from server sockets, and closes client socket 
+        5- Now client sockets start sending and receiving.
+        6- Side channel listens for FIN confirmations from server sockets, and closes client socket 
            receiving processes
-        6- Once all sending/receiving is done, the client sends all its NAT ports to server
+        7- Once all sending/receiving is done, the client sends all its NAT ports to server
            so it can clean up its maps
-        7- Client closes the side channel.
+        8- Client closes the side channel.
     '''
     
     PRINT_ACTION('Reading configs file and args)', 0)
