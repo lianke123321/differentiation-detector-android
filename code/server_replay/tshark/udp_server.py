@@ -8,17 +8,28 @@ by: Arash Molavi Kakhki (arash@ccs.neu.edu)
 Goal: server script for UDP replay
 
 Usage:
-    python udp_server.py
-    
-ps aux | grep "python udp_server.py" |  awk '{ print $2}' | xargs kill -9
+    python udp_server.py --pcap_folder=[]
+
+Mandatory:
+    --pcap_folder: either path to a parsed folder, or a text file where each line is path to a 
+                   parsed folder
+
+Optional:
+    --original_ports: if true, uses same server ports as seen in the original pcap
+                      default: False
+    --timing: if true, it respect inter-packet timings seen in the original pcap
+              default: True
+
+To kill the server:  
+    ps aux | grep "python udp_server.py" |  awk '{ print $2}' | xargs kill -9
 #######################################################################################################
 #######################################################################################################
 '''
-import sys, socket, threading, time, multiprocessing, numpy, select, traceback, pickle
 
+import sys, socket, threading, time, multiprocessing, numpy, select, traceback, pickle
 from python_lib import *
 
-DEBUG = 3
+DEBUG = 5
 
 class UDPServer(object):
     def __init__(self, instance, original_ports):
@@ -51,13 +62,13 @@ class UDPServer(object):
             - If mapping[client_ip][client_port] doesn't exist, it's a new client socket declaring, 
               its c_s_pair. Add it to mapping and put it on the queue so the client is acknowledged.
               Note: when a client socket send a packet for the very first time, the 
-                    content is: id;c_s_pair
-            - If mapping[client_ip][client_port] == (None, None) --> Already started sending 
+                    content is: id;c_s_pair;replay_name
+            - If mapping[client_ip][client_port] == (None, None, None) --> Already started sending 
               packets to this client socket, so do nothing
             - Else fire off send_Q to send packets to this client socket and set the mapping
-              to (None, None).
+              to (None, None, None).
             
-        mapping[client_ip][client_port] = c_s_pair (or None if already taken care of)
+        mapping[client_ip][client_port] = (id, c_s_pair, replay_name) or (None, None, None) if already taken care of
         '''
         while True:
             data, client_address = self.sock.recvfrom(4096)
@@ -72,20 +83,22 @@ class UDPServer(object):
                 mapping[client_ip] = {}
             
             try:
-                (id, c_s_pair) = mapping[client_ip][client_port]
+                (id, c_s_pair, replay_name) = mapping[client_ip][client_port]
                 if c_s_pair is None:
                     continue
-                mapping[client_ip][client_port] = (None, None)
-                p = multiprocessing.Process(target=self.send_Q(Qs[c_s_pair], time.time(), client_address, queue, id, timing))
+                mapping[client_ip][client_port] = (None, None, None)
+                p = multiprocessing.Process(target=self.send_Q(Qs[replay_name][c_s_pair], time.time(), client_address, queue, id, timing))
                 p.start()
             
             except KeyError, e:
                 print e
                 if DEBUG == 1: print 'New port:', client_address, data
-                data     = data.split(';')
-                id       = data[0]
-                c_s_pair = data[1]
-                mapping[client_ip][client_port] = (id, c_s_pair)
+                data        = data.split(';')
+                id          = data[0]
+                c_s_pair    = data[1]
+                replay_name = data[2]
+                mapping[client_ip][client_port] = (id, c_s_pair, replay_name)
+                print 'got:', (id, c_s_pair, replay_name)
                 queue.put((id, client_port))
                 
     def send_Q(self, Q, time_origin, client_address, queue, id, timing):
@@ -186,7 +199,7 @@ class SideChannel(object):
 
 def map_cleaner(mapping, map_cleaner_queue):
     '''
-    This acts as a grabage collector which removes elements of mapping when no longer needed.
+    This acts as a garbage collector which removes elements of mapping when no longer needed.
     '''
     while True:
         data = map_cleaner_queue.get()
@@ -213,7 +226,7 @@ def create_test_Qs(ports):
     UDPset --> payload, timestamp
     ########################################################################### 
     '''
-    Qs         = {}
+    Q         = {}
     test_count = 5
     ports      = [55055, 55056, 55057]
     
@@ -221,53 +234,70 @@ def create_test_Qs(ports):
         port = ports[i]
         c_s_pair = 'XXX.XXX.XXX.XXX.XXXXX-XXX.XXX.XXX.XXX.' + str(port)
         timestamps = sorted([abs(numpy.random.normal(loc=1, scale=1, size=None)) for k in range(test_count)])
-        Qs[c_s_pair] = []
+        Q[c_s_pair] = []
         
         for j in range(test_count):
             payload = str(i) + '-' + str(j)
-            Qs[c_s_pair].append(UDPset(payload, timestamps[j], c_s_pair))
+            Q[c_s_pair].append(UDPset(payload, timestamps[j], c_s_pair))
     
-    for c_s_pair in Qs:
-        print '\t', Qs[c_s_pair]
+    for c_s_pair in Q:
+        print '\t', Q[c_s_pair]
     
+    Qs = {}
+    Qs['test'] = Q
     return Qs, ports
 
-
+def load_Qs(pcap_folder):
+    Qs      = {}
+    ports   = set()
+    folders = []
+    
+    if os.path.isfile(pcap_folder):
+        with open(pcap_folder, 'r') as f:
+            for l in f:
+                folders.append(l.strip())
+    else:
+         folders.append(pcap_folder)
+    
+    for folder in folders:
+        if folder == '':
+            continue
+        
+        for file in os.listdir(folder):
+            if file.endswith('_server_pickle'):
+                pickle_file = os.path.abspath(folder) + '/' + file
+                break
+        
+        Q, server_ports, replay_name = pickle.load(open(pickle_file, 'rb'))
+        Qs[replay_name] = Q
+        
+        for port in server_ports:
+            ports.add(port)
+        PRINT_ACTION('Created servers for: ' + replay_name, 1, action=False)
+    
+    return Qs, ports    
+    
 def main():
-    PRINT_ACTION('Creating test Qs', 0)
+    PRINT_ACTION('Creating variables', 0)
     ip = ''
     sidechannel_port = 55555
-    
-    '''
-    ###########################################################################
-    mapping: mapping[client_ip][port] = c_s_pair
-             Gets populated by servers is UDPServer.run (see description of run())
-    ###########################################################################
-    '''
-    
-    PRINT_ACTION('Reading configs file and args)', 0)
+    notify_queue      = multiprocessing.Queue() #Queue used to notify clients that server is done sending
+    map_cleaner_queue = multiprocessing.Queue() #Queue used to notify servers that client is done and can be removed from mapping
+    Qs       = {}   #Qs[replay_name] = {c_s_pair: Q, ...}
+    mapping  = {}   #mapping[client_ip][client_port] = (id, c_s_pair, replay_name)
+    port_map = {}   #port_map[server.original_port] = server.instance.port 
+
+    PRINT_ACTION('Reading configs and args', 0)
     configs = Configs()
     configs.set('original_ports', False)
     configs.set('timing', True)
     configs.read_args(sys.argv)
     configs.show_all()
-
-    PRINT_ACTION('Creating variables', 0)
-    threads = []
-    mapping = {}
-    port_map = {}
-    notify_queue      = multiprocessing.Queue()
-    map_cleaner_queue = multiprocessing.Queue()
     
-        
     PRINT_ACTION('Loading server queues', 0)
-    for file in os.listdir(configs.get('pcap_folder')):
-        if file.endswith('_server_pickle'):
-            pickle_file = os.path.abspath(configs.get('pcap_folder')) + '/' + file
-            break
-    Qs, server_ports = pickle.load(open(pickle_file, 'rb'))
-#    Qs, ports = create_test_Qs(ip)
-    
+    Qs, server_ports = load_Qs(configs.get('pcap_folder'))
+#    Qs, server_ports = create_test_Qs(ip)
+        
     PRINT_ACTION('Firing off map_cleaner', 0)
     t = threading.Thread(target=map_cleaner, args=[mapping, map_cleaner_queue])
     t.start()
@@ -278,11 +308,12 @@ def main():
         port_map[server.original_port] = server.instance.port
         t = threading.Thread(target=server.run, args=[mapping, Qs, notify_queue, configs.get('timing')])
         t.start()
-        threads.append(t)
 
     PRINT_ACTION('Creating and running the side channel', 0)
     side_channel = SideChannel(SocketInstance(ip, sidechannel_port), port_map)
     side_channel.run(notify_queue, map_cleaner_queue)
+    
+    PRINT_ACTION('READY! You can now run the client script', 0)
     
 if __name__=="__main__":
     main()
