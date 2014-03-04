@@ -36,7 +36,7 @@ class Client(object):
         port = str(sock.getsockname()[1]).zfill(5)
         return sock, port
     
-    def identify(self, side_channel, NAT_map, id):
+    def identify(self, side_channel, NAT_map, id, replay_name):
         '''
         Before anything, client needs to identify itself to the server and tell
         which c_s_pair it will be replaying.
@@ -47,7 +47,7 @@ class Client(object):
         '''
         while True:
             print '\tIdentifying: {}--{} for {} to {} ...'.format(id, self.port, self.c_s_pair, (self.dst_ip, self.dst_port)),; sys.stdout.flush()
-            message = ';'.join([id, self.c_s_pair])
+            message = ';'.join([id, self.c_s_pair, replay_name])
             self.sock.sendto(message, (self.dst_ip, self.dst_port))
             r, w, e = select.select([side_channel.sock], [], [], 1)
             if r:
@@ -83,7 +83,7 @@ class Queue(object):
         time_origin = time.time()
         i = 1
         for udp in self.Q:
-            print_progress(i, len(self.Q))
+            if DEBUG == 4: print_progress(i, len(self.Q))
             i += 1
             if timing:
                 if time.time() < time_origin + udp.timestamp:
@@ -180,7 +180,7 @@ def create_test_Q():
     for udp in Q:
         print udp
     
-    return Q, c_s_pairs
+    return Q, c_s_pairs, 'test'
 
 def main():
     '''
@@ -223,8 +223,8 @@ def main():
         if file.endswith('_client_pickle'):
             pickle_file = os.path.abspath(configs.get('pcap_folder')) + '/' + file
             break
-    Q, c_s_pairs = pickle.load(open(pickle_file, 'rb'))
-#    Q, c_s_pairs      = create_test_Q()
+    Q, c_s_pairs, replay_name = pickle.load(open(pickle_file, 'rb'))
+#    Q, c_s_pairs, replay_name = create_test_Q()
     
     PRINT_ACTION('Creating side channel and declaring client id', 0)
     side_channel = SideChannel(SocketInstance(configs.get('instance').host, side_channel_port), id)
@@ -239,7 +239,7 @@ def main():
         if server_port_maps:
             dst_port = server_port_maps[dst_port]
         client = Client(configs.get('instance').host, dst_port, c_s_pair)
-        client.identify(side_channel, NAT_map, id)
+        client.identify(side_channel, NAT_map, id, replay_name)
         p_recv = multiprocessing.Process(target=client.receive)
         p_recv.start()
         port_map[client.port] = (client, p_recv)

@@ -2,8 +2,8 @@ import socket, sys, subprocess, commands, os, ConfigParser, math
 
 def PRINT_ACTION(string, indent, action=True):
     if action:
-        print ''.join(['\t']*indent), '[' + str(Configs().get('action_count')) + ']' + string
-        Configs().set('action_count', Configs().get('action_count') + 1)
+        print ''.join(['\t']*indent), '[' + str(Configs().action_count) + ']' + string
+        Configs().action_count = Configs().action_count + 1
     else:
         print ''.join(['\t']*indent) + string
 def append_to_file(line, filename):
@@ -135,7 +135,7 @@ class Configs(object):
     _configs = {}
     def __init__(self, config_file = None):
         self._Config = ConfigParser.ConfigParser()
-        self._configs['action_count'] = 0
+        self.action_count = 1
         self._maxlen = 0
         if config_file != None:
             read_config_file(config_file)

@@ -27,7 +27,7 @@ from scapy.all import *
 
 DEBUG = 0
 
-def parse(pcap_file, client_ip, cut_off=0):
+def parse(pcap_file, client_ip, replay_name, cut_off=0):
     '''
     This function parses a UDP pcap file (main traffic over UDP) and creates pickle dumps of
     following objects:
@@ -165,8 +165,13 @@ def parse(pcap_file, client_ip, cut_off=0):
             if len(server_ports[server_port]) == 0:
                 del server_ports[server_port]
     
-    pickle.dump((client_Q, c_s_pairs)   , open((pcap_file+'_client_pickle'), "wb" ), 2)
-    pickle.dump((server_Q, server_ports), open((pcap_file+'_server_pickle'), "wb" ), 2)
+    pickle.dump((client_Q, c_s_pairs, replay_name)   , open((pcap_file+'_client_pickle'), "wb" ), 2)
+    pickle.dump((server_Q, server_ports, replay_name), open((pcap_file+'_server_pickle'), "wb" ), 2)
+    
+    '''Storing replay name for later reference'''
+    f = open((pcap_file+'_replay_name.txt'), 'w')
+    f.write(replay_name)
+    f.close()
     
     print 'After cut off:'
     print '\tNumber of c_s_pairs:', len(c_s_pairs)
@@ -189,15 +194,21 @@ def main():
     for file in os.listdir(configs.get('pcap_folder')):
         if file.endswith('.pcap'):
             pcap_file = os.path.abspath(configs.get('pcap_folder')) + '/' + file
+            replay_name = file.partition('.pcap')[0]
         if file == 'client_ip.txt':
             client_ip_file = os.path.abspath(configs.get('pcap_folder')) + '/' + file
         
     if not os.path.isfile(client_ip_file):
         print 'The folder is missing the client_ip_file!'
+        sys.exit(-2)
+    
+    if not configs.is_given('replay_name'):
+        configs.set('replay_name', replay_name)
+        print 'Replay name not given. Naming it after the pcap_file:', configs.get('replay_name')
     
     client_ip = read_client_ip(client_ip_file)
     
-    parse(pcap_file, client_ip, cut_off=configs.get('cut_off'))
+    parse(pcap_file, client_ip, configs.get('replay_name'), cut_off=configs.get('cut_off'))
 
 if __name__=="__main__":
     main()
