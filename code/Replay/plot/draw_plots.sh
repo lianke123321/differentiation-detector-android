@@ -90,7 +90,7 @@ vpn_rtt_count='0'
 vpn_count='0'
 
 # For every pcap you find in data/pcaps
-for f in `cd ../data/$dir;ls *.pcap;cd ../../../plot`
+for f in `cd ../data/$dir;ls *.pcap;cd ../../plot`
 do
     # Filter out the name (strip the extention).
     name=${f%.pcap}
@@ -98,22 +98,68 @@ do
     if [ $sto != 'true' ]; then
     # Make the directory for the plot.
     mkdir "../data/$dir/generated_plots/$name"
-    mkdir "../data/$dir/generated_plots/$name/dissected_pcaps"
+    # mkdir "../data/$dir/generated_plots/$name/dissected_pcaps"
     # Dump the pcap to plain text using tcpdump.
     tcpdump -nr ../data/$dir/$f >../data/$dir/text_pcaps/$name.txt 2>/dev/null
-    mono SplitCap.exe
     cd "../data/$dir/generated_plots/$name"
     # Generate the script to draw the plot.
-    echo ../../../../plot/filterer/filter ../../text_pcaps/$name.txt `cat ../../confs/"$name"`\; >filterit.sh
-    cd ../../../../plot/splitcap/; mono ./SplitCap.exe -r ../../data/$dir/$f -o ../../data/$dir/generated_plots/$name/dissected_pcaps/ >/dev/null  2>/dev/null; cd ../../data/$dir/generated_plots/$name/;
-    echo echo File: `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'` \>$name.rtt.txt\; >>filterit.sh
-    echo tcptrace -lr `find dissected_pcaps/*.pcap -printf '%s %p\n'|sort -nr|head -n 1|awk '{print $2}'` \| awk \'/RTT min/,/RTT stdev/\' \>\>$name.rtt.txt\; >>filterit.sh
+    if [ -b ../../confs/$name ]; then
+	conf=`cat ../../confs/"$name"`
+    else
+	conf=''
+    fi;
+    echo ../../../../plot/filterer/filter ../../text_pcaps/$name.txt $conf\; >filterit.sh
+    # SplitCap.exe was used to split the pcap into streams (UDP and TCP).
+    # cd ../../../../plot/splitcap/; mono ./SplitCap.exe -r ../../data/$dir/$f -o ../../data/$dir/generated_plots/$name/dissected_pcaps/ >/dev/null  2>/dev/null; cd ../../data/$dir/generated_plots/$name/;
 
-    mkdir rtts
-    echo cd rtts >>filterit.sh
-    echo tcptrace -Z ../../../$f \>/dev/null \; >>filterit.sh
-    echo cat *_rttraw.dat \| grep -v " 0" \| sort -n -k2,2 \| awk \'{print \$2}\' \>rtts.txt >>filterit.sh
-    echo cd .. >>filterit.sh
+# ******************************
+# Calculating RTT using tcptrace
+# ******************************
+
+    # Split the PCAP into streams using tshark filters.
+    # Note that this will only extract streams that are deemed "big enough by the filterer (the ones that appear in the plot).
+#    echo "for flow in \`cat connection_index.txt | awk '{print \$3}';\`
+#    do
+#        if [ \${flow%_UDP} = \$flow ];
+#        then
+#	    proto=tcp
+#        else
+#	    proto=udp
+#	fi;
+#        f=\${flow%_UDP}
+#
+#        src=\`echo \$f | cut -d \- -f 1 | cut -d \. -f 5 --complement\`
+#	dst=\`echo \$f | cut -d \- -f 2 | cut -d \. -f 5 --complement\`
+#
+#	src_port=\`echo \$f | cut -d \- -f 1 | cut -d \. -f 5\`
+#	dst_port=\`echo \$f | cut -d \- -f 2 | cut -d \. -f 5\`
+#
+#        tshark -r ../../$f -2 -w dissected_pcaps/\$f-\$proto.pcap -R \"ip.src==\$src and \$proto.srcport==\$src_port and ip.dst==\$dst and \$proto.dstport==\$dst_port\"
+#    done;" >> filterit.sh
+
+    # This can be used in place of SplitCap .NET tool, but it only treats TCP streams and ignores UDP.
+    #for stream in `tshark -r ../../$f -T fields -e tcp.stream | sort -n | uniq`
+    #do
+	#echo $stream
+	#tshark -r ../../$f -2 -w dissected_pcaps/stream-$stream.pcap -R "tcp.stream==$stream"
+    #done
+    
+
+#    echo echo File: \`find dissected_pcaps/*.pcap -printf \'%s %p\\n\'\|sort -nr\|head -n 1\|awk \'{print \$2}\'\` \>$name.rtt.txt\; >>filterit.sh
+#    echo tcptrace -lr \`find dissected_pcaps/*.pcap -printf \'%s %p\\n\'\|sort -nr\|head -n 1\|awk \'{print \$2}\'\` \| awk \'/RTT min/,/RTT stdev/\' \>\>$name.rtt.txt\; >>filterit.sh
+
+
+#    mkdir rtts
+#    echo cd rtts >>filterit.sh
+#    echo tcptrace -Z ../../../$f \>/dev/null \; >>filterit.sh
+#    echo cat *_rttraw.dat \| grep -v " 0" \| sort -n -k2,2 \| awk \'{print \$2}\' \>rtts.txt >>filterit.sh
+#    echo cd .. >>filterit.sh
+
+# ******************************
+#              END
+# ******************************
+
+
     echo gnuplot cdfrtt.gp\; >>filterit.sh
 
     echo 'set title "RTT CDF"
@@ -134,16 +180,17 @@ set out "cdfrttp.ps"
 a=0
 cumulative_sum(x)=(a=a+x,a)
 countpoints(file) = system( sprintf("grep -v \"^#\" %s| wc -l", file) )
-pointcount = countpoints("rtts/rtts.txt")
-plot "rtts/rtts.txt" using 1:(1/pointcount) smooth cumulative with lines lw 3 linecolor rgb "green" t "A to B"' >cdfrtt.gp
+pointcount = countpoints("rtt_samples.txt")
+plot "rtt_samples.txt" using 1:(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "green" t "A to B"' >cdfrtt.gp
 
     echo cat meta.txt \>$name.stats.txt\; >>filterit.sh
-    echo tshark -qz io,stat,0.1 -r ../../../$dir/$f \| ../../../../plot/xput/xput xput.txt \>\>$name.stats.txt\; >>filterit.sh
+    echo tshark -qz io,stat,0.1 -r ../../../$dir/$f \| ../../../../plot/xput/xput xput.txt n \>\>$name.stats.txt\; >>filterit.sh
     echo 'set style data lines
 set title "Throughput"
 set key off
 set xlabel "Time (seconds)"
 set ylabel "Throughput (KB/s)"
+
 set term postscript color eps enhanced "Helvetica" 16
 set size ratio 0.5
 # Line style for axes
@@ -153,11 +200,31 @@ set border 3 back linestyle 80
 set xtics nomirror
 set ytics nomirror
 set out "xp.ps"
-plot "xput.txt" using 1:($2/1e3) with lines lw 3' >xputplot.gp
+plot "xput.txt" using 1:($2/1000.0) with lines lw 3' >xputplot.gp
     echo gnuplot xputplot.gp\; >>filterit.sh
-#    echo convert -density 1000 xp.ps -scale 2000x1000 xp.jpg >>filterit.sh
-    echo cat $name.rtt.txt \| ../../../../plot/rtt/rtt \>\>$name.stats.txt\; >>filterit.sh
-    echo rm -rf $name.rtt.txt\; >>filterit.sh
+    echo cat xput.txt \| sort -n -k2,2 \| awk \'{print \$2}\' \>xpsorted.txt >>filterit.sh
+    echo 'set style data lines
+set title "Throughput CDF"
+set key off
+set xlabel "Throughput (KB/s)"
+set ylabel "CDF"
+set yrange [0:1]
+set term postscript color eps enhanced "Helvetica" 16
+set size ratio 0.5
+# Line style for axes
+set style line 80 lt 0
+set grid back linestyle 81
+set border 3 back linestyle 80
+set xtics nomirror
+set ytics nomirror
+set out "xpcdf.ps"
+countpoints(file) = system( sprintf("grep -v \"^#\" %s| wc -l", file) )
+pointcount = countpoints("xpsorted.txt")
+plot "xpsorted.txt" using ($1/1000.0):(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "blue" t "A to B"' >xputcdf.gp
+    echo gnuplot xputcdf.gp\; >>filterit.sh
+#    echo convert -density 1000 -flatten xp.ps -scale 2000x1000 xp.jpg >>filterit.sh
+#    echo cat $name.rtt.txt \| ../../../../plot/rtt/rtt \>\>$name.stats.txt\; >>filterit.sh
+
     echo rm -rf meta.txt\; >>filterit.sh
     chmod +x filterit.sh
     # Run the script.
@@ -214,7 +281,7 @@ plot "xput.txt" using 1:($2/1e3) with lines lw 3' >xputplot.gp
 	
 	vpn_count=`bc -l <<< "$vpn_count + 1"`
 
-	if [ $rtt_ab_min != '' ]
+	if [[ $rtt_ab_min != '' ]]
 	then
 	    vpn_rtt_ab_min=`bc -l <<< "$vpn_rtt_ab_min + $rtt_ab_min"`
 	    vpn_rtt_ba_min=`bc -l <<< "$vpn_rtt_ba_min + $rtt_ba_min"`
@@ -234,8 +301,14 @@ plot "xput.txt" using 1:($2/1e3) with lines lw 3' >xputplot.gp
     echo Done.
 done
 
+if [ $vpn_count -ge 1 -a $novpn_count -ge 1 ]
+then
+
 cat ../data/$dir/generated_plots/dump_novpn*/rtts/rtts.txt | awk '{if ($1 > 10) print $1}' | sort -n >../data/$dir/results/$dir.rtts.novpn.txt
 cat ../data/$dir/generated_plots/tcpdump*/rtts/rtts.txt | awk '{if ($1 > 10) print $1}' | sort -n >../data/$dir/results/$dir.rtts.vpn.txt
+
+cat ../data/$dir/generated_plots/dump_novpn*/xpsorted.txt | sort -n >../data/$dir/results/$dir.xputs.novpn.txt
+cat ../data/$dir/generated_plots/tcpdump*/xpsorted.txt | sort -n >../data/$dir/results/$dir.xputs.vpn.txt
 
 echo 'set title "RTT CDF"
 set style data lines
@@ -257,11 +330,35 @@ cumulative_sum(x)=(a=a+x,a)
 countpoints(file) = system( sprintf("grep -v \"^#\" %s| wc -l", file) )
 pointcountvpn = countpoints("'$dir'.rtts.vpn.txt")
 pointcountnovpn = countpoints("'$dir'.rtts.novpn.txt")
-plot "'$dir'.rtts.vpn.txt" using 1:(1/pointcountvpn) smooth cumulative with lines lw 3 linecolor rgb "green" t "With VPN",\
-     "'$dir'.rtts.novpn.txt" using 1:(1/pointcountnovpn) smooth cumulative with lines lw 3 linecolor rgb "green" t "Without VPN"' >../data/$dir/results/$dir.rtts.cdf.gp
+plot "'$dir'.rtts.vpn.txt" using 1:(1.0/pointcountvpn) smooth cumulative with lines lw 3 linecolor rgb "green" t "With VPN",\
+     "'$dir'.rtts.novpn.txt" using 1:(1.0/pointcountnovpn) smooth cumulative with lines lw 3 linecolor rgb "green" t "Without VPN"' >../data/$dir/results/$dir.rtts.cdf.gp
+
+echo 'set title "Throughput CDF"
+set style data lines
+set key bottom right
+set ylabel "CDF"
+set xlabel "Throughput (KB/s)"
+set yrange [0:1]
+set term postscript color eps enhanced "Helvetica" 16
+set size ratio 0.5
+# Line style for axes
+set style line 80 lt 0
+set grid back linestyle 81
+set border 3 back linestyle 80
+set xtics nomirror
+set ytics nomirror
+set out "'$dir'.cdfxputp.ps"
+a=0
+cumulative_sum(x)=(a=a+x,a)
+countpoints(file) = system( sprintf("grep -v \"^#\" %s| wc -l", file) )
+pointcountvpn = countpoints("'$dir'.xputs.vpn.txt")
+pointcountnovpn = countpoints("'$dir'.xputs.novpn.txt")
+plot "'$dir'.xputs.vpn.txt" using ($1/1000.0):(1.0/pointcountvpn) smooth cumulative with lines lw 3 linecolor rgb "blue" t "With VPN",\
+     "'$dir'.xputs.novpn.txt" using ($1/1000.0):(1.0/pointcountnovpn) smooth cumulative with lines lw 3 linecolor rgb "blue" t "Without VPN"' >../data/$dir/results/$dir.xputs.cdf.gp
 
 cd ../data/$dir/results
 gnuplot $dir.rtts.cdf.gp
+gnuplot $dir.xputs.cdf.gp
 ../../../plot/ten_ninety/tn <$dir.rtts.vpn.txt >$dir.rtt.avg_stdev.vpn.txt
 ../../../plot/ten_ninety/tn <$dir.rtts.novpn.txt >$dir.rtt.avg_stdev.novpn.txt
 cd ../../../plot
@@ -303,3 +400,4 @@ echo encrypted_rtt_ba_avg: `bc -l <<< "$vpn_rtt_ba_avg / $vpn_rtt_count"` >>../d
 echo encrypted_rtt_ab_stdev: `bc -l <<< "$vpn_rtt_ab_stdev / $vpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
 echo encrypted_rtt_ba_stdev: `bc -l <<< "$vpn_rtt_ba_stdev / $vpn_rtt_count"` >>../data/$dir/results/$dir.stats.txt
 
+fi;
