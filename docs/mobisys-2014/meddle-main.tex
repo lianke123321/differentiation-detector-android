@@ -6,16 +6,21 @@
 \usepackage[english,plain]{fancyref}
 \usepackage{times}
 \usepackage{rotating}
-\usepackage[labelformat=simple]{subfig}
+\usepackage{subfig}
 \usepackage{multirow}
 \usepackage{amsfonts,xspace}
 \usepackage{url}
 \usepackage{graphicx}
+\usepackage[sort]{cite}
 
+%\usepackage[compact]{titlesec}
+
+\pdfpagewidth=\paperwidth
+\pdfpageheight=\paperheight
 
 %%%%%%%%%% LIST OF COMMANDS
-\newcommand{\ie}{{\it i.e.}\xspace}
-\newcommand{\eg}{{\it e.g.}\xspace}
+\newcommand{\ie}{{\it i.e.,}\xspace}
+\newcommand{\eg}{{\it e.g.,}\xspace}
 \newcommand{\etc}{{\it etc.}}
 \newcommand{\etal}{\emph{et~al.}}
 \newcommand{\useragent}{{\it User-Agent}\xspace}
@@ -28,14 +33,20 @@
 \newcommand{\tbd}[1]{[{\color{red}{\bf{TBD: #1}}}]}
 \newcommand{\artbd}[1]{[{\color{blue}{\bf{AR:TBD: #1}}}]}
 \newcommand{\dtbd}[1]{[{\color{blue}{\bf{Dave:TBD: #1}}}]}
+\newcommand{\drc}[1]{[{\color{blue}{Dave: #1}}]}
+%\newcommand{\tbd}[1]{}
+%\newcommand{\artbd}[1]{}
+%\newcommand{\dtbd}[1]{}
+%\newcommand{\drc}[1]{}
 % platform
 \newcommand{\meddle}{{\emph{Meddle}}\xspace}
+\newcommand{\meddlebox}{{\emph{meddlebox}}\xspace}
 
-\newcommand{\mypara}[1]{\medskip\noindent{\bf {#1}:}~}
+\newcommand{\mypara}[1]{\noindent{\bf {#1}.}~}
 \newcommand{\chk}{$\checkmark$}
 \newcommand{\dsh}{{\bf --}}
 \newcommand{\til}{{\bf\large \textasciitilde}}
-\newcommand{\drc}[1]{[{\color{blue}{Dave: #1}}]}
+
 %\newcommand{\tbd}[1]{}
 \newcommand{\tbdv}[1]{{\color{blue}{!\bf{#1}$_{verify}$}!}}
 \newcommand{\platname}{{\emph{Meddle}}\xspace}
@@ -45,28 +56,35 @@
 \newcommand{\iphone}{iPhone\xspace}
 \newcommand{\postfigspace}{-1em}
 \newcommand{\figcapspace}{0em}
-\newcommand{\mobWild}{{\emph{mobWild}}\xspace}
+\newcommand{\mobWild}{{\emph{mobUser}}\xspace}
 
 
 \newenvironment{packedenumerate}{\begin{list}{\thepackednmbr.}{\usecounter{packednmbr}\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
 \newenvironment{packeditemize}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
 
+%Added by ARAO for letterpaper 
+\pdfpagewidth=\paperwidth
+\pdfpageheight=\paperheight
 
 \begin{document}
 
 \date{}
 
-\title{{\Large \bf Using the Middle to Meddle with Mobile} \\
-{\large A Practical Approach to Improving Transparency and Control for Mobile Networking}}
-
-\author{ 
-Ashwin Rao${^a}$, Amy Tang${^b}$, Shen Wang${^c}$, Nick Martindell${^c}$, Justine Sherry${^b}$, Arnaud Legout${^a}$, \\
- Walid Dabbous${^a}$, Arvind Krishnamurthy${^c}$, and David Choffnes${^d}$\\ 
-$^{a}$INRIA $^{b}$University of California, Berkeley \\
-$^{c}$University of Washington $^{d}$Northeastern University
+\title{{\Large \bf Using the Middle to Meddle with Mobile} 
+%\subtitle{}
+\\
+\vspace{1em}
+%{\large A Practical Approach to Improving Transparency and Control for Mobile Networking}}
+\author{} 
+\large Ashwin Rao${^a}$, Arash Molavi Kakhki${^b}$, Abbas Razaghpanah${^e}$, Amy Tang${^c}$, Shen Wang${^d}$, Justine Sherry${^c}$, %Nick Martindell${^d}$, 
+Phillipa Gill${^e}$, \large Arvind Krishnamurthy${^d}$, Arnaud Legout${^a}$, Alan Mislove${^b}$, and David Choffnes${^b}$\\ 
+\vspace{1em}
+\large $^{a}$INRIA $^{b}$Northeastern Univ. $^{c}$UC Berkeley $^{d}$Univ. of Washington  ${^e}$Stony Brook Univ.
+\vspace{-3em}
 } 
 
 \maketitle
+\vspace{-2em}
 
 % Use the following at camera-ready time to suppress page numbers.
 % Comment it out when you first submit the paper for review.
@@ -74,9 +92,11 @@ $^{c}$University of Washington $^{d}$Northeastern University
 
 \input{abstract}
 
-\input{introduction}
+%\input{introduction}
+\input{intro-justinehax}
 
 \input{platform}
+%\input{justine-designstuff}
 
 \input{methodology}
 
@@ -84,7 +104,7 @@ $^{c}$University of Washington $^{d}$Northeastern University
 
 \input{isp}
 
-\input{thirdparty}
+%\input{thirdparty}
 
 \input{related}
 

@@ -1,24 +1,68 @@
-\section{Application: Third Party Threats}
+\section{Application: Mobile Malware \\
+Detection and Blocking}
+\label{sec:malware}
 
-\subsection{Mobile infection vectors}
+%\subsection{Mobile infection vectors}
+%
+%\textbf{Two-second approach}: Get list of drive-by downloads for mobile. Potential sources:
+%- Websites that post this stuff
+%- Tweets by fake accounts from Alan's twitter data\
+%- Other?
+%
+%Make a script that causes a device to load those malicious URLs. Identify malicious behavior from there.
+%
+%\textbf{Table}: Types of malicious URLs and what they do. Rows are URL types, columns are types of behavior, cells are counts/percentages/checkmarks. 
 
-\textbf{Two-second approach}: Get list of drive-by downloads for mobile. Potential sources:
-- Websites that post this stuff
-- Tweets by fake accounts from Alan's twitter data\
-- Other?
+%\subsection{Mobile malware network analysis}
 
-Make a script that causes a device to load those malicious URLs. Identify malicious behavior from there.
+In the fixed-line environment, malware is used for botnets, spam, data exfiltration, and sabotage, among other 
+purposes. Despite a handful of studies in the mobile space, little research has focused on the \emph{network 
+properties} of malware in the mobile environment. In this section, we use \meddle to investigate malware network 
+behavior and develop new techniques for detecting and blocking malware activity based exclusively on network 
+activity.
 
-\textbf{Table}: Types of malicious URLs and what they do. Rows are URL types, columns are types of behavior, cells are counts/percentages/checkmarks. 
+\mypara{Assumptions and methodology} We base our analysis on the likely incentives for malware authors, mainly 
+that they distribute malware for profit. 
+In this setting, we assume that malware \emph{must} communicate some information to a remote service for coordination (\eg C\&C), exfiltration (stealing personal information) or billing (contacting toll services). 
+Mobile malwares can be broadly categorized as either 1) Spywares that leak private information, 2) Trojans and Viruses that gain access to the resources and increase the resource usage, for example, send messages, and make calls, 3) Phishing apps that redirect users to fraudulent sites that are impostors to legitimate sites, and 4) Bots that become active on specific user activities and request for commands from their command and control servers (C\&C). 
+[ http://www.veracode.com/blog/2013/10/common-mobile-malware-types-cybersecurity-101/ ] 
+\meddle can be used to monitor and detect malwares that use IP; we cannot detect circuit switched activity such as sending SMS or making phone calls.
 
-\subsection{Mobile malware network analysis}
+\meddle gives us two opportunities to detect and block malware activity over IP. 
+First, we can detect the app binary being downloaded via a hash and block that transfer if it is identified as malware. 
+Note that, \meddle can compute hashes only if the app binary is downloaded in the clear and not over a secure channel.
+Second, we can use network behavioral analysis to identify malicious activity from apps that passed through our hash filters and were successfully installed. 
+In the following paragraphs we describe how existing hash registries fail to capture most confirmed malware, how to use network activity to identify and block malware and how to augment hash registries by automatically identifying the malicious app binary responsible for the activity -- thus inoculating other users from this malware. 
+Importantly, this approach works at machine instead of human timescales.%, protecting infected users and preventing new infections 
+%within minutes, not days.
 
-Get list of confirmed malware, run through Meddle, collect traces. Do the same for known non-malicous apps. 
-Understand what are distinguishing network characteristics for the former vs the latter. 
+\mypara{Dataset} 
+To understand malware network behavior, we use a dataset consisting of 111 confirmed malicious Android APKs gathered by the Andrubis project~\cite{andrubis} in September, 2013.  
+Similar to the approach in \S\ref{sec:dataset-contr-exper}, we conduct controlled experiments by installing a malware app on a clean OS with dummy user data, manually interacting with it for 10 minutes and recording the network traces using \meddle. 
+To compare with non-malicous apps, we use the dataset gathered in \S\ref{sec:dataset}.
 
-Show how blacklists are ineffective. Show how effective the behavior-based analysis is.
+The malware consists of 46 families ranging from backdoors to spyware. 
+Of the 111 apps, 99 (89\%) apps generated network traffic, and 90 (81\%) apps generated HTTP traffic. 
+Many of the remaining apps targeted earlier versions of the Android OS and thus did not work in our tests. 
+Note that although our study focuses on Android malware, our approach is applicable to iOS and other mobile OSes because it relies only on monitoring network traffic.
 
-\subsection{Unsolicited traffic}
-Presumably there is none, but probably worth looking at inbound unsolicited traffic from a 
-\meddle instance with no users compared to one with active users. Might find something interesting there.
+\mypara{Signature-based detection is insufficient} 
+First, we determine whether existing malware hash registries contain signatures for the malicious APKs in our data. 
+Even in December 2013, 3 months after the malware was identified by Andrubis, we find that only 9 (8.1\%) of the apps in our dataset were correctly identified as malware; 7 of these 9 apks generated network traffic. 
+This motivates the need for behavioral analysis.
 
+\mypara{Malware exhibits distinctive network behavior} 
+Previous work in fixed-line environments~\cite{perdisci:malwaresig} use network behavioral analysis to identify malware 
+from network flows. 
+In particular, they extract signatures from the parts of HTTP requests including the request method (GET, POST, \etc), and fields of the URI and perform clustering on these values to identify distinguish malware from non-malicious traffic. 
+
+Of the 99 apps generating network traffic, we observe that 81\% (74) exfiltrate PII without encoding the PII. 
+Unique identifiers such as IMEI, and Android ID are most commonly leaked, and we further find 9 apps leaking telephone numbers. 
+For the remaining 26 apps, we did not detect PII;12 use HTTP traffic, 7 use nonstandard ports and 1 attempts to communicate with a server that is not online. 
+
+\mypara{Effectiveness of behavioral filters}
+
+%\subsection{Unsolicited traffic}
+%Presumably there is none, but probably worth looking at inbound unsolicited traffic from a 
+%\meddle instance with no users compared to one with active users. Might find something interesting there.
+%
