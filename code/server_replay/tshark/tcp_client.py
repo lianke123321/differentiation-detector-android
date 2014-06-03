@@ -1,123 +1,212 @@
-import os, sys, socket, pickle, threading, time
-from python_lib import * 
+'''
+#######################################################################################################
+#######################################################################################################
 
-def read_ports(path):
-    if path == None:
-        path = 'achtung.ccs.neu.edu:/home/arash/public_html/free_ports'
-    os.system(('scp ' + path + ' .'))
-    return pickle.load(open('free_ports', 'rb'))
-def socket_connect(host, port):
-    print 'Connecting to:', host, port
-    server_address = (host, port)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    sock.connect(server_address)
-    return sock        
-def send_single_request(req_set, sock, All_Hash, status):
+by: Arash Molavi Kakhki (arash@ccs.neu.edu)
+    Northeastern University
     
-    c_s_pair = req_set[1]
-    
-    while status[c_s_pair] is False:
-        continue
-    
-    status[c_s_pair] = False
-    
-    buff_size = 4096
-    
-    pld = str(req_set[0])
-    svr = req_set[1]
-    if req_set[2] is None:
-        res = None
+Goal: this is the client side script for TCP replay.
+
+Usage:
+    python tcp_client.py --pcap_folder=../data/dropbox_d --instance=achtung --original_ports=False
+
+#######################################################################################################
+#######################################################################################################
+'''
+
+import os, sys, socket, pickle, threading, time, ConfigParser
+import python_lib 
+from python_lib import Configs, PRINT_ACTION
+
+DEBUG0 = False
+
+def read_ports(host, username, key, ports_file):
+    """
+    If random ports are used on the server side, then the mapping of the ports are
+    written to a file on the server side and client needs to download it before 
+    starting
+    """
+    if key is not None:
+        command = 'scp -i ' + key + ' '
+    if username is not None:
+        command += username + '@'
     else:
-        res = hash(req_set[2])
+        command = 'scp '
+    command += host + ':' + ports_file + ' .'
+    os.system(command)
+    return pickle.load(open('free_ports', 'rb'))
+class Connections(object):
+    """
+    This class handles connections to servers.
     
-    print '\nSent\t', svr, len(pld), hash(pld), '\n'
-    sock.sendall(pld)
-    print '\twaiting for response...'
-    if res is None:
-        print '\tNo response required'
-        return
-    
-    buffer = ''
-    while True:
-        buffer += sock.recv(buff_size)
-#        print len(buffer)        
-        if All_Hash:
-            buffer = int(buffer)
-        if hash(buffer) == res:
-            break
-    status[c_s_pair] = True
-    print '\nRcvd\t', svr, len(buffer), hash(pld), '\n'
-def main():
-    DEBUG = False
-    
-    [All_Hash, pcap_file, number_of_servers] = read_config_file('config_file')
-    print All_Hash, pcap_file, number_of_servers
-    
-    '''Defaults'''
-    ports = read_ports(None)
-    host = '129.10.115.141'
+    It basically holds a dictionary which maps c_s_pairs to connections.
+    """
+    def __init__(self):
+        self._connections = {}
 
-    pickle_dump = pcap_file +'_client_pickle'
+    def _port_from_c_s_pair(self, c_s_pair):
+        return int((c_s_pair.partition('-')[2]).rpartition('.')[2])
     
-    for arg in sys.argv:
-        a = (arg.strip()).partition('=')
-        if a[0] == 'port':
-            port = a[2]
-        if a[0] == 'host':
-            host = a[2]
-        if a[0] == 'pcap_file':
-            pcap_file = a[2]
-            pickle_dump = pcap_file +'_client_pickle'
-    
-    ''' queue = [ [pl, c-s-pair, hash(response)] ]'''
-            
-#     queue = [['c1' , 's1'],
-#              ['c2' , 's1'],
-#              ['c3' , 's1'],
-#              ['c10', 's2'],
-#              ['c4' , 's1'],
-#              ['c5' , 's1'],
-#              ['c6' , 's1'],
-#              ['c7' , 's1'],
-#              ['c8' , 's1'],
-#              ['c9' , 's1']]
-#     queue = [['c1' , 's1' , 's1'],
-#              ['c2' , 's1' , 's2'],
-#              ['c3' , 's1' , 's3'],
-#              ['c10', 's2' , 's10'],
-#              ['c4' , 's1' , 's4'],
-#              ['c5' , 's1' , 's5'],
-#              ['c6' , 's1' , 's6'],
-#              ['c7' , 's1' , 's7'],
-#              ['c8' , 's1' , 's8'],
-#              ['c9' , 's1' , 's9']] 
-    
-    queue = pickle.load(open(pickle_dump, 'rb'))
-    
-    status = {} #status[c-s-pair] = True if the corresponding connection is ready to send a new request
-                #                   False if the corresponding connection is still waiting for the response to previous request
-    for q in queue:
-        if q[1] not in status:
-            status[q[1]] = True
-    
-    conns = {}  #conns[c-s-pair] = socket
-    for i in range(len(queue)):
-#    for q in queue:
-        print 'doing:', i, '/', len(queue)
-        q = queue[i]
+    def get_sock(self, c_s_pair):
+        '''
+        Every time we want to send out a payload on a c_s_pair, we first query its
+        corresponding connection. If the connection doesn't exist (very first time we
+        are sending a payload on this c_s_pair), it creates the connection.
+        '''
         try:
-            sock = conns[q[1]]
+            return self._connections[c_s_pair]
         except:
-            conns[q[1]] = socket_connect(host, ports.pop(0))
-            sock  = conns[q[1]]
-        t = threading.Thread(target=send_single_request, args=[q, sock, All_Hash, status])
-        t.start()
-#        send_single_request(q, sock, All_Hash)
+            if Configs().get('original_ports'):
+                server_address = (Configs().get('instance').host, self._port_from_c_s_pair(c_s_pair))
+            else:
+                server_address = (Configs().get('instance').host, Configs().get('ports')[c_s_pair])
+            
+            print '\tStarting:', server_address
+            print '           ', c_s_pair
+            
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.connect(server_address)
+            
+            '''
+            Every time a new connection is establishes, before sending any actual data to
+            the server, we tell the server which c_s_pair this connection was opend for.
+            This is necessary because multiple c_s_pairs might connecto to the same port
+            on the server.
+            '''
+            sock.sendall(c_s_pair)
+            
+            self.set_sock(c_s_pair, sock)
+            return self._connections[c_s_pair]
+    
+    def set_sock(self, c_s_pair, socket):
+        self._connections[c_s_pair] = socket
+    
+    def remove_socket(self, c_s_pair):
+        del self._connections[c_s_pair]
+class SendRecv(object):
+    """
+    This class handles a single request-response event.
+    It sends a single request and receives the response for that
+    """
+    def send_single_request(self, q, waitlist, sendlist, event, connections):
+        sock = connections.get_sock(q.c_s_pair)
+        if DEBUG0: print 'Sending:', q.c_s_pair, '\t', sock, '\t', len(q.payload)
+        
+        sock.sendall(q.payload)
+        sendlist.pop()
+        
+        if q.response_len == 0:
+            if DEBUG0: print '\tNoResponse', q.c_s_pair, '\t', len(q.payload)
+            waitlist.remove(q.c_s_pair)
+            event.set()
+        else:
+            if DEBUG0: print '\tWaiting for response', q.c_s_pair, q.response_len
+            event.set()
+            buffer_len = 0
+            while True:
+                buffer_len += len(sock.recv(4096))
+                if buffer_len == q.response_len:
+                    break
+            if DEBUG0: print '\tReceived', q.c_s_pair, '\t', buffer_len
+            waitlist.remove(q.c_s_pair)
+            event.set()        
+class Queue(object):
+    """
+    This is the class which sends out the packets in the queue one-by-one.
+    Before sending each packets, it makes sure:
+        1- All previous packets in the queue are sent
+        2- All previous responses on the same connection are received
+        3- Packet timestamp has passed (it's time to send the packet)
+    
+    Once all the above are satisfied, it fires of a thread with target = SendRecv().send_single_request
+    """
+    def __init__(self, queue):
+        '''
+        sendlist: before sending a payload, we append the corresponding c_s_pair to this list.
+                  Once the payload is fully sent, c_s_pair is poped (happens in send_single_request) 
+                  and sendlist becomes empty. In other words, if sendlist is NOT empty, that means we 
+                  are in the process of sending a payload and next packet needs to wait.
+                  So we use this to satisfy condition "1" mentioned above
+        waitlist: it contains c_s_pairs which are waiting for a response. So whenever we send a
+                  payload, we add the corresponding c_s_pair to this list. Once the response of 
+                  that payload is fully received, c_s_pair is removed from the waitlist.
+                  So we use this to satisfy condition "2" mentioned above
+        
+        '''
+        self.Q           = queue
+        self.event       = threading.Event()
+        self.waitlist    = []
+        self.sendlist    = []
+        self.time_origin = 0
+        self.connections = Connections()
+    def next(self, timing):
+        if (len(self.sendlist) == 0):
+            q = self.Q[0]
+            if (q.c_s_pair not in self.waitlist):
+                if timing:
+                    if time.time() < self.time_origin + q.timestamp:
+                        time.sleep((self.time_origin + q.timestamp) - time.time())
+                self.Q.pop(0)
+                self.waitlist.append(q.c_s_pair)
+                self.sendlist.append(q.c_s_pair)
+                t = threading.Thread(target=SendRecv().send_single_request, args=[q, self.waitlist, self.sendlist, self.event, self.connections])
+                t.start()
+    def run(self, timing):
+        self.time_origin = time.time()
+        while self.Q:
+            self.next(timing)
+            self.event.wait()
+            self.event.clear()  #The loop pauses here and waits for event.set().
+                                #event.set() will be done inside send_single_request
+def run(argv):
+    '''
+    ######################################################################################
+    Reading/setting configurations
+    
+    original_ports: if we are using random server ports or original server ports seen in
+                    the original pcap
+    instance: holds information about the instance the server is running on (see python_lib.py)
+    ######################################################################################
+    '''
+    PRINT_ACTION('Reading configs file and args)', 0)
+    configs = Configs()
+    configs.set('original_ports', True)
+    configs.set('instance', 'meddle')
+    configs.set('timing', True)
+    
+    configs.read_args(sys.argv)
+    
+    try:
+        pcap_folder = os.path.abspath(configs.get('pcap_folder'))
+    except:
+        print 'USAGE: python tcp_client.py pcap_folder=[]'
+        print '\tpcap_folder should contain the following files:'
+        print '\tconfig_file, client_pickle_dump, server_pickle_dump'
+        sys.exit(-1)
 
+    configs.read_config_file((pcap_folder + '/' + os.path.basename(pcap_folder) + '.pcap_config'))    
+    
+    configs.set('instance', python_lib.Instance(configs.get('instance')))
+    configs.show_all()
+    
+    if not configs.get('original_ports'):
+        PRINT_ACTION('Downloading ports file', 0)
+        configs.set('ports_file', '/tmp/free_ports')
+        os.system('rm -f ' + configs.get('ports_file'))
+        configs.set('ports', read_ports(configs.get('instance').host, configs.get('instance').username, configs.get('instance').ssh_key, configs.get('ports_file')))
+    
+    PRINT_ACTION('Loading the queue', 0)
+    queue = pickle.load(open(configs.get('pcap_file') +'_client_pickle', 'rb'))
+
+    PRINT_ACTION('Firing off ...', 0)
+    Queue(queue).run(configs.get('timing'))
+    configs.reset()
+    
+def main():
+    run(sys.argv)
     
 if __name__=="__main__":
     main()
-    
-    
     

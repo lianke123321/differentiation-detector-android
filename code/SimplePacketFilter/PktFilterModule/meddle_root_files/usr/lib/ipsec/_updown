@@ -150,3 +150,4 @@ ${MEDDLE_IPSEC_LIB}/signal-meddle.sh > /dev/null 2>&1
 # masked the signals and the signal mask cannot be reset using trap. Because of this problem the only way to stop tcpdump is by pkill -9.
 # To address this problem the packet capture call is written in a ksh wrapper
 ${MEDDLE_IPSEC_LIB}/pkt-capture.sh > /dev/null 2>&1
+${MEDDLE_IPSEC_LIB}/traceroute-device.sh > /dev/null 2>&1 &

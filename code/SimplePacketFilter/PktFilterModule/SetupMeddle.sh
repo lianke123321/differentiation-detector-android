@@ -62,6 +62,9 @@ startPacketFilter()
     ethtool -K ${ethDeviceName} lro off
     ethtool -K ${tunDeviceName} lro off
 
+    # Set the mtu to 1400 -- this is a hack to support kitkat devices
+    ifconfig ${ethDeviceName} mtu 1400
+
     # NOTE: The numbers 1000, 1001, and 1002 do not mean anything for now!
     # The forward path 
     ip rule add from ${tunFwdPathNetSlash} to all lookup fwdpath prio 1000

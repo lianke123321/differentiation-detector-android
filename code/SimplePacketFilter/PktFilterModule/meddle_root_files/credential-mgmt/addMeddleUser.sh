@@ -5,10 +5,14 @@ tmpPass=`echo ${tmpID} | cut -b -5`
 clientName="$tmpID"
 clientPassword="$tmpPass"
 
+export clientCertsPath="${clientCertsPath}/${clientName}/"
+echo ${clientCertsPath}
 mkdir -p ${clientCertsPath}
 ./genClientP12.sh ${clientName} ${clientPassword}
 
 python genIOSConfigXML.py "${clientName}" "${clientPassword}" "${mobileConfigOrgName}" "${mobileConfigConDisplayName}" "${caName}" "${mobileConfigServerHostname}" "${signingCertsPath}${caCertName}" "${clientCertsPath}" 
+
+python genIOS7ConfigXML.py "${clientName}" "${clientPassword}" "${mobileConfigOrgName}" "${mobileConfigConDisplayName}" "${caName}" "${mobileConfigServerHostname}" "${signingCertsPath}${caCertName}" "${clientCertsPath}"
 
 query="INSERT INTO UserConfigs VALUES (0, '${clientName}', 0);"
 echo "${query}"
@@ -17,6 +21,11 @@ query="select userID, userName, filterAdsAnalytics from UserConfigs where userNa
 echo "${query}"
 mysql -u "${dbUserName}" --password="${dbPassword}" -D "${dbName}" -e "${query}"
 echo "${clientName} : XAUTH \"${clientPassword}\"" >> ${MEDDLE_ETC}/ipsec.secrets
+
+authCode=`date +%s``uptime``free`${clientName}
+authCode=`echo ${authCode}| md5sum | cut -d ' ' -f 1`
+query="insert Into UserAuthMap  SELECT max(userID)+1, '${authCode}' FROM UserAuthMap;"
+mysql -u "${dbUserName}" --password="${dbPassword}" -D "${dbName}" -e "${query}"
 
 echo "Making strongswan load the new credentials"
 ${MEDDLE_ROOT}/usr/sbin/ipsec rereadall 

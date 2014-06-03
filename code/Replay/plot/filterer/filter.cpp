@@ -86,7 +86,7 @@ int main(int argc, char ** argv)
     }
     else
     {
-        cout << "No threshold given, using default (1000)." << endl;
+        //cout << "No threshold given, using default (1000)." << endl;
     }
     if (argc >= 4)
     {
@@ -159,11 +159,21 @@ int main(int argc, char ** argv)
     // Total number of lost TCP packets.
     long total_tcp_lost = 0;
 
-    // Map of ACKS
+    // Map of ACKS for packet loss.
     map<string, bool> acks;
 
-    // Map of SEQs.
+    // Map of SEQs for packet loss.
     vector<string> seqs;
+
+    // Map of ACKS for RTT.
+    map<string,double> rtt_acks;
+
+    // Map of SEQs for RTT.
+    map<string,double> rtt_seqs;
+
+
+    // Map of RTT samples.
+    map<string,vector<double> > rtt_samples;
 /*
     // Throughput timer.
     double now_time = 0;
@@ -264,6 +274,7 @@ int main(int argc, char ** argv)
     while(!inp.eof())
     {
         eatspaces(inp);
+	flag = false;
         // Read the time value (packet time).
         inp >> hh; inp.get();
         inp >> mm; inp.get();
@@ -316,7 +327,6 @@ int main(int argc, char ** argv)
                     // Maximum connection length for a TCP connection is the last sequence number.
                     max_len[(p1 + "-" + p2)] = seq2;
                     eatspaces(inp);
-                    flag = false;
                     // If there are too many files open, close this one.
                     if(open_files > OPEN_FILE_HANDLE_LIMIT) {(*(file_map[p1+ "-" + p2])).close(); open_files--;}
 
@@ -352,21 +362,26 @@ int main(int argc, char ** argv)
             if(seq_or_ack == "seq" && flag)
             {
                 string s;
+		string src_dst_seq;
                 char seq1c[20];
                 sprintf(seq1c,"%ld", seq1);
                 char seq2c[20];
                 sprintf(seq2c,"%ld", seq2);
-                s += p1 + p2 + seq1c + seq2c;
+                s += p1 + "-" + p2 + "-" + seq1c + "-" + seq2c;
+		
+		src_dst_seq = p1 + "-" + p2 + "-" + seq2c;
 
                 if(find(seqs.begin(), seqs.end(), s) != seqs.end())
                 {
                     //cout << "Duplicate seq: " << p1 << ">" << p2 << " seq " << seq1c << ":" << seq2c << endl;
                     total_tcp_lost++;
+		    rtt_seqs[src_dst_seq] = ttime;
                 }
                 else
                 {
                     // If it hasn't been seen before, add it.
                     seqs.push_back(s);
+		    rtt_seqs[src_dst_seq] = ttime;
                 }
             }
             // If there is a duplicate "ack n" that has been seen only once before,
@@ -374,9 +389,13 @@ int main(int argc, char ** argv)
             else if (seq_or_ack == "ack")
             {
                 string s;
+		string reverse_src_dst_ack;
                 char seq1c[20];
                 sprintf(seq1c,"%ld", seq1);
-                s += p1 + p2 + seq1c;
+                s += p1 + "-" + p2 + "-" + seq1c;
+		
+		// It is in reverse for ack.
+		reverse_src_dst_ack = p2 + "-" + p1 + "-" + seq1c;
 
                 // If this has been seen and only seen once, a packet was lost.
                 if(acks.count(s) != 0 && acks[s] == false)
@@ -389,10 +408,23 @@ int main(int argc, char ** argv)
                 {
                     // If it hasn't been seen before, add it.
                     if (acks.count(s) == 0)
+		    {
                         acks[s] = false;
+
+			rtt_acks[reverse_src_dst_ack] = ttime;
+		    
+			if (rtt_seqs.count(reverse_src_dst_ack) != 0)
+			{
+			    string src_dst_pair;
+			    src_dst_pair = p2 + "-" + p1;
+			    // cout << "RTT sample: " << src_dst_pair << " - time: " << rtt_acks[reverse_src_dst_ack] - rtt_seqs[reverse_src_dst_ack] << "s - seq: " << seq1 << endl;
+			    rtt_samples[src_dst_pair].push_back(rtt_acks[reverse_src_dst_ack] - rtt_seqs[reverse_src_dst_ack]);
+			}
+		    }
                 }
             }
             total_tcp_packets++;
+
         }
         else if (protocol == "UDP,") // UDP
         {
@@ -553,11 +585,53 @@ int main(int argc, char ** argv)
 
     // Maximum connection length.
     long MAX = 0;
+    string MAX_5tuple = "";
 
     // Find the maximum connection length among all connections in the trace.
     for(map<string,long>::iterator it = max_len.begin(); it != max_len.end(); it++)
     {
-        MAX = (MAX > it->second ? MAX : it->second);
+        if (MAX < it->second)
+	{
+	    MAX = it->second;
+	    MAX_5tuple = it->first;
+	}
+    }
+
+    // If it is TCP (has some samples).
+    if (rtt_samples.count(MAX_5tuple) != 0)
+    {
+	double rtt_agg = 0;
+	ofstream rtt_of("rtt_samples.txt");
+	vector<double>	rtt_vec = rtt_samples[MAX_5tuple];
+
+        // Simplest sorting algorithm in the world! :)
+	bool swapped = false;
+        for(int i = rtt_vec.size(); i > 0; i--)
+	{
+            swapped = false;
+	    for (int j = 1; j < i; j++)
+    	    {
+    	        if (rtt_vec[j-1] > rtt_vec[j])
+		{
+            	    swap(rtt_vec[j-1], rtt_vec[j]);
+                    swapped = true;
+	        }
+    	    }
+            if(!swapped)
+                break;
+	}
+
+	for(int i = 0; i < rtt_vec.size(); i++)
+        {
+	    rtt_of << rtt_vec[i] * 1000 << endl;
+	    rtt_agg += rtt_vec[i] * 1000;
+	}
+	rtt_of.close();
+
+	meta	<< "rtt_min\t	" << rtt_vec[0]				<< endl
+		<< "rtt_median\t"<< rtt_vec[(rtt_vec.size()-1)/2]	<< endl
+		<< "RTT_avg\t	" << rtt_agg / double(rtt_vec.size())	<< endl
+		<< "RTT_max\t	" << rtt_vec[rtt_vec.size() - 1]	<< endl;
     }
 
     // Add files to the plot.
@@ -611,10 +685,11 @@ int main(int argc, char ** argv)
     }
     plot << endl;
     plot.close();
-
+    
+    cout << MAX_5tuple << endl;
     // Draw the plot.
     system("gnuplot plot.gp");
     // Convert it to JPEG for convenience.
-    system("convert -density 1000 p.ps -scale 2000x1000 p.jpg");
+    //system("convert -density 1000 p.ps -scale 2000x1000 p.jpg");
     return 0;
 }
