@@ -1,5 +1,0 @@
-# This folder contains the list of domains to blocked. These files must be installed along with other files for the bind dns server. I have also kept the entries for the dnsmasq dns server if dnsmasq is used.
-
-The installation steps are present in the installation-steps.txt
-
-

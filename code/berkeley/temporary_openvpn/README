@@ -1,3 +1,0 @@
-While we wait for StrongSwan setup, in the mean time we have a static openVPN configuration that allows us to send some traffic to the host. These are the conf files, OpenVPN **should** be running on c7 at all times in a screen session under Justine's account.
-
-Once StrongSwan is set up we can kill the OpenVPN session for good.
