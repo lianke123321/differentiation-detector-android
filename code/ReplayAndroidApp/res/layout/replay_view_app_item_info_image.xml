@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:divider="#00000000"
+    android:orientation="horizontal"
+    android:paddingLeft="5dp" >
+
+    <ImageView
+        android:id="@+id/appImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:paddingBottom="6dp"
+        android:paddingRight="16dp"
+        android:paddingTop="6dp"
+        android:src="@drawable/dropbox" />
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" >
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="0dip" >
+
+            <TextView
+                android:id="@+id/appSizeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/appSizeLabel"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/appSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="20dp"
+                android:text="10 M" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/appTimeLabel"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/appTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingLeft="5dp"
+                android:text="20 s" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip" >
+
+            <TextView
+                android:id="@+id/appStatusTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="4"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:padding="10dp"
+                android:text="Pending"
+                android:textColor="@color/black"
+                android:textSize="@dimen/main_title_text_size"
+                android:textStyle="bold" />
+        </TableRow>
+    </TableLayout>
+
+     <ProgressBar
+        android:id="@+id/appProgress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:minHeight="25dp"
+        android:minWidth="200dp"
+        android:paddingLeft="25dp"
+        android:visibility="gone" /> 
+
+    <ImageButton
+        android:id="@+id/appResultBtn"
+         android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:paddingBottom="6dp"
+        android:paddingRight="16dp"
+        android:paddingTop="6dp"
+        android:minHeight="25dp"
+        android:minWidth="100dp"
+        android:padding="4dp"
+        android:layout_marginTop="10dp"
+        android:visibility="visible"
+        android:paddingLeft="25dp"      
+        android:src="@drawable/analysis"
+        android:background="@null"
+         />
+
+</LinearLayout>

@@ -1,0 +1,18 @@
+Setting up the app:
+
+To Setup the app on machine, go through following steps:
+
+- First get the source of the App on your system.
+- Import the project in your editor(I'd suggest eclipse).
+- To run this code you need to setup the jni directory of the project. This is required to establish VPN connection. Strongswan is an android VPN client which is being used here. Setting up jni is tricky. Following is the link that I found useful. You might also have to search for specific 
+
+http://wiki.strongswan.org/projects/strongswan/wiki/AndroidVPNClient
+
+- After setting up JNI directory, ytry to build the project. On successful build, you can install this app on Android phone. 
+
+- To connect to Meddle VPN from App, you need install Certificate. As of now there is no user interface to enter Credentials of VPN on App, you need to hardcode this into the App. You have to do that at two places : 
+	Line 155: src/com/stonybrook/android/logic/CharonVpnService.java (no change change should be needed here unless IP of Meddle server changes)
+	Line 858: src/com/stonybrook/replay/ReplayActivity.java (Username and Password)
+
+- After this, you should be able to connect to VPN. Now you can run the Replays from App.
+. 

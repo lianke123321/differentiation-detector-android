@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Record Replay</string>
+    <string name="action_settings">Settings</string>
+    <string name="main_page_title">Pick Applications</string>
+    <string name="next_button">Next</string>
+    <string name="selected">Selected</string>
+    <string name="back_button">Back</string>
+    <string name="selected_apps">Selected Applications</string>
+    <string name="replay">Start</string>
+    <string name="title_activity_replay">Remove this</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_crash">CrashActivity</string>
+    <string name="pending">Pending</string>
+    <string name="processing">Running on Open</string>
+    <string name="downloading">Downloading File</string>
+    <string name="vpn">Running on VPN</string>
+    <string name="error">Error </string>
+    <string name="vpn_connect">Trying to connect VPN</string>
+    <string name="vpn_failed">Failed to connect VPN</string>
+    <string name="finished">Finished</string>
+    <string name="appResultButton">Results</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="setting">Settings</string>
+    <string name="log">Log</string>
+    
+    <string name="errMsgTitle">Error!!!</string>
+    <string name="errMsg">It appears that Saruman has caused distrurbance with your request. An E-mail has been sent to Gandalf. He will be here as soon as possible on his flying dragon to solve your problem. Thank you for your patience.</string>
+
+    <string name="timing_label">Enable Inter-packet Timing?</string>
+    <string name="timing_Yes">true</string>
+    <string name="timing_No">false</string>
+    
+    <string name="server_label">Select Server</string>
+    <string name="server_rajesh_ec2">54.186.125.120</string>
+    <string name="server_something_else">54.186.125.120</string>
+    <string name="appSizeLabel">Size:</string>
+    <string name="appTimeLabel">Time:</string>
+    
+</resources>
