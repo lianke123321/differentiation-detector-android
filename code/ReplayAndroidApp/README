@@ -3,6 +3,8 @@ Setting up the app:
 To Setup the app on machine, go through following steps:
 
 - First get the source of the App on your system.
+- Add files from following link to the assets folder of the App.
+	https://drive.google.com/file/d/0B-JCoSGOFdwjbXJaVENVYkl5SHM/edit?usp=sharing
 - Import the project in your choice of editor (I'd suggest eclipse ADT).
 - To run this code you need to setup the jni directory of the project. This is required to establish VPN connection. Strongswan is an android VPN client which is being used here. Setting up jni is tricky. Following is the link that I found useful. You might also have to search for specific issues.
 

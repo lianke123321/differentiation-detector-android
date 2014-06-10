@@ -1,2 +1,0 @@
-Android NDK: WARNING: APP_PLATFORM android-19 is larger than android:minSdkVersion 14 in /home/rajesh/Documents/Adv.Proj/Workspace-Meddle/MainActivity/AndroidManifest.xml    
-[armeabi] SharedLibrary  : libstrongswan.so
