@@ -1,0 +1,39 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white" >
+
+    <LinearLayout
+        android:id="@+id/ll1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue14"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/errorMsgTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:padding="10dp"
+            android:text="@string/errMsgTitle"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_title_text_size"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/errorMsg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:padding="10dp"
+        android:text="@string/errMsg"
+        android:textColor="@color/blue14"
+        android:textSize="@dimen/main_title_text_size"
+        android:textStyle="bold" 
+        android:gravity="center"
+        android:layout_below="@id/ll1"
+        />
+
+</RelativeLayout>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.rgolani.replay"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <!-- Rememeber this change. Changed min API version from 8 to 11 to support executeOnExecutor -->
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="18" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="true"
+        android:debuggable="true"
+        android:icon="@drawable/app_icon"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:theme="@style/LightThemeSelector" >
+        <activity
+            android:name="com.stonybrook.replay.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.stonybrook.replay.ReplayActivity"
+            android:label="@string/title_activity_replay"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.stonybrook.replay.CrashActivity"
+            android:label="@string/title_activity_crash"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.stonybrook.android.ui.LogActivity"
+            android:label="@string/log"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <receiver
+            android:name="org.strongswan.android.ui.logic.StartVPNServiceAtBootReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:label="StartVPNServiceAtBootReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name="com.stonybrook.android.data.LogContentProvider"
+            android:authorities="org.strongswan.android.content.log" >
+
+            <!--
+                 android:grantUriPermissions="true" combined with a custom permission does
+                 not work (probably too many indirections with ACTION_SEND) so we secure
+                 this provider with a custom ticketing system
+            -->
+        </provider>
+
+        <service
+            android:name="com.stonybrook.android.logic.VpnStateService"
+            android:exported="false" >
+        </service>
+        <service
+            android:name="com.stonybrook.android.logic.CharonVpnService"
+            android:exported="false"
+            android:permission="android.permission.BIND_VPN_SERVICE" >
+            <intent-filter>
+                <action android:name="org.strongswan.android.logic.CharonVpnService" />
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>
