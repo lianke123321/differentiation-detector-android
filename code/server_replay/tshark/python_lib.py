@@ -1,4 +1,4 @@
-import socket, sys, subprocess, commands, os, ConfigParser, math
+import sys, os, ConfigParser, math, json, time, subprocess
 
 def PRINT_ACTION(string, indent, action=True):
     if action:
@@ -6,25 +6,34 @@ def PRINT_ACTION(string, indent, action=True):
         Configs().action_count = Configs().action_count + 1
     else:
         print ''.join(['\t']*indent) + string
+
 def append_to_file(line, filename):
     f = open(filename, 'a')
     f.write((line + '\n'))
     f.close()
 
-def print_progress(current_step, total_number_of_steps, extra_print=None, width=50):
+def print_progress(total_number_of_steps, extra_print=None, width=50):
     '''
     Prints progress bar.
     '''
-    sys.stdout.write('\r')
-    sys.stdout.write("\t[{}] {}% ({}/{})".format(('='*(current_step*width/total_number_of_steps)).ljust(width)
-                                               , int(math.ceil(100*current_step/float(total_number_of_steps)))
-                                               , current_step
-                                               , total_number_of_steps))
-    if extra_print:
-        sys.stdout.write(extra_print)
-    sys.stdout.flush()
-    if current_step == total_number_of_steps:
-        print '\n'
+    current_step = 1
+    
+    while current_step <= total_number_of_steps:
+        sys.stdout.write('\r')
+        sys.stdout.write("\t[{}] {}% ({}/{})".format(('='*(current_step*width/total_number_of_steps)).ljust(width)
+                                                   , int(math.ceil(100*current_step/float(total_number_of_steps)))
+                                                   , current_step
+                                                   , total_number_of_steps))
+        if extra_print:
+            sys.stdout.write(extra_print)
+        
+        sys.stdout.flush()
+        
+        if current_step == total_number_of_steps:
+            print '\n'
+        
+        current_step += 1
+        yield
 
 def dir_list(dir_name, subdir, *args):
     '''
@@ -66,27 +75,74 @@ def convert_ip(ip):
     l[4]  = l[4].zfill(5)
     return '.'.join(l)
 
-class UDPQueue(object):
-    def __init__(self, starttime=None, dst_socket=None, c_s_pair=None):
-        self.Q          = []
-        self.c_s_pair   = c_s_pair
-        self.starttime  = starttime
-        self.dst_socket = dst_socket
-        
-    def add_UDPset(self, udp_set):
-        self.Q.append(udp_set)
-        
-    def __str__(self):
-        return (' -- '.join([self.c_s_pair, str(self.starttime), str(self.dst_socket), '\n\t']) +
-                '\n\t'.join([(udp_set.payload + '\t' + str(udp_set.timestamp)) for udp_set in self.Q]))
+# class UDPQueue(object):
+#     def __init__(self, starttime=None, dst_socket=None, c_s_pair=None):
+#         self.Q          = []
+#         self.c_s_pair   = c_s_pair
+#         self.starttime  = starttime
+#         self.dst_socket = dst_socket
+#         
+#     def add_UDPset(self, udp_set):
+#         self.Q.append(udp_set)
+#         
+#     def __str__(self):
+#         return (' -- '.join([self.c_s_pair, str(self.starttime), str(self.dst_socket), '\n\t']) +
+#                 '\n\t'.join([(udp_set.payload + '\t' + str(udp_set.timestamp)) for udp_set in self.Q]))
 
 class UDPset(object):
-    def __init__(self, payload, timestamp, c_s_pair):
-        self.payload   = payload
-        self.timestamp = timestamp
-        self.c_s_pair  = c_s_pair
+    def __init__(self, payload, timestamp, c_s_pair, client_port=None, end=False):
+        self.payload     = payload
+        self.timestamp   = timestamp
+        self.c_s_pair    = c_s_pair
+        self.client_port = client_port
+        self.end         = end
     def __str__(self):
-        return '{}--{}--{}'.format(self.payload, self.timestamp, self.c_s_pair)
+        return '{}--{}--{}--{}--{}'.format(self.payload, self.timestamp, self.c_s_pair, self.client_port, self.end)
+    def __repr__(self):
+        return '{}--{}--{}--{}--{}'.format(self.payload, self.timestamp, self.c_s_pair, self.client_port, self.end)
+        
+class TCP_UDPjsonEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, UDPset):
+            obj = {'payload':obj.payload, 'timestamp':obj.timestamp, 'c_s_pair':obj.c_s_pair, 'client_port':obj.client_port, 'end':obj.end}
+        elif isinstance(obj, RequestSet):
+            obj = {'payload':obj.payload, 'c_s_pair':obj.c_s_pair, 'timestamp':obj.timestamp, 'response_hash':obj.response_hash, 'response_len':obj.response_len}
+        elif isinstance(obj, ResponseSet):
+            obj = {'request_len':obj.request_len, 'request_hash':obj.request_hash, 'response_list':obj.response_list}
+        elif isinstance(obj, OneResponse):
+            obj = {'payload':obj.payload, 'payload':obj.payload}
+        else:
+            obj = super(TCP_UDPjsonEncoder, self).default(obj)
+        return obj    
+
+class UDPjsonDecoder_client(json.JSONDecoder):
+    def decode(self, json_string):
+        default_obj = super(UDPjsonDecoder_client,self).decode(json_string)
+        client_Q = []
+        for udp in default_obj[0]:
+            client_Q.append(UDPset(udp['payload'], udp['timestamp'], udp['c_s_pair'], udp['client_port'], udp['end']))
+        return [client_Q] + default_obj[1:]
+
+class UDPjsonDecoder_server(json.JSONDecoder):
+    def decode(self, json_string):
+        default_obj = super(UDPjsonDecoder_server,self).decode(json_string)
+        server_Q = {}
+        for server_port in default_obj[0]:
+            server_Q[server_port] = []
+            for udp in default_obj[0][server_port]:
+                server_Q[server_port].append(UDPset(udp['payload'], udp['timestamp'], udp['c_s_pair'], udp['client_port'], udp['end']))
+        return [server_Q] + default_obj[1:]
+
+class TCPjsonDecoder_client(json.JSONDecoder):
+    def decode(self, json_string):
+        default_obj = super(TCPjsonDecoder_client, self).decode(json_string)
+        client_Q = []
+        for tcp in default_obj[0]:
+            req = RequestSet(tcp['payload'], tcp['c_s_pair'], '', tcp['timestamp'])
+            req.response_hash = tcp['response_hash']
+            req.response_len  = tcp['response_len']
+            client_Q.append(req)
+        return [client_Q] + default_obj[1:]
 
 class SocketInstance():
     def __init__(self, ip, port, name=None):
@@ -97,33 +153,52 @@ class SocketInstance():
         return '{}-{}'.format(self.ip, self.port)
 
 class RequestSet(object):
+    '''
+    NOTE: These objects are created in the parser and the payload is encoded in HEX.
+          However, before replaying, the payload is decoded, so for hash and length,
+          we need to use the decoded payload.
+    '''
     def __init__(self, payload, c_s_pair, response, timestamp):
-        self.payload  = payload
-        self.c_s_pair = c_s_pair
+        self.payload   = payload
+        self.c_s_pair  = c_s_pair
+        self.timestamp = timestamp
+        
         if response is None:
             self.response_hash = None
             self.response_len  = 0
         else:    
-            self.response_hash = hash(response)
-            self.response_len  = len(response)
-        self.timestamp = timestamp
-
+            self.response_hash = hash(response.decode('hex'))
+            self.response_len  = len(response.decode('hex'))
+    
+    def __str__(self):
+        return '{} -- {} -- {}'.format(self.payload, self.timestamp, self.c_s_pair)
+    
 class ResponseSet(object):
+    '''
+    NOTE: These objects are created in the parser and the payload is encoded in HEX.
+          However, before replaying, the payload is decoded, so for hash and length,
+          we need to use the decoded payload.
+    '''
     def __init__(self, request, response_list):
-        self.request_len   = len(request)
-        self.request_hash  = hash(request)
+        self.request_len   = len(request.decode('hex'))
+        self.request_hash  = hash(request.decode('hex'))
         self.response_list = response_list
-
+    
+    def __str__(self):
+        return '{} -- {}'.format(self.request_len, self.response_list)
+    
 class OneResponse(object):
     def __init__(self, payload, timestamp):
         self.payload   = payload
         self.timestamp = timestamp
+        
 class Singleton(type):
     _instances = {}
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
+
 class Configs(object):
     '''
     This object holds all configs
@@ -155,7 +230,10 @@ class Configs(object):
                 try:
                     self.set(a[0], int(a[2]))
                 except ValueError:
-                    self.set(a[0], a[2])
+                    try:
+                        self.set(a[0], float(a[2]))
+                    except ValueError:
+                        self.set(a[0], a[2])
     def check_for(self, list_of_mandotary):
         try:
             for l in list_of_mandotary:
@@ -188,7 +266,13 @@ class Configs(object):
 
 class Instance(object):
     instance_list = {
+        '2ec2'    : {'host'     : 'ec2-54-86-43-223.compute-1.amazonaws.com',
+                     'username' : 'ubuntu',
+                     'ssh_key'  : '~/.ssh/meddle'},
         'meddle'  : {'host'     : 'ec2-54-243-17-203.compute-1.amazonaws.com',
+                     'username' : 'ubuntu',
+                     'ssh_key'  : '~/.ssh/meddle'},
+        'meddle-tun'  : {'host' : '10.101.101.101',
                      'username' : 'ubuntu',
                      'ssh_key'  : '~/.ssh/meddle'},
         'achtung' : {'host'     :'129.10.115.141',
@@ -197,6 +281,9 @@ class Instance(object):
         'alan-ec2': {'host'     :'ec2-54-204-220-73.compute-1.amazonaws.com',
                      'username' : 'ubuntu',
                      'ssh_key'  : '~/.ssh/ancsaaa-keypair_ec2.pem'},
+        'localhost': {'host'    :'127.0.0.1',
+                     'username' : 'arash',
+                     'ssh_key'  : ''},
     }
     def __init__(self, instance, instances=instance_list):
         self.name     = instance
@@ -205,3 +292,63 @@ class Instance(object):
         self.ssh_key  = instances[instance]['ssh_key']
     def __str__(self):
         return '{} -- {} -- {} -- {}'.format(self.name, self.host, self.username, self.ssh_key)
+
+class tcpdump(object):
+    '''
+    Class for taking tcpdump
+    
+    Everything is self-explanatory
+    '''
+    def __init__(self, dump_name=None, interface='en0'):
+        self._interface = interface
+        self._running   = False
+        self._p         = None
+        self._plist     = None
+        self.dump_name  = None
+        
+        if dump_name is None:
+            self.dump_name = 'dump_' + time.strftime('%Y-%b-%d-%H-%M-%S', time.gmtime()) + '.pcap'
+        else:
+            self.dump_name = 'dump_' + dump_name + '.pcap'
+    
+    def start(self, host=None):
+        self._plist = ['tcpdump', '-nn', '-i', self._interface, '-w', self.dump_name]
+        if host:
+            self._plist += ['host', host]
+        self._p = subprocess.Popen(self._plist)
+        self._running = True
+#         print '\nStarted tcpdump: {}'.format(self._plist)
+        return self._running
+    
+    def stop(self):
+        self._p.terminate()
+        self._running = False
+#         print '\tDump stopped: {}'.format(self._interface, self.dump_name, self._p.pid)
+        return self._running
+    
+    def status(self):
+        return self._running
+
+def clean_pcap(in_pcap, port_list, out_pcap=None, logfile='clean_pcap_logfile'):
+    if out_pcap is None:
+        out_pcap = in_pcap.replace('.pcap', '_out.pcap')
+    
+    filter  = 'port ' + ' or port '.join(map(str, port_list))
+    command = ['tcpdump', '-r', in_pcap, '-w', out_pcap, '-R', filter]
+
+    p = subprocess.Popen(command)
+    
+class ReplayObj(object):
+    def __init__(self, id, replay_name, ip, tcpdump_int):
+        self.id          = id
+        self.replay_name = replay_name
+        self.ip          = ip
+        self.start_time  = time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
+        self.dump        = tcpdump(dump_name='_'.join([id, replay_name, ip, self.start_time]), interface=tcpdump_int)
+        self.ports       = []
+    
+    def get_info(self):
+        return '\t'.join([self.id, self.replay_name, self.ip, self.dump.dump_name, self.start_time])
+    
+    def get_ports(self):
+        return self.id + '\t' + ';'.join(self.ports)
