@@ -7,12 +7,12 @@
 %%% PG2013:: bunch of macros you can ignore them for now 
 \def\full{0}        % set 1 for a full tech report version
                     % set 0 for submission version
-\def\shownotes{0}   % set 1 for version with author notes
+\def\shownotes{1}   % set 1 for version with author notes
                     % set 0 for no notes
 \def\anon{0}        % set 1 to anonymize
                     % set 0 for acks and author names
 
-\def\showedits{0} %set for 1 to turn edits red, 0 for them to become black.
+\def\showedits{1} %set for 1 to turn edits red, 0 for them to become black.
 
 \newcommand{\namedref}[2]{#1~\ref{#2}}
 \newcommand{\tableref}[1]{\namedref{Table}{#1}}
@@ -174,7 +174,7 @@ Previous work \cite{glasnost, zhang:netdiff, tariq:nano} explored this problem i
 \label{sec:method}
 
 %\subsection{Assumptions} 
-We assume that ISPs will differentiate traffic based on hostname, IP addresses, ports, total number of connections, payload signatures, total bandwidth and time of day. Our system currently can detect all forms of differentiation mentioned with the exception of server-based differentiation.
+We assume that ISPs will differentiate traffic based on hostname, IP addresses, ports, total number of connections, payload signatures, total bandwidth and time of day. Our system currently can detect all of these forms of differentiation with the exception of server-based differentiation.
 
 \subsection{Overview} Mobile Replay identifies service differentiation using two key components. First, it tests for differentiation by replaying real network traces generated from user interactions with apps. Meddle \cite{meddle} facilitates capturing this information, and we develop new strategies for replaying arbitrary app traces. Second, Mobile Replay exploits the Meddle VPN to conduct controlled experiments. By alternately replaying traffic over tunneled and untunneled connections multiple times in rapid succession, we control for factors that ISPs may use to differentiate traffic.
 
@@ -189,17 +189,17 @@ A key challenge is how to capture and replay the salient features of application
 \end{figure}
 
 \subsection{Replay and methodology}
-We support both UDP and TCP flows in our replay system, which consists of a client app running on the mobile device and a replay server written in Python in a event-driven fashion using Gevent \cite{gevent}, which has been shown to perform very efficiently with many concurrent clients. The server also perform UDP hole punching to support clients behind a NAT. The client and server co-ordinate to replay the original flows to reproduces packet timings, sequence of bytes, ports and client IPs. Since our replay is limited to using our own replay servers, we cannot detect differentiation based on arbitrary server IPs (a topic of ongoing work).
+We support both UDP and TCP flows in our replay system, which consists of a client app running on the mobile device and a replay server written in Python in a event-driven fashion using Gevent \cite{gevent}, which performs efficiently with many concurrent clients. The server also performs UDP hole punching to support clients behind a NAT. The client and server coordinate to replay the original flows to reproduces packet timings, sequence of bytes, ports and client IPs. Since our replay is limited to using our own replay servers, we cannot detect differentiation based on arbitrary server IPs (a topic of ongoing work). \edit{Note, however, that if our replay servers are co-located with servers contacted in our traces, we do not suffer from this limitation. For example, if we use EC2 servers and the tested app streams video from a server in the same data center (and/or same block of IP addresses), we may be able to trigger the same differentiation in our replays.}
 
 We detect differentiation according to the following metrics. First, we compute checksums to verify that the bytes sent/received at each endpoint during the replay are exactly the same as the original trace. If not, we flag a case of content manipulation/blocking. Second, we compute summary statistics on throughput, loss, and RTT. Unlike manipulation/blocking, there are confounding factors other than differentiation that may causes changes in these statistics between the record and replay.
-To address this issue, we run multiple replay trials (10 total), alternating between using a VPN connection ($R_T$) and an untunneled one ($R_U$). By computing statistics over multiple trials of one category ($R_T$ or $R_U$) we can quantify natural variations in performance that are not a result of differentiation. Having computed the variance over $R_T$ and $R_U$, we can compare the summary statistics (mean/median) of $R_T$ and $R_U$ and use the variance in each category to determine if the differences are statistically significant.
+To address this issue, we run multiple replay trials (10 total\edit{, though we are investigating dynamically adjusting the number of trials in response to observed noise}), alternating between using a VPN connection ($R_T$) and an untunneled one ($R_U$). By computing statistics over multiple trials of one category ($R_T$ or $R_U$) we can quantify natural variations in performance that are not a result of differentiation. Having computed the variance over $R_T$ and $R_U$, we can compare the summary statistics (mean/median) of $R_T$ and $R_U$ and use the variance in each category to determine if the differences are statistically significant.
 Note that ISPs may apply differentiation to all VPN traffic, e.g., by throttling. To detect this, we group all $R_T$ samples and compare them to all $R_U$ samples across all applications and use the analysis described above.
 
 \begin{figure}[t]
 	\centering
 %	\vspace{-0.25in}
 	\includegraphics[width=3.25in]{figures/double.eps}
-	\caption{Cumulative byte-transfer plot of YouTube trace replays with inter-packet timing preserved vs. not preserved. The x-axis is time and y-axis is the total number of bytes transferred to that point. It is observed that the original packet-trace looks exactly the same as the replay with timing preserved. }
+	\caption{Cumulative byte-transfer plot of YouTube trace replays with inter-packet timing preserved vs. not preserved. The x-axis is time and y-axis is the total number of bytes transferred to that point. Observe that the original packet trace looks identical to the replay when timing is preserved. }
 	\label{fig:double}
 %	\vspace{-1em}
 \end{figure}
@@ -211,7 +211,7 @@ We now demonstrate that our replay module performs as expected and can detect di
 
 By preserving packet ordering and timing, our system produces very similar results to the original traffic. Figure \ref{fig:double} shows a YouTube trace replayed in both conditions side-by-side. Of course, a variety of factors can differ between record and replay, including network conditions and access technology. In particular, apps may change their behavior in response to network technology and available bandwidth. In such cases, we must ensure that we replay traffic that was originally captured over similar network conditions. In our experiments, YouTube was the only app that exhibited such behavior.
 
-We next tested whether we can detect differentiation in a controlled environment. We ran a full replay test with YouTube in a test environment where we add differentiation by adding a 3\% packet loss and 10ms of delay. Figure \ref{fig:diff} is the CDF plot of throughput over time where differentiation is clearly detectable, indicating that our system can distinguish between differentiation and noise. Last, we tested our approach using several application traces on Verizon. Figure \ref{fig:nodiff} shows our replay results for two of those services, and we are able to confirm that there is no differentiation.
+We next tested whether we can detect differentiation in a controlled environment. We ran a full replay test with YouTube in a test environment where we \edit{inject a simple form of} differentiation by adding a 3\% packet loss and 10ms of delay. Figure \ref{fig:diff} shows CDFs of throughput during the replays, with and without differentiation. \edit{The effect of differentiation on the distribution is clear}, indicating that our system and metrics allow us to distinguish between differentiation and noise. Last, we tested our approach using several application traces on Verizon in Boston. Figure \ref{fig:nodiff} shows our replay results for two of those services, and we are able to confirm that there is no differentiation.
 
 %A few qualities had to be verified about reference service trace: the reference WiFi network on which the packets were recorded should be well provisioned itself (i.e. no service differentiation mechanism should be in place), so the traces were recorded on campus WiFi network. Additionally, tested applications shouldn't behave differently on WiFi compared to when they are on cellular network. This was confirmed for all tested applications by recording traces once on a WiFi network and an HSDPA+ network with roughly the same bandwidth.
 
@@ -226,7 +226,8 @@ We next tested whether we can detect differentiation in a controlled environment
 \begin{figure}[t!]
 	\centering
 	\includegraphics[width=3.25in]{figures/diff_no_diff.eps}
-	\caption{CDF of throughput over time, with and without extra delay and packet loss induced at the server.}
+	\caption{CDF of throughput over time, with and without extra delay and packet loss induced at the server. 
+	Our approach allows us to detect differences in throughput sample distributions when differentiation is applied. }
 	\label{fig:diff}
 %	\vspace{-1em}
 \end{figure}
@@ -244,7 +245,8 @@ We next tested whether we can detect differentiation in a controlled environment
 \vspace{0.2in}
 \subfigure[ ]{\epsfig{figure=figures/nfx.eps,width=1.55in}\label{fig:a}}
 \subfigure[ ]{\epsfig{figure=figures/spotify.eps,width=1.55in}\label{fig:b}}
-\caption{CDF of throughput over time left: Netflix, right: Spotify}
+\caption{CDF of throughput over time for Verizon (left: Netflix, right: Spotify). \edit{Our tests show 
+that Verizon does not differentiate traffic for these apps.} }
 \label{fig:nodiff}
 \end{figure}
 
@@ -359,7 +361,8 @@ We next tested whether we can detect differentiation in a controlled environment
 
 To address the limitation that we cannot detect differentiation based on server ports, our future work includes leveraging source-spoofing such that the source IP in the server's packets are the same as in the original traces. Additionally, because the VPN itself may be subject to differentiation (or blocked), we are investigating using multiple differentiation detection approaches, including randomizing packet payloads and ports in the replay.
 %
-%Currently, the testing and measurement is done on a laptop tethered to a phone by a researcher. The next step is to implement a cell phone application that does this experiment automatically so that people can freely download the app and perform measurements themselves. This way, more data will become available and the results would be more dependable for the existing cellular networks.
+%Currently, the testing and measurement is done on a laptop tethered to a phone by a researcher. 
+\edit{We are also developing an app that allows average users to create and conduct tests from an mobile provider worldwide. We plan to use results from these tests to produce a Web site informing consumers of ISP policies.}
 %%, as well as giving data to detect differentiation on newer ones.
 %Additionally, our platform will reveal possible differentiation variations on the same network in different regions.
 
