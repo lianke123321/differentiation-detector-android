@@ -1,0 +1,93 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white" >
+
+    <LinearLayout
+        android:id="@+id/ll1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue14"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/settingsButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonshape"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:padding="5dp"
+            android:shadowColor="#000"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="10"
+            android:text="@string/setting"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/mainPageTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:padding="10dp"
+            android:text="@string/main_page_title"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_title_text_size"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/nextButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonshape_next"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:padding="5dp"
+            android:shadowColor="#000"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="10"
+            android:text="@string/next_button"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+   
+
+       <!--  <ListView
+            android:id="@+id/appsListView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="2"
+            android:background="@color/white"
+            android:divider="@drawable/listitem"
+            android:dividerHeight="1.5dip"
+            android:layout_below="@+id/ll1"
+             >
+        </ListView> -->
+        
+        <GridView
+          android:id='@+id/appsListView'
+          android:layout_width='fill_parent'
+          android:layout_height='fill_parent'
+          android:columnWidth='100dip'
+          android:gravity='center'
+          android:horizontalSpacing='4dip'
+          android:numColumns='auto_fit'
+          android:stretchMode='columnWidth'
+          android:verticalSpacing='2dip' 
+          android:layout_below="@+id/ll1"
+          />
+  
+</RelativeLayout>

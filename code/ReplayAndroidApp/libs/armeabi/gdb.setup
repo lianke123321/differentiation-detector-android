@@ -1,0 +1,2 @@
+set solib-search-path ./obj/local/armeabi
+directory /home/rajesh/Documents/Work/AP/Tools/android-ndk-r9d/platforms/android-19/arch-arm/usr/include jni/vstr/include jni/strongswan/src/libipsec jni/strongswan/src/libhydra jni/strongswan/src/libcharon jni/strongswan/src/libstrongswan jni/libandroidbridge jni/strongswan/src/include jni/openssl/. jni/openssl/crypto jni/openssl/crypto/asn1 jni/openssl/crypto/evp jni/openssl/crypto/modes jni/openssl/include jni/openssl/include/openssl /home/rajesh/Documents/Work/AP/Tools/android-ndk-r9d/sources/cxx-stl/system
