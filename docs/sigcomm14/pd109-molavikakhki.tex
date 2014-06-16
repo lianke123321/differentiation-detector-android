@@ -7,12 +7,12 @@
 %%% PG2013:: bunch of macros you can ignore them for now 
 \def\full{0}        % set 1 for a full tech report version
                     % set 0 for submission version
-\def\shownotes{1}   % set 1 for version with author notes
+\def\shownotes{0}   % set 1 for version with author notes
                     % set 0 for no notes
 \def\anon{0}        % set 1 to anonymize
                     % set 0 for acks and author names
 
-\def\showedits{1} %set for 1 to turn edits red, 0 for them to become black.
+\def\showedits{0} %set for 1 to turn edits red, 0 for them to become black.
 
 \newcommand{\namedref}[2]{#1~\ref{#2}}
 \newcommand{\tableref}[1]{\namedref{Table}{#1}}
@@ -174,7 +174,7 @@ Previous work \cite{glasnost, zhang:netdiff, tariq:nano} explored this problem i
 \label{sec:method}
 
 %\subsection{Assumptions} 
-We assume that ISPs will differentiate traffic based on hostname, IP addresses, ports, total number of connections, payload signatures, total bandwidth and time of day. Our system currently can detect all of these forms of differentiation with the exception of server-based differentiation.
+We assume that ISPs will differentiate traffic based on hostname, IP addresses, ports, total number of connections, payload signatures, total bandwidth and time of day. Our system currently can detect all of these forms of differentiation with the exception of destination IP-based differentiation.
 
 \subsection{Overview} Mobile Replay identifies service differentiation using two key components. First, it tests for differentiation by replaying real network traces generated from user interactions with apps. Meddle \cite{meddle} facilitates capturing this information, and we develop new strategies for replaying arbitrary app traces. Second, Mobile Replay exploits the Meddle VPN to conduct controlled experiments. By alternately replaying traffic over tunneled and untunneled connections multiple times in rapid succession, we control ISP visibility into packet contents that may used to differentiate traffic.
 
