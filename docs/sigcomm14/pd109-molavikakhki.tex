@@ -7,12 +7,12 @@
 %%% PG2013:: bunch of macros you can ignore them for now 
 \def\full{0}        % set 1 for a full tech report version
                     % set 0 for submission version
-\def\shownotes{0}   % set 1 for version with author notes
+\def\shownotes{1}   % set 1 for version with author notes
                     % set 0 for no notes
 \def\anon{0}        % set 1 to anonymize
                     % set 0 for acks and author names
 
-\def\showedits{0} %set for 1 to turn edits red, 0 for them to become black.
+\def\showedits{1} %set for 1 to turn edits red, 0 for them to become black.
 
 \newcommand{\namedref}[2]{#1~\ref{#2}}
 \newcommand{\tableref}[1]{\namedref{Table}{#1}}
@@ -78,7 +78,7 @@
 
 \author{
 	\alignauthor Arash Molavi Kakhki$^\ddagger$, Abbas Razaghpanah$^\star$, Rajesh Golani$^\star$\\David Choffnes$^\ddagger$ , Phillipa Gill$^\star$, Alan Mislove$^\ddagger$ \\
-	\affaddr{$\ddagger$Northeastern University, $\star$ Stony Brook University}
+	\affaddr{$^\ddagger$Northeastern University, $^\star$Stony Brook University}
 }
 
 
@@ -139,7 +139,7 @@ http://dx.doi.org/10.1145/2619239.2631445 }
 
 %As wireless providers offer faster and more widely available cellular data to their customers, more mobile applications emerge that utilize this additional capacity to add more services to the mobile platform or improve on the quality of service for existing ones. However, it is often unclear how traffic from mobile services is treated while traversing boundaries of these networks. 
 
-The goal of this research is to detect traffic differentiation in cellular data networks. We define service differentiation as any attempt to change the performance of network traffic traversing an ISP's boundaries. ISPs may implement differentiation policies for a number of reasons, including load balancing, bandwidth management, or business reasons. Specifically, we focus on detecting whether certain types of network traffic receive better (or worse) performance. As an example, a wireless provider might limit the performance of third-party VoIP or video calling services (or any other competing services) by introducing delays or reducing transfer rates to encourage users to use services provided by the wireless provider.
+The goal of this research is to detect traffic differentiation in cellular data networks. We define traffic differentiation as any attempt to change the performance of network traffic traversing an ISP's boundaries. ISPs may implement differentiation policies for a number of reasons, including load balancing, bandwidth management, or business reasons. Specifically, we focus on detecting whether certain types of network traffic receive better (or worse) performance. As an example, a wireless provider might limit the performance of third-party VoIP or video calling services (or any other competing services) by introducing delays or reducing transfer rates to encourage users to use services provided by the provider. Likewise, a provider may allocate more bandwidth to preferred applications.
 
 Previous work \cite{glasnost, zhang:netdiff, tariq:nano} explored this problem in limited environments. Glasnost focused on BitTorrent in the desktop/laptop environment, and used port/payload randomization to avoid differentiation. NetDiff covered a wide range of passively gathered traffic from a large ISP but likewise did not support targeted, controlled experiments. We address these limitations with \textit{Mobile Replay}.
 
@@ -174,11 +174,11 @@ Previous work \cite{glasnost, zhang:netdiff, tariq:nano} explored this problem i
 \label{sec:method}
 
 %\subsection{Assumptions} 
-We assume that ISPs will differentiate traffic based on hostname, IP addresses, ports, total number of connections, payload signatures, total bandwidth and time of day. Our system currently can detect all of these forms of differentiation with the exception of destination IP-based differentiation.
+We assume that ISPs will differentiate traffic based on properties such as hostname, IP addresses, ports, total number of connections, payload signatures, total bandwidth and time of day. Our system currently can detect all of these forms of differentiation with the exception of server-based differentiation.
 
 \subsection{Overview} Mobile Replay identifies service differentiation using two key components. First, it tests for differentiation by replaying real network traces generated from user interactions with apps. Meddle \cite{meddle} facilitates capturing this information, and we develop new strategies for replaying arbitrary app traces. Second, Mobile Replay exploits the Meddle VPN to conduct controlled experiments. By alternately replaying traffic over tunneled and untunneled connections multiple times in rapid succession, we control ISP visibility into packet contents that may used to differentiate traffic.
 
-A key challenge is how to capture and replay the salient features of application traffic such that it will be subject to differentiation from middleboxes. To this end, we design a system that captures traffic generated by users' devices (via Meddle) and replays those flows from a replay server. Another challenge is how to establish ground truth as to whether the ISP is differentiating service for replay traffic. To address this, we exploit the VPN connection that Meddle provides as follows. When the VPN is enabled, the ISP cannot inspect flow contents and thus cannot differentiate based on the above factors except total bandwidth and time of day. We then compare this performance to the case when we send traffic untunneled. Using multiple successive trials of tunneled and untunneled replay experiments, we can determine the noise inherent in performance metrics in each type of experiment (tunneled vs not tunneled), then identify cases where there are statistically significant differences between them -- indicating differentiation.
+A key challenge is how to capture and replay the salient features of application traffic such that it will be subject to differentiation from middleboxes. To this end, we design a system that captures traffic generated by users' devices (via Meddle) and replays those flows from a replay server. Another challenge is how to establish ground truth as to whether the ISP is differentiating service for replay traffic. To address this, we exploit the VPN connection that Meddle provides as follows. When the VPN is enabled, the ISP cannot inspect flow contents and thus cannot differentiate based on the above factors except total bandwidth and time-of-day. We then compare this performance to the case when we send traffic untunneled. Using multiple successive trials of tunneled and untunneled replay experiments, we can determine the noise inherent in performance metrics in each type of experiment (tunneled vs not tunneled), then identify cases where there are statistically significant differences between them, indicating differentiation.
 
 \begin{figure}[t]
 \centering
