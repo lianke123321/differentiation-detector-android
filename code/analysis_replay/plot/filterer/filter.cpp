@@ -524,7 +524,6 @@ int main(int argc, char ** argv)
     meta << "tcp_total\t" << total_tcp_packets << endl;
     meta << "loss_rate\t" << double(total_tcp_lost) / double(total_tcp_packets) * 100.0 << endl;
 
-    meta.close();
 /*
     // Throughput plot.
     ofstream xputplot("xput.gp");
@@ -628,10 +627,10 @@ int main(int argc, char ** argv)
 	}
 	rtt_of.close();
 
-	meta	<< "rtt_min\t	" << rtt_vec[0]				<< endl
-		<< "rtt_median\t"<< rtt_vec[(rtt_vec.size()-1)/2]	<< endl
-		<< "RTT_avg\t	" << rtt_agg / double(rtt_vec.size())	<< endl
-		<< "RTT_max\t	" << rtt_vec[rtt_vec.size() - 1]	<< endl;
+	meta	<< "rtt_min\t	" << rtt_vec[0]	* 1000				<< endl
+		<< "rtt_median\t"<< rtt_vec[(rtt_vec.size()-1)/2] * 1000	<< endl
+		<< "rtt_avg\t	" << rtt_agg / double(rtt_vec.size())		<< endl
+		<< "rtt_max\t	" << rtt_vec[rtt_vec.size() - 1] * 1000		<< endl;
     }
 
     // Add files to the plot.
@@ -685,7 +684,7 @@ int main(int argc, char ** argv)
     }
     plot << endl;
     plot.close();
-    
+    meta.close();
     cout << MAX_5tuple << endl;
     // Draw the plot.
     system("gnuplot plot.gp");
