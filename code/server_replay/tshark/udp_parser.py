@@ -288,6 +288,6 @@ def main():
     client_ip = read_client_ip(client_ip_file)
     #parse(pcap_file, client_ip, configs.get('replay_name'), cut_off=configs.get('cut_off'), configs.get('random_bytes'))
 
-    parse(pcap_file, client_ip, configs.get('replay_name'), configs.get('randon_bytes'), cut_off=configs.get('cut_off'))
+    parse(pcap_file, client_ip, configs.get('replay_name'), configs.get('random_bytes'), cut_off=configs.get('cut_off'))
 if __name__=="__main__":
     main()
