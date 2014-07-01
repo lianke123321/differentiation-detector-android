@@ -7,12 +7,12 @@
 %%% PG2013:: bunch of macros you can ignore them for now 
 \def\full{0}        % set 1 for a full tech report version
                     % set 0 for submission version
-\def\shownotes{1}   % set 1 for version with author notes
+\def\shownotes{0}   % set 1 for version with author notes
                     % set 0 for no notes
 \def\anon{0}        % set 1 to anonymize
                     % set 0 for acks and author names
 
-\def\showedits{1} %set for 1 to turn edits red, 0 for them to become black.
+\def\showedits{0} %set for 1 to turn edits red, 0 for them to become black.
 
 \newcommand{\namedref}[2]{#1~\ref{#2}}
 \newcommand{\tableref}[1]{\namedref{Table}{#1}}
@@ -182,6 +182,7 @@ A key challenge is how to capture and replay the salient features of application
 
 \begin{figure}[t]
 \centering
+\vspace{2cm}
 \includegraphics[width=3.5in]{figures/meddle}
 \vspace{-0.5cm}
 \caption{Schematic view of how our project works. Traffic is sent unencrypted and through the Meddle VPN tunnel between the mobile client and a control server.}
