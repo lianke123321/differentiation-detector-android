@@ -192,20 +192,25 @@ def run():
 	print "\tThere are " + parsedPktCnt(pcap_dir, server_rcvd) + " packets which server has successfully received."
 	
 	PRINT_ACTION('Getting inter-packet timestamps UDP Packets on server side.',0)
+	server_sent_interval = pcap_dir + "/" + server_sent + "_interPacketIntervals.txt"
+	server_rcvd_interval = pcap_dir + "/" + server_rcvd + "_interPacketIntervals.txt"
 	getTimestamp(pcap_dir, server_sent)
 	interPacketSentInterval(pcap_dir, server_sent)
-	print "\t" + pcap_dir + "/" + server_sent + "_interPacketIntervals.txt has been created!"
+	print "\t" + server_sent_interval + " has been created!"
 	getTimestamp(pcap_dir, server_rcvd)
 	interPacketSentInterval(pcap_dir, server_rcvd)
-	print "\t" + pcap_dir + "/" + server_rcvd + "_interPacketIntervals.txt has been created!"
+	print "\t" + server_rcvd_interval + " has been created!"
 
 	PRINT_ACTION('Receiving the interPacketIntervals files from the client.',0)
-	file1 = pcap_dir + '/' + 'client_sent_interPacketIntervals_rcvd.txt'
-	file2 = pcap_dir + '/' + 'client_rcvd_interPacketIntervals_rcvd.txt'
-	receivingFile(file1)
-	print '\tReceived the file from the client.. (' + file1 + ')'
-	receivingFile(file2)
-	print '\tReceived the file from the client.. (' + file2 + ')'
+	client_sent_interval = pcap_dir + '/' + 'client_sent_interPacketIntervals_rcvd.txt'
+	client_rcvd_interval = pcap_dir + '/' + 'client_rcvd_interPacketIntervals_rcvd.txt'
+	receivingFile(client_sent_interval)
+	print '\tReceived the file from the client.. (' + client_sent_interval + ')'
+	receivingFile(client_rcvd_interval)
+	print '\tReceived the file from the client.. (' + client_rcvd_interval + ')'
+	
+	PRINT_ACTION('Calculating the interPacketIntervals at bothendpoints',0)
+	udpDelay(pcap_dir, client_sent_interval, client_rcvd_interval, server_sent_interval, server_rcvd_interval)
 		
 def main():
 	run()
