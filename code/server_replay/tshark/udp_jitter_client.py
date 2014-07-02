@@ -202,6 +202,8 @@ def run():
 	sendingFile(file2)
 	print '\tSent the file to the server successfully.. (' + file2 + ')'
 	
+	PRINT_ACTION('Done...!!',0)
+	
 def main():
 	run()
 	
