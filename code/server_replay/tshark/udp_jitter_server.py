@@ -6,7 +6,10 @@ by: Hyungjoon Koo (hykoo@cs.stonybrook.edu)
     Stony Brook University
 
 Goal: calculate udp jitter between client and server
-Required package: dpkt (https://code.google.com/p/dpkt/)
+Required package
+	(*) dpkt (https://code.google.com/p/dpkt/)
+	(-) numpy (https://pypi.python.org/pypi/numpy)
+	(-) gnuplot (http://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/)
 
 Usage:
     python udp_jitter_server.py --pcap_folder=[]
@@ -23,6 +26,9 @@ from python_lib import *
 import dpkt
 import socket
 import commands
+import subprocess
+# from numpy import *
+# import Gnuplot
 
 DEBUG = 2
 # HOST = ''
@@ -116,6 +122,64 @@ def interPacketSentInterval(pcap_dir, server):
 	os.system('rm -f ' + pcap_dir + '/ts_' + server + '.tmp')
 '''
 
+# UDP Jitter calculation
+# Si: the timestamp from packet i, 
+# Ri: the time of arrival in RTP timestamp units for packet i, 
+# J: the interarrival between two packets i and j,
+# J(i,j) = (Rj - Ri) - (Sj - Si) = (Rj - Sj) - (Ri - Si)
+def udpDelay(pcap_dir, client_sent_interval, client_rcvd_interval, server_sent_interval, server_rcvd_interval):
+    f1 = open(client_sent_interval, 'r')
+    f2 = open(server_rcvd_interval, 'r')
+    f3 = open(server_sent_interval, 'r')
+    f4 = open(client_rcvd_interval, 'r')
+
+    interval1 = [line.rstrip() for line in f1]
+    interval2 = [line.rstrip() for line in f2]
+    interval3 = [line.rstrip() for line in f3]
+    interval4 = [line.rstrip() for line in f4]
+
+    if (len(interval1) != len(interval2)):
+        print("\tThe number of packets client sent is different from the number of packets server received..!")
+        sys.exit(1)
+
+    print "\tProcessing delay at server..."
+    print "\tClient has sent " + str(len(interval1)) + " UDP packets and",
+    print "server has received " + str(len(interval2))+ " UDP packets."
+
+    delayAtServer = []
+    
+    for x in range(0,len(interval1)-1):
+        delayAtServer.append(format_float(abs(float(interval2[x])-float(interval1[x])),15))
+	
+	f_delayAtServer = open(pcap_dir + '/server_delay.txt','w')
+    for delay in range(0, len(delayAtServer)):
+        f_delayAtServer.write(delayAtServer[delay]+'\n')
+
+    f1.close()
+    f2.close()
+
+    if (len(interval3) != len(interval4)):
+        print("\tThe number of packets server sent is different from the number of packets client received..!")
+        sys.exit(1)
+
+    print "\tProcessing delay at client..."
+    print "\tClient has sent " + str(len(interval3)) + " UDP packets and",
+    print "server has received " + str(len(interval4))+ " UDP packets."
+
+    delayAtClient = []
+    f_delayAtClient = open(pcap_dir + '/client_delay.txt','w')
+    for x in range(0,len(interval3)-1):
+        delayAtClient.append(format_float(abs(float(interval4[x])-float(interval3[x])),15))
+
+    for delay in range(0, len(delayAtClient)):
+        f_delayAtClient.write(delayAtClient[delay]+'\n')
+
+    f3.close()
+    f4.close()
+
+    print "\tDone...!"
+	
+# Receives the jitter result from the client
 def receivingFile(file_received):
 	s = None
 
@@ -148,16 +212,41 @@ def receivingFile(file_received):
 	s.close()
 	conn.close()
 
+# Writes the plot file (*.gp) for gnuplot
+def writePlotSet(result_dir, endpoint):
+	fplot = open(result_dir + '/' + endpoint + '_jitter.gp','w')
+	data = 'set title "UDP Jitter"\n'
+	data += 'set style data lines\n' 
+	data += 'set key bottom right\n'
+	data += 'set ylabel "CDF"\n'
+	data += 'set xlabel "Jitter"\n'
+	data += 'set yrange [0:1]\n'
+	data += 'set term postscript color eps enhanced "Helvetica" 16\n'
+	data += 'set style line 80 lt 0\n'
+	data += 'set grid back linestyle 81\n'
+	data += 'set border 3 back linestyle 80\n'
+	data += 'set xtics nomirror\n'
+	data += 'set ytics nomirror\n'
+	data += 'set out "' + result_dir + '/cdf_udpjitter_' + endpoint + '.ps"\n'
+	data += 'a=0\n'
+	data += 'cumulative_sum(x)=(a=a+x,a)\n'
+	data += 'countpoints(file) = system( sprintf("grep -v ^# %s| wc -l", file) )\n'
+	data += 'pointcount = countpoints("' + result_dir + '/' + endpoint + '_delay_sorted.txt")\n'
+	data += 'plot "' + result_dir + '/' + endpoint + '_delay_sorted.txt" using 1:(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "green"\n'
+	fplot.write(data)
+
+# Draws the plot for UDP jitter
+def drawPlot(result_dir, endpoint):
+	subprocess.Popen("gnuplot " + result_dir + "/" + endpoint + "_jitter.gp", shell = True)
+
 def run():
 	PRINT_ACTION('Getting the server pcap file while replaying.', 0)
-
 	configs = Configs()
 	configs.read_args(sys.argv)
 	configs.is_given('pcap_folder')
 	configs.show_all()
 
 	pcap_dir = configs.get('pcap_folder')
-	
 	pcap_files = []
 	for pcap_file in os.listdir('.'):
 		if pcap_file.endswith('_out.pcap'):
@@ -211,7 +300,21 @@ def run():
 	
 	PRINT_ACTION('Calculating the interPacketIntervals at bothendpoints',0)
 	udpDelay(pcap_dir, client_sent_interval, client_rcvd_interval, server_sent_interval, server_rcvd_interval)
-		
+	
+	PRINT_ACTION('Drawing the graph with Gnuplot',0)
+	client_delay_sort_cmd = ("sort " + pcap_dir + '/client_delay.txt > ' + pcap_dir + '/client_delay_sorted.txt')
+	server_delay_sort_cmd = ("sort " + pcap_dir + '/server_delay.txt > ' + pcap_dir + '/server_delay_sorted.txt')
+	os.system(client_delay_sort_cmd)
+	os.system(server_delay_sort_cmd)
+	writePlotSet(pcap_dir,'client')
+	drawPlot(pcap_dir, 'client')
+	print '\tPlot has been saved to ' + pcap_dir + '/cdf_udpjitter_client.ps'
+	writePlotSet(pcap_dir,'server')
+	drawPlot(pcap_dir, 'server')
+	print '\tPlot has been saved to ' + pcap_dir + '/cdf_udpjitter_server.ps'
+	
+	PRINT_ACTION('Done...!!',0)
+	
 def main():
 	run()
 	
