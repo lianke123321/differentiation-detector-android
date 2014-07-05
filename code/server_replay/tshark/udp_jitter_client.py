@@ -210,5 +210,6 @@ def main():
 if __name__=="__main__":
 	if len(sys.argv) < 2:
 		print "Usage: " + sys.argv[0] + " --pcap_folder = [YOUR_PCAP_FOLDER]"
+		print "This program assumes that there exists the file whose name ends with 'client.pcap' in a current directory"
 		sys.exit()
 	main()

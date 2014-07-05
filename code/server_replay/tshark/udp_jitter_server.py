@@ -127,6 +127,7 @@ def interPacketSentInterval(pcap_dir, server):
 # Ri: the time of arrival in RTP timestamp units for packet i, 
 # J: the interarrival between two packets i and j,
 # J(i,j) = (Rj - Ri) - (Sj - Si) = (Rj - Sj) - (Ri - Si)
+# Output is in milliseconds: {pcap_dir}/[server|client]_delay.txt
 def udpDelay(pcap_dir, client_sent_interval, client_rcvd_interval, server_sent_interval, server_rcvd_interval):
     f1 = open(client_sent_interval, 'r')
     f2 = open(server_rcvd_interval, 'r')
@@ -137,47 +138,48 @@ def udpDelay(pcap_dir, client_sent_interval, client_rcvd_interval, server_sent_i
     interval2 = [line.rstrip() for line in f2]
     interval3 = [line.rstrip() for line in f3]
     interval4 = [line.rstrip() for line in f4]
-
-    if (len(interval1) != len(interval2)):
-        print("\tThe number of packets client sent is different from the number of packets server received..!")
-        sys.exit(1)
-
+	
+    num_client_sent = len(interval1) + 1
+    num_server_rcvd = len(interval2) + 1
+    lossRateCS = 100.0 - (float(num_server_rcvd)/float(num_client_sent))*100
     print "\tProcessing delay at server..."
-    print "\tClient has sent " + str(len(interval1)) + " UDP packets and",
-    print "server has received " + str(len(interval2))+ " UDP packets."
+    if lossRateCS < 0:
+		print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateCS, num_server_rcvd, num_client_sent) + "<--WHAT?? SOMETHING IS WRONG!"
+    else:
+		print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateCS, num_server_rcvd, num_client_sent)
+    print "\t\tClient has sent " + str(num_client_sent) + " UDP packets and",
+    print "server has received " + str(num_server_rcvd)+ " UDP packets."
 
     delayAtServer = []
-    
-    for x in range(0,len(interval1)-1):
-        delayAtServer.append(format_float(abs(float(interval2[x])-float(interval1[x])),15))
+    for x in range(0,len(interval1)-1) if len(interval1) <= len(interval2) else range(0,len(interval2)-1):
+		delayAtServer.append(format_float(abs(1000*(float(interval2[x])-float(interval1[x]))),15))
 	
-	f_delayAtServer = open(pcap_dir + '/server_delay.txt','w')
+    f_delayAtServer = open(pcap_dir + '/server_delay.txt','w')
     for delay in range(0, len(delayAtServer)):
         f_delayAtServer.write(delayAtServer[delay]+'\n')
-
     f1.close()
     f2.close()
 
-    if (len(interval3) != len(interval4)):
-        print("\tThe number of packets server sent is different from the number of packets client received..!")
-        sys.exit(1)
-
+    num_server_sent = len(interval3) + 1
+    num_client_rcvd = len(interval4) + 1
+    lossRateSC = 100.0 - (float(num_client_rcvd)/float(num_server_sent))*100
     print "\tProcessing delay at client..."
-    print "\tClient has sent " + str(len(interval3)) + " UDP packets and",
-    print "server has received " + str(len(interval4))+ " UDP packets."
+    if lossRateSC < 0:
+	    print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent) + "<--WHAT?? SOMETHING IS WRONG!"
+    else:
+	    print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent)
+    print "\t\tClient has sent " + str(num_server_sent) + " UDP packets and",
+    print "server has received " + str(num_client_rcvd)+ " UDP packets."
 
     delayAtClient = []
     f_delayAtClient = open(pcap_dir + '/client_delay.txt','w')
-    for x in range(0,len(interval3)-1):
-        delayAtClient.append(format_float(abs(float(interval4[x])-float(interval3[x])),15))
+    for x in range(0,len(interval3)-1) if len(interval3) <= len(interval4) else range(0,len(interval4)-1):
+		delayAtClient.append(format_float(abs(1000*(float(interval4[x])-float(interval3[x]))),15))
 
     for delay in range(0, len(delayAtClient)):
         f_delayAtClient.write(delayAtClient[delay]+'\n')
-
     f3.close()
     f4.close()
-
-    print "\tDone...!"
 	
 # Receives the jitter result from the client
 def receivingFile(file_received):
@@ -215,16 +217,18 @@ def receivingFile(file_received):
 # Writes the plot file (*.gp) for gnuplot
 def writePlotSet(result_dir, endpoint):
 	fplot = open(result_dir + '/' + endpoint + '_jitter.gp','w')
-	data = 'set title "UDP Jitter"\n'
+	data = '# Sorted jitter on ' + endpoint + ' side\n'
+	data += 'set title "UDP Jitter"\n'
 	data += 'set style data lines\n' 
 	data += 'set key bottom right\n'
-	data += 'set ylabel "CDF"\n'
-	data += 'set xlabel "Jitter"\n'
+	data += 'set ylabel "Jitter CDF" font "Courier, 14"\n'
+	data += 'set xlabel "Time (msec)" font "Courier, 14"\n'
 	data += 'set yrange [0:1]\n'
 	data += 'set term postscript color eps enhanced "Helvetica" 16\n'
-	data += 'set style line 80 lt 0\n'
+	#data += 'set style line 80 lt 0\n'
 	data += 'set grid back linestyle 81\n'
-	data += 'set border 3 back linestyle 80\n'
+	#data += 'set border 3 back linestyle 80\n'
+	data += 'set style line 1 lw 4 lc rgb "#990042"\n'
 	data += 'set xtics nomirror\n'
 	data += 'set ytics nomirror\n'
 	data += 'set out "' + result_dir + '/cdf_udpjitter_' + endpoint + '.ps"\n'
@@ -232,7 +236,7 @@ def writePlotSet(result_dir, endpoint):
 	data += 'cumulative_sum(x)=(a=a+x,a)\n'
 	data += 'countpoints(file) = system( sprintf("grep -v ^# %s| wc -l", file) )\n'
 	data += 'pointcount = countpoints("' + result_dir + '/' + endpoint + '_delay_sorted.txt")\n'
-	data += 'plot "' + result_dir + '/' + endpoint + '_delay_sorted.txt" using 1:(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "green"\n'
+	data += 'plot "' + result_dir + '/' + endpoint + '_delay_sorted.txt" using 1:(1.0/pointcount) smooth cumulative with lines ls 1\n'
 	fplot.write(data)
 
 # Draws the plot for UDP jitter
@@ -321,5 +325,6 @@ def main():
 if __name__=="__main__":
 	if len(sys.argv) < 2:
 		print "Usage: " + sys.argv[0] + " --pcap_folder = [YOUR_PCAP_FOLDER]"
+		print "This program assumes that there exists the file whose name ends with '_out.pcap' in a current directory"
 		sys.exit()
 	main()
