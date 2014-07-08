@@ -18,6 +18,7 @@ Example:
 
 import sys, socket, time, random, numpy, multiprocessing, select, string, pickle, Queue, threading
 from python_lib import *
+import subprocess
 
 DEBUG = 4
 
@@ -209,7 +210,30 @@ class SideChannel(object):
             f = open(outfile, 'wb')
             f.write(result)
         return result
-        
+
+    # [ADDED BY HYUNGJOON KOO] SEND JITTER FILES TO SERVER
+    def send_jitter(self, id, jitter_file=None, jitter=False):
+        if not jitter:
+            self.send_object(';'.join(['NoJitter', id]))
+            return
+
+        self.send_object(';'.join(['WillSendClientJitter', id]))
+        if jitter_file is not None:
+            f = open(jitter_file, 'rb')
+            self.send_object(f.read())
+        return
+
+    def send_jitter2(self, id, jitter_file=None, jitter=False):
+        if not jitter:
+            self.send_object(';'.join(['NoJitter2', id]))
+            return
+
+        self.send_object(';'.join(['WillSendClientJitter2', id]))
+        if jitter_file is not None:
+            f = open(jitter_file, 'rb')
+            self.send_object(f.read())
+        return
+
     def terminate(self, clients):
         self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
@@ -291,9 +315,13 @@ def run(*args):
     configs.set('result'  , False)
     configs.set('instance', 'achtung')
     configs.set('serialize', 'json')
-    
+    configs.set('jitter', False)
+
     configs.read_args(sys.argv)
     configs.set('instance', Instance(configs.get('instance')))
+    configs.set('pcap_folder', configs.get('pcap_folder'))
+    configs.set('jitter', configs.get('jitter'))
+    pcap_folder = configs.get('pcap_folder')
     configs.show_all()
 
     PRINT_ACTION('Creating variables', 0)
@@ -319,20 +347,43 @@ def run(*args):
     PRINT_ACTION('Running side channel notifier', 0)
     p_notf = threading.Thread( target=side_channel.notifier, args=(socket_list, num_server_ports,) )
     p_notf.start()
-    
+
     PRINT_ACTION('Running the Receiver process', 0)
     p_recv = threading.Thread( target=Receiver().run, args=(socket_list, side_channel.close_q, num_server_ports,) )
     p_recv.start()
-    
+
     PRINT_ACTION('Running the Sender process', 0)
     p_send = threading.Thread( target=Sender(Q).run, args=(client_port_mapping, configs.get('timing'), side_channel, socket_list, side_channel.notify_q, server_port_mapping, ) )
     p_send.start()
 
     p_send.join()
     p_recv.join()
-    
+
     PRINT_ACTION('Receiving results ...', 0)
     side_channel.get_result(id, outfile='result.jpg', result=configs.get('result'))
+
+    PRINT_ACTION('Preparing the jitter results manually...', 0)
+    print '\tExecute udp_jitter_client.py --pcap_folder=[] with client.pcap in the current directory'
+
+    client_sent_jitter = "None"
+    client_rcvd_jitter = "None"
+    client_jitter_ready = "None"
+
+    while True:
+        for file in os.listdir(pcap_folder):
+            if file.endswith('_client_sent.txt_interPacketIntervals.txt'):
+                client_sent_jitter = os.path.abspath(pcap_folder) + '/' + file
+            if file.endswith('_client_rcvd.txt_interPacketIntervals.txt'):
+                client_rcvd_jitter = os.path.abspath(pcap_folder) + '/' + file
+        if client_sent_jitter is not "None" and client_rcvd_jitter is not "None" and client_jitter_ready == "yes":
+            break
+        else:
+            print "\tMissing files: either _client_sent.txt_interPacketIntervals.txt or _client_rcvd.txt_interPacketIntervals.txt"
+            client_jitter_ready = raw_input('\tEnter yes when ready! ')
+
+    PRINT_ACTION('Sending the jitter results on client...', 0)
+    side_channel.send_jitter(id, jitter_file=client_sent_jitter, jitter=configs.get('jitter'))
+    side_channel.send_jitter2(id, jitter_file=client_rcvd_jitter, jitter=configs.get('jitter'))
 
     PRINT_ACTION('Fin', 0)
 
