@@ -1,8 +1,8 @@
 set title "UDP Jitter"
 set style data lines
 set key bottom right
-set ylabel "CDF"
-set xlabel "Jitter"
+set ylabel "Jitter CDF"
+set xlabel "ms"
 set yrange [0:1]
 set term postscript color eps enhanced "Helvetica" 16
 set style line 80 lt 0
