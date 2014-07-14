@@ -217,11 +217,9 @@ class SideChannel(object):
         if data is None: return
         data = data.split(';')
         if data[0] == 'WillSendClientJitter':
-            #self.tcpdump_q.put(('stop', id))
             if self.get_jitter(connection) is False: return
 
         elif data[0] == 'NoJitter':
-            #self.tcpdump_q.put(('stop', id))
             pass
 
         data = self.receive_object(connection)
@@ -242,7 +240,7 @@ class SideChannel(object):
     # [ADDED BY HYUNGJOON KOO] GET JITTER VALUES FROM CLIENT AND WRITE A FILE
     def get_jitter(self, connection):
         pcap_folder = Configs().get('pcap_folder')
-        jitter_file = pcap_folder + '/client_sent_interPacketIntervals_rcvd.txt'
+        jitter_file = pcap_folder + '/client_sent_interval_rcvd.txt'
         f = open(jitter_file, 'wb')
         jitters = self.receive_object(connection)
         f.write(jitters)
@@ -250,7 +248,7 @@ class SideChannel(object):
 
     def get_jitter2(self, connection):
         pcap_folder = Configs().get('pcap_folder')
-        jitter_file2 = pcap_folder + '/client_rcvd_interPacketIntervals_rcvd.txt'
+        jitter_file2 = pcap_folder + '/client_rcvd_interval_rcvd.txt'
         f = open(jitter_file2, 'wb')
         jitters = self.receive_object(connection)
         f.write(jitters)
