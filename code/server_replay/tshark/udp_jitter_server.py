@@ -6,10 +6,12 @@ by: Hyungjoon Koo (hykoo@cs.stonybrook.edu)
     Stony Brook University
 
 Goal: calculate udp jitter between client and server
+
+THIS FILE IS NO LONGER NECESSARY. 
+RUN "udp_jitter_plotready.py" INSTEAD!!
+
 Required package
     (*) dpkt (https://code.google.com/p/dpkt/)
-    (-) numpy (https://pypi.python.org/pypi/numpy)
-    (-) gnuplot (http://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/)
 
 Usage:
     python udp_jitter_server.py --pcap_folder=[]
@@ -227,8 +229,8 @@ def writePlotSet(result_dir, endpoint):
     data += 'set title "UDP Jitter"\n'
     data += 'set style data lines\n' 
     data += 'set key bottom right\n'
-    data += 'set ylabel "Jitter CDF" font "Courier, 14"\n'
-    data += 'set xlabel "Time (msec)" font "Courier, 14"\n'
+    data += 'set ylabel "CDF" font "Courier, 14"\n'
+    data += 'set xlabel "Jitter (ms)" font "Courier, 14"\n'
     data += 'set yrange [0:1]\n'
     data += 'set term postscript color eps enhanced "Helvetica" 16\n'
     #data += 'set style line 80 lt 0\n'
