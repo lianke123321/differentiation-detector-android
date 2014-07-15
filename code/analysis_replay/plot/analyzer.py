@@ -14,14 +14,14 @@ Usage:
     python analyzer.py --proto=[tcp|udp] --abbas=[True|False]
 
 Pre-condition:
-    In case of TCP, the script generates throughput, throughput CDF, and RTT CDF in TCP_PCAP_DIR/
+    In case of TCP, the script generates throughput, throughput CDF, and RTT CDF in TCP_PCAP_DIR.
 	It is required to copy pcap files in TCP_PCAP_DIR in advance.
 	In case of UDP, the script generates throughput, throughput CDF, and jitter CDF in UDP_PCAP_DIR.
-    It is required to run "udp_jitter_plotready.py" ahead of time to make preparation/
+    It is required to run "udp_jitter_plotready.py" ahead of time to make preparation.
     
 Example:
     python analyzer.py --proto=tcp
-	python analyzer.py --proto=udp
+	python analyzer.py --proto=udp --replaying_dir=./skype
 	python analyzer.py --abbas=True
 
 #######################################################################################################
@@ -34,14 +34,19 @@ import ConfigParser
 import commands
 import subprocess
 import operator
+import dpkt
+
+DEBUG = 2
 
 # Global variables
+PCAP_DIR = '../data/pcaps'
 TCP_PCAP_DIR = '../data/pcaps/tcp'
 UDP_PCAP_DIR = '../data/pcaps/udp'
-ABBAS_DIR = '../data/pcaps/generated_plots'	# Directory where the result of Abbas code reside in
-ABBAS_RUN = '../plot/draw_plots.sh'
 PLOT_DIR = '../data/pcaps/generated_plots2'	# Directory where result files reside in
 TXT_PCAP_DIR = '../data/pcaps/text_pcaps'	# Directory where tshark output reside in
+REPLAYING_PCAP_DIR = '../../server_replay/tshark'
+ABBAS_DIR = '../data/pcaps/generated_plots'	# Directory where the result of Abbas code reside in
+ABBAS_RUN = '../plot/draw_plots.sh'
 
 # Common generating files during analysis in PLOT_DIR/[file_name]
 XPUT_TXT = "xputplot.txt"
@@ -334,7 +339,202 @@ def jitterCDFAnalyze(file):
 	else:
 		print "\t\tEither of the following file is missing: " + SVR_JITTER + ' or ' + CLT_JITTER
 		sys.exit()
+
+'''
+Helper functions to prepare for UDP Jitter CDF analysis
+'''
+# Extracts two files containing the packets which server sent and which received from client respectively
+def splitPcap2(outDir, file_name, client, server):
+    split_cs = ("tshark -r \"" + UDP_PCAP_DIR + "/" + file_name + "\" | grep \"" + client + " -> " + server + "\" > " + outDir + "/" + SVR_RCVD)
+    os.system(split_cs)
+    split_sc = ("tshark -r \"" + UDP_PCAP_DIR + "/" + file_name + "\" | grep \"" + server + " -> " + client + "\" > " + outDir + "/" + SVR_SENT)
+    os.system(split_sc)
+    
+# UDP Jitter calculation
+# Si: the timestamp from packet i, 
+# Ri: the time of arrival in RTP timestamp units for packet i, 
+# J: the interarrival between two packets i and j,
+# J(i,j) = (Rj - Ri) - (Sj - Si) = (Rj - Sj) - (Ri - Si)
+# Output is in milliseconds
+def udpDelay2(outDirectory):
+    f1 = open(outDirectory + "/" + CLT_SENT_INTVL, 'r')
+    f2 = open(outDirectory + "/" + SVR_RCVD_INTVL, 'r')
+    f3 = open(outDirectory + "/" + SVR_SENT_INTVL, 'r')
+    f4 = open(outDirectory + "/" + CLT_RCVD_INTVL, 'r')
+
+    interval1 = [line.rstrip() for line in f1]
+    interval2 = [line.rstrip() for line in f2]
+    interval3 = [line.rstrip() for line in f3]
+    interval4 = [line.rstrip() for line in f4]
+    
+    num_client_sent = len(interval1) + 1
+    num_server_rcvd = len(interval2) + 1
+    lossRateCS = 100.0 - (float(num_server_rcvd)/float(num_client_sent))*100
+    print "\tProcessing delay at server..."
+    if lossRateCS < 0:
+        print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateCS, num_server_rcvd, num_client_sent) + "<--WHAT?? SOMETHING IS WRONG!"
+    else:
+        print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateCS, num_server_rcvd, num_client_sent)
+    print "\t\tClient has sent " + str(num_client_sent) + " UDP packets and",
+    print "server has received " + str(num_server_rcvd)+ " UDP packets."
+
+    jiiterAtServer = []
+    for x in range(0,len(interval1)-1) if len(interval1) <= len(interval2) else range(0,len(interval2)-1):
+        jiiterAtServer.append(format_float(abs(1000*(float(interval2[x])-float(interval1[x]))),15))
+    
+    f_jiiterAtServer = open(outDirectory + '/' + SVR_JITTER ,'w')
+    for delay in range(0, len(jiiterAtServer)):
+        f_jiiterAtServer.write(jiiterAtServer[delay]+'\n')
+    f1.close()
+    f2.close()
+
+    num_server_sent = len(interval3) + 1
+    num_client_rcvd = len(interval4) + 1
+    lossRateSC = 100.0 - (float(num_client_rcvd)/float(num_server_sent))*100
+    print "\tProcessing delay at client..."
+    if lossRateSC < 0:
+        print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent) + "<--WHAT?? SOMETHING IS WRONG!"
+    else:
+        print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent)
+    print "\t\tClient has sent " + str(num_server_sent) + " UDP packets and",
+    print "server has received " + str(num_client_rcvd)+ " UDP packets."
+
+    jiiterAtClient = []
+    f_jiiterAtClient = open(outDirectory + '/' + CLT_JITTER, 'w')
+    for x in range(0,len(interval3)-1) if len(interval3) <= len(interval4) else range(0,len(interval4)-1):
+        jiiterAtClient.append(format_float(abs(1000*(float(interval4[x])-float(interval3[x]))),15))
+
+    for delay in range(0, len(jiiterAtClient)):
+        f_jiiterAtClient.write(jiiterAtClient[delay]+'\n')
+    f3.close()
+    f4.close()
+
+def extractEndpoints2(out_dir, file_name):
+	extract = ("tshark -Tfields -E separator=- -e ip.src -e ip.dst -r " + UDP_PCAP_DIR + "/" + file_name +" | head -1 > " + out_dir + "/endpoints.txt")
+	os.system(extract)
+	with open(out_dir + "/endpoints.txt",'r') as f:
+		ends = f.read().splitlines()
+	f.close()
+	return ends[0].split("-")
+
+def parsedPktCnt2(out_dir, file):
+	pktCntCmd = ("cat " + out_dir + "/" + file + " " + " | wc -l")
+	import commands
+	pktCnt = commands.getoutput(pktCntCmd)
+	return pktCnt
 	
+def getTimestamp2(out_dir, file):
+	getTimestampCmd = ("cat " + out_dir + "/" + file + " | awk '{print $2}' > " + out_dir + "/" + "ts_" + file + ".tmp")
+	os.system(getTimestampCmd)
+	
+# Saves the inter-packet intervals between when to sent
+def interPacketSentInterval2(out_dir, file):
+	tmp = open(out_dir + '/ts_' + file + '.tmp','r')
+	timestamps = tmp.read().splitlines()
+	intervals = []
+	i = 0
+	ts_cnt = len(timestamps)
+	while (i < ts_cnt - 1):
+		intervals.append(format_float(float(timestamps[i+1]) - float(timestamps[i]),15))
+		i = i + 1
+	f = open(out_dir + '/' + file.split('.txt')[0] + '_interval.txt', 'w')
+	f.write('\n'.join(str(ts) for ts in intervals))
+	os.system('rm -f ' + out_dir + '/ts_' + file + '.tmp')
+
+# Helps to write float format by removing characters
+def format_float(value, precision=-1):
+    if precision < 0:
+        f = "%f" % value
+    else:
+        f = "%.*f" % (precision, value)
+    p = f.partition(".")
+    s = "".join((p[0], p[1], p[2][0], p[2][1:].rstrip("0")))
+    return s
+
+# Returns the number of packets in a pcap file (pkt_type=[udp|tcp|total|other])
+def pkt_ctr(pcap_dir, file_name, pkt_type):
+	udp_ctr = 0
+	tcp_ctr = 0
+	other_ctr = 0
+	total_ctr = 0
+
+	filepath = pcap_dir + "/" + file_name
+	f = open(filepath)
+	for ts, buf in dpkt.pcap.Reader(file(filepath, "rb")):
+		 eth = dpkt.ethernet.Ethernet(buf)
+		 total_ctr += 1
+		 if eth.type == dpkt.ethernet.ETH_TYPE_IP: # 2048
+				 ip = eth.data
+				 if ip.p == dpkt.ip.IP_PROTO_UDP:  # 17
+						 udp_ctr += 1
+
+				 if ip.p == dpkt.ip.IP_PROTO_TCP:  # 6
+						 tcp_ctr += 1
+		 else:
+				 other_ctr += 1
+
+	# Returns the number of packets depending on the type
+	if pkt_type == 'total':
+		return total_ctr
+	elif pkt_type == 'tcp':
+		return tcp_ctr
+	elif pkt_type == 'udp':
+		return udp_ctr
+	elif pkt_type == 'other':
+		return other_ctr
+	else:
+		return -1
+		
+# Generate appropriate files to draw jitter CDF graph
+def jitterPlotReady(replaying_dir):
+    pcap_files = []
+    for pcap_file in os.listdir(REPLAYING_PCAP_DIR):
+        if pcap_file.endswith('_out.pcap'):
+			outDirectory = PLOT_DIR + "/" + pcap_file.split('.pcap')[0]
+			if os.path.isdir(outDirectory) == False:
+				os.mkdir(outDirectory)
+			pcap_files.append(os.path.abspath('.') + '/' + pcap_file)
+			print "\tMoving " + pcap_file + " to " +  UDP_PCAP_DIR
+			os.system("mv " + REPLAYING_PCAP_DIR + "/" + pcap_file + " " + UDP_PCAP_DIR + "/" + pcap_file)
+
+    if len(pcap_files) == 0:
+        print '\tThe directory "'+ REPLAYING_PCAP_DIR + '" does not contain any "*_out.pcap" file while replaying!'
+        sys.exit()
+    else:
+        (absolute_path, file_name) = os.path.split(pcap_files[0])
+		
+    # Extracting client/server packets from two endpoints respectively. (IP might be different due to NAT/PAT.)
+    if DEBUG == 2: print "\tTarget file: " + file_name
+    endpoints = extractEndpoints2(outDirectory, file_name)
+    client = endpoints[0]
+    server = endpoints[1]
+    if DEBUG == 2: print "\t" + "Client: " + client + " <-> Server: " + server + " from server side"
+    splitPcap2(outDirectory, file_name, client, server)
+    
+    # Counting all UDP Packets on server side.
+    if DEBUG == 2: print "\t# of UDP packets collected on server side: " + str(pkt_ctr(UDP_PCAP_DIR, file_name, 'udp'))
+    
+    # Getting the delay from parsed UDP Packets on server side.
+    if DEBUG == 2: print "\tThere are " + parsedPktCnt2(outDirectory, SVR_SENT) + " packets which server has successfully sent."
+    if DEBUG == 2: print "\tThere are " + parsedPktCnt2(outDirectory, SVR_RCVD) + " packets which server has successfully received."
+    
+    # Getting inter-packet timestamps UDP Packets on server side.
+    getTimestamp2(outDirectory, SVR_SENT)
+    interPacketSentInterval2(outDirectory, SVR_SENT)
+    print "\t" + SVR_SENT_INTVL + " has been created!"
+    getTimestamp2(outDirectory, SVR_RCVD)
+    interPacketSentInterval2(outDirectory, SVR_RCVD)
+    print "\t" + SVR_RCVD_INTVL + " has been created!"
+
+    # Bring the received file from client.
+    os.system("cp " + replaying_dir + "/" + CLT_SENT_INTVL + " " + outDirectory + "/" + CLT_SENT_INTVL)
+    os.system("cp " + replaying_dir + "/" + CLT_RCVD_INTVL + " " + outDirectory + "/" + CLT_RCVD_INTVL)
+    udpDelay2(outDirectory)
+
+
+'''
+Main Functions to run TCP/UDP analysis
+'''
 def runTCP():
 	files = os.listdir(TCP_PCAP_DIR)
 	for file in files:
@@ -382,7 +582,9 @@ def chkPcap(pcap_dir):
 		sys.exit()
 
 # Check if PLOT_DIR/TCP_PCAP_DIR/UDP_PCAP_DIR exists
-def chkEnv(protocol):
+def chkEnv(protocol, replaying_dir = None):
+	if os.path.isdir(PCAP_DIR) == False:
+		os.mkdir(PCAP_DIR)
 	if os.path.isdir(PLOT_DIR) == False:
 		os.mkdir(PLOT_DIR)
 	if os.path.isdir(TXT_PCAP_DIR) == False:
@@ -395,16 +597,19 @@ def chkEnv(protocol):
 	if protocol == 'tcp':
 		chkPcap(TCP_PCAP_DIR) 
 	elif protocol == 'udp':
+		jitterPlotReady(replaying_dir)
 		chkPcap(UDP_PCAP_DIR)
 	else:
 		print '\tUnexpected Error! Terminated...'
 	
-def run():
+def analysisMain():
 	PRINT_ACTION('Reading configs file and args...', 0)
 	configs = Configs()
 	configs.set('abbas', False)
+	configs.set('replaying_dir', None)
 	configs.read_args(sys.argv)
 	configs.show_all()
+	replaying_dir = configs.get('replaying_dir')
 	
 	PRINT_ACTION('Analyzing and drawing plots...', 0)
 	if configs.get('abbas') == True:
@@ -412,6 +617,8 @@ def run():
 		copy_pcaps = 'cp ' + TCP_PCAP_DIR + '/*.pcap' + ' ../data/pcaps/'
 		os.system(copy_pcaps)
 		os.system("bash " + ABBAS_RUN)
+		remove_pcaps = 'rm ../data/pcaps/*.pcap' 
+		os.system(remove_pcaps)
 		print '\tAll generated files have been saved to ' + ABBAS_DIR
 	else:
 		protocol = configs.get('proto')
@@ -421,7 +628,10 @@ def run():
 			runTCP()
 		elif protocol == 'udp':
 			print '\t[UDP Pcap File Analysis]'
-			chkEnv(protocol)
+			if replaying_dir == None:
+				print '\tOption "--replaying_dir" is missing!'
+				sys.exit()
+			chkEnv(protocol, replaying_dir)
 			runUDP()
 		else:
 			print '\tOops! Provided the protocol which is NOT supported, Terminated...'
@@ -429,8 +639,10 @@ def run():
 	
 if __name__ == '__main__':
 	if len(sys.argv) < 2:
-		print "Usage: " + sys.argv[0] + " --proto=[tcp|udp] --abbas=[True|False]"
+		print "Usage: " + sys.argv[0] + " --proto=[tcp|udp] --abbas=[True|False] --replaying_dir=[]"
 		print "\tThis program assumes that there exists *.pcap files in the following:" 
 		print "\tTCP: " + TCP_PCAP_DIR + ", UDP: " + UDP_PCAP_DIR
-		print "\tIf you use Abbas code, then the files will be copied into ../data/pcaps."
-	run()
+		print "\tIf you use Abbas code, the pcap files will be copied into ../data/pcaps."
+		print "\tIf you analyze UDP, the replaying directory should be indicated."
+		sys.exit()
+	analysisMain()
