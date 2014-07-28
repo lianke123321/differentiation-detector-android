@@ -46,6 +46,8 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
           with a packed from client (will be validated once parsing more real traffic pcaps)
     '''
     
+    has_begin = []
+    
     udp_counter = 0
     tcp_counter = 0
     client_Q  = []
@@ -105,6 +107,8 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
             server      = dst_ip + '.' + str(dst_p)
             c_s_pair    = convert_ip(client) + '-' + convert_ip(server)
             
+            has_begin.append(c_s_pair)
+            
             client_port = str(src_p).zfill(5)
             server_port = str(dst_p).zfill(5)
             
@@ -118,12 +122,17 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
                 server_time_origins[server_port] = p.time
             
         elif client_ip == dst_ip:
+            
+            
             if time_origin == None:
                 continue
                 
             server      = src_ip + '.' + str(src_p)
             client      = dst_ip + '.' + str(dst_p)
             c_s_pair    = convert_ip(client) + '-' + convert_ip(server)
+            
+            if c_s_pair not in has_begin:
+                continue 
             
             client_port = str(dst_p).zfill(5)
             server_port = str(src_p).zfill(5)
@@ -286,7 +295,7 @@ def main():
         print 'Replay name not given. Naming it after the pcap_file:', configs.get('replay_name')
     
     client_ip = read_client_ip(client_ip_file)
-    parse(pcap_file, client_ip, configs.get('replay_name'), cut_off=configs.get('cut_off'), configs.get('random_bytes'))
+    parse(pcap_file, client_ip, configs.get('replay_name'), configs.get('random_bytes'), cut_off=configs.get('cut_off'))
 
 if __name__=="__main__":
     main()
