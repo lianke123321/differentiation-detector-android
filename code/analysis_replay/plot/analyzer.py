@@ -1,7 +1,7 @@
 '''
 #######################################################################################################
 #######################################################################################################
-Last Updated: Jul 24, 2014
+Last Updated: Jul 30, 2014
 
 By: Hyungjoon Koo (hykoo@cs.stonybrook.edu)
 	Stony Brook University
@@ -18,7 +18,8 @@ Pre-condition:
 	In case of TCP, the script generates throughput, throughput CDF, and RTT CDF in TCP_PCAP_DIR.
 	It is required to copy pcap files in TCP_PCAP_DIR in advance.
 	In case of UDP, the script generates throughput, throughput CDF, and jitter CDF in UDP_PCAP_DIR.
-	It is required to run "udp_jitter_plotready.py" ahead of time to make preparation.
+		For UDP jitter, it is required to have CLT_SENT_INTVL and CLT_RCVD_INTVL in PLOT_DIR/[pcap_name].
+		CLT_SENT_INTVL and CLT_RCVD_INTVL will be collected and sent by udp_client.py while replaying with the option --jitter=True
 	
 Example:
 	python analyzer.py --proto=tcp --multiplot=True
