@@ -402,10 +402,6 @@ def run(*args):
                 client_sent_jitter = os.path.abspath(pcap_folder) + '/' + file
             if file.endswith('_client_rcvd.txt_interPacketIntervals.txt'):
                 client_rcvd_jitter = os.path.abspath(pcap_folder) + '/' + file
-            if file.endswith(CLT_SENT_JITTER)
-                client_sent_jitter = os.path.abspath(pcap_folder) + '/' + CLT_SENT_JITTER
-            if file.endswith(CLT_RCVD_JITTER)
-                client_rcvd_jitter = os.path.abspath(pcap_folder) + '/' + CLT_RCVD_JITTER
         if client_sent_jitter is not "None" and client_rcvd_jitter is not "None" and client_jitter_ready == "yes":
             break
         else:
