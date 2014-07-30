@@ -638,8 +638,8 @@ def udpDelay2(outDirectory):
 		print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent) + "<--WHAT?? SOMETHING IS WRONG!"
 	else:
 		print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent)
-	print "\t\tClient has sent " + str(num_server_sent) + " UDP packets and",
-	print "server has received " + str(num_client_rcvd)+ " UDP packets."
+	print "\t\tServer has sent " + str(num_server_sent) + " UDP packets and",
+	print "client has received " + str(num_client_rcvd)+ " UDP packets."
 
 	jiiterAtClient = []
 	f_jiiterAtClient = open(outDirectory + '/' + CLT_JITTER, 'w')
