@@ -211,7 +211,7 @@ def xPutCDFPlot(fileLocation):
 	data += 'set style data lines\n' 
 	data += 'set title "Throughput CDF (' + file_name.replace('_','-') + ')"\n'
 	data += 'set key off\n'
-	data += 'set xlabel "Time (seconds)"\n'
+	data += 'set xlabel "Throughput (KB/s)"\n'
 	data += 'set ylabel "CDF"\n'
 	data += 'set yrange [0:1]\n'
 	data += 'set term postscript color eps enhanced "Helvetica" 16\n'
@@ -257,7 +257,7 @@ def generateXputCDFMultiplot(numOfPlots):
 	data += 'set style data lines\n' 
 	data += 'set title "Throughtput CDF Comparison"\n'
 	data += 'set key bottom right\n'
-	data += 'set xlabel "Throughput"\n'
+	data += 'set xlabel "Throughput (KB/s)"\n'
 	data += 'set ylabel "CDF"\n'
 	data += 'set yrange [0:1]\n'
 	data += 'set term postscript color eps enhanced "Helvetica" 16\n'
@@ -280,9 +280,9 @@ def generateXputCDFMultiplot(numOfPlots):
 	data += 'plot '
 	j = 0
 	while j < len(entriesTocompare) - 1:
-		data += '"' + PLOT_DIR + '/' + entry + '/' + XPUT_CDF_TXT + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
+		data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + XPUT_CDF_TXT + '" using ($1/1000.0):(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
 		j = j + 1
-	data += '"' + PLOT_DIR + '/' + entry + '/' + XPUT_CDF_TXT + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
+	data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + XPUT_CDF_TXT + '" using ($1/1000.0):(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
 	
 	xputMultiplotFile.write(data)
 	subprocess.Popen("gnuplot ./" + XPUT_CDF_MULTI_GRAPH, shell = True)
@@ -413,9 +413,9 @@ def generateRTTCDFMultiplot(numOfPlots):
 	data += 'plot '
 	j = 0
 	while j < len(entriesTocompare) - 1:
-		data += '"' + PLOT_DIR + '/' + entry + '/' + RTT_CDF_TXT + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
+		data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + RTT_CDF_TXT + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
 		j = j + 1
-	data += '"' + PLOT_DIR + '/' + entry + '/' + RTT_CDF_TXT + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
+	data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + RTT_CDF_TXT + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
 	
 	rttMultiplotFile.write(data)
 	subprocess.Popen("gnuplot ./" + RTT_CDF_MULTI_GRAPH, shell = True)
@@ -536,9 +536,9 @@ def generateJitterCDFMultiplot(numOfPlots):
 	data += 'plot '
 	j = 0
 	while j < len(entriesTocompare) - 1:
-		data += '"' + PLOT_DIR + '/' + entry + '/' + CLT_JITTER_SORTED + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
+		data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + CLT_JITTER_SORTED + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
 		j = j + 1
-	data += '"' + PLOT_DIR + '/' + entry + '/' + CLT_JITTER_SORTED + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
+	data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + CLT_JITTER_SORTED + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
 	
 	jitterMultiplotFile1.write(data)
 	subprocess.Popen("gnuplot ./" + JITTER_CDF_MULTI_GRAPH_CLT, shell = True)
@@ -571,9 +571,9 @@ def generateJitterCDFMultiplot(numOfPlots):
 	data += 'plot '
 	j = 0
 	while j < len(entriesTocompare) - 1:
-		data += '"' + PLOT_DIR + '/' + entry + '/' + SVR_JITTER_SORTED + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
+		data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + SVR_JITTER_SORTED + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
 		j = j + 1
-	data += '"' + PLOT_DIR + '/' + entry + '/' + SVR_JITTER_SORTED + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
+	data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + SVR_JITTER_SORTED + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
 	
 	jitterMultiplotFile2.write(data)
 	subprocess.Popen("gnuplot ./" + JITTER_CDF_MULTI_GRAPH_SVR, shell = True)
@@ -597,13 +597,10 @@ def splitPcap2(outDir, file_name, client, server):
 	os.system(split_sc)
     
 def udpDelay2(outDirectory):
-	try:
-		f1 = open(outDirectory + "/" + CLT_SENT_INTVL, 'r')
-		f2 = open(outDirectory + "/" + SVR_RCVD_INTVL, 'r')
-		f3 = open(outDirectory + "/" + SVR_SENT_INTVL, 'r')
-		f4 = open(outDirectory + "/" + CLT_RCVD_INTVL, 'r')
-	except:
-		print "One of these files is missing: " + CLT_SENT_INTVL + ", " + SVR_RCVD_INTVL + ", " + SVR_SENT_INTVL + ", " + CLT_RCVD_INTVL
+	f1 = open(outDirectory + "/" + CLT_SENT_INTVL, 'r')
+	f2 = open(outDirectory + "/" + SVR_RCVD_INTVL, 'r')
+	f3 = open(outDirectory + "/" + SVR_SENT_INTVL, 'r')
+	f4 = open(outDirectory + "/" + CLT_RCVD_INTVL, 'r')
 
 	interval1 = [line.rstrip() for line in f1]
 	interval2 = [line.rstrip() for line in f2]
