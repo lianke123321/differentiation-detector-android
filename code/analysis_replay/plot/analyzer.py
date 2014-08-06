@@ -36,6 +36,7 @@ import commands
 import subprocess
 import operator
 import dpkt
+import time
 
 DEBUG = 0
 
@@ -607,17 +608,23 @@ def udpDelay2(outDirectory):
 	interval3 = [line.rstrip() for line in f3]
 	interval4 = [line.rstrip() for line in f4]
 	
+	statFile = open(outDirectory + "/" + "stats.txt", "w")
+	
 	num_client_sent = len(interval1) + 1
 	num_server_rcvd = len(interval2) + 1
 	lossRateCS = 100.0 - (float(num_server_rcvd)/float(num_client_sent))*100
-	print "\tProcessing delay at server..."
+	if DEBUG == 2: print "\tProcessing delay at server..."
 	if lossRateCS < 0:
-		print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateCS, num_server_rcvd, num_client_sent) + "<--WHAT?? SOMETHING IS WRONG!"
+		if DEBUG == 2: print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateCS, num_server_rcvd, num_client_sent) + "<--WHAT?? SOMETHING IS WRONG!"
 	else:
-		print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateCS, num_server_rcvd, num_client_sent)
-	print "\t\tClient has sent " + str(num_client_sent) + " UDP packets and",
-	print "server has received " + str(num_server_rcvd)+ " UDP packets."
+		if DEBUG == 2: print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateCS, num_server_rcvd, num_client_sent)
+	if DEBUG == 2: print "\t\tClient has sent " + str(num_client_sent) + " UDP packets and",
+	if DEBUG == 2: print "server has received " + str(num_server_rcvd)+ " UDP packets."
 
+	statFile.write("udp_client_sent: " + str(num_client_sent) + "\n")
+	statFile.write("udp_server_rcvd: " + str(num_server_rcvd) + "\n")
+	statFile.write("udp_loss_rate_client_to_server: " + str(lossRateCS) + " %\n")
+	
 	jiiterAtServer = []
 	for x in range(0,len(interval1)-1) if len(interval1) <= len(interval2) else range(0,len(interval2)-1):
 		jiiterAtServer.append(format_float(abs(1000*(float(interval2[x])-float(interval1[x]))),15))
@@ -633,12 +640,16 @@ def udpDelay2(outDirectory):
 	lossRateSC = 100.0 - (float(num_client_rcvd)/float(num_server_sent))*100
 	print "\tProcessing delay at client..."
 	if lossRateSC < 0:
-		print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent) + "<--WHAT?? SOMETHING IS WRONG!"
+		if DEBUG == 2: print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent) + "<--WHAT?? SOMETHING IS WRONG!"
 	else:
-		print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent)
-	print "\t\tServer has sent " + str(num_server_sent) + " UDP packets and",
-	print "client has received " + str(num_client_rcvd)+ " UDP packets."
+		if DEBUG == 2: print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent)
+	if DEBUG == 2: print "\t\tServer has sent " + str(num_server_sent) + " UDP packets and",
+	if DEBUG == 2: print "client has received " + str(num_client_rcvd)+ " UDP packets."
 
+	statFile.write("udp_server_sent: " + str(num_server_sent) + "\n")
+	statFile.write("udp_client_rcvd: " + str(num_client_rcvd) + "\n")
+	statFile.write("udp_loss_rate_server_to_client: " + str(lossRateSC) + " %\n")
+	
 	jiiterAtClient = []
 	f_jiiterAtClient = open(outDirectory + '/' + CLT_JITTER, 'w')
 	for x in range(0,len(interval3)-1) if len(interval3) <= len(interval4) else range(0,len(interval4)-1):
@@ -809,6 +820,60 @@ def jitterPlotReady(replaying_dir = None):
 			print "\tError occured while processing " + pcap_file
 		jitterPreProcessing(outDirectory, file_name, replaying_dir)
 		return file_name
+		
+# Generate "stat.txt" file containing tcp_loss_rate, rtt/xput min/avg/max
+def tcpStats(file):
+	fileName = os.path.splitext(file)[0]
+	statFile = open(PLOT_DIR + "/" + fileName + "/" + "stats.txt", "w")
+	tcp_total = commands.getoutput("cat " + TXT_PCAP_DIR + "/" + fileName + "_rtt.txt | wc -l")
+	statFile.write("tcp_total: " + str(int(tcp_total) - 1) + "\n")
+	tcp_loss = commands.getoutput("tshark -Y tcp.analysis.lost_segment -r " + TCP_PCAP_DIR + "/" + file + " | wc -l")
+	statFile.write("tcp_loss: " + str(int(tcp_loss)) + "\n")
+	statFile.write("tcp_loss_rate: " + str(round(float(tcp_loss)/float(tcp_total)*100, 5)) + " %\n")
+	
+	rttTxt = PLOT_DIR + "/" + fileName + "/" + RTT_CDF_TXT
+	rttMin = commands.getoutput("head -1 " + rttTxt)
+	rttMax = commands.getoutput("tail -1 " + rttTxt)
+	rttAll = open(rttTxt).read().splitlines()
+	rttSum = 0.0
+	for rtt in rttAll:
+		rttSum += float(rtt)
+	rttAvg = round(float(rttSum / len(rttAll)),5)
+	
+	statFile.write("rtt_min: " + str(float(rttMin)) + " (s)\n")
+	statFile.write("rtt_avg: " + str(rttAvg) + " (s)\n")
+	statFile.write("rtt_max: " + str(float(rttMax)) + " (s)\n")
+	
+	xputTxt = PLOT_DIR + "/" + fileName + "/" + XPUT_CDF_TXT
+	xputMin = commands.getoutput("head -1 " + xputTxt)
+	xputMax = commands.getoutput("tail -1 " + xputTxt)
+	xputAll = open(xputTxt).read().splitlines()
+	xputSum = 0.0
+	for xput in xputAll:
+		xputSum += float(xput)
+	xputAvg = round(float(xputSum / len(xputAll) / 100),5)
+	
+	statFile.write("xput_min: " + str(float(xputMin)/100) + " (KB/s)\n")
+	statFile.write("xput_avg: " + str(xputAvg) + " (KB/s)\n")
+	statFile.write("xput_max: " + str(float(xputMax)/100) + " (KB/s)\n")
+	
+# Generate "stat.txt" file containing udp_loss_rate, xput min/avg/max
+def udpStats(file):
+	fileName = os.path.splitext(file)[0]
+	statFile = open(PLOT_DIR + "/" + fileName + "/" + "stats.txt", "a")
+	
+	xputTxt = PLOT_DIR + "/" + fileName + "/" + XPUT_CDF_TXT
+	xputMin = commands.getoutput("head -1 " + xputTxt)
+	xputMax = commands.getoutput("tail -1 " + xputTxt)
+	xputAll = open(xputTxt).read().splitlines()
+	xputSum = 0.0
+	for xput in xputAll:
+		xputSum += float(xput)
+	xputAvg = round(float(xputSum / len(xputAll) / 100),5)
+	
+	statFile.write("xput_min: " + str(float(xputMin)/100) + " (KB/s)\n")
+	statFile.write("xput_avg: " + str(xputAvg) + " (KB/s)\n")
+	statFile.write("xput_max: " + str(float(xputMax)/100) + " (KB/s)\n")
 
 '''
 Main Functions to run TCP/UDP analysis
@@ -819,6 +884,7 @@ def runTCP():
 		if '.' in file:
 			if file.split('.')[-1] == "pcap":
 				print '\tProcessing "' + file + '"'
+				print '\tProcessing "' + file + '"'
 				print '\t\tThroughtput ...',
 				xPutAnalyze(file, TCP_PCAP_DIR)
 				print '...Done!!'
@@ -828,7 +894,8 @@ def runTCP():
 				print '\t\tRTT CDF ...',
 				rttCDFAnalyze(file, TCP_PCAP_DIR)
 				print '...Done!!'
-	print '\tAll generated files have been saved to ' + PLOT_DIR
+				tcpStats(file)
+	print '\tAll generated plots/stats have been saved to ' + PLOT_DIR
 
 def runUDP(replaying_dir):
 	# If replaying directory has not been set, then process all UDP pcaps
@@ -846,6 +913,7 @@ def runUDP(replaying_dir):
 				print '\t\t...Done!!'
 				print '\t\tJitter CDF ...',
 				jitterCDFAnalyze(file)
+				udpStats(file)
 				print '...Done!!'
 
 	# If replaying directory has been configured, then process a given UDP pcap
@@ -861,8 +929,9 @@ def runUDP(replaying_dir):
 			print '\t\t...Done!!'
 			print '\t\tJitter CDF ...',
 			jitterCDFAnalyze(file)
+			udpStats(file)
 			print '...Done!!'
-	print '\tAll generated files have been saved to ' + PLOT_DIR
+	print '\tAll generated plots/stats have been saved to ' + PLOT_DIR
 
 # Check if pcap files are in the pcap directory
 def isPcap(pcap_dir):
