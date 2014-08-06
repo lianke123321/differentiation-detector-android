@@ -36,7 +36,6 @@ import commands
 import subprocess
 import operator
 import dpkt
-import time
 
 DEBUG = 0
 
@@ -613,6 +612,7 @@ def udpDelay2(outDirectory):
 	num_client_sent = len(interval1) + 1
 	num_server_rcvd = len(interval2) + 1
 	lossRateCS = 100.0 - (float(num_server_rcvd)/float(num_client_sent))*100
+	
 	if DEBUG == 2: print "\tProcessing delay at server..."
 	if lossRateCS < 0:
 		if DEBUG == 2: print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateCS, num_server_rcvd, num_client_sent) + "<--WHAT?? SOMETHING IS WRONG!"
@@ -638,7 +638,8 @@ def udpDelay2(outDirectory):
 	num_server_sent = len(interval3) + 1
 	num_client_rcvd = len(interval4) + 1
 	lossRateSC = 100.0 - (float(num_client_rcvd)/float(num_server_sent))*100
-	print "\tProcessing delay at client..."
+	
+	if DEBUG == 2: print "\tProcessing delay at client..."
 	if lossRateSC < 0:
 		if DEBUG == 2: print "\t\tLoss Rate = %3.2f%% (%d / %d)" % (lossRateSC, num_client_rcvd, num_server_sent) + "<--WHAT?? SOMETHING IS WRONG!"
 	else:
@@ -883,7 +884,6 @@ def runTCP():
 	for file in files:
 		if '.' in file:
 			if file.split('.')[-1] == "pcap":
-				print '\tProcessing "' + file + '"'
 				print '\tProcessing "' + file + '"'
 				print '\t\tThroughtput ...',
 				xPutAnalyze(file, TCP_PCAP_DIR)
