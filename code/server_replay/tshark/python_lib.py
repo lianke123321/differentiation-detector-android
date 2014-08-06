@@ -284,9 +284,12 @@ class Instance(object):
         'localhost': {'host'    :'127.0.0.1',
                      'username' : 'arash',
                      'ssh_key'  : ''},
-		'koo'  : {'host'     : 'ec2-54-243-17-203.compute-1.amazonaws.com',
-			 'username' : 'ubuntu',
-			 'ssh_key'  : ''},
+        'koo'  : {'host'     : 'ec2-54-243-17-203.compute-1.amazonaws.com',
+            'username' : 'ubuntu',
+             'ssh_key'  : ''},
+        'koo2'  : {'host'     : 'ec2-54-90-255-129.compute-1.amazonaws.com',
+            'username' : 'ubuntu',
+             'ssh_key'  : ''},
     }
     def __init__(self, instance, instances=instance_list):
         self.name     = instance
