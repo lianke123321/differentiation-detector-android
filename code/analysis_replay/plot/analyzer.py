@@ -1,7 +1,7 @@
 '''
 #######################################################################################################
 #######################################################################################################
-Last Updated: Jul 30, 2014
+Last Updated: Aug 10, 2014
 
 By: Hyungjoon Koo (hykoo@cs.stonybrook.edu)
 	Stony Brook University
@@ -59,6 +59,11 @@ XPUT_CDF_GRAPH = "xputcdfplot.gp"
 XPUT_CDF_PLOT = "xputcdfplot.ps"
 XPUT_CDF_MULTI_GRAPH = "xputcdfmultiplot.gp"
 XPUT_CDF_MULTI_PLOT = "xputcdfmultiplot.ps"
+STATS_TXT = "stats.txt"
+PKT_CDF_GRAPH = "pktcdfplot.gp"
+PKT_CDF_PLOT = "pktcdfplot.ps"
+PKT_SIZE_CDF_MULTI_GRAPH = "pktcdfmultiplot.gp"
+PKT_SIZE_CDF_MULTI_PLOT = "pktcdfmultiplot.ps"
 
 # Generating common files for TCP during analysis in PLOT_DIR/[file_name]
 RTT_CDF_TXT = "rttcdfplot.txt"
@@ -66,6 +71,7 @@ RTT_CDF_GRAPH = "rttcdfplot.gp"
 RTT_CDF_PLOT = "rttcdfplot.ps"
 RTT_CDF_MULTI_GRAPH = "rttcdfmultiplot.gp"
 RTT_CDF_MULTI_PLOT = "rttcdfmultiplot.ps"
+SVR_PKT_CDF_TXT = "server_pktcdfplot.txt"
 
 # Generating common files for UDP during analysis in PLOT_DIR/[file_name]
 SVR_SENT = "server_sent.txt"
@@ -84,6 +90,8 @@ JITTER_CDF_MULTI_GRAPH_CLT = "jittercdfmultiplot_client.gp"
 JITTER_CDF_MULTI_PLOT_CLT = "jittercdfmultiplot_client.ps"
 JITTER_CDF_MULTI_GRAPH_SVR = "jittercdfmultiplot_server.gp"
 JITTER_CDF_MULTI_PLOT_SVR = "jittercdfmultiplot_server.ps"
+SVR_RCVD_PKT_CDF_TXT = "server_rcvd_pktcdfplot.txt"
+SVR_SENT_PKT_CDF_TXT = "server_sent_pktcdfplot.txt"
 
 DEBUG = 0
 
@@ -190,6 +198,7 @@ def xPutPlot(fileLocation):
 	data += 'set out "' + fileLocation + '/' + XPUT_PLOT + '"\n'
 	data += 'plot "' + fileLocation + '/' + XPUT_TXT + '" using 1:($2/1000.0) with lines lw 3\n'
 	xPutPlotFile.write(data)
+	xPutPlotFile.close()
 	subprocess.Popen("gnuplot " + fileLocation + "/" + XPUT_GRAPH, shell = True)
 	
 def xPutAnalyze(file, pcap_dir):
@@ -226,6 +235,7 @@ def xPutCDFPlot(fileLocation):
 	data += 'pointcount = countpoints("' + fileLocation + '/' + XPUT_CDF_TXT + '")\n'
 	data += 'plot "' + fileLocation + '/' + XPUT_CDF_TXT + '" using ($1/1000.0):(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "blue" t "A to B"\n'
 	xPutPlotFile.write(data)
+	xPutPlotFile.close()
 	subprocess.Popen("gnuplot " + fileLocation + "/" + XPUT_CDF_GRAPH, shell = True)
 	
 def xPutCDFAnalyze(file):
@@ -285,6 +295,7 @@ def generateXputCDFMultiplot(numOfPlots):
 	data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + XPUT_CDF_TXT + '" using ($1/1000.0):(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
 	
 	xputMultiplotFile.write(data)
+	xputMultiplotFile.close()
 	subprocess.Popen("gnuplot ./" + XPUT_CDF_MULTI_GRAPH, shell = True)
 	
 '''
@@ -314,6 +325,7 @@ def rttCDFPlot(fileLocation):
 	data += 'pointcount = countpoints("' + fileLocation + '/' + RTT_CDF_TXT + '")\n'
 	data += 'plot "' + fileLocation + '/' + RTT_CDF_TXT + '" using 1:(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "green" t "A to B"\n'
 	rttPlotFile.write(data)
+	rttPlotFile.close()
 	subprocess.Popen("gnuplot " + fileLocation + "/" + RTT_CDF_GRAPH, shell = True)
 
 def rttCDFAnalyze(file, pcap_dir):
@@ -323,7 +335,7 @@ def rttCDFAnalyze(file, pcap_dir):
 	outFile = outDirectory + "/" + RTT_CDF_TXT
 	
 	textRTTPcap = TXT_PCAP_DIR + "/" + file.split('.pcap')[0] + "_rtt.txt"
-	rttCmd = 'tshark -T fields -E header=y -E separator=, -E quote=d -e frame.number -e frame.time_relative -e ip.src -e tcp.srcport -e ip.dst -e tcp.dstport -e tcp.flags -e tcp.analysis.acks_frame -e tcp.analysis.ack_rtt -r "' + pcap_dir + '/' + file + '" > ' + textRTTPcap
+	rttCmd = 'tshark -Tfields -E header=y -E separator=, -E quote=d -e frame.number -e frame.time_relative -e ip.src -e tcp.srcport -e ip.dst -e tcp.dstport -e tcp.flags -e tcp.analysis.acks_frame -e tcp.analysis.ack_rtt -e tcp.len -r "' + pcap_dir + '/' + file + '" > ' + textRTTPcap
 	os.system(rttCmd)
 	
 	pairs = {}
@@ -368,6 +380,7 @@ def rttCDFAnalyze(file, pcap_dir):
 	f = open(outFile, 'w')
 	for rtt in tcp_rtts:
 		f.write(str(rtt*1000) + '\n')
+	f.close()
 	rttCDFPlot(outDirectory)
 
 '''
@@ -418,6 +431,7 @@ def generateRTTCDFMultiplot(numOfPlots):
 	data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + RTT_CDF_TXT + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
 	
 	rttMultiplotFile.write(data)
+	rttMultiplotFile.close()
 	subprocess.Popen("gnuplot ./" + RTT_CDF_MULTI_GRAPH, shell = True)
 	
 '''
@@ -448,6 +462,7 @@ def jitterCDFPlot(fileLocation, endpoint):
 	else:
 		data += 'plot "' + fileLocation + '/' + endpoint + '_jitter_sorted.txt" using 1:(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "' + color[0] + '" t "' + endpoint + ' to client"'
 	jitterPlotFile.write(data)
+	jitterPlotFile.close()
 	subprocess.Popen("gnuplot " + fileLocation + "/jittercdfplot_" + endpoint + ".gp", shell = True)
 	
 def jitterCDFPlotAll(fileLocation):
@@ -474,18 +489,23 @@ def jitterCDFPlotAll(fileLocation):
 	data += 'plot "' + fileLocation + '/' + CLT_JITTER_SORTED + '" using 1:(1.0/pointcount1) smooth cumulative with lines lw 3 linecolor rgb "' + color[0] + '" t "client to server", '
 	data += '"' + fileLocation + '/' + SVR_JITTER_SORTED + '" using 1:(1.0/pointcount2) smooth cumulative with lines lw 3 linecolor rgb "' + color[1] + '" t "server to client"'
 	jitterPlotFile.write(data)
+	jitterPlotFile.close()
 	subprocess.Popen("gnuplot " + fileLocation + "/" + JITTER_CDF_GRAPH, shell = True)
 	
 def jitterCDFAnalyze(file):
 	outDirectory = PLOT_DIR + "/" + file.split('.pcap')[0]
 	files = os.listdir(outDirectory)
 	if SVR_JITTER and CLT_JITTER in files:
-		client_jitter_sort_cmd = ("sort " + outDirectory + '/' + CLT_JITTER + ' > ' + outDirectory + '/' + 'client_jitter_sorted.txt')
-		server_jitter_sort_cmd = ("sort " + outDirectory + '/' + SVR_JITTER + ' > ' + outDirectory + '/' + 'server_jitter_sorted.txt')
-		os.system(client_jitter_sort_cmd)
-		os.system(server_jitter_sort_cmd)
-		#jitterCDFPlot(outDirectory, 'server')
-		#jitterCDFPlot(outDirectory, 'client')
+		jiiterAtServerFloatSorted = sorted(map(float, open(outDirectory + '/' + SVR_JITTER, 'r').read().splitlines()))
+		jiiterAtServerSortedFile = open(outDirectory + '/' + SVR_JITTER_SORTED, 'w')
+		for jitter in range(0, len(jiiterAtServerFloatSorted)):
+			jiiterAtServerSortedFile.write(str(jiiterAtServerFloatSorted[jitter])+'\n')
+		
+		jiiterAtClientFloatSorted = sorted(map(float, open(outDirectory + '/' + CLT_JITTER, 'r').read().splitlines()))
+		jiiterAtClientSortedFile = open(outDirectory + '/' + CLT_JITTER_SORTED, 'w')
+		for jitter in range(0, len(jiiterAtClientFloatSorted)):
+			jiiterAtClientSortedFile.write(str(jiiterAtClientFloatSorted[jitter])+'\n')
+		
 		jitterCDFPlotAll(outDirectory)
 	else:
 		print "\t\tEither of the following file is missing: " + SVR_JITTER + ' or ' + CLT_JITTER
@@ -607,7 +627,7 @@ def udpDelay2(outDirectory):
 	interval3 = [line.rstrip() for line in f3]
 	interval4 = [line.rstrip() for line in f4]
 	
-	statFile = open(outDirectory + "/" + "stats.txt", "w")
+	statFile = open(outDirectory + "/" + STATS_TXT, "w")
 	
 	num_client_sent = len(interval1) + 1
 	num_server_rcvd = len(interval2) + 1
@@ -624,14 +644,16 @@ def udpDelay2(outDirectory):
 	statFile.write("udp_client_sent: " + str(num_client_sent) + "\n")
 	statFile.write("udp_server_rcvd: " + str(num_server_rcvd) + "\n")
 	statFile.write("udp_loss_rate_client_to_server: " + str(lossRateCS) + " %\n")
-	
+
 	jiiterAtServer = []
 	for x in range(0,len(interval1)-1) if len(interval1) <= len(interval2) else range(0,len(interval2)-1):
-		jiiterAtServer.append(format_float(abs(1000*(float(interval2[x])-float(interval1[x]))),15))
+		jiiterAtServer.append(format_float(1000*(float(interval2[x])-float(interval1[x])),15))
 	
-	f_jiiterAtServer = open(outDirectory + '/' + SVR_JITTER ,'w')
-	for delay in range(0, len(jiiterAtServer)):
-		f_jiiterAtServer.write(jiiterAtServer[delay]+'\n')
+	jiiterAtServerFloat = map(float, jiiterAtServer)
+	jiiterAtServerFile = open(outDirectory + '/' + SVR_JITTER ,'w')
+	for jitter in range(0, len(jiiterAtServerFloat)):
+		jiiterAtServerFile.write(str(jiiterAtServerFloat[jitter])+'\n')
+	
 	f1.close()
 	f2.close()
 
@@ -652,12 +674,14 @@ def udpDelay2(outDirectory):
 	statFile.write("udp_loss_rate_server_to_client: " + str(lossRateSC) + " %\n")
 	
 	jiiterAtClient = []
-	f_jiiterAtClient = open(outDirectory + '/' + CLT_JITTER, 'w')
 	for x in range(0,len(interval3)-1) if len(interval3) <= len(interval4) else range(0,len(interval4)-1):
-		jiiterAtClient.append(format_float(abs(1000*(float(interval4[x])-float(interval3[x]))),15))
+		jiiterAtClient.append(format_float(1000*(float(interval4[x])-float(interval3[x])),15))
 
-	for delay in range(0, len(jiiterAtClient)):
-		f_jiiterAtClient.write(jiiterAtClient[delay]+'\n')
+	jiiterAtClientFloat = map(float, jiiterAtClient)
+	jiiterAtClientFile = open(outDirectory + '/' + CLT_JITTER, 'w')
+	for jitter in range(0, len(jiiterAtClientFloat)):
+		jiiterAtClientFile.write(str(jiiterAtClientFloat[jitter])+'\n')
+	
 	f3.close()
 	f4.close()
 
@@ -821,14 +845,167 @@ def jitterPlotReady(replaying_dir = None):
 			print "\tError occured while processing " + pcap_file
 		jitterPreProcessing(outDirectory, file_name, replaying_dir)
 		return file_name
+
+
+'''
+Packet size CDF analysis
+'''
+def pktSizeCDFPlot(fileLocation, type):
+	color = ['blue', 'green']
+	fileName = fileLocation.split("/")[-1]
+	pktSizePlotFile = open(fileLocation + '/' + PKT_CDF_GRAPH, 'w')
+	data = '# Sorted packet sizes\n'
+	data += 'set title "Packet size CDF (' + fileName.replace('_','-') + ')"\n'
+	data += 'set style data lines\n' 
+	data += 'set key bottom right\n'
+	data += 'set ylabel "CDF" font "Courier, 14"\n'
+	data += 'set xlabel "Packet Size (Bytes)" font "Courier, 14"\n'
+	data += 'set yrange [0:1]\n'
+	data += 'set term postscript color eps enhanced "Helvetica" 16\n'
+	data += 'set grid back linestyle 81\n'
+	data += 'set xtics nomirror\n'
+	data += 'set ytics nomirror\n'
+	data += 'set out "' + fileLocation + '/' + PKT_CDF_PLOT + '"\n'
+	data += 'a=0\n'
+	data += 'cumulative_sum(x)=(a=a+x,a)\n'
+	data += 'countpoints(file) = system( sprintf("grep -v ^# %s| wc -l", file) )\n'
+	
+	if type == UDP_PCAP_DIR:
+		data += 'pointcount1 = countpoints("' + fileLocation + '/' + SVR_RCVD_PKT_CDF_TXT + '")\n'
+		data += 'pointcount2 = countpoints("' + fileLocation + '/' + SVR_SENT_PKT_CDF_TXT + '")\n'
+		data += 'plot "' + fileLocation + '/' + SVR_RCVD_PKT_CDF_TXT + '" using 1:(1.0/pointcount1) smooth cumulative with lines lw 3 linecolor rgb "' + color[0] + '" t "pkts server rcvd", '
+		data += '"' + fileLocation + '/' + SVR_SENT_PKT_CDF_TXT + '" using 1:(1.0/pointcount2) smooth cumulative with lines lw 3 linecolor rgb "' + color[1] + '" t "pkts server sent"'
+	elif type == TCP_PCAP_DIR:
+		data += 'pointcount = countpoints("' + fileLocation + '/' + SVR_PKT_CDF_TXT + '")\n'
+		data += 'plot "' + fileLocation + '/' + SVR_PKT_CDF_TXT + '" using 1:(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "' + color[0] + '" t "pkts"'
+	else:
+		pass
 		
-# Generate "stat.txt" file containing tcp_loss_rate, rtt/xput min/avg/max
+	pktSizePlotFile.write(data)
+	pktSizePlotFile.close()
+	subprocess.Popen("gnuplot " + fileLocation + "/" + PKT_CDF_GRAPH, shell = True)
+
+def pktSizeCDFAnalyze(file, type):
+	outDirectory = PLOT_DIR + "/" + file.split('.pcap')[0]
+	fileName = outDirectory.split("/")[-1]
+	
+	if type == UDP_PCAP_DIR:
+		server_rcvd_pkt_cmd = "cat " + outDirectory + "/" + SVR_RCVD + " | grep -v 'Frame' | awk '{print $7}' > " + outDirectory + "/tmp_" + SVR_RCVD_PKT_CDF_TXT
+		server_sent_pkt_cmd = "cat " + outDirectory + "/" + SVR_SENT + " | grep -v 'Frame' | awk '{print $7}' > " + outDirectory + "/tmp_" + SVR_SENT_PKT_CDF_TXT 
+		os.system(server_rcvd_pkt_cmd)
+		os.system(server_sent_pkt_cmd)
+		
+		rcvd_pkt_sizes = sorted(map(int, open(outDirectory + "/tmp_" + SVR_RCVD_PKT_CDF_TXT, "r").read().splitlines()))
+		sent_pkt_sizes = sorted(map(int, open(outDirectory + "/tmp_" + SVR_SENT_PKT_CDF_TXT, "r").read().splitlines()))
+
+		if os.path.isfile(outDirectory + "/" + SVR_RCVD_PKT_CDF_TXT) == True:
+			os.remove(outDirectory + "/" + SVR_RCVD_PKT_CDF_TXT)
+		if os.path.isfile(outDirectory + "/" + SVR_SENT_PKT_CDF_TXT) == True:
+			os.remove(outDirectory + "/" + SVR_SENT_PKT_CDF_TXT)
+
+		for rcvd_pkt_size in rcvd_pkt_sizes:
+			open(outDirectory + "/" + SVR_RCVD_PKT_CDF_TXT, "a").write(str(rcvd_pkt_size) + "\n") 
+		for sent_pkt_size in sent_pkt_sizes:
+			open(outDirectory + "/" + SVR_SENT_PKT_CDF_TXT, "a").write(str(sent_pkt_size) + "\n")
+		
+		os.remove(outDirectory + "/tmp_" + SVR_RCVD_PKT_CDF_TXT)
+		os.remove(outDirectory + "/tmp_" + SVR_SENT_PKT_CDF_TXT)
+	
+	elif type == TCP_PCAP_DIR:
+		#server_client_extract_cmd = ("cat " + TXT_PCAP_DIR + "/" + fileName + "_rtt.txt" + " | grep -v tcp | grep 0.00000000 | awk -F',' '{print $3, $5}' | awk -F'\"' '{print $2, $4}'")
+		#endpoints = commands.getoutput(server_client_extract_cmd)
+		#client = endpoints.split(' ')[0]
+		#server = endpoints.split(' ')[1]
+		
+		server_pkt_cmd = "cat " + TXT_PCAP_DIR + "/" + fileName + "_rtt.txt" + " | awk -F',' '{print $10}' | grep -v tcp > " + outDirectory + "/tmp_" + SVR_PKT_CDF_TXT
+		os.system(server_pkt_cmd)
+		
+		raw_pkt_sizes = open(outDirectory + "/tmp_" + SVR_PKT_CDF_TXT, "r").readlines()
+		pkt_sizes = []
+		for pkt_size in raw_pkt_sizes:
+			if pkt_size == "":
+				pkt_size = 0
+			else:
+				pkt_sizes.append(pkt_size.strip('\n').replace('\"',''))
+		if os.path.isfile(outDirectory + "/" + SVR_PKT_CDF_TXT) == True:
+			os.remove(outDirectory + "/" + SVR_PKT_CDF_TXT)
+		for pkt_size in sorted(map(int, [x for x in pkt_sizes if x !=''])):
+			open(outDirectory + "/" + SVR_PKT_CDF_TXT, "a").write(str(pkt_size) + "\n") 
+		os.remove(outDirectory + "/tmp_" + SVR_PKT_CDF_TXT)
+	
+	else:
+		pass
+		
+	pktSizeCDFPlot(outDirectory, type)
+
+'''
+Multiplot - Packet Size CDF for multiple cases for TCP(Up to 10)
+'''
+def generatePktSizeCDFMultiplot(numOfPlots):
+	if numOfPlots > 10:
+		print "\tThe Multiplot graph supports drawing up to 10\n"
+		sys.exit()
+	
+	entriesTocompare = os.listdir(PLOT_DIR)
+	if(len(entriesTocompare) == 0):
+		print "\tThere is no generated plot to compare with\n"
+	
+	print "\t\t* Packet Size CDF Multiplot (" + str(numOfPlots) + ")"
+	
+	color = ['blue', 'green', 'red', 'black']
+	pktSizeMultiplotFile = open('./' + PKT_SIZE_CDF_MULTI_GRAPH, 'w')
+	data = '# Packet Size CDF Multiplot Graph \n'
+	data += 'set style data lines\n' 
+	data += 'set title "Packet Size CDF Comparison"\n'
+	data += 'set key bottom right\n'
+	data += 'set xlabel "Packet Size (Bytes)"\n'
+	data += 'set ylabel "CDF"\n'
+	data += 'set yrange [0:1]\n'
+	data += 'set term postscript color eps enhanced "Helvetica" 16\n'
+	data += 'set size ratio 0.5\n'
+	data += 'set style line 80 lt 0\n'
+	data += 'set grid back linestyle 81\n'
+	data += 'set border 3 back linestyle 80\n'
+	data += 'set xtics nomirror\n'
+	data += 'set ytics nomirror\n'
+	data += 'set out "' + './' + PKT_SIZE_CDF_MULTI_PLOT + '"\n'
+	data += 'a=0\n'
+	data += 'cumulative_sum(x)=(a=a+x,a)\n'
+	data += 'countpoints(file) = system( sprintf("grep -v ^# %s| wc -l", file) )\n'
+	
+	i = 0
+	for entry in entriesTocompare:
+		data += 'pointcount' + str(i) + ' = countpoints("' + PLOT_DIR + '/' + entry + '/' + RTT_CDF_TXT + '")\n'
+		i = i + 1
+	
+	data += 'plot '
+	j = 0
+	while j < len(entriesTocompare) - 1:
+		data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + SVR_PKT_CDF_TXT + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
+		j = j + 1
+	data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + SVR_PKT_CDF_TXT + '" using 1:(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
+	
+	pktSizeMultiplotFile.write(data)
+	pktSizeMultiplotFile.close()
+	subprocess.Popen("gnuplot ./" + PKT_SIZE_CDF_MULTI_GRAPH, shell = True)
+	
+def statMedian(list):
+	if not list or len(list) == 0:
+		return 0
+	sortedList = sorted(list)
+	length = len(sortedList)
+	if length % 2 == 1:
+		return float(sortedList[(length + 1) / 2 - 1])
+	else:
+		return float(sortedList[length / 2 - 1])
+	
+# Generate "stat.txt" file containing tcp_loss_rate, rtt/xput min/median/avg/max
 def tcpStats(file):
 	fileName = os.path.splitext(file)[0]
-	statFile = open(PLOT_DIR + "/" + fileName + "/" + "stats.txt", "w")
+	statFile = open(PLOT_DIR + "/" + fileName + "/" + STATS_TXT, "w")
 	tcp_total = commands.getoutput("cat " + TXT_PCAP_DIR + "/" + fileName + "_rtt.txt | wc -l")
 	statFile.write("tcp_total: " + str(int(tcp_total) - 1) + "\n")
-	tcp_loss = commands.getoutput("tshark -Y tcp.analysis.lost_segment -r " + TCP_PCAP_DIR + "/" + file + " | wc -l")
+	tcp_loss = commands.getoutput("tshark -2 -R tcp.analysis.lost_segment -r " + TCP_PCAP_DIR + "/" + file + " | wc -l")
 	statFile.write("tcp_loss: " + str(int(tcp_loss)) + "\n")
 	statFile.write("tcp_loss_rate: " + str(round(float(tcp_loss)/float(tcp_total)*100, 5)) + " %\n")
 	
@@ -837,44 +1014,83 @@ def tcpStats(file):
 	rttMax = commands.getoutput("tail -1 " + rttTxt)
 	rttAll = open(rttTxt).read().splitlines()
 	rttSum = 0.0
+	
+	rttMedian = round(float(statMedian(rttAll)),5)
 	for rtt in rttAll:
 		rttSum += float(rtt)
 	rttAvg = round(float(rttSum / len(rttAll)),5)
 	
-	statFile.write("rtt_min: " + str(float(rttMin)) + " (s)\n")
-	statFile.write("rtt_avg: " + str(rttAvg) + " (s)\n")
-	statFile.write("rtt_max: " + str(float(rttMax)) + " (s)\n")
+	statFile.write("rtt_min: " + str(float(rttMin)) + " (ms)\n")
+	statFile.write("rtt_avg: " + str(rttAvg) + " (ms)\n")
+	statFile.write("rtt_median: " + str(rttMedian) + " (ms)\n")
+	statFile.write("rtt_max: " + str(float(rttMax)) + " (ms)\n")
 	
 	xputTxt = PLOT_DIR + "/" + fileName + "/" + XPUT_CDF_TXT
 	xputMin = commands.getoutput("head -1 " + xputTxt)
 	xputMax = commands.getoutput("tail -1 " + xputTxt)
 	xputAll = open(xputTxt).read().splitlines()
+	#xputMedian = round(float(statMedian(xputAll)/1000), 5)
+	
 	xputSum = 0.0
 	for xput in xputAll:
 		xputSum += float(xput)
-	xputAvg = round(float(xputSum / len(xputAll) / 100),5)
+	xputAvg = round(float(xputSum / len(xputAll) / 1000), 5)
+
+	pktSizeSvrTxt = PLOT_DIR + "/" + fileName + "/" + SVR_PKT_CDF_TXT
+	pktSizeMin = commands.getoutput("head -1 " + pktSizeSvrTxt)
+	pktSizeMax = commands.getoutput("tail -1 " + pktSizeSvrTxt)
+	pktSizeSvrAll = open(pktSizeSvrTxt).read().splitlines()
+	pktSizeSvrSum = 0.0
+	for pktSize in pktSizeSvrAll:
+		pktSizeSvrSum += float(pktSize)
+	pktSizeSvrAvg = round(float(pktSizeSvrSum / len(pktSizeSvrAll)), 5)
 	
-	statFile.write("xput_min: " + str(float(xputMin)/100) + " (KB/s)\n")
+	statFile.write("xput_min: " + str(round(float(xputMin)/1000, 5)) + " (KB/s)\n")
 	statFile.write("xput_avg: " + str(xputAvg) + " (KB/s)\n")
-	statFile.write("xput_max: " + str(float(xputMax)/100) + " (KB/s)\n")
+	#statFile.write("xput_median: " + str(xputMedian) + " (KB/s)\n")
+	statFile.write("xput_max: " + str(round(float(xputMax)/1000, 5)) + " (KB/s)\n")
+	statFile.write("pkt_size_avg: " + str(pktSizeSvrAvg) + " [Range: " + pktSizeMin + " - " + pktSizeMax + "] (Bytes)\n")
+	statFile.close()
 	
 # Generate "stat.txt" file containing udp_loss_rate, xput min/avg/max
 def udpStats(file):
 	fileName = os.path.splitext(file)[0]
-	statFile = open(PLOT_DIR + "/" + fileName + "/" + "stats.txt", "a")
+	statFile = open(PLOT_DIR + "/" + fileName + "/" + STATS_TXT, "a")
 	
 	xputTxt = PLOT_DIR + "/" + fileName + "/" + XPUT_CDF_TXT
 	xputMin = commands.getoutput("head -1 " + xputTxt)
 	xputMax = commands.getoutput("tail -1 " + xputTxt)
 	xputAll = open(xputTxt).read().splitlines()
+	#xputMedian = round(float(statMedian(xputAll)/1000), 5)
 	xputSum = 0.0
 	for xput in xputAll:
 		xputSum += float(xput)
-	xputAvg = round(float(xputSum / len(xputAll) / 100),5)
+	xputAvg = round(float(xputSum / len(xputAll) / 1000), 5)
 	
-	statFile.write("xput_min: " + str(float(xputMin)/100) + " (KB/s)\n")
+	pktSizeSvrRcvdTxt = PLOT_DIR + "/" + fileName + "/" + SVR_RCVD_PKT_CDF_TXT
+	pktSizeSvrSentTxt = PLOT_DIR + "/" + fileName + "/" + SVR_SENT_PKT_CDF_TXT
+	pktSizeRcvdMin = commands.getoutput("head -1 " + pktSizeSvrRcvdTxt)
+	pktSizeRcvdMax = commands.getoutput("tail -1 " + pktSizeSvrRcvdTxt)
+	pktSizeSentMin = commands.getoutput("head -1 " + pktSizeSvrSentTxt)
+	pktSizeSentMax = commands.getoutput("tail -1 " + pktSizeSvrSentTxt)
+	pktSizeSvrRcvdAll = open(pktSizeSvrRcvdTxt).read().splitlines()
+	pktSizeSvrSentAll = open(pktSizeSvrSentTxt).read().splitlines()
+	pktSizeSvrRcvdSum = 0.0
+	for pktSize in pktSizeSvrRcvdAll:
+		pktSizeSvrRcvdSum += float(pktSize)
+	pktSizeSvrRcvdAvg = round(float(pktSizeSvrRcvdSum / len(pktSizeSvrRcvdAll)), 5)
+	pktSizeSvrSentSum = 0.0
+	for pktSize in pktSizeSvrSentAll:
+		pktSizeSvrSentSum += float(pktSize)
+	pktSizeSvrSentAvg = round(float(pktSizeSvrSentSum / len(pktSizeSvrSentAll)), 5)
+	
+	statFile.write("xput_min: " + str(round(float(xputMin)/1000, 5)) + " (KB/s)\n")
 	statFile.write("xput_avg: " + str(xputAvg) + " (KB/s)\n")
-	statFile.write("xput_max: " + str(float(xputMax)/100) + " (KB/s)\n")
+	#statFile.write("xput_median: " + str(xputMedian) + " (KB/s)\n")
+	statFile.write("xput_max: " + str(round(float(xputMax)/1000, 5)) + " (KB/s)\n")
+	statFile.write("pkt_size_avg (sever_rcvd): " + str(pktSizeSvrRcvdAvg) + " [Range: " + pktSizeRcvdMin + " - " + pktSizeRcvdMax + "] (Bytes)\n")
+	statFile.write("pkt_size_avg (sever_sent): " + str(pktSizeSvrSentAvg) + " [Range: " + pktSizeSentMin + " - " + pktSizeSentMax + "] (Bytes)\n")
+	statFile.close()
 
 '''
 Main Functions to run TCP/UDP analysis
@@ -893,8 +1109,9 @@ def runTCP():
 				print '...Done!!'
 				print '\t\tRTT CDF ...',
 				rttCDFAnalyze(file, TCP_PCAP_DIR)
-				print '...Done!!'
+				pktSizeCDFAnalyze(file, TCP_PCAP_DIR)
 				tcpStats(file)
+				print '...Done!!'
 	print '\tAll generated plots/stats have been saved to ' + PLOT_DIR
 
 def runUDP(replaying_dir):
@@ -913,6 +1130,7 @@ def runUDP(replaying_dir):
 				print '\t\t...Done!!'
 				print '\t\tJitter CDF ...',
 				jitterCDFAnalyze(file)
+				pktSizeCDFAnalyze(file, UDP_PCAP_DIR)
 				udpStats(file)
 				print '...Done!!'
 
@@ -929,6 +1147,7 @@ def runUDP(replaying_dir):
 			print '\t\t...Done!!'
 			print '\t\tJitter CDF ...',
 			jitterCDFAnalyze(file)
+			pktSizeCDFAnalyze(file, UDP_PCAP_DIR)
 			udpStats(file)
 			print '...Done!!'
 	print '\tAll generated plots/stats have been saved to ' + PLOT_DIR
@@ -943,7 +1162,7 @@ def isPcap(pcap_dir):
 				numOfFiles += 1
 	return numOfFiles
 
-# Check if PLOT_DIR/TCP_PCAP_DIR/UDP_PCAP_DIR exists
+# Check if PLOT_DIR/TCP_PCAP_DIR/UDP_PCAP_DIR and pcaps exist
 def chkEnv(protocol):
 	if os.path.isdir(PCAP_DIR) == False:
 		os.mkdir(PCAP_DIR)
@@ -1007,7 +1226,8 @@ def analysisMain():
 			numOfPlots = isPcap(TCP_PCAP_DIR)
 			generateXputCDFMultiplot(numOfPlots)
 			generateRTTCDFMultiplot(numOfPlots)
-			print "\tDone..! (Plots have been saved to the current directory)\n"
+			#generatePktSizeCDFMultiplot(numOfPlots)
+			print "\tDone..! (Multiplots have been saved to the current directory)\n"
 	elif protocol == 'udp':
 		print '\t[UDP Pcap File Analysis]'
 		chkEnv(protocol)
@@ -1017,7 +1237,7 @@ def analysisMain():
 			numOfPlots = isPcap(UDP_PCAP_DIR)
 			generateXputCDFMultiplot(numOfPlots)
 			generateJitterCDFMultiplot(numOfPlots)
-			print "\tDone..! (Plots have been saved to the current directory)\n"
+			print "\tDone..! (Multiplots have been saved to the current directory)\n"
 	else:
 		print '\tOops! Provided protocol is NOT supported, Terminated...'
 		sys.exit()
