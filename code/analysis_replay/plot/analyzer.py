@@ -1,7 +1,7 @@
 '''
 #######################################################################################################
 #######################################################################################################
-Last Updated: Aug 10, 2014
+Last Updated: Aug 26, 2014
 
 By: Hyungjoon Koo (hykoo@cs.stonybrook.edu)
 	Stony Brook University
@@ -12,7 +12,7 @@ Required package
 	(*) dpkt (https://code.google.com/p/dpkt/)
 
 Usage:
-	python analyzer.py --proto=[tcp|udp] --multiplot=[True|False]
+	python analyzer.py --proto=[tcp|udp] --multiplot=[True|False] --kstest=[True|False]
 
 Pre-condition:
 	In case of TCP, the script generates throughput, throughput CDF, and RTT CDF in TCP_PCAP_DIR.
@@ -22,7 +22,7 @@ Pre-condition:
 		CLT_SENT_INTVL and CLT_RCVD_INTVL will be collected and sent by udp_client.py while replaying with the option --jitter=True
 	
 Example:
-	python analyzer.py --proto=tcp --multiplot=True
+	python analyzer.py --proto=tcp --multiplot=True --kstest=True
 	python analyzer.py --proto=udp --replaying_dir=./skype 
 
 #######################################################################################################
@@ -92,6 +92,14 @@ JITTER_CDF_MULTI_GRAPH_SVR = "jittercdfmultiplot_server.gp"
 JITTER_CDF_MULTI_PLOT_SVR = "jittercdfmultiplot_server.ps"
 SVR_RCVD_PKT_CDF_TXT = "server_rcvd_pktcdfplot.txt"
 SVR_SENT_PKT_CDF_TXT = "server_sent_pktcdfplot.txt"
+
+# Generating KS-Test files using R
+KS_ORIGINAL_FILE = "server_jitter_sorted1.txt"
+KS_COMPARED_FILE = "server_jitter_sorted2.txt"
+KS_RESULT_PS = "ks_result.ps"
+KS_RESULT_TXT = "ks_result.txt"
+R_FILE = "ks_test.R"
+R_COMMAND = "Rscript"
 
 DEBUG = 0
 
@@ -988,7 +996,97 @@ def generatePktSizeCDFMultiplot(numOfPlots):
 	pktSizeMultiplotFile.write(data)
 	pktSizeMultiplotFile.close()
 	subprocess.Popen("gnuplot ./" + PKT_SIZE_CDF_MULTI_GRAPH, shell = True)
+
+'''
+The K-S Test using R here is as following:
+1. Remove outliers
+2. Extract the half number of samples from comparing target  
+3. Compare two distributions (one for baseline, the other one for comparison)
+4. If p-value is larger than 0.05, then we can accept the null hypothesis. 
+	In this case, we can say two dists derive from the same one.
+	If not (p < 0.05), we should reject H0 or two dists are significantly different.
+5. The R generates cdf and boxplot in a single ps file.
+'''
+def ksTest(origin, compared, labelX):
+	rFile = open('./' + R_FILE, 'w')
+	data = '# K-S(Kolmogorov-Smirnov) Test using R\n'
+	data += 'remove_outliers <- function(x, na.rm = TRUE, ...) {\n'
+	data += '  qnt <- quantile(x, probs=c(.01, .99), na.rm = na.rm, ...)\n'
+	data += '  H <- 1.5 * IQR(x, na.rm = na.rm)\n'
+	data += '  y <- x\n'
+	data += '  y[x < (qnt[1] - H)] <- NA\n'
+	data += '  y[x > (qnt[2] + H)] <- NA\n'
+	data += '  y\n'
+	data += '}\n'
+	data += '\n'
+	data += 'origin <- read.table("' + origin +'")\n'
+	data += 'originValues <- origin$V1\n'
+	data += 'comparison <- read.table("' + compared + '")\n'
+	data += 'comparisonValues <- comparison$V1\n'
+	data += '\n'
+	data += '#originValuesWithoutOutliers <- remove_outliers(originValues)\n'
+	data += 'originValuesWithoutOutliers <- originValues[!originValues %in% boxplot.stats(originValues)$out]\n'
+	data += '#comparisonValuesWithoutOutliers <- remove_outliers(comparisonValues)\n'
+	data += 'comparisonValuesWithoutOutliers <- comparisonValues[!comparisonValues %in% boxplot.stats(comparisonValues)$out]\n'
+	data += 'comparisonSamples <- sample(comparisonValuesWithoutOutliers, round(length(comparisonValuesWithoutOutliers)/2), prob = NULL)\n'
+	data += '\n'
+	data += 'saveResult <- file("' + KS_RESULT_TXT + '", open="wt")\n'
+	data += 'sink(saveResult)\n'
+	data += '#message("[A] Summary of originValues (samples:", length(originValues), ")")\n'
+	data += '#summary(originValues)\n'
+	data += '#writeLines("")\n'
+	data += '#message("[B] Summary of originValuesWithoutOutliers (samples:", length(originValuesWithoutOutliers), ")")\n'
+	data += '#summary(originValuesWithoutOutliers)\n'
+	data += '#writeLines("")\n'
+	data += '#message("[C] Summary of comparisonValues (samples:", length(comparisonValues), ")")\n'
+	data += '#summary(comparisonValues)\n'
+	data += '#writeLines("")\n'
+	data += '#message("[D] Summary of comparisonValuesWithoutOutliers (samples:", length(comparisonValuesWithoutOutliers), ")")\n'
+	data += '#summary(comparisonValuesWithoutOutliers)\n'
+	data += '#writeLines("")\n'
+	data += '#message("[E] Summary of comparisonSamples (samples:", length(comparisonSamples), ")")\n'
+	data += '#summary(comparisonSamples)\n'
+	data += '#writeLines("")\n'
+	data += '\n'
+	data += 'ks.test(originValuesWithoutOutliers, comparisonSamples)\n'
+	data += '\n'
+	data += 'postscript("' + KS_RESULT_PS + '")\n'
+	data += 'par(mfrow=c(1,2))\n'
+	data += 'plot(ecdf(originValuesWithoutOutliers), do.points=FALSE, verticals=TRUE, xlim=range(originValuesWithoutOutliers, comparisonSamples), main="CDF of Sample Distributions", xlab="' + labelX + '", ylab="CDF")\n'
+	data += 'plot(ecdf(comparisonSamples), do.points=FALSE, verticals=TRUE, add=TRUE, col="red")\n'
+	data += 'boxplot(list(orig=originValuesWithoutOutliers, compared=comparisonSamples))\n'
+	data += '#dev.off()\n'
 	
+	rFile.write(data)
+	rFile.close()
+	
+	#subprocess.Popen(R_COMMAND + " ./" + R_FILE + "2> /dev/null", shell = True)
+	try:
+		rCmd = R_COMMAND + " ./" + R_FILE + " 2> /dev/null"
+		os.system(rCmd)
+	except:
+		print "Failed to use R.."
+		exit(1)
+	return commands.getoutput("cat ./" + KS_RESULT_TXT + " | grep p-value")
+	#print "All result file from R has been saved to " + KS_RESULT_TXT + " and " + KS_RESULT_PS + "..."
+	
+def ksTestFinalDecision(description, origin, compared):
+	sum = 0.0
+	print description + " (" + origin + " VS " + compared + ")"
+	for i in range(1, 11):
+		result = ksTest(origin, compared, description)
+		(d,pValue) = result.split(',')
+		try:
+			sum = sum + float(pValue.split(" = ")[1])
+		except:
+			sum = sum + float(pValue.split(" < ")[1])
+		os.system('sleep 0.5')
+	pAvg = sum/10.0
+	if pAvg < 0.05:
+		print "\tH0: rejected, Two Distributions are statistically DIFFERENT. (Average of P values = " + str(pAvg)
+	else:
+		print "\tH0: accepted, Two Distributions are statistically SAME. (Average of P values = " + str(pAvg)
+		
 def statMedian(list):
 	if not list or len(list) == 0:
 		return 0
@@ -1197,11 +1295,14 @@ def analysisMain():
 	#configs.set('abbas', False)
 	configs.set('multiplot', False)
 	configs.set('replaying_dir', None)
+	configs.set('proto', None)
+	configs.set('kstest', None)
 	configs.read_args(sys.argv)
 	configs.show_all()
 	replaying_dir = configs.get('replaying_dir')
 	multiplot = configs.get('multiplot')
 	protocol = configs.get('proto')
+	kstest = configs.get('kstest')
 	
 	PRINT_ACTION('Analyzing and drawing plots...', 0)
 	'''
@@ -1228,6 +1329,20 @@ def analysisMain():
 			generateRTTCDFMultiplot(numOfPlots)
 			#generatePktSizeCDFMultiplot(numOfPlots)
 			print "\tDone..! (Multiplots have been saved to the current directory)\n"
+		if kstest == True:
+			comparisonDirs = os.listdir(PLOT_DIR)
+			if len(comparisonDirs) == 0:
+				print "Nothing to compare each other!"
+				exit(1)
+			print "K-S Testing..."
+			print "(Note that this testing might not work if " + PLOT_DIR + "is mixed up with TCP/UDP)"
+			for i in range(0, len(comparisonDirs)):
+				print "[" + str(i+1) + "] " + comparisonDirs[i]
+			baseline = raw_input("Select the baseline distribution to make a comparison: ")
+			for i in range(0, len(comparisonDirs)):
+				if comparisonDirs[i] <> comparisonDirs[int(baseline) - 1]:
+					ksTestFinalDecision("TCP Xput (KB/s)", PLOT_DIR + "/" + comparisonDirs[int(baseline) - 1] + "/" + XPUT_CDF_TXT, PLOT_DIR + "/" + comparisonDirs[i] + "/" + XPUT_CDF_TXT)
+					ksTestFinalDecision("TCP RTT (ms)", PLOT_DIR + "/" + comparisonDirs[int(baseline) - 1] + "/" + RTT_CDF_TXT, PLOT_DIR + "/" + comparisonDirs[i] + "/" + RTT_CDF_TXT)
 	elif protocol == 'udp':
 		print '\t[UDP Pcap File Analysis]'
 		chkEnv(protocol)
@@ -1238,6 +1353,21 @@ def analysisMain():
 			generateXputCDFMultiplot(numOfPlots)
 			generateJitterCDFMultiplot(numOfPlots)
 			print "\tDone..! (Multiplots have been saved to the current directory)\n"
+		if kstest == True:
+			comparisonDirs = os.listdir(PLOT_DIR)
+			if len(comparisonDirs) == 0:
+				print "Nothing to compare each other!"
+				exit(1)
+			print "K-S Testing..."
+			print "(Note that this testing might not work if " + PLOT_DIR + "is mixed up with TCP/UDP)"
+			for i in range(0, len(comparisonDirs)):
+				print "[" + str(i+1) + "] " + comparisonDirs[i]
+			baseline = raw_input("Select the baseline distribution to make a comparison: ")
+			for i in range(0, len(comparisonDirs)):
+				if comparisonDirs[i] <> comparisonDirs[int(baseline) - 1]:
+					ksTestFinalDecision("UDP Xput (KB/s)", PLOT_DIR + "/" + comparisonDirs[int(baseline) - 1] + "/" + XPUT_CDF_TXT, PLOT_DIR + "/" + comparisonDirs[i] + "/" + XPUT_CDF_TXT)
+					ksTestFinalDecision("UDP Jitter@Server (ms)", PLOT_DIR + "/" + comparisonDirs[int(baseline) - 1] + "/" + SVR_JITTER_SORTED, PLOT_DIR + "/" + comparisonDirs[i] + "/" + SVR_JITTER_SORTED)
+					ksTestFinalDecision("UDP Jitter@Client (ms)", PLOT_DIR + "/" + comparisonDirs[int(baseline) - 1] + "/" + CLT_JITTER_SORTED, PLOT_DIR + "/" + comparisonDirs[i] + "/" + CLT_JITTER_SORTED)
 	else:
 		print '\tOops! Provided protocol is NOT supported, Terminated...'
 		sys.exit()
