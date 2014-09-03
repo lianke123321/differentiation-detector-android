@@ -204,7 +204,8 @@ def xPutPlot(fileLocation):
 	data += 'set xtics nomirror\n'
 	data += 'set ytics nomirror\n'
 	data += 'set out "' + fileLocation + '/' + XPUT_PLOT + '"\n'
-	data += 'plot "' + fileLocation + '/' + XPUT_TXT + '" using 1:($2/1000.0) with lines lw 3\n'
+	#data += 'plot "' + fileLocation + '/' + XPUT_TXT + '" using 1:($2/1000.0) with lines lw 3\n'
+	data += 'plot "' + fileLocation + '/' + XPUT_TXT + '" using 1:($2/1.0) with lines lw 3\n'
 	xPutPlotFile.write(data)
 	xPutPlotFile.close()
 	subprocess.Popen("gnuplot " + fileLocation + "/" + XPUT_GRAPH, shell = True)
@@ -241,7 +242,8 @@ def xPutCDFPlot(fileLocation):
 	data += 'set out "' + fileLocation + '/' + XPUT_CDF_PLOT + '"\n'
 	data += 'countpoints(file) = system( sprintf("grep -v ^# %s| wc -l", file) )\n'
 	data += 'pointcount = countpoints("' + fileLocation + '/' + XPUT_CDF_TXT + '")\n'
-	data += 'plot "' + fileLocation + '/' + XPUT_CDF_TXT + '" using ($1/1000.0):(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "blue" t "A to B"\n'
+	#data += 'plot "' + fileLocation + '/' + XPUT_CDF_TXT + '" using ($1/1000.0):(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "blue" t "A to B"\n'
+	data += 'plot "' + fileLocation + '/' + XPUT_CDF_TXT + '" using ($1/1.0):(1.0/pointcount) smooth cumulative with lines lw 3 linecolor rgb "blue" t "A to B"\n'
 	xPutPlotFile.write(data)
 	xPutPlotFile.close()
 	subprocess.Popen("gnuplot " + fileLocation + "/" + XPUT_CDF_GRAPH, shell = True)
@@ -251,7 +253,7 @@ def xPutCDFAnalyze(file):
 	if os.path.isdir(outDirectory) == False:
 		os.mkdir(outDirectory)
 	outFile = outDirectory + "/" + XPUT_CDF_TXT
-	sortXPutCmd = "cat " + outDirectory + "/" + XPUT_TXT + " | sort -n -k2,2 | awk '{print $2}' > " + outFile + " 2> /dev/null"
+	sortXPutCmd = "cat " + outDirectory + "/" + XPUT_TXT + " | sort -n -k2,2 | awk '{print $2/1000}' > " + outFile + " 2> /dev/null"
 	os.system(sortXPutCmd)
 	xPutCDFPlot(outDirectory)
 
@@ -298,9 +300,9 @@ def generateXputCDFMultiplot(numOfPlots):
 	data += 'plot '
 	j = 0
 	while j < len(entriesTocompare) - 1:
-		data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + XPUT_CDF_TXT + '" using ($1/1000.0):(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
+		data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + XPUT_CDF_TXT + '" using ($1/1.0):(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '", '
 		j = j + 1
-	data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + XPUT_CDF_TXT + '" using ($1/1000.0):(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
+	data += '"' + PLOT_DIR + '/' + entriesTocompare[j] + '/' + XPUT_CDF_TXT + '" using ($1/1.0):(1.0/pointcount' + str(j) + ') smooth cumulative with lines lw 3 linecolor rgb "' + color[j % len(color)] + '" t "' + entriesTocompare[j].replace('_','-') + '"\n'
 	
 	xputMultiplotFile.write(data)
 	xputMultiplotFile.close()
@@ -455,6 +457,7 @@ def jitterCDFPlot(fileLocation, endpoint):
 	data += 'set key bottom right\n'
 	data += 'set ylabel "CDF" font "Courier, 14"\n'
 	data += 'set xlabel "Jitter (ms)" font "Courier, 14"\n'
+	data += 'set xrange [-150:150]\n'
 	data += 'set yrange [0:1]\n'
 	data += 'set term postscript color eps enhanced "Helvetica" 16\n'
 	data += 'set grid back linestyle 81\n'
@@ -483,6 +486,7 @@ def jitterCDFPlotAll(fileLocation):
 	data += 'set key bottom right\n'
 	data += 'set ylabel "CDF" font "Courier, 14"\n'
 	data += 'set xlabel "Jitter (ms)" font "Courier, 14"\n'
+	data += 'set xrange [-150:150]\n'
 	data += 'set yrange [0:1]\n'
 	data += 'set term postscript color eps enhanced "Helvetica" 16\n'
 	data += 'set grid back linestyle 81\n'
@@ -543,6 +547,7 @@ def generateJitterCDFMultiplot(numOfPlots):
 	data += 'set key bottom right\n'
 	data += 'set xlabel "Jitter (ms)"\n'
 	data += 'set ylabel "CDF"\n'
+	data += 'set xrange [-150:150]\n'
 	data += 'set yrange [0:1]\n'
 	data += 'set term postscript color eps enhanced "Helvetica" 16\n'
 	data += 'set size ratio 0.5\n'
@@ -578,6 +583,7 @@ def generateJitterCDFMultiplot(numOfPlots):
 	data += 'set key bottom right\n'
 	data += 'set xlabel "Jitter (ms)"\n'
 	data += 'set ylabel "CDF"\n'
+	data += 'set xrange [-150:150]\n'
 	data += 'set yrange [0:1]\n'
 	data += 'set term postscript color eps enhanced "Helvetica" 16\n'
 	data += 'set size ratio 0.5\n'
@@ -1055,9 +1061,11 @@ def ksTest(origin, compared, labelX):
 	data += '\n'
 	data += 'postscript("' + ksResultPsForEachExp + '")\n'
 	data += 'par(mfrow=c(1,2))\n'
-	data += 'plot(ecdf(originValuesWithoutOutliers), do.points=FALSE, verticals=TRUE, xlim=range(originValuesWithoutOutliers, comparisonSamples), main="CDF of Sample Distributions", xlab="' + labelX + '", ylab="CDF")\n'
+	data += 'plot(ecdf(originValuesWithoutOutliers), do.points=FALSE, verticals=TRUE, xlim=range(originValuesWithoutOutliers, comparisonSamples), main="CDF of Sample Distributions", xlab="' + labelX + '", ylab="CDF", panel.first = grid())\n'
 	data += 'plot(ecdf(comparisonSamples), do.points=FALSE, verticals=TRUE, add=TRUE, col="red")\n'
-	data += 'boxplot(list(original=originValuesWithoutOutliers, compared=comparisonSamples))\n'
+	# line type arguments: ("solid", "dashed", "dotted", "dotdash")
+	data += 'legend("bottomright", legend = c("' + origin.split('/')[-2] + '", "' + compared.split('/')[-2] + '"), col=c("black", "red"), lty=c("solid", "solid"))\n'
+	data += 'boxplot(list(' + origin.split('/')[-2] + '=originValuesWithoutOutliers, ' + compared.split('/')[-2] + '=comparisonSamples))\n'
 	data += '#dev.off()\n'
 	
 	rFile.write(data)
