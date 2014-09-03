@@ -432,7 +432,6 @@ def main():
             for i in range(len(table[c_s_pair])):
                 for j in range(len(table[c_s_pair][i].response_list)):
                     table[c_s_pair][i].response_list[j].payload = random_hex(len(table[c_s_pair][i].response_list[j].payload))
-                    sys.exit()
     
     pickle.dump((queue, list(c_s_pairs)   , replay_name), open((pcap_file+'_client_pickle'), "w" ), 2)
     pickle.dump((table, list(server_ports), replay_name), open((pcap_file+'_server_pickle'), "w" ), 2)
