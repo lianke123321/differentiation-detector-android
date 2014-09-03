@@ -1,7 +1,7 @@
 '''
 #######################################################################################################
 #######################################################################################################
-Last Updated: Aug 26, 2014
+Last Updated: Sep 2, 2014
 
 By: Hyungjoon Koo (hykoo@cs.stonybrook.edu)
 	Stony Brook University
@@ -271,7 +271,8 @@ def generateXputCDFMultiplot(numOfPlots):
 	
 	print "\t\t* Throughput CDF Multiplot (" + str(numOfPlots) + ")"
 	
-	color = ['blue', 'green', 'red', 'black']
+	#color = ['blue', 'green', 'red', 'black']
+	color = ['#330000', '#FF0000', '#009900', '#003366', '#4C0099', '#404040', '#660000', '#000066', '#808080','#0080FF']
 	xputMultiplotFile = open('./' + XPUT_CDF_MULTI_GRAPH, 'w')
 	data = '# TCP RTT CDF Multiplot Graph \n'
 	data += 'set style data lines\n' 
@@ -407,7 +408,8 @@ def generateRTTCDFMultiplot(numOfPlots):
 	
 	print "\t\t* RTT CDF Multiplot (" + str(numOfPlots) + ")"
 	
-	color = ['blue', 'green', 'red', 'black']
+	#color = ['blue', 'green', 'red', 'black']
+	color = ['#330000', '#FF0000', '#009900', '#003366', '#4C0099', '#404040', '#660000', '#000066', '#808080','#0080FF']
 	rttMultiplotFile = open('./' + RTT_CDF_MULTI_GRAPH, 'w')
 	data = '# TCP RTT CDF Multiplot Graph \n'
 	data += 'set style data lines\n' 
@@ -539,7 +541,8 @@ def generateJitterCDFMultiplot(numOfPlots):
 	print "\t\t* Jitter CDF Multiplot (" + str(numOfPlots) + ")"
 	
 	# jitterMultiplot for client and server respectively
-	color = ['blue', 'green', 'red', 'black']
+	#color = ['blue', 'green', 'red', 'black']
+	color = ['#330000', '#FF0000', '#009900', '#003366', '#4C0099', '#404040', '#660000', '#000066', '#808080','#0080FF']
 	jitterMultiplotFile1 = open('./' + JITTER_CDF_MULTI_GRAPH_CLT , 'w')
 	data = '# UDP Jitter CDF Multiplot Graph (client)\n'
 	data += 'set style data lines\n' 
@@ -966,7 +969,8 @@ def generatePktSizeCDFMultiplot(numOfPlots):
 	
 	print "\t\t* Packet Size CDF Multiplot (" + str(numOfPlots) + ")"
 	
-	color = ['blue', 'green', 'red', 'black']
+	#color = ['blue', 'green', 'red', 'black']
+	color = ['#330000', '#FF0000', '#009900', '#003366', '#4C0099', '#404040', '#660000', '#000066', '#808080','#0080FF']
 	pktSizeMultiplotFile = open('./' + PKT_SIZE_CDF_MULTI_GRAPH, 'w')
 	data = '# Packet Size CDF Multiplot Graph \n'
 	data += 'set style data lines\n' 
@@ -1138,12 +1142,12 @@ def tcpStats(file):
 	xputMin = commands.getoutput("head -1 " + xputTxt)
 	xputMax = commands.getoutput("tail -1 " + xputTxt)
 	xputAll = open(xputTxt).read().splitlines()
-	#xputMedian = round(float(statMedian(xputAll)/1000), 5)
+	#xputMedian = round(float(statMedian(xputAll), 5)
 	
 	xputSum = 0.0
 	for xput in xputAll:
 		xputSum += float(xput)
-	xputAvg = round(float(xputSum / len(xputAll) / 1000), 5)
+	xputAvg = round(float(xputSum / len(xputAll)), 5)
 
 	pktSizeSvrTxt = PLOT_DIR + "/" + fileName + "/" + SVR_PKT_CDF_TXT
 	pktSizeMin = commands.getoutput("head -1 " + pktSizeSvrTxt)
@@ -1154,10 +1158,10 @@ def tcpStats(file):
 		pktSizeSvrSum += float(pktSize)
 	pktSizeSvrAvg = round(float(pktSizeSvrSum / len(pktSizeSvrAll)), 5)
 	
-	statFile.write("xput_min: " + str(round(float(xputMin)/1000, 5)) + " (KB/s)\n")
+	statFile.write("xput_min: " + str(round(float(xputMin), 5)) + " (KB/s)\n")
 	statFile.write("xput_avg: " + str(xputAvg) + " (KB/s)\n")
 	#statFile.write("xput_median: " + str(xputMedian) + " (KB/s)\n")
-	statFile.write("xput_max: " + str(round(float(xputMax)/1000, 5)) + " (KB/s)\n")
+	statFile.write("xput_max: " + str(round(float(xputMax), 5)) + " (KB/s)\n")
 	statFile.write("pkt_size_avg: " + str(pktSizeSvrAvg) + " [Range: " + pktSizeMin + " - " + pktSizeMax + "] (Bytes)\n")
 	statFile.close()
 	
@@ -1170,11 +1174,11 @@ def udpStats(file):
 	xputMin = commands.getoutput("head -1 " + xputTxt)
 	xputMax = commands.getoutput("tail -1 " + xputTxt)
 	xputAll = open(xputTxt).read().splitlines()
-	#xputMedian = round(float(statMedian(xputAll)/1000), 5)
+	#xputMedian = round(float(statMedian(xputAll)), 5)
 	xputSum = 0.0
 	for xput in xputAll:
 		xputSum += float(xput)
-	xputAvg = round(float(xputSum / len(xputAll) / 1000), 5)
+	xputAvg = round(float(xputSum / len(xputAll)), 5)
 	
 	pktSizeSvrRcvdTxt = PLOT_DIR + "/" + fileName + "/" + SVR_RCVD_PKT_CDF_TXT
 	pktSizeSvrSentTxt = PLOT_DIR + "/" + fileName + "/" + SVR_SENT_PKT_CDF_TXT
@@ -1193,10 +1197,10 @@ def udpStats(file):
 		pktSizeSvrSentSum += float(pktSize)
 	pktSizeSvrSentAvg = round(float(pktSizeSvrSentSum / len(pktSizeSvrSentAll)), 5)
 	
-	statFile.write("xput_min: " + str(round(float(xputMin)/1000, 5)) + " (KB/s)\n")
+	statFile.write("xput_min: " + str(round(float(xputMin), 5)) + " (KB/s)\n")
 	statFile.write("xput_avg: " + str(xputAvg) + " (KB/s)\n")
 	#statFile.write("xput_median: " + str(xputMedian) + " (KB/s)\n")
-	statFile.write("xput_max: " + str(round(float(xputMax)/1000, 5)) + " (KB/s)\n")
+	statFile.write("xput_max: " + str(round(float(xputMax), 5)) + " (KB/s)\n")
 	statFile.write("pkt_size_avg (sever_rcvd): " + str(pktSizeSvrRcvdAvg) + " [Range: " + pktSizeRcvdMin + " - " + pktSizeRcvdMax + "] (Bytes)\n")
 	statFile.write("pkt_size_avg (sever_sent): " + str(pktSizeSvrSentAvg) + " [Range: " + pktSizeSentMin + " - " + pktSizeSentMax + "] (Bytes)\n")
 	statFile.close()
