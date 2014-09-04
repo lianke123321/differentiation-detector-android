@@ -73,7 +73,7 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
                 raw = p['Raw'].load
                 tcp_counter += 1
             except:
-                continue
+                pass
             
             continue
         
@@ -87,6 +87,7 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
         src_ip = p['IP'].src
         dst_ip = p['IP'].dst
         
+        
         '''
         time_origin is the time of the very first client UDP packet.
         
@@ -99,20 +100,18 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
         
         
         if client_ip == src_ip:
-            
             if time_origin == None:
                 time_origin = p.time
                 
             client      = src_ip + '.' + str(src_p)
             server      = dst_ip + '.' + str(dst_p)
             c_s_pair    = convert_ip(client) + '-' + convert_ip(server)
+
+            client_port = str(src_p).zfill(5)
+            server_port = str(dst_p).zfill(5)            
+            port_pair = client_port + '-' + server_port
             
             has_begin.append(c_s_pair)
-            
-            client_port = str(src_p).zfill(5)
-            server_port = str(dst_p).zfill(5)
-            
-            port_pair = client_port + '-' + server_port
             
             talking     = 'c'
             
@@ -123,7 +122,6 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
             
         elif client_ip == dst_ip:
             
-            
             if time_origin == None:
                 continue
                 
@@ -131,15 +129,18 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
             client      = dst_ip + '.' + str(dst_p)
             c_s_pair    = convert_ip(client) + '-' + convert_ip(server)
             
-            if c_s_pair not in has_begin:
-                continue 
-            
             client_port = str(dst_p).zfill(5)
             server_port = str(src_p).zfill(5)
             port_pair = client_port + '-' + server_port
+
+            if c_s_pair not in has_begin:
+                continue 
             
             talking     = 's'
             server_Q[server_port].append(UDPset(raw, p.time-server_time_origins[server_port], c_s_pair))
+        
+        else:
+            continue
     
         if server_port not in server_ports:
             server_ports[server_port] = []
@@ -295,6 +296,7 @@ def main():
         print 'Replay name not given. Naming it after the pcap_file:', configs.get('replay_name')
     
     client_ip = read_client_ip(client_ip_file)
+    print 'client_ip:', client_ip 
     parse(pcap_file, client_ip, configs.get('replay_name'), configs.get('random_bytes'), cut_off=configs.get('cut_off'))
 
 if __name__=="__main__":
