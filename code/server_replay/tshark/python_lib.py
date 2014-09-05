@@ -1,4 +1,4 @@
-import sys, os, ConfigParser, math, json, time, subprocess
+import sys, os, ConfigParser, math, json, time, subprocess, dpkt
 
 def PRINT_ACTION(string, indent, action=True):
     if action:
@@ -284,6 +284,12 @@ class Instance(object):
         'localhost': {'host'    :'127.0.0.1',
                      'username' : 'arash',
                      'ssh_key'  : ''},
+        'koo'  : {'host'     : 'ec2-54-243-17-203.compute-1.amazonaws.com',
+            'username' : 'ubuntu',
+             'ssh_key'  : ''},
+        'koo2'  : {'host'     : 'ec2-54-90-255-129.compute-1.amazonaws.com',
+            'username' : 'ubuntu',
+             'ssh_key'  : ''},
     }
     def __init__(self, instance, instances=instance_list):
         self.name     = instance
@@ -352,3 +358,86 @@ class ReplayObj(object):
     
     def get_ports(self):
         return self.id + '\t' + ';'.join(self.ports)
+
+############################################
+##### ADDED BY HYUNGJOON KOO FROM HERE #####
+############################################
+
+# Determines both endpoints
+def extractEndpoints(pcap_dir, file_name):
+	extract = ("tshark -Tfields -E separator=- -e ip.src -e ip.dst -r " + pcap_dir + "/" + file_name +" | head -1 > " + pcap_dir + "/" + file_name + "_endpoints.txt")
+	os.system(extract)
+	with open(pcap_dir + "/" + file_name + "_endpoints.txt",'r') as f:
+		ends = f.read().splitlines()
+	f.close()
+	return ends[0].split("-")
+
+# Returns the number of packets in a pcap file (pkt_type=[udp|tcp|total|other])
+def pkt_ctr(pcap_dir, file_name, pkt_type):
+	udp_ctr = 0
+	tcp_ctr = 0
+	other_ctr = 0
+	total_ctr = 0
+
+	filepath = pcap_dir + "/" + file_name
+	f = open(filepath)
+	for ts, buf in dpkt.pcap.Reader(file(filepath, "rb")):
+		 eth = dpkt.ethernet.Ethernet(buf)
+		 total_ctr += 1
+		 if eth.type == dpkt.ethernet.ETH_TYPE_IP: # 2048
+				 ip = eth.data
+				 if ip.p == dpkt.ip.IP_PROTO_UDP:  # 17
+						 udp_ctr += 1
+
+				 if ip.p == dpkt.ip.IP_PROTO_TCP:  # 6
+						 tcp_ctr += 1
+		 else:
+				 other_ctr += 1
+
+	# Returns the number of packets depending on the type
+	if pkt_type == 'total':
+		return total_ctr
+	elif pkt_type == 'tcp':
+		return tcp_ctr
+	elif pkt_type == 'udp':
+		return udp_ctr
+	elif pkt_type == 'other':
+		return other_ctr
+	else:
+		return -1
+
+# Returns the count of parsed packets
+def parsedPktCnt(pcap_dir, endpoint):
+	pktCntCmd = ("cat " + pcap_dir + "/" + endpoint + " " + " | wc -l")
+	import commands
+	pktCnt = commands.getoutput(pktCntCmd)
+	return pktCnt
+
+# Extracts the timestamps for the endpoint to calculate jitter
+def getTimestamp(pcap_dir, endpoint):
+	getTimestampCmd = ("cat " + pcap_dir + "/" + endpoint + " | awk '{print $2}' > " + pcap_dir + "/" + "ts_" + endpoint + ".tmp")
+	os.system(getTimestampCmd)
+
+# Saves the inter-packet intervals between when to sent
+def interPacketSentInterval(pcap_dir, endpoint):
+	tmp = open(pcap_dir + '/ts_' + endpoint + '.tmp','r')
+	timestamps = tmp.read().splitlines()
+	intervals = []
+	i = 0
+	ts_cnt = len(timestamps)
+	while (i < ts_cnt - 1):
+		intervals.append(format_float(float(timestamps[i+1]) - float(timestamps[i]),15))
+		i = i + 1
+	f = open(pcap_dir + '/' + endpoint + '_interPacketIntervals.txt', 'w')
+	f.write('\n'.join(str(ts) for ts in intervals))
+	os.system('rm -f ' + pcap_dir + '/ts_' + endpoint + '.tmp')
+
+# Helps to write float format by removing characters
+def format_float(value, precision=-1):
+    if precision < 0:
+        f = "%f" % value
+    else:
+        f = "%.*f" % (precision, value)
+    p = f.partition(".")
+    s = "".join((p[0], p[1], p[2][0], p[2][1:].rstrip("0")))
+    return s

@@ -28,7 +28,7 @@ To kill the server:
 
 import sys, time, numpy, pickle
 from python_lib import *
-
+import subprocess
 import gevent, gevent.pool, gevent.server, gevent.queue
 from gevent import monkey
 monkey.patch_all()
@@ -170,7 +170,8 @@ class SideChannel(object):
             3- add the new client
             4- Send port mapping to client
             5- Receive results request and send back results
-            6- Close connection
+            6- Receive jitter results from client
+            7- Close connection
         '''
         
         #0- Put the greenlet on the queue
@@ -197,24 +198,62 @@ class SideChannel(object):
         else:
             send_result = self.send_object(connection, self.server_port_mapping_pickle)
         if send_result is False: return
-        
+
         #5- Receive results request and send back results
         data = self.receive_object(connection)
         if data is None: return
         
         data = data.split(';')
         if data[0] == 'GiveMeResults':
-            self.tcpdump_q.put(('stop', id))
+            #self.tcpdump_q.put(('stop', id))
             if self.send_reults(connection) is False: return
-        
+
         elif data[0] == 'NoResult':
+            #self.tcpdump_q.put(('stop', id))
+            pass
+
+        #6- [ADDED BY HYUNGJOON KOO] RECEIVE JITTER FILES
+        data = self.receive_object(connection)
+        if data is None: return
+        data = data.split(';')
+        if data[0] == 'WillSendClientJitter':
+            if self.get_jitter(connection) is False: return
+
+        elif data[0] == 'NoJitter':
+            pass
+
+        data = self.receive_object(connection)
+        if data is None: return
+        data = data.split(';')
+        if data[0] == 'WillSendClientJitter2':
+            self.tcpdump_q.put(('stop', id))
+            if self.get_jitter2(connection) is False: return
+
+        elif data[0] == 'NoJitter2':
             self.tcpdump_q.put(('stop', id))
             pass
-        
-        #6- Close connection
+
+        #7- Close connection
         connection.shutdown(gevent.socket.SHUT_RDWR)
         connection.close()
-    
+
+    # [ADDED BY HYUNGJOON KOO] GET JITTER VALUES FROM CLIENT AND WRITE A FILE
+    def get_jitter(self, connection):
+        pcap_folder = Configs().get('pcap_folder')
+        jitter_file = pcap_folder + '/client_sent_interval_rcvd.txt'
+        f = open(jitter_file, 'wb')
+        jitters = self.receive_object(connection)
+        f.write(jitters)
+        return jitters
+
+    def get_jitter2(self, connection):
+        pcap_folder = Configs().get('pcap_folder')
+        jitter_file2 = pcap_folder + '/client_rcvd_interval_rcvd.txt'
+        f = open(jitter_file2, 'wb')
+        jitters = self.receive_object(connection)
+        f.write(jitters)
+        return jitters
+
     def get_ports(self):
         while True:
             (what, id, port) = self.ports_q.get()
@@ -302,8 +341,8 @@ class SideChannel(object):
     def send_reults(self, connection):
         result_file = 'smile.jpg'
         f = open(result_file, 'rb')
-        return self.send_object(connection, f.read())   
-    
+        return self.send_object(connection, f.read())
+
 class ClientObj(object):
     def __init__(self, id, replay_name, connection, ip):
         self.id          = id
@@ -546,6 +585,6 @@ def main():
     side_channel.run()
     
     PRINT_ACTION('READY! You can now run the client script', 0)
-    
+
 if __name__=="__main__":
     main()
