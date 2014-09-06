@@ -25,10 +25,11 @@ CLT_SENT_JITTER = 'client_sent_delay.txt'
 CLT_RCVD_JITTER = 'client_rcvd_delay.txt'
 
 class Client(object):
-    def __init__(self, dst_ip, id, replay_name):
+    def __init__(self, dst_ip, id, replay_name, original_client_port):
         self.dst_ip       = dst_ip
         self.id           = id
         self.replay_name  = replay_name
+        self.original_client_port  = original_client_port
         self.NAT_port     = {}
         self.identified   = {}
         self.sock         = None
@@ -42,7 +43,7 @@ class Client(object):
         self.sock.sendto('', ('127.0.0.1', 100))
         self.port = str(self.sock.getsockname()[1]).zfill(5)
 
-    def identify(self, side_channel, q, c_s_pair, dst_port):
+    def identify(self, side_channel, notify_q, c_s_pair, dst_port):
         '''
         Before anything, client needs to identify itself to the server and tell
         which c_s_pair and replay_name it will be replaying.
@@ -52,20 +53,20 @@ class Client(object):
         The ack contains clients external port (NAT port) which is stored for later use.
         '''
 
-        server_port = c_s_pair[-5:]
-        message = ';'.join([self.id, server_port, self.replay_name])
+        original_server_port = c_s_pair[-5:]
+        message = ';'.join([self.id, original_server_port, self.original_client_port, self.replay_name])
         
         while True:
-            if DEBUG == 2: print '\n\tIdentifying: {} -- {}...'.format(c_s_pair, server_port), 'to', (self.dst_ip, dst_port)
+            if DEBUG == 2: print '\n\tIdentifying: {} -- {}...'.format(c_s_pair, original_server_port), 'to', (self.dst_ip, dst_port)
             self.sock.sendto(message, (self.dst_ip, dst_port))
             
             try:
-                port = q.get(timeout=0.1)
+                port = notify_q.get(timeout=0.1)
             except Queue.Empty:
                 continue
             
-            self.NAT_port[server_port] = port
-            self.identified[server_port] = None
+            self.NAT_port[original_server_port]   = port
+            self.identified[original_server_port] = None
             
             break
             
@@ -92,11 +93,13 @@ class Receiver(object):
         self.buff_size = buff_size
         
     def run(self, socket_list, close_q, server_ports_left, pcap_folder):
+        
+        #### Added by Hyungjoon Koo
         if os.path.isfile(pcap_folder + '/' + CLT_RCVD_JITTER):
             os.system('rm -rf ' + pcap_folder + '/' + CLT_RCVD_JITTER)
-
         time_delay_origin = time.time()
-
+        ####
+        
         while server_ports_left > 0:
 #             print 'server_ports_left:', server_ports_left
             r, w, e = select.select(socket_list, [], [], 0.1)
@@ -128,11 +131,12 @@ class Sender(object):
         progress_bar = print_progress(len(self.Q))
         time_origin  = time.time()
         
+        #### Added by Hyungjoon Koo
         if os.path.isfile(pcap_folder + '/' + CLT_SENT_JITTER):
             os.system('rm -rf ' + pcap_folder + '/' + CLT_SENT_JITTER)
-
         time_delay_origin = time.time()
-
+        ####
+        
         for udp in self.Q:
             if DEBUG == 4: progress_bar.next()
 
@@ -315,7 +319,7 @@ def load_Q(test, serialize='pickle'):
         if serialize == 'pickle':
             Q, client_ports, num_server_ports, c_s_pairs, replay_name = pickle.load(open(pickle_file, 'rb'))
         elif serialize == 'json':
-            Q, client_ports, num_server_ports, c_s_pairs, replay_name= json.load(open(pickle_file, "r"), cls=UDPjsonDecoder_client)
+            Q, client_ports, num_server_ports, c_s_pairs, replay_name = json.load(open(pickle_file, "r"), cls=UDPjsonDecoder_client)
     
     for udp in Q:
         udp.payload = udp.payload.decode('hex')
@@ -367,9 +371,9 @@ def run(*args):
     client_port_mapping = {}
     socket_list      = []
     
-    for client_port in client_ports:
-        client = Client(configs.get('instance').host, id, replay_name)
-        client_port_mapping[client_port] = client
+    for original_client_port in client_ports:
+        client = Client(configs.get('instance').host, id, replay_name, original_client_port)
+        client_port_mapping[original_client_port] = client
     
     PRINT_ACTION('Running side channel notifier', 0)
     p_notf = threading.Thread( target=side_channel.notifier, args=(socket_list, num_server_ports,) )
