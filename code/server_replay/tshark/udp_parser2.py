@@ -56,6 +56,8 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
     number_of_client_packets = 0
     number_of_server_packets = 0
     
+    number_of_ports = 0
+    
     client_Q  = []
     server_Q  = {}
     server_time_origins = {}
@@ -128,9 +130,12 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
             
             if server_port not in server_Q:
                 server_Q[server_port] = {}
+                server_time_origins[server_port] = {}
+            
             if client_port not in server_Q[server_port]:
-                server_Q[server_port][client_port] = [] 
+                server_Q[server_port][client_port] = []
                 server_time_origins[server_port][client_port] = p.time
+                number_of_ports += 1
             
         elif client_ip == dst_ip:
             
@@ -240,7 +245,7 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
             if diff < 30:
                 continue
             number = int(diff/15)
-            print server_port, diff, number, prev_time[server_port], udp.timestamp
+#             print server_port, diff, number, prev_time[server_port], udp.timestamp
             for i in range(1, number+1):
                 new_udp = UDPset('', prev_time[server_port]+(i*15), udp.c_s_pair, client_port=udp.client_port)
                 new_client_Q.append(new_udp)
@@ -250,13 +255,16 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
     
     new_client_Q.sort(key=lambda x: x.timestamp)
     
-    print 'Number of keep-alive packets added:', number_of_keepalive_packets
+    print '\tNumber of keep-alive packets added:', number_of_keepalive_packets
     '''############################################'''
 
-    pickle.dump((new_client_Q, client_ports, len(server_ports), c_s_pairs, replay_name)   , open((pcap_file+'_client_pickle'), "w" ), 2)
+    
+#     pickle.dump((new_client_Q, client_ports, len(server_ports), c_s_pairs, replay_name)   , open((pcap_file+'_client_pickle'), "w" ), 2)
+    pickle.dump((new_client_Q, client_ports, number_of_ports, c_s_pairs, replay_name)   , open((pcap_file+'_client_pickle'), "w" ), 2)
     pickle.dump((server_Q, server_ports, replay_name), open((pcap_file+'_server_pickle'), "w" ), 2)
 
-    json.dump((new_client_Q, client_ports, len(server_ports), c_s_pairs, replay_name), open((pcap_file+'_client_json'), "w"), cls=TCP_UDPjsonEncoder)
+#     json.dump((new_client_Q, client_ports, len(server_ports), c_s_pairs, replay_name), open((pcap_file+'_client_json'), "w"), cls=TCP_UDPjsonEncoder)
+    json.dump((new_client_Q, client_ports, number_of_ports, c_s_pairs, replay_name), open((pcap_file+'_client_json'), "w"), cls=TCP_UDPjsonEncoder)
     json.dump((server_Q, server_ports, replay_name), open((pcap_file+'_server_json'), "w" ), cls=TCP_UDPjsonEncoder)
     
     '''Storing replay name for later reference'''

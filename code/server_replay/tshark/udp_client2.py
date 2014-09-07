@@ -101,7 +101,6 @@ class Receiver(object):
         ####
         
         while server_ports_left > 0:
-#             print 'server_ports_left:', server_ports_left
             r, w, e = select.select(socket_list, [], [], 0.1)
             for sock in r:
                 data = sock.recv(self.buff_size)
@@ -121,7 +120,7 @@ class Receiver(object):
             except Queue.Empty:
                 pass
 
-#         PRINT_ACTION('Done receiving', 1, action=False)
+        PRINT_ACTION('Done receiving', 1, action=False)
         
 class Sender(object):
     def __init__(self, udp_queue):
@@ -169,7 +168,7 @@ class Sender(object):
 
             client.send_udp_packet(udp, dst_port)
 
-#         PRINT_ACTION('Done sending', 1, action=False)
+        PRINT_ACTION('Done sending', 1, action=False)
 
 class SideChannel(object):
     '''
@@ -325,7 +324,7 @@ def load_Q(test, serialize='pickle'):
         udp.payload = udp.payload.decode('hex')
      
     return Q, client_ports, num_server_ports, c_s_pairs, replay_name
-        
+
 def run(*args):
     '''
     Communication sequence on side channel:
