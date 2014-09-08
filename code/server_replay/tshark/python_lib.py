@@ -1,4 +1,9 @@
-import sys, os, ConfigParser, math, json, time, subprocess, dpkt
+import sys, os, ConfigParser, math, json, time, subprocess 
+
+try:
+    import dpkt
+except:
+    pass
 
 def PRINT_ACTION(string, indent, action=True):
     if action:

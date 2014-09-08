@@ -53,11 +53,6 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
     tcp_counter = 0
     tcp_total   = 0
     
-    number_of_client_packets = 0
-    number_of_server_packets = 0
-    
-    number_of_ports = 0
-    
     client_Q  = []
     server_Q  = {}
     server_time_origins = {}
@@ -126,16 +121,9 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
             talking     = 'c'
             
             client_Q.append(UDPset(raw, p.time-time_origin, c_s_pair, client_port=client_port))
-            number_of_client_packets += 1
-            
             if server_port not in server_Q:
-                server_Q[server_port] = {}
-                server_time_origins[server_port] = {}
-            
-            if client_port not in server_Q[server_port]:
-                server_Q[server_port][client_port] = []
-                server_time_origins[server_port][client_port] = p.time
-                number_of_ports += 1
+                server_Q[server_port] = []
+                server_time_origins[server_port] = p.time
             
         elif client_ip == dst_ip:
             
@@ -154,8 +142,7 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
                 continue 
             
             talking     = 's'
-            server_Q[server_port][client_port].append(UDPset(raw, p.time-server_time_origins[server_port][client_port], c_s_pair))
-            number_of_server_packets += 1
+            server_Q[server_port].append(UDPset(raw, p.time-server_time_origins[server_port], c_s_pair))
         
         else:
             continue
@@ -177,12 +164,21 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
         else:
             c_s_pairs[c_s_pair][1] += 1
     
+    if DEBUG == 2:    
+        for udp in client_Q:
+            print udp
+        
+        for server_port in server_Q:
+            print server_port
+            for udp in server_Q[server_port]:
+                print '\t', udp
+    
     print 'Before cut off:'
     print '\tNumber of distinct c_s_pairs:', len(c_s_pairs)
     print '\tNumber of distinct server ports:', len(server_ports)
-    print '\t# of packets:', number_of_client_packets + number_of_server_packets
-    print '\t# of client packets:', number_of_client_packets
-    print '\t# of server packets:', number_of_server_packets
+    print '\t# of packets:', len(client_Q) + sum([len(server_Q[server_port]) for server_port in server_Q])
+    print '\t# of client packets:', len(client_Q)
+    print '\t# of server packets:', sum([len(server_Q[server_port]) for server_port in server_Q])
 
 #     '''
 #     This part cuts off small c_s_pairs
@@ -231,7 +227,7 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
     '''
     new_client_Q = []
     prev_time = {}
-    number_of_keepalive_packets = 0
+    
     for udp in client_Q:
         
         new_client_Q.append(udp)
@@ -245,36 +241,44 @@ def parse(pcap_file, client_ip, replay_name, random_bytes, cut_off=0):
             if diff < 30:
                 continue
             number = int(diff/15)
-#             print server_port, diff, number, prev_time[server_port], udp.timestamp
+            print server_port, diff, number, prev_time[server_port], udp.timestamp
             for i in range(1, number+1):
                 new_udp = UDPset('', prev_time[server_port]+(i*15), udp.c_s_pair, client_port=udp.client_port)
                 new_client_Q.append(new_udp)
-                number_of_keepalive_packets += 1
+                if server_port == '62348':
+                    print '\t', new_udp
             prev_time[server_port] = udp.timestamp
                     
     
     new_client_Q.sort(key=lambda x: x.timestamp)
-    
-    print '\tNumber of keep-alive packets added:', number_of_keepalive_packets
     '''############################################'''
-
     
-#     pickle.dump((new_client_Q, client_ports, len(server_ports), c_s_pairs, replay_name)   , open((pcap_file+'_client_pickle'), "w" ), 2)
-    pickle.dump((new_client_Q, client_ports, number_of_ports, c_s_pairs, replay_name)   , open((pcap_file+'_client_pickle'), "w" ), 2)
+    
+    pickle.dump((new_client_Q, client_ports, len(server_ports), c_s_pairs, replay_name)   , open((pcap_file+'_client_pickle'), "w" ), 2)
     pickle.dump((server_Q, server_ports, replay_name), open((pcap_file+'_server_pickle'), "w" ), 2)
 
-#     json.dump((new_client_Q, client_ports, len(server_ports), c_s_pairs, replay_name), open((pcap_file+'_client_json'), "w"), cls=TCP_UDPjsonEncoder)
-    json.dump((new_client_Q, client_ports, number_of_ports, c_s_pairs, replay_name), open((pcap_file+'_client_json'), "w"), cls=TCP_UDPjsonEncoder)
+    json.dump((new_client_Q, client_ports, len(server_ports), c_s_pairs, replay_name), open((pcap_file+'_client_json'), "w"), cls=TCP_UDPjsonEncoder)
     json.dump((server_Q, server_ports, replay_name), open((pcap_file+'_server_json'), "w" ), cls=TCP_UDPjsonEncoder)
     
     '''Storing replay name for later reference'''
     f = open((pcap_file+'_replay_name.txt'), 'w')
     f.write(replay_name)
     f.close()
-        
+    
+    print 'After cut off:'
+    print '\tNumber of c_s_pairs:', len(c_s_pairs)
+    print '\tNumber of distinct server ports:', len(server_ports)
+    print '\t# of packets:', len(client_Q) + sum([len(server_Q[server_port]) for server_port in server_Q])
+    print '\t# of client packets:', len(client_Q)
+    print '\t# of server packets:', sum([len(server_Q[server_port]) for server_port in server_Q])
+    
     print 'tcp_counter:', tcp_counter, tcp_total
     print 'udp_counter:', udp_counter, udp_total
-        
+    print client_ports
+    
+    print 'kir'
+    print len(server_Q)
+    
 def main():
     configs = Configs()
     configs.set('cut_off', 0)
