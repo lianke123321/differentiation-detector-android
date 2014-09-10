@@ -1,7 +1,7 @@
 '''
 #######################################################################################################
 #######################################################################################################
-Last Updated: Sep 2, 2014
+Last Updated: Sep 9, 2014
 
 By: Hyungjoon Koo (hykoo@cs.stonybrook.edu)
 	Stony Brook University
@@ -36,7 +36,15 @@ import commands
 import subprocess
 import operator
 import dpkt
+import array
 
+try:
+	import rpy2.robjects as robjects
+	from rpy2.robjects.packages import importr
+	from rpy2.robjects.functions import SignatureTranslatedFunction
+except:
+	pass
+	
 DEBUG = 0
 
 # Global variables
@@ -1077,30 +1085,88 @@ def ksTest(origin, compared, labelX):
 	
 	#subprocess.Popen(R_COMMAND + " ./" + rFileForEachExp + "2> /dev/null", shell = True)
 	try:
-		rCmd = R_COMMAND + " ./" + rFileForEachExp + " 2> /dev/null"
-		os.system(rCmd)
+		print "Generating R script for future use.."
+		os.system('R_COMMAND + " ./" + rFileForEachExp + " 2> /dev/null"')
 	except:
 		print "Failed to use R.."
 		exit(1)
-	return commands.getoutput("cat ./" + ksResultForEachExp + " | grep p-value")
+	#return commands.getoutput("cat ./" + ksResultForEachExp + " | grep p-value")
 	#print "All result file from R has been saved to " + ksResultForEachExp + " and " + KS_RESULT_PS + "..."
 	
 def ksTestFinalDecision(description, origin, compared):
-	sum = 0.0
-	numOfTest = 5
+	base = importr('base')
+	stats = importr('stats')
+	graphics = importr('graphics')
+	grdevices = importr('grDevices')
+	
+	# Get K-S test via execute string as R statement
+	kstest = robjects.r('ks.test')
+	# Get a built-in function variables directly
+	pexp = robjects.r.pexp
+
+	# Defined functions in R and call them in python through rpy interface
+	robjects.r(r'''
+		getOriginValuesWithoutOutliers <- function(x) {
+			origin <- read.table(x)
+			originValues <- origin$V1
+			originValuesWithoutOutliers <- originValues[!originValues %in% boxplot.stats(originValues)$out]
+		}
+		getComparisonSamples <- function(y) {
+			comparison <- read.table(y)
+			comparisonValues <- comparison$V1
+			comparisonValuesWithoutOutliers <- comparisonValues[!comparisonValues %in% boxplot.stats(comparisonValues)$out]
+			comparisonSamples <- sample(comparisonValuesWithoutOutliers, round(length(comparisonValuesWithoutOutliers)/2), prob = NULL)
+		}''')
+
+	pValueSum = 0.0
+	dStatisticSum = 0.0
+	numOfTest = 100
+
 	for i in range(0, numOfTest):
-		result = ksTest(origin, compared, description)
-		(d,pValue) = result.split(',')
-		try:
-			sum = sum + float(pValue.split(" = ")[1])
-		except:
-			sum = sum + float(pValue.split(" < ")[1])
-		os.system('sleep 0.5')
-	pAvg = float(sum/numOfTest)
-	if pAvg < 0.05:
-		print "\t\tH0: rejected, Two Distributions are statistically DIFFERENT. (Average of P values = " + str(pAvg)
+		getOriginValuesF = robjects.r['getOriginValuesWithoutOutliers']
+		getComparisonValuesF = robjects.r['getComparisonSamples']
+		originValues = getOriginValuesF(origin)
+		comparisonValues = getComparisonValuesF(compared)
+		
+		result = kstest(originValues, comparisonValues, pexp)
+		pValueSum = pValueSum + float(result[result.names.index('p.value')][0])
+		dStatisticSum = dStatisticSum + float(result[result.names.index('statistic')][0])
+
+	pAvg = float(pValueSum/numOfTest)
+	dAvg = float(dStatisticSum/numOfTest)
+	# print "P-Value: " + str(result[result.names.index('p.value')][0])		# P-value
+	# print "D-Value: " + str(result[result.names.index('statistic')][0])		# D-value (statistic)
+
+	# Describes the summary for the last ks-test
+	summary1 = robjects.r.summary(originValues)
+	summary2 = robjects.r.summary(comparisonValues)
+	print "\tBaseline summary: "	#(Population=" + str(len(originValues)) + ")"
+	print "\t\tMin: " + str(summary1[0]) + ", Median: " + str(summary1[2]) + ", Mean: " + str(summary1[3]) + ", Max: " + str(summary1[5])
+	print "\tTarget summary: "		#(Samples=" + str(len(comparisonValues)) + ")"
+	print "\t\tMin: " + str(summary2[0]) + ", Median: " + str(summary2[2]) + ", Mean: " + str(summary2[3]) + ", Max: " + str(summary2[5])
+	print "\tTwo-sample Kolmogorov-Smirnov test: (# of Tests=" + str(numOfTest) + ")"
+	print "\t\tAverage P-value: " + str(pAvg) + ", Average statistic (D): " + str(dAvg)
+
+	# Draw plots (ecdf / boxplot) for the last ks-test
+	psPlot = KS_RESULT_PS.split('.')[0] + "_" + origin.split('/')[-2] + "-VS-" + compared.split('/')[-2] + "-" + description.split(' ')[0] + "." + KS_RESULT_PS.split('.')[1]
+	grdevices.postscript(file=psPlot, width=512, height=512)
+	graphics.par(mfrow = array.array('i', [1,2]))
+	legendArgs = 'bottomright, legend = c(' + origin.split('/')[-2] + ', ' + compared.split('/')[-2] + '), col=c(black, red), lty=c(solid, solid)'
+	title = "CDF of Sample Distributions (" + origin.split('/')[-2] + " VS " + compared.split('/')[-2] + ")"
+	plotargs1 = {'do.points':"FALSE", 'verticals':"TRUE", 'main':title, 'xlab':description, 'ylab':"CDF", 'legend':legendArgs}
+	graphics.plot(robjects.r.ecdf(originValues), **plotargs1)
+	plotargs2 = {'do.points':"FALSE", 'verticals':"TRUE", 'add':"TRUE", 'col':"red"}
+	graphics.plot(robjects.r.ecdf(comparisonValues), **plotargs2)
+	#x = origin.split('/')[-2]
+	#y = compared.split('/')[-2]
+	graphics.boxplot(robjects.r.list(baseline=originValues, target=comparisonValues))
+	grdevices.dev_off()
+	
+	# Final decision with heuristics
+	if pAvg >= 0.05 or dAvg <= 0.1:
+		print "\t\tH0: accepted, Two Distributions are statistically SAME. "
 	else:
-		print "\t\tH0: accepted, Two Distributions are statistically SAME. (Average of P values = " + str(pAvg)
+		print "\t\tH0: rejected, Two Distributions are statistically DIFFERENT." 
 		
 def statMedian(list):
 	if not list or len(list) == 0:
@@ -1340,9 +1406,9 @@ def analysisMain():
 		if multiplot == True:
 			print "\tGenerating multiple TCP plots for the purpose of comparison...\n"
 			numOfPlots = isPcap(TCP_PCAP_DIR)
-			generateXputCDFMultiplot(numOfPlots)
+			#generateXputCDFMultiplot(numOfPlots)
 			generateRTTCDFMultiplot(numOfPlots)
-			#generatePktSizeCDFMultiplot(numOfPlots)
+			generatePktSizeCDFMultiplot(numOfPlots)
 			print "\tDone..! (Multiplots have been saved to the current directory)\n"
 		if kstest == True:
 			comparisonDirs = os.listdir(PLOT_DIR)
@@ -1357,10 +1423,11 @@ def analysisMain():
 			for i in range(0, len(comparisonDirs)):
 				if comparisonDirs[i] <> comparisonDirs[int(baseline) - 1]:
 					print "\t< " + comparisonDirs[int(baseline) - 1] + " VS " + comparisonDirs[i] + " >"
-					print "\tThroughtput:"
+					print "\tThroughtput (KB/s):"
 					ksTestFinalDecision("Xput (KB/s)", PLOT_DIR + "/" + comparisonDirs[int(baseline) - 1] + "/" + XPUT_CDF_TXT, PLOT_DIR + "/" + comparisonDirs[i] + "/" + XPUT_CDF_TXT)
-					print "\tRTT:"
+					print "\tRTT (ms):"
 					ksTestFinalDecision("RTT (ms)", PLOT_DIR + "/" + comparisonDirs[int(baseline) - 1] + "/" + RTT_CDF_TXT, PLOT_DIR + "/" + comparisonDirs[i] + "/" + RTT_CDF_TXT)
+				print ""
 	elif protocol == 'udp':
 		print '\t[UDP Pcap File Analysis]'
 		chkEnv(protocol)
@@ -1384,12 +1451,13 @@ def analysisMain():
 			for i in range(0, len(comparisonDirs)):
 				if comparisonDirs[i] <> comparisonDirs[int(baseline) - 1]:
 					print "\t< " + comparisonDirs[int(baseline) - 1] + " VS " + comparisonDirs[i] + " >"
-					print "\tThroughtput:"
+					print "\tThroughtput (KB/s):"
 					ksTestFinalDecision("Xput (KB/s)", PLOT_DIR + "/" + comparisonDirs[int(baseline) - 1] + "/" + XPUT_CDF_TXT, PLOT_DIR + "/" + comparisonDirs[i] + "/" + XPUT_CDF_TXT)
-					print "\tJitter@Server:"
+					print "\tJitter@Server (ms):"
 					ksTestFinalDecision("Jitter@Server (ms)", PLOT_DIR + "/" + comparisonDirs[int(baseline) - 1] + "/" + SVR_JITTER_SORTED, PLOT_DIR + "/" + comparisonDirs[i] + "/" + SVR_JITTER_SORTED)
-					print "\tJitter@Client:"
+					print "\tJitter@Client (ms):"
 					ksTestFinalDecision("Jitter@Client (ms)", PLOT_DIR + "/" + comparisonDirs[int(baseline) - 1] + "/" + CLT_JITTER_SORTED, PLOT_DIR + "/" + comparisonDirs[i] + "/" + CLT_JITTER_SORTED)
+				print ""
 	else:
 		print '\tOops! Provided protocol is NOT supported, Terminated...'
 		sys.exit()
