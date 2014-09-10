@@ -231,6 +231,7 @@ class SideChannel(object):
     
     def get_result(self, id, outfile=None, result=False):
         if not result:
+            PRINT_ACTION('NoResult', 1, action=False)
             self.send_object(';'.join(['NoResult', id]))
             return
         
@@ -244,6 +245,7 @@ class SideChannel(object):
     # [ADDED BY HYUNGJOON KOO] SEND JITTER FILES TO SERVER
     def send_jitter(self, id, jitter_file=None, jitter=False):
         if not jitter:
+            
             self.send_object(';'.join(['NoJitter', id]))
             return
 
@@ -255,6 +257,7 @@ class SideChannel(object):
 
     def send_jitter2(self, id, jitter_file=None, jitter=False):
         if not jitter:
+            PRINT_ACTION('NoJitter', 1, action=False)
             self.send_object(';'.join(['NoJitter2', id]))
             return
 
@@ -345,7 +348,7 @@ def run(*args):
     configs.set('result'  , False)
     configs.set('instance', 'achtung')
     configs.set('serialize', 'json')
-    configs.set('jitter', False)
+    configs.set('jitter', True)
 
     configs.read_args(sys.argv)
     configs.set('instance', Instance(configs.get('instance')))
