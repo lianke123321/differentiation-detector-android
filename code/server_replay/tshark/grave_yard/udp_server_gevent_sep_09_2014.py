@@ -28,9 +28,11 @@ To kill the server:
 
 import sys, time, numpy, pickle
 from python_lib import *
-import subprocess
+
 import gevent, gevent.pool, gevent.server, gevent.queue
 from gevent import monkey
+from gevent.coros import RLock
+
 monkey.patch_all()
 
 DEBUG = 4
@@ -48,6 +50,7 @@ class UDPServer(object):
         self.ports_q        = ports_q
         self.greenlets_q    = greenlets_q
         self.tcpdump_q      = tcpdump_q
+        self.lock           = RLock()
         
     def run(self, start_port=None):
         
@@ -83,36 +86,42 @@ class UDPServer(object):
         
         if DEBUG == 2: print 'got:', data, client_ip, client_port
         if DEBUG == 3: print 'got:', len(data), 'from', client_ip, client_port
+#         print 'got:', data, 'from', client_ip, client_port
         
         if client_ip not in self.mapping:
             self.mapping[client_ip] = {}
         
         try:
-            (id, server_port, replay_name) = self.mapping[client_ip][client_port]
+            [id, original_server_port, original_client_port, replay_name, started] = self.mapping[client_ip][client_port]
             
         except KeyError:
             data = data.split(';')
             
-            if len(data) != 3:
+            if len(data) != 4:
                 print 'Something is wrong!!! Unknown client:', client_ip, client_port, self.original_port, self.instance
                 return
-            id          = data[0]
-            server_port = data[1]
-            replay_name = data[2]
             
-            if DEBUG == 2: print 'New port:', client_address, server_port, id
+            id                   = data[0]
+            original_server_port = data[1]
+            original_client_port = data[2]
+            replay_name          = data[3]
+            
+            if DEBUG == 2: print 'New port pair:', client_address, original_server_port, original_client_port, id, replay_name
+            
+            self.mapping[client_ip][client_port] = [id, original_server_port, original_client_port, replay_name, False]
             self.ports_q.put(('NEW', id, client_port))
-            self.mapping[client_ip][client_port] = (id, server_port, replay_name)
             self.notify_q.put((id, client_port, 'NOTIFY'))
             self.tcpdump_q.put(('port', id, client_port))
             
             return
-                
-        if server_port is None:
+        
+        
+        if started is True:
             return
         
-        self.mapping[client_ip][client_port] = (None, None, None)
-        gevent.Greenlet.spawn(self.send_Q, self.Qs[replay_name][server_port], time.time(), client_address, id, self.timing)
+        self.mapping[client_ip][client_port][4] = True
+        
+        gevent.Greenlet.spawn(self.send_Q, self.Qs[replay_name][original_server_port][original_client_port], time.time(), client_address, id, self.timing)
         
     def send_Q(self, Q, time_origin, client_address, id, timing):
         '''
@@ -124,7 +133,8 @@ class UDPServer(object):
             if timing:
                 gevent.sleep((time_origin + udp_set.timestamp) - time.time())
             
-            self.server.socket.sendto(udp_set.payload, client_address)
+            with self.lock:
+                self.server.socket.sendto(udp_set.payload, client_address)
             
             if DEBUG == 2: print '\tsent:', udp_set.payload, 'to', client_address
             if DEBUG == 3: print '\tsent:', len(udp_set.payload), 'to', client_address
@@ -171,8 +181,7 @@ class SideChannel(object):
             3- add the new client
             4- Send port mapping to client
             5- Receive results request and send back results
-            6- Receive jitter results from client
-            7- Close connection
+            6- Close connection
         '''
         
         #0- Put the greenlet on the queue
@@ -206,54 +215,16 @@ class SideChannel(object):
         
         data = data.split(';')
         if data[0] == 'GiveMeResults':
-            #self.tcpdump_q.put(('stop', id))
+            self.tcpdump_q.put(('stop', id))
             if self.send_reults(connection) is False: return
         
         elif data[0] == 'NoResult':
-            #self.tcpdump_q.put(('stop', id))
-            pass
-
-        #6- [ADDED BY HYUNGJOON KOO] RECEIVE JITTER FILES
-        data = self.receive_object(connection)
-        if data is None: return
-        data = data.split(';')
-        if data[0] == 'WillSendClientJitter':
-            if self.get_jitter(connection) is False: return
-
-        elif data[0] == 'NoJitter':
-            pass
-
-        data = self.receive_object(connection)
-        if data is None: return
-        data = data.split(';')
-        if data[0] == 'WillSendClientJitter2':
-            self.tcpdump_q.put(('stop', id))
-            if self.get_jitter2(connection) is False: return
-
-        elif data[0] == 'NoJitter2':
             self.tcpdump_q.put(('stop', id))
             pass
         
-        #7- Close connection
+        #6- Close connection
         connection.shutdown(gevent.socket.SHUT_RDWR)
         connection.close()
-
-    # [ADDED BY HYUNGJOON KOO] GET JITTER VALUES FROM CLIENT AND WRITE A FILE
-    def get_jitter(self, connection):
-        pcap_folder = Configs().get('pcap_folder')
-        jitter_file = pcap_folder + '/client_sent_interval_rcvd.txt'
-        f = open(jitter_file, 'wb')
-        jitters = self.receive_object(connection)
-        f.write(jitters)
-        return jitters
-
-    def get_jitter2(self, connection):
-        pcap_folder = Configs().get('pcap_folder')
-        jitter_file2 = pcap_folder + '/client_rcvd_interval_rcvd.txt'
-        f = open(jitter_file2, 'wb')
-        jitters = self.receive_object(connection)
-        f.write(jitters)
-        return jitters
     
     def get_ports(self):
         while True:
@@ -310,6 +281,8 @@ class SideChannel(object):
             
             if DEBUG == 2: print '\tNOTIFYING:', data, str(port).zfill(5)
             
+#             print '\tNOTIFYING:', data
+            
             try:
                 self.send_object(self.all_clients[id].connection, ';'.join([command, str(port).zfill(5)]) )
             except Exception as e:
@@ -344,8 +317,8 @@ class SideChannel(object):
     def send_reults(self, connection):
         result_file = 'smile.jpg'
         f = open(result_file, 'rb')
-        return self.send_object(connection, f.read())
-
+        return self.send_object(connection, f.read())   
+    
 class ClientObj(object):
     def __init__(self, id, replay_name, connection, ip):
         self.id          = id
@@ -528,7 +501,7 @@ def load_Qs(test, serialize='pickle'):
             
             if serialize == 'pickle':
                 Q, server_ports, replay_name = pickle.load(open(pickle_file, 'r'))
-            
+                
             elif serialize == 'json':
                 Q, server_ports, replay_name = json.load(open(pickle_file, "r"), cls=UDPjsonDecoder_server)
             
@@ -541,8 +514,9 @@ def load_Qs(test, serialize='pickle'):
     
     for replay_name in Qs:
         for server_port in Qs[replay_name]:
-            for udp in Qs[replay_name][server_port]:
-                udp.payload = udp.payload.decode('hex')
+            for client_port in Qs[replay_name][server_port]:
+                for udp in Qs[replay_name][server_port][client_port]:
+                    udp.payload = udp.payload.decode('hex')
     
     return Qs, ports    
     
@@ -589,6 +563,7 @@ def main():
     side_channel.run()
     
     PRINT_ACTION('READY! You can now run the client script', 0)
-
+    
+    
 if __name__=="__main__":
     main()
