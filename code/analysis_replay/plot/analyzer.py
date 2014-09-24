@@ -1,7 +1,7 @@
 '''
 #######################################################################################################
 #######################################################################################################
-Last Updated: Sep 9, 2014
+Last Updated: Sep 23, 2014
 
 By: Hyungjoon Koo (hykoo@cs.stonybrook.edu)
 	Stony Brook University
@@ -376,26 +376,29 @@ def rttCDFAnalyze(file, pcap_dir):
 	sorted_pair = sorted(pairs.iteritems(), key=operator.itemgetter(1))
 	
 	if DEBUG == 1:
-		print "\tTOP 10 Connections:"
+		print "\tTOP 10 Connections:" 
 		for i in range(1,11):
 			print "\t\t" + str(sorted_pair[len(sorted_pair)-i])
 	
-	(ip,cnt) = sorted_pair[len(sorted_pair)-1]
-	src = ip.split('-')[0]
-	dst = ip.split('-')[2]
+	(ip_src_dst,cnt1) = sorted_pair[len(sorted_pair)-1]
+	(ip_dst_src,cnt2) = sorted_pair[len(sorted_pair)-2]
+	src = ip_src_dst.split('-')[0]
+	dst = ip_src_dst.split('-')[2]
 	
 	for line in range(1, (len(allPkts) -1)):
-		client_ip = allPkts[line].replace('\n','').replace('"','').split(',')[2]
-		client_port = allPkts[line].replace('\n','').replace('"','').split(',')[3]
-		server_ip = allPkts[line].replace('\n','').replace('"','').split(',')[4]
-		server_port = allPkts[line].replace('\n','').replace('"','').split(',')[5]
-		pkt_keys = client_ip + '-' + client_port + '-' + server_ip + '-' + server_port
+		#client_ip = allPkts[line].replace('\n','').replace('"','').split(',')[2]
+		#client_port = allPkts[line].replace('\n','').replace('"','').split(',')[3]
+		#server_ip = allPkts[line].replace('\n','').replace('"','').split(',')[4]
+		#server_port = allPkts[line].replace('\n','').replace('"','').split(',')[5]
+		#pkt_keys = client_ip + '-' + client_port + '-' + server_ip + '-' + server_port
 		rtt = allPkts[line].replace('\n','').replace('"','').split(',')[8]
 		if (client_ip == src and server_ip == dst) or (client_ip == dst and server_ip == src):
 			if len(rtt) > 0:
 				tcp_rtts.append(float(rtt))
+
 	tcp_rtts.sort()
-	print str(len(tcp_rtts)) + ' packets! (' + src + ' <---> ' + dst + ')',
+	print str(cnt1 + cnt2) + " / " + str(len(allPkts)) + ' packets! (' + src + ' <---> ' + dst + ')',
+	
 	f = open(outFile, 'w')
 	for rtt in tcp_rtts:
 		f.write(str(rtt*1000) + '\n')
@@ -1119,9 +1122,12 @@ def ksTestFinalDecision(description, origin, compared):
 		}''')
 
 	pValueSum = 0.0
+	#pValues = []
 	dStatisticSum = 0.0
+	#dStaticstics = []
 	numOfTest = 100
 
+	f = open('./values.txt','a')
 	for i in range(0, numOfTest):
 		getOriginValuesF = robjects.r['getOriginValuesWithoutOutliers']
 		getComparisonValuesF = robjects.r['getComparisonSamples']
@@ -1129,13 +1135,30 @@ def ksTestFinalDecision(description, origin, compared):
 		comparisonValues = getComparisonValuesF(compared)
 		
 		result = kstest(originValues, comparisonValues, pexp)
+		f.write("p:" + str(result[result.names.index('p.value')][0]) + "\n")
+		f.write("d:" + str(result[result.names.index('statistic')][0]) + "\n")
+		
 		pValueSum = pValueSum + float(result[result.names.index('p.value')][0])
+		#pValues.append(float(result[result.names.index('p.value')][0]))
 		dStatisticSum = dStatisticSum + float(result[result.names.index('statistic')][0])
+		#dStaticstics.append(float(result[result.names.index('statistic')][0]))
 
 	pAvg = float(pValueSum/numOfTest)
 	dAvg = float(dStatisticSum/numOfTest)
-	# print "P-Value: " + str(result[result.names.index('p.value')][0])		# P-value
-	# print "D-Value: " + str(result[result.names.index('statistic')][0])		# D-value (statistic)
+	'''
+	pAvg = sum(pValues)/len(pValues)
+	dAvg = sum(dStaticstics)/len(dStaticstics)
+	f = open('./values.txt','a')
+	f.write('----- p ------\n')
+	for pValue in pValues:
+		f.write(str(pValue) + '\n')
+	f.write('----- d ------\n')
+	for dStaticstic in dStaticstics:
+		f.write(str(dStaticstic) + '\n')
+	f.close()
+	'''
+	#print "P-Value: " + str(result[result.names.index('p.value')][0])		# P-value
+	#print "D-Value: " + str(result[result.names.index('statistic')][0])		# D-value (statistic)
 
 	# Describes the summary for the last ks-test
 	summary1 = robjects.r.summary(originValues)
@@ -1406,9 +1429,9 @@ def analysisMain():
 		if multiplot == True:
 			print "\tGenerating multiple TCP plots for the purpose of comparison...\n"
 			numOfPlots = isPcap(TCP_PCAP_DIR)
-			#generateXputCDFMultiplot(numOfPlots)
+			generateXputCDFMultiplot(numOfPlots)
 			generateRTTCDFMultiplot(numOfPlots)
-			generatePktSizeCDFMultiplot(numOfPlots)
+			#generatePktSizeCDFMultiplot(numOfPlots)
 			print "\tDone..! (Multiplots have been saved to the current directory)\n"
 		if kstest == True:
 			comparisonDirs = os.listdir(PLOT_DIR)
