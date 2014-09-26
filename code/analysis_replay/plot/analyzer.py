@@ -261,7 +261,9 @@ def xPutCDFAnalyze(file):
 	if os.path.isdir(outDirectory) == False:
 		os.mkdir(outDirectory)
 	outFile = outDirectory + "/" + XPUT_CDF_TXT
-	sortXPutCmd = "cat " + outDirectory + "/" + XPUT_TXT + " | sort -n -k2,2 | awk '{print $2/1000}' > " + outFile + " 2> /dev/null"
+	
+	# Removed all 0s for xput CDF
+	sortXPutCmd = "cat " + outDirectory + "/" + XPUT_TXT + " | sort -n -k2,2 | awk '{print $2/1000}' | grep -v 0 > " + outFile + " 2> /dev/null"
 	os.system(sortXPutCmd)
 	xPutCDFPlot(outDirectory)
 
