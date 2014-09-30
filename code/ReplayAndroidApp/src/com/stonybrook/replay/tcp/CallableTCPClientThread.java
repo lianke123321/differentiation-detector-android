@@ -16,6 +16,7 @@ import android.util.Log;
 import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.util.UtilsManager;
 
+// @@@ This class is for debugging purpose. Blocking call, not used now.
 public class CallableTCPClientThread implements Callable<Void> {
 
 	private TCPClient client = null;
