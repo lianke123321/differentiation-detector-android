@@ -58,6 +58,7 @@ public class OldTCPSideChannel {
 			while (!socketChannel.finishConnect()) {
 				// wait, or do something else...
 			}
+			// @@@ open selector to monitor multiple channel in one thread
 			selector = Selector.open();
 			key = socketChannel.register(selector, SelectionKey.OP_READ);
 		} catch (SocketException e) {
@@ -99,9 +100,9 @@ public class OldTCPSideChannel {
 
 		ByteBuffer lenBuf = ByteBuffer.allocate(2);
 		ByteBuffer buf = null;
-		int readyChannels = this.selector.select();
+		int readyChannels = this.selector.select();	// @@@ get the # ready channels
 
-		Set<SelectionKey> selectedKeys = this.selector.selectedKeys();
+		Set<SelectionKey> selectedKeys = this.selector.selectedKeys();	// @@@ <type> means this set could only store such type
 		Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
 
 		while (keyIterator.hasNext()) {
@@ -111,15 +112,16 @@ public class OldTCPSideChannel {
 			if (key.isReadable()) {
 				// a channel is ready for reading
 				lenBuf = ByteBuffer.allocate(10);
-				int bytesRead = ((SocketChannel) key.channel()).read(lenBuf);
+				int bytesRead = ((SocketChannel) key.channel()).read(lenBuf);	// @@@ read key(?) from specific channel
 				lenBuf.rewind();
+				// @@@ use trim() to get rid of space and tab at beginning and end of a string
 				int len = Integer.parseInt(new String(lenBuf.array(), "ASCII").trim());
 
 				if (len == 0)
 					break;
 
 				buf = ByteBuffer.allocate(len);
-				bytesRead = ((SocketChannel) key.channel()).read(buf);
+				bytesRead = ((SocketChannel) key.channel()).read(buf);	// @@@ read value(?) from that channel
 
 				
 				Log.d("Replay", "Received String" + new String(buf.array()));

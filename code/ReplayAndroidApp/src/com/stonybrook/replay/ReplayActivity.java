@@ -554,7 +554,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		TCPAppJSONInfoBean appData = null;
 		long timeStarted = 0;
-		//This is Lister which will be called when this method finishes. More information about this is provided in ReplayCompleteListener file.
+		//This is Listener which will be called when this method finishes. More information about this is provided in ReplayCompleteListener file.
 		private ReplayCompleteListener listener;
 		boolean success = true;
 		//This simply identifies whether we are in open or VPN

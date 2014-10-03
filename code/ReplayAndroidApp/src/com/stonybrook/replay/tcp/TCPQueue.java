@@ -16,7 +16,7 @@ import com.stonybrook.replay.bean.RequestSet;
 /**
  * This loads and de-serializes all necessary objects.
  * Complicated. I'll have to think what I did here. May be comments in python client can be helpful.
- * TODO: Find a way to get exceptions from child threads. Difficult than it looks. Trued using Callable Thread but it did not work out.
+ * TODO: Find a way to get exceptions from child threads. Difficult than it looks. Tried using Callable Thread but it did not work out.
  * Callbacks can be used. When child thread gets Exception, it can callback to parent which can stop executing other threads and return Error to AsyncTask. 
 */
 public class TCPQueue {
