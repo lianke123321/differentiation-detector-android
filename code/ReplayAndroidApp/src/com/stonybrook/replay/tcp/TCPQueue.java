@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+//import java.util.concurrent.locks.Lock;
+//import java.util.concurrent.locks.ReentrantLock;
 
-import android.graphics.Paint.Join;
+//import android.graphics.Paint.Join;
 import android.util.Log;
 
 import com.stonybrook.replay.bean.RequestSet;
@@ -24,7 +24,8 @@ public class TCPQueue {
 	public AtomicBoolean flag = new AtomicBoolean();
 	private ArrayList<RequestSet> Q = null;
 	long timeOrigin;
-	private Map<TCPClient, Lock> mLocks = new HashMap<TCPClient, Lock>();
+	// @@@ comment this out, not used
+	//private Map<TCPClient, Lock> mLocks = new HashMap<TCPClient, Lock>();
 	private Map<TCPClient, Semaphore> mSema = new HashMap<TCPClient, Semaphore>();
 	private ArrayList<Thread> cThreadList = new ArrayList<Thread>();
 	public volatile boolean done = false;
@@ -51,6 +52,7 @@ public class TCPQueue {
 		try {
 			int i = 1;
 			int len = this.Q.size();
+			// @@@ start all the treads here
 			for (RequestSet RS : this.Q) {
 
 				Semaphore sema = getSemaLock(cSPairMapping.get(RS.getc_s_pair()));
@@ -58,6 +60,7 @@ public class TCPQueue {
 
 				Log.d("Replay", "Sending " + (i++) + "/" + len + " at time " + (System.currentTimeMillis() - timeOrigin) + " expected " + RS.getTimestamp() + " with response " + RS.getResponse_len());
 
+				// @@@ every time when calling next we create and start a new thread
 				next(cSPairMapping.get(RS.getc_s_pair()), RS, timing, sema);
 
 				
@@ -68,6 +71,7 @@ public class TCPQueue {
 			}
 			
 			//Wait for all threads to finish processing
+			// @@@ in other words, wait for every thread to die
 			for(Thread t : cThreadList)
 				t.join();
 			
@@ -97,6 +101,7 @@ public class TCPQueue {
 	 */
 	private void next(TCPClient client, RequestSet RS, Boolean timing, Semaphore sema) throws Exception {
 
+		// @@@ if timing is set to be true, wait until expected Time to send this packet
 		if (timing) {
 			double expectedTime = timeOrigin + RS.getTimestamp() * 1000;
 			if (System.currentTimeMillis() < expectedTime) {
@@ -107,6 +112,7 @@ public class TCPQueue {
 			}
 		}
 
+		// @@@ package this TCPClient into a TCPClientThread, then put it into a thread
 		TCPClientThread clientThread = new TCPClientThread(client, RS, this, sema, timeOrigin);
 		Thread cThread = new Thread(clientThread);
 		cThread.start();

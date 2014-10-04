@@ -617,6 +617,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					try {
 						randomID = new RandomString(10).nextString();
 						sideChannel = new OldTCPSideChannel(socketInstance, randomID);
+						// @@@ send id then receive server port map
 						sideChannel.declareID(appData.getReplayName());
 						serverPortsMap = sideChannel.receivePortMappingNonBlock();
 						s = true;
@@ -629,6 +630,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * Create clients from CSPairs
 				 */
 				for (String key : appData.getCsPairs()) {
+					// @@@ don't understand how to take out destPort here
 					int destPort = Integer.valueOf(key.substring(key.lastIndexOf('.') + 1, key.length()));
 					if (serverPortsMap.size() != 0)
 						destPort = serverPortsMap.get(destPort);
@@ -639,6 +641,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Log.d("Replay", String.valueOf(CSPairMapping.size()));
 				
 				//Running the Queue
+				// @@@ Q in appData is list of RequestSet, and each request set corresponds to a packet
+				// @@@ here we start all TCPClients in CSPairMapping!
 				TCPQueue queue = new TCPQueue(appData.getQ());
 				queue.run(CSPairMapping, Boolean.valueOf(Config.get("timing")));
 				
