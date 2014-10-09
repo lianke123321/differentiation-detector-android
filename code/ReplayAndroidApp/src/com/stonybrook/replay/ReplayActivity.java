@@ -74,6 +74,7 @@ import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.tcp.OldTCPSideChannel;
 import com.stonybrook.replay.tcp.TCPClient;
 import com.stonybrook.replay.tcp.TCPQueue;
+import com.stonybrook.replay.tcp.TCPSideChannel;
 import com.stonybrook.replay.udp.ClientThread;
 import com.stonybrook.replay.udp.UDPClient;
 import com.stonybrook.replay.udp.UDPQueue;
@@ -193,12 +194,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			Config.set("timing", enableTiming);
 			Config.set("server", server);
-
+			
+			Log.d("Server", server);
 			//Check server reachability
 			boolean isAvailable = (new ServerReachable()).execute(server).get();
 			Log.d("Replay", "Server availability " + String.valueOf(isAvailable));
 			
-			if (isAvailable) {
+			if (!isAvailable) {
 				//If server is available. Change status from to processing
 				selectedApps.get(currentReplayCount).status = getResources().getString(R.string.processing);
 				adapter.notifyDataSetChanged();
@@ -228,7 +230,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	private void processTCPApplication(ApplicationBean applicationBean) throws Exception {
 
 		currentTask = "tcp";
-		appData_tcp = UnpickleDataStream.unpickleTCP(applicationBean.getDataFile(), context);
+		appData_tcp = UnpickleDataStream.unpickleTCPJSON(applicationBean.getDataFile(), context);
+		Log.d("Parsing", applicationBean.getDataFile());
 		queueTCP = new QueueTCPAsync(this, "open");
 		queueTCP.execute("");
 
@@ -604,7 +607,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Log.d("Server", Config.get("server"));
 				
 				//OldTCPSiceChannel is being used as TCPSideChannel is for gevent branch.
-				OldTCPSideChannel sideChannel = null;
+				TCPSideChannel sideChannel = null;
 				HashMap<Integer, Integer> serverPortsMap = null; 
 				
 				/**
@@ -616,8 +619,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				while (!s) {
 					try {
 						randomID = new RandomString(10).nextString();
-						sideChannel = new OldTCPSideChannel(socketInstance, randomID);
-						// @@@ send id then receive server port map
+						sideChannel = new TCPSideChannel(socketInstance, randomID);
 						sideChannel.declareID(appData.getReplayName());
 						serverPortsMap = sideChannel.receivePortMappingNonBlock();
 						s = true;
@@ -630,7 +632,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * Create clients from CSPairs
 				 */
 				for (String key : appData.getCsPairs()) {
-					// @@@ don't understand how to take out destPort here
 					int destPort = Integer.valueOf(key.substring(key.lastIndexOf('.') + 1, key.length()));
 					if (serverPortsMap.size() != 0)
 						destPort = serverPortsMap.get(destPort);
@@ -641,8 +642,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Log.d("Replay", String.valueOf(CSPairMapping.size()));
 				
 				//Running the Queue
-				// @@@ Q in appData is list of RequestSet, and each request set corresponds to a packet
-				// @@@ here we start all TCPClients in CSPairMapping!
 				TCPQueue queue = new TCPQueue(appData.getQ());
 				queue.run(CSPairMapping, Boolean.valueOf(Config.get("timing")));
 				

@@ -133,7 +133,7 @@ public class JSONParser {
 		    	temp = qArray.getJSONObject(i);
 		    	tempRS = new RequestSet();
 		    	tempRS.setc_s_pair(temp.getString("c_s_pair"));
-		    	tempRS.setPayload(temp.get("payload"));
+		    	//tempRS.setPayload(temp.get("payload"));
 		    	tempRS.setTimestamp(temp.getDouble("timestamp"));
 		    	Q.add(tempRS);
 		    }

@@ -3,16 +3,13 @@ package com.stonybrook.replay.tcp;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.SocketChannel;
 import java.util.concurrent.Semaphore;
 
 import android.util.Log;
 
 import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.util.UtilsManager;
+// @@@ Adrian add this
 
 public class TCPClientThread implements Runnable {
 
@@ -43,17 +40,17 @@ public class TCPClientThread implements Runnable {
 		DataInputStream dataInputStream = null;
 		try {
 
-			if (client.socket == null || !client.socket.isConnected())
+			if (client.socket == null)
 				client.createSocket();
-
+			
 			// Get Input/Output stream for socket
 			dataOutputStream = new DataOutputStream(client.socket.getOutputStream());
 			dataInputStream = new DataInputStream(client.socket.getInputStream());
 
-			Log.d("Replay", "Sending payload for pair " + RS.getc_s_pair() + " " + RS.getResponse_len());
-
+			Log.d("Sending", "Sending payload for pair " + RS.getc_s_pair() + " " + RS.getResponse_len());
 			
-			dataOutputStream.write(UtilsManager.serialize(RS.getPayload())); //Data type for payload
+			dataOutputStream.write(RS.getPayload()); //Data type for payload
+			Log.d("Sending", String.valueOf(RS.getPayload().length));
 
 			synchronized (queue) {
 				queue.notifyAll();
@@ -67,19 +64,24 @@ public class TCPClientThread implements Runnable {
 
 				Log.d(String.valueOf(RS.getResponse_len()), "start " + String.valueOf(System.currentTimeMillis() - timeOrigin));
 				
-				int bufferSize = 1024*1024;
-				if(RS.getResponse_len() < bufferSize)
-					bufferSize = RS.getResponse_len();
+				// @@@ try another way
+				int bufferSize = 4096;
+				//if(RS.getResponse_len() < bufferSize)
+				//	bufferSize = RS.getResponse_len();
 				
 				byte[] buffer = new byte[bufferSize];
 				while (totalRead < RS.getResponse_len()) {
+					// @@@ offset is wrong?
 					int bytesRead = dataInputStream.read(buffer, 0, Math.min(RS.getResponse_len() - totalRead, bufferSize));
+					Log.d("Payload " + RS.getResponse_len(), String.valueOf(buffer));
+					//int bytesRead = dataInputStream.read(buffer);
+					Log.d("Received " + RS.getResponse_len(), String.valueOf(bytesRead));
 					if (bytesRead < 0) {
 						throw new IOException("Data stream ended prematurely");
 					}
 					totalRead += bytesRead;
 				}
-				Log.d(String.valueOf(RS.getResponse_len()), "end " + String.valueOf(System.currentTimeMillis() - timeOrigin));
+				Log.d("Finished " + String.valueOf(RS.getResponse_len()), "end " + String.valueOf(System.currentTimeMillis() - timeOrigin));
 			}
 
 			

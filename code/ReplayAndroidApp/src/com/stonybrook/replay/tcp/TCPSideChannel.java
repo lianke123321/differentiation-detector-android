@@ -86,7 +86,9 @@ public class TCPSideChannel {
 	
 	public byte[] receiveObject(int objLen) throws Exception{
 		byte[] recvObjSizeBytes = receiveKbytes(objLen);
+		Log.d("Obj", new String(recvObjSizeBytes));
 		int recvObjSize = (new BigInteger(new String(recvObjSizeBytes))).intValue();
+		Log.d("Obj", String.valueOf(recvObjSize));
 		return receiveKbytes(recvObjSize);
 	}
 	

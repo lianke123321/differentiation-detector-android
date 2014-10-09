@@ -73,14 +73,19 @@ public class TCPClient /*implements Runnable */{
         which c_s_pair it will be replaying.
 	 * @throws IOException
 	 */
-	public void identify() throws IOException {
+	public void identify() throws Exception {
 		Log.d("Replay", id + ";" + this.CSPair + ";" + replayName);
 		byte[] message = (id + ";" + this.CSPair + ";" + replayName).getBytes();
-		DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-		dataOutputStream.write(message);
+		sendObject(message);
 
 	}
-
+	
+	private void sendObject(byte[] buf) throws Exception {
+		DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+		dataOutputStream.writeBytes(String.format("%010d", buf.length));
+		dataOutputStream.write(buf);
+	}
+	
 	public void close() throws Exception {
 		this.socket.close();
 	}

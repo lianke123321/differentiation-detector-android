@@ -136,8 +136,8 @@ public final class R {
     public static final class string {
         public static final int action_settings=0x7f080001;
         public static final int appResultButton=0x7f080013;
-        public static final int appSizeLabel=0x7f080020;
-        public static final int appTimeLabel=0x7f080021;
+        public static final int appSizeLabel=0x7f080022;
+        public static final int appTimeLabel=0x7f080023;
         public static final int app_name=0x7f080000;
         public static final int back_button=0x7f080005;
         public static final int cancel=0x7f080015;
@@ -157,8 +157,10 @@ public final class R {
         public static final int selected=0x7f080004;
         public static final int selected_apps=0x7f080006;
         public static final int server_label=0x7f08001d;
-        public static final int server_rajesh_ec2=0x7f08001e;
-        public static final int server_something_else=0x7f08001f;
+        public static final int server_meddle1=0x7f08001e;
+        public static final int server_meddle2=0x7f08001f;
+        public static final int server_rajesh_ec2=0x7f080020;
+        public static final int server_something_else=0x7f080021;
         public static final int setting=0x7f080016;
         public static final int timing_No=0x7f08001c;
         public static final int timing_Yes=0x7f08001b;

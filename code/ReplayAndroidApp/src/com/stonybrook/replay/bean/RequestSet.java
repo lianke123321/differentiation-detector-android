@@ -6,7 +6,7 @@ package com.stonybrook.replay.bean;
 public class RequestSet {
 	public String c_s_pair;
 	public int response_len;
-	public Object payload;
+	public byte[] payload;
 	private double timestamp;
 
 	// private int response_hash;
@@ -27,11 +27,11 @@ public class RequestSet {
 		this.response_len = response_len;
 	}
 
-	public Object getPayload() {
+	public byte[] getPayload() {
 		return payload;
 	}
 
-	public void setPayload(Object payload) {
+	public void setPayload(byte[] payload) {
 		this.payload = payload;
 	}
 
