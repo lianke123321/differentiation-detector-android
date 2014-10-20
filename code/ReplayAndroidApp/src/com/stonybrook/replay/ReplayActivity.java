@@ -502,7 +502,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					try {
 						randomID = new RandomString(10).nextString();
 						sideChannel = new UDPSideChannel(socketInstance, randomID);
-						sideChannel.declareID();
+						sideChannel.declareID(appData.getReplayName());
 						serverPortsMap = sideChannel.receivePortMappingNonBlock();
 						s = true;
 					} catch (JSONException ex) {

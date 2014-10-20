@@ -54,8 +54,8 @@ public class UDPSideChannel {
 
 	}
 
-	public void declareID() throws Exception {
-		send(this.id.getBytes());
+	public void declareID(String replayName) throws Exception {
+		send((id+";"+replayName).getBytes());
 
 	}
 

@@ -1,5 +1,8 @@
 package com.stonybrook.replay;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -26,6 +29,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -37,8 +41,13 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.res.AssetManager;
 
 public class MainActivity extends Activity {
 
@@ -52,6 +61,10 @@ public class MainActivity extends Activity {
 
 	String server = null;
 	String enableTiming = null;
+	
+	// @@@ add SharedPreferences for consent form
+	public static final String STATUS = "MyPrefsFile";
+	SharedPreferences settings;
 
 	// Remove this
 	// @SuppressLint("NewApi")
@@ -64,6 +77,7 @@ public class MainActivity extends Activity {
 		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
 		
 		setContentView(R.layout.activity_main_image);
+		
 
 		// In Android, Network cannot be done on Main thread. But Initially for testing purposes this hack was placed which allowed network usage on main thread
 		// Remove this hack...very bad....for only testing purpose
@@ -74,6 +88,33 @@ public class MainActivity extends Activity {
 		 */
 
 		try {
+			// @@@ check if user agreed
+			/*if(!userAgreed){
+				new AlertDialog.Builder(this)
+			    .setTitle("Consent Form")
+			    .setView(LayoutInflater.from(this).inflate(R.layout.consent_form_scroll_layout, null))
+			    .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int which) { 
+			        	Editor editor = settings.edit();
+						editor.putBoolean("userAgreed", true);
+						editor.commit();
+			        }
+			     })
+			     .setNegativeButton("Not Accept", new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int which) { 
+			        	Editor editor = settings.edit();
+						editor.putBoolean("userAgreed", false);
+						editor.commit();
+						MainActivity.this.finish();
+			        }
+			     })
+			    .show();
+				
+				//Create Intent for ReplayActivity and make data of selected apps by user available to ReplayActivity
+				Intent intent = new Intent(MainActivity.this, ConsentFormActivity.class);
+				startActivity(intent);
+			}*/
+			
 			/*
 			 * First check to see of Internet access is available
 			 * TODO : Identify if connection is WiFi or Cellular
