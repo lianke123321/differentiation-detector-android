@@ -1,0 +1,5 @@
+[Section1]
+all_hash = False
+pcap_file = ../data/hulu/hulu.pcap
+number_of_servers = 49
+

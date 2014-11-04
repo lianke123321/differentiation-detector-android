@@ -1,7 +1,9 @@
 package com.stonybrook.replay;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -100,7 +102,15 @@ public class ConsentFormActivity extends Activity {
 			Editor editor = settings.edit();
 			editor.putBoolean("userAgreed", false);
 			editor.commit();
-			ConsentFormActivity.this.finish();
+			new AlertDialog.Builder(ConsentFormActivity.this)
+			.setTitle("Thank you!")
+			.setMessage("Thank you for your support!")
+			.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { 
+					ConsentFormActivity.this.finish();
+				}
+			})
+			.show();
 		}
 	};
 }

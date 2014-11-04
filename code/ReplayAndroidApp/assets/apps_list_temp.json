@@ -1,0 +1,76 @@
+{
+  "apps": [
+    {
+        "name" : "DropBox",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 10
+    },
+    {
+        "name" : "Hulu",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 0.6
+    },
+    {
+        "name" : "Facebook",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 0.5
+    },
+    {
+        "name" : "Quora",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 20
+    },
+    {
+        "name" : "Twitter",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 15
+    },
+    {
+        "name" : "Music",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 11
+    },
+    {
+        "name" : "Youtube",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 9
+    },
+    {
+        "name" : "Skype",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 8
+    },
+    {
+        "name" : "Viber",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 12
+    },
+    {
+        "name" : "Hangout",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 50
+    },
+    {
+        "name" : "Gmail",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 0.2
+    },
+    {
+        "name" : "Running out of App names",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "dropbox_d.client_pickle",
+        "size" : 0.7
+    }
+  ]
+}

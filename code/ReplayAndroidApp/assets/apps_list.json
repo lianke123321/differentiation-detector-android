@@ -1,0 +1,51 @@
+{
+  "apps": [
+    {
+        "name" : "DropBox",
+        "configfile" : "dropbox_d.pcap_config",
+        "datafile" : "dropbox_d1.pcap_client_pickle",
+        "size" : 16.0,
+        
+        "time" : "50 s",
+        "image" : "dropbox",
+        "type" : "tcp"
+    },
+    {
+        "name" : "Youtube",
+        "configfile" : "dropbox_d.config",
+        "datafile" : "youtube_d_org.pcap_client_json",
+        "size" : 0.5,
+        "time" : "2 m",
+        "image" : "youtube1",
+        "type" : "tcp"
+    },
+    {
+        "name" : "Skype",
+        "configfile" : "",
+        "datafile" : "skype.pcap_client_pickle",
+        "size" : 8,
+        "time" : "1 m",
+        "image" : "skype",
+        "type" : "udp"
+     }
+    ,
+    {
+        "name" : "Spotify",
+        "configfile" : "",
+        "datafile" : "spotify.pcap_client_pickle",
+        "size" : 8,
+        "time" : "50 s",
+        "image" : "spotify",
+        "type" : "tcp"
+    },
+    {
+        "name" : "netflix",
+        "configfile" : "",
+        "datafile" : "tmobile_hsdpa+_nfx.pcap_client_pickle",
+        "size" : 8,
+        "time" : "30 s",
+        "image" : "netflix",
+        "type" : "tcp"
+    }
+  ]
+}

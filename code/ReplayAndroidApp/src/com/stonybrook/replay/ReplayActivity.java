@@ -167,7 +167,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		Log.d("Replay", "Loading VPN certificates");
 		new CertificateLoadTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, false);
-		
+		KeyChain.choosePrivateKeyAlias(ReplayActivity.this,
+				new SelectUserCertOnClickListener(), new String[] { "RSA" },
+				null, null, -1, "adrian-replay");
 	}
 	
 	/**
@@ -200,7 +202,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			boolean isAvailable = (new ServerReachable()).execute(server).get();
 			Log.d("Replay", "Server availability " + String.valueOf(isAvailable));
 			
-			if (!isAvailable) {
+			if (true) {
 				//If server is available. Change status from to processing
 				selectedApps.get(currentReplayCount).status = getResources().getString(R.string.processing);
 				adapter.notifyDataSetChanged();
