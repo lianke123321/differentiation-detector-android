@@ -5,8 +5,8 @@
         <item>@string/timing_No</item>
     </string-array>
     <string-array name="server">
-        <item>@string/server_meddle1</item>
         <item>@string/server_meddle2</item>
+        <item>@string/server_meddle1</item>
         <item>@string/server_rajesh_ec2</item>
         <item>@string/server_something_else</item>
     </string-array>

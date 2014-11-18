@@ -73,9 +73,9 @@ public class TCPClientThread implements Runnable {
 				while (totalRead < RS.getResponse_len()) {
 					// @@@ offset is wrong?
 					int bytesRead = dataInputStream.read(buffer, 0, Math.min(RS.getResponse_len() - totalRead, bufferSize));
-					Log.d("Payload " + RS.getResponse_len(), String.valueOf(buffer));
+					//Log.d("Payload " + RS.getResponse_len(), String.valueOf(buffer));
 					//int bytesRead = dataInputStream.read(buffer);
-					Log.d("Received " + RS.getResponse_len(), String.valueOf(bytesRead));
+					//Log.d("Received " + RS.getResponse_len(), String.valueOf(bytesRead));
 					if (bytesRead < 0) {
 						throw new IOException("Data stream ended prematurely");
 					}
