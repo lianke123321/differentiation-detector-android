@@ -53,7 +53,7 @@ public class TCPClient /*implements Runnable */{
 			socket.setKeepAlive(true);
 			socket.connect(endPoint);
 			
-			this.identify();
+			//this.identify();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

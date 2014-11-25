@@ -65,6 +65,7 @@ import com.stonybrook.android.logic.TrustedCertificateManager;
 import com.stonybrook.android.ui.LogActivity;
 import com.stonybrook.replay.adapter.ImageReplayListAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
+import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
 import com.stonybrook.replay.bean.TCPAppJSONInfoBean;
 import com.stonybrook.replay.bean.UDPAppJSONInfoBean;
@@ -671,9 +672,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// OldTCPSiceChannel is being used as TCPSideChannel is for
 				// gevent branch.
-				TCPSideChannel sideChannel = null;
-				HashMap<Integer, Integer> serverPortsMap = null;
-
+				TCPSideChannel sideChannel = new TCPSideChannel(socketInstance,
+						randomID);
+				HashMap<String, HashMap<String, ServerInstance>> serverPortsMap = null;
+				
+				sideChannel.ask4Permission();
+				
+				/*if (sideChannel.ask4Permission() == 0) {
+					Log.d("Error", "No permission: another client with same IP address is running. Wait for them to finish!");
+					return null;
+				}*/
+				
 				/**
 				 * Ask for port mapping from server. For some reason, port map
 				 * info parsing was throwing error. so, I put while loop to do
@@ -684,8 +693,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				while (!s) {
 					try {
 						randomID = new RandomString(10).nextString();
-						sideChannel = new TCPSideChannel(socketInstance,
-								randomID);
+						
 						sideChannel.declareID(appData.getReplayName());
 						serverPortsMap = sideChannel
 								.receivePortMappingNonBlock();
@@ -699,12 +707,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * Create clients from CSPairs
 				 */
 				for (String key : appData.getCsPairs()) {
-					int destPort = Integer.valueOf(key.substring(
-							key.lastIndexOf('.') + 1, key.length()));
-					if (serverPortsMap.size() != 0)
-						destPort = serverPortsMap.get(destPort);
-					TCPClient c = new TCPClient(key, Config.get("server"),
-							destPort, randomID, appData.getReplayName());
+					String destIP = key.substring(key.lastIndexOf('-') + 1, key.lastIndexOf("."));
+					String destPort = key.substring(key.lastIndexOf('.') + 1, key.length());
+					ServerInstance instance = serverPortsMap.get(destIP).get(destPort);
+					if (instance.server.trim().equals(""))
+						instance.server = server; //serverPortsMap.get(destPort);
+					TCPClient c = new TCPClient(key, instance.server,
+							Integer.valueOf(instance.port), randomID, appData.getReplayName());
 					CSPairMapping.put(key, c);
 				}
 

@@ -1,31 +1,23 @@
 package com.stonybrook.replay.tcp;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.util.Log;
-import android.util.SparseArray;
 
-import com.stonybrook.replay.bean.RequestSet;
+import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
-import com.stonybrook.replay.util.UnpickleDataStream;
 
 public class TCPSideChannel {
 	private String id = null;
@@ -72,14 +64,23 @@ public class TCPSideChannel {
 		byte[] result = receiveObject(objLen);
 	}
 	
-	public HashMap<Integer, Integer> receivePortMappingNonBlock() throws Exception {
-		HashMap<Integer, Integer> ports = new HashMap<Integer, Integer>();
+	public HashMap<String, HashMap<String, ServerInstance>> receivePortMappingNonBlock() throws Exception {
+		HashMap<String, HashMap<String, ServerInstance>> ports = new HashMap<String, HashMap<String, ServerInstance>>();
 		byte[] data = receiveObject(objLen);
+	
 		JSONObject jObject = new JSONObject(new String(data));
 		Iterator<String> keys = jObject.keys();
 		while (keys.hasNext()) {
-			String k = keys.next();
-			ports.put(Integer.valueOf(k), jObject.getInt(k));
+			HashMap<String, ServerInstance> tempHolder = new HashMap<String, ServerInstance>();
+			String key = keys.next();
+			JSONObject firstLevel = (JSONObject) jObject.get(key);
+			Iterator<String> firstLevelKeys = firstLevel.keys();
+			while(firstLevelKeys.hasNext()) {
+				String key1 = firstLevelKeys.next();
+				JSONArray pair = firstLevel.getJSONArray(key1);
+				tempHolder.put(key1, new ServerInstance(String.valueOf(pair.get(0)), String.valueOf(pair.get(1))));
+			}
+			ports.put(key, tempHolder);
 		}
 		return ports;
 	}
@@ -92,6 +93,13 @@ public class TCPSideChannel {
 		return receiveKbytes(recvObjSize);
 	}
 	
+	public byte[] ask4Permission() throws Exception {
+		return receiveObject(10);
+	}
+	
+	int fromByteArray(byte[] bytes) {
+	     return ByteBuffer.wrap(bytes).getInt();
+	}
 	
     public byte[] receiveKbytes(int k) throws Exception{
     	int totalRead = 0;
