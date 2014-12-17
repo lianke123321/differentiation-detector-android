@@ -1,5 +1,27 @@
 package com.stonybrook.replay;
 
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -7,8 +29,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.text.Html;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -18,6 +43,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rgolani.replay.R;
+import com.stonybrook.android.data.TrustedCertificateEntry;
+import com.stonybrook.android.data.VpnProfile;
+import com.stonybrook.android.data.VpnProfileDataSource;
+import com.stonybrook.android.data.VpnType;
 
 public class ConsentFormActivity extends Activity {
 
@@ -32,6 +61,7 @@ public class ConsentFormActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+		
 		// Get "userAgreed" value. If the value doesn't exist yet false is
 		// returned
 		settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
@@ -86,12 +116,115 @@ public class ConsentFormActivity extends Activity {
 			 * startActivity(intent); ConsentFormActivity.this.finish();
 			 */
 
+			// download credentials 
+			downloadAndInstallVpnCreds();
+			
 			Intent intent = new Intent();
 			intent.setClass(ConsentFormActivity.this, MainActivity.class);
 			startActivity(intent);
 			ConsentFormActivity.this.finish();
 		}
+
+
 	};
+	
+	/**
+	 * Gets VPN credentials and stores them in the VPN datastore
+	 */
+	private void downloadAndInstallVpnCreds() {
+		
+		// get reference to database for storing credentials
+		Context context = this.getApplicationContext();
+		VpnProfileDataSource mDataSource = new VpnProfileDataSource(context);
+		mDataSource.open();
+		
+		// create VPN proile, fill it up and save it in the database
+		VpnProfile mProfile = new VpnProfile();
+		getAndUpdateProfileData(mProfile);
+		mDataSource.insertProfile(mProfile);
+		
+	}
+	
+	/**
+	 * Fills the VpnProfile object with credentials fetched from the server
+	 * @param mProfile
+	 */
+	private void getAndUpdateProfileData(VpnProfile mProfile){
+		
+		// We want to use certs to avoid passwords
+		VpnType mVpnType = VpnType.IKEV2_CERT;
+		// TODO update the gateway used
+		String gateway = "replay.meddle.mobi";
+		
+		try {
+			
+			// fetch credentials in an async thread
+			FetchCredentialTask task = new FetchCredentialTask(gateway);
+			task.execute("");
+			JSONObject json = (JSONObject)task.get();
+			
+			// we fetch a JSON object, now we need to create a cert from it
+			TrustedCertificateEntry mUserCertEntry = new TrustedCertificateEntry(json.getString("alias"), 
+					(X509Certificate) getCertFromString(json.getString("alias"), json.getString("cert")));
+			String name = "Meddle Replay Server";
+			
+			mProfile.setName(name.isEmpty() ? gateway : name);
+			mProfile.setGateway(gateway);
+			mProfile.setVpnType(mVpnType);
+	
+			if (mVpnType.getRequiresCertificate())
+			{
+				mProfile.setUserCertificateAlias(mUserCertEntry.getAlias());
+			}
+			String certAlias = null;
+	//		String certAlias = mCheckAuto.isChecked() ? null : mCertEntry.getAlias();
+			mProfile.setCertificateAlias(certAlias);
+			mProfile.setAutoReconnect(false );
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Converts string of a certificate into an X509 object
+	 * @param alias
+	 * @param certData
+	 * @return
+	 */
+	private Certificate getCertFromString(String alias, String certData) {
+		KeyStore keyStore;
+		try {
+			keyStore = KeyStore.getInstance( "PKCS12" );
+		
+			String pkcs12 = certData;
+			InputStream sslInputStream = new ByteArrayInputStream( 
+					Base64.decode( pkcs12.getBytes(), Base64.DEFAULT ) );
+			keyStore.load( sslInputStream, alias.toCharArray() );
+			return keyStore.getCertificate(alias);
+		} catch (KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CertificateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
 
 	OnClickListener disagreeButtonClick = new OnClickListener() {
 
@@ -113,4 +246,64 @@ public class ConsentFormActivity extends Activity {
 			.show();
 		}
 	};
+	
+	/**
+	 * Fetches JSON object with VPN credentails
+	 * @author choffnes
+	 *
+	 */
+	private class FetchCredentialTask extends AsyncTask {
+	    private String gateway;
+
+	    /**
+	     * 
+	     * @param gateway the domain of host with credentials
+	     */
+		public FetchCredentialTask(String gateway) {
+			this.gateway = gateway;
+		}
+
+		@Override
+	    protected Object doInBackground(Object... arg0) {
+
+	    	JSONObject json = null;
+			try {
+				json = new JSONObject(getWebPage("http://"+gateway+":50080/dyn/getTempCert"));
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+	        return json;
+
+	    }
+		
+		private String getWebPage(String url) {
+			HttpResponse response = null;
+	        HttpGet httpGet = null;
+	        HttpClient mHttpClient = null;
+	        String s = "";
+
+	        try {
+	            if(mHttpClient == null){
+	                mHttpClient = new DefaultHttpClient();
+	            }
+
+
+	            httpGet = new HttpGet(url);
+
+
+	            response = mHttpClient.execute(httpGet);
+	            s = EntityUtils.toString(response.getEntity(), "UTF-8");
+
+
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        } 
+	        return s;
+		}
+	}
+
 }
+
+
