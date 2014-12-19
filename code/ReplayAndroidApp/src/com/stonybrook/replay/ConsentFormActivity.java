@@ -32,6 +32,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.security.KeyChain;
 import android.text.Html;
 import android.util.Base64;
 import android.view.Menu;
@@ -55,6 +56,9 @@ public class ConsentFormActivity extends Activity {
 	Button agreeButton, disagreeButton;
 
 	SharedPreferences settings;
+	
+	String gateway = "replay.meddle.mobi";
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -118,15 +122,16 @@ public class ConsentFormActivity extends Activity {
 
 			// download credentials 
 			downloadAndInstallVpnCreds();
+		
 			
-			Intent intent = new Intent();
-			intent.setClass(ConsentFormActivity.this, MainActivity.class);
-			startActivity(intent);
-			ConsentFormActivity.this.finish();
+			
 		}
 
 
 	};
+	private TrustedCertificateEntry mUserCertEntry;
+	private VpnProfile mProfile;
+	private VpnProfileDataSource mDataSource;
 	
 	/**
 	 * Gets VPN credentials and stores them in the VPN datastore
@@ -135,13 +140,15 @@ public class ConsentFormActivity extends Activity {
 		
 		// get reference to database for storing credentials
 		Context context = this.getApplicationContext();
-		VpnProfileDataSource mDataSource = new VpnProfileDataSource(context);
+		mDataSource = new VpnProfileDataSource(context);
 		mDataSource.open();
 		
 		// create VPN proile, fill it up and save it in the database
-		VpnProfile mProfile = new VpnProfile();
+		mProfile = new VpnProfile();
 		getAndUpdateProfileData(mProfile);
-		mDataSource.insertProfile(mProfile);
+		
+		
+		
 		
 	}
 	
@@ -151,10 +158,8 @@ public class ConsentFormActivity extends Activity {
 	 */
 	private void getAndUpdateProfileData(VpnProfile mProfile){
 		
-		// We want to use certs to avoid passwords
-		VpnType mVpnType = VpnType.IKEV2_CERT;
-		// TODO update the gateway used
-		String gateway = "replay.meddle.mobi";
+		
+		
 		
 		try {
 			
@@ -164,22 +169,9 @@ public class ConsentFormActivity extends Activity {
 			JSONObject json = (JSONObject)task.get();
 			
 			// we fetch a JSON object, now we need to create a cert from it
-			TrustedCertificateEntry mUserCertEntry = new TrustedCertificateEntry(json.getString("alias"), 
+			mUserCertEntry = new TrustedCertificateEntry(json.getString("alias"), 
 					(X509Certificate) getCertFromString(json.getString("alias"), json.getString("cert")));
-			String name = "Meddle Replay Server";
 			
-			mProfile.setName(name.isEmpty() ? gateway : name);
-			mProfile.setGateway(gateway);
-			mProfile.setVpnType(mVpnType);
-	
-			if (mVpnType.getRequiresCertificate())
-			{
-				mProfile.setUserCertificateAlias(mUserCertEntry.getAlias());
-			}
-			String certAlias = null;
-	//		String certAlias = mCheckAuto.isChecked() ? null : mCertEntry.getAlias();
-			mProfile.setCertificateAlias(certAlias);
-			mProfile.setAutoReconnect(false );
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -190,6 +182,39 @@ public class ConsentFormActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		
+		// TODO check request code...
+		String name = "Meddle Replay Server";
+		
+		// We want to use certs to avoid passwords
+		VpnType mVpnType = VpnType.IKEV2_CERT;
+				// TODO update the gateway used
+		mProfile.setName(name.isEmpty() ? gateway : name);
+		mProfile.setGateway(gateway);
+		mProfile.setVpnType(mVpnType);
+
+		if (mVpnType.getRequiresCertificate())
+		{
+			mProfile.setUserCertificateAlias(mUserCertEntry.getAlias());
+		}
+		String certAlias = null;
+//		String certAlias = mCheckAuto.isChecked() ? null : mCertEntry.getAlias();
+		mProfile.setCertificateAlias(certAlias);
+		mProfile.setAutoReconnect(false );
+		mDataSource.insertProfile(mProfile);
+		
+
+		Intent intent = new Intent();
+		intent.setClass(ConsentFormActivity.this, MainActivity.class);
+		startActivity(intent);
+		ConsentFormActivity.this.finish();
+		
 	}
 
 	/**
@@ -204,9 +229,16 @@ public class ConsentFormActivity extends Activity {
 			keyStore = KeyStore.getInstance( "PKCS12" );
 		
 			String pkcs12 = certData;
+			byte pkcsBytes[] = Base64.decode( pkcs12.getBytes(), Base64.DEFAULT );
 			InputStream sslInputStream = new ByteArrayInputStream( 
-					Base64.decode( pkcs12.getBytes(), Base64.DEFAULT ) );
+					pkcsBytes );
 			keyStore.load( sslInputStream, alias.toCharArray() );
+			
+			Intent installIntent = KeyChain.createInstallIntent();
+			
+			  installIntent.putExtra(KeyChain.EXTRA_PKCS12, pkcsBytes);
+			  startActivityForResult(installIntent, 0);
+			
 			return keyStore.getCertificate(alias);
 		} catch (KeyStoreException e) {
 			// TODO Auto-generated catch block

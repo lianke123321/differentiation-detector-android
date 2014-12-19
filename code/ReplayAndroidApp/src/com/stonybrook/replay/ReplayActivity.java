@@ -116,6 +116,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 */
 	public static final String CONTACT_EMAIL = "demo@gmail.com";
 	private static final int PREPARE_VPN_SERVICE = 0;
+	private static final String DEFAULT_ALIAS = "test-cert-replay";
 	boolean isKeyChainInitialized = false;
 	boolean isVPNConnected = false;
 
@@ -147,6 +148,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								}
 							}).show();
 		}
+		
+
 
 		// Extract data that was sent by previous activity. In our case, list of
 		// apps, server and timing
@@ -176,9 +179,19 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		Log.d("Replay", "Loading VPN certificates");
 		new CertificateLoadTask().executeOnExecutor(
 				AsyncTask.THREAD_POOL_EXECUTOR, false);
+		
+		KeyChain.choosePrivateKeyAlias(this, new SelectUserCertOnClickListener(), // Callback
+                new String[] {}, // Any key types.
+                null, // Any issuers.
+                "localhost", // Any host
+                -1, // Any port
+                DEFAULT_ALIAS);
+		
+		/** Dave commented out to test auto-credentials
 		KeyChain.choosePrivateKeyAlias(ReplayActivity.this,
 				new SelectUserCertOnClickListener(), new String[] { "RSA" },
-				null, null, -1, "adrian-replay");
+				null, null, -1, "adrian-replay"); 
+		*/
 	}
 
 	/**
@@ -255,6 +268,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		appData_tcp = UnpickleDataStream.unpickleTCPJSON(
 				applicationBean.getDataFile(), context);
 		Log.d("Parsing", applicationBean.getDataFile());
+		
 		queueTCP = new QueueTCPAsync(this, "open");
 		
 /*		onVpnProfileSelected(null);
@@ -935,12 +949,19 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 * @param profile
 	 */
 	public void onVpnProfileSelected(VpnProfile profile) {
+		Context context = this.getApplicationContext();
+		VpnProfileDataSource mDataSource = new VpnProfileDataSource(context);
+		mDataSource.open();
+		profile = mDataSource.getAllVpnProfiles().get(0);
 		Bundle profileInfo = new Bundle();
-		profileInfo.putLong(VpnProfileDataSource.KEY_ID, 1);
-		// TODO: Move this to settings Pop-up which should be pretty straight
-		// forward
-		profileInfo.putString(VpnProfileDataSource.KEY_USERNAME, "rajesh");
-		profileInfo.putString(VpnProfileDataSource.KEY_PASSWORD, "rajesh");
+		profileInfo.putLong(VpnProfileDataSource.KEY_ID, profile.getId());
+//		
+//		// TODO: Move this to settings Pop-up which should be pretty straight
+//		// forward
+//		profileInfo.putString(VpnProfileDataSource.KEY_USERNAME, "rajesh");
+//		profileInfo.putString(VpnProfileDataSource.KEY_PASSWORD, "rajesh");
+		
+		
 		prepareVpnService(profileInfo);
 
 	}
