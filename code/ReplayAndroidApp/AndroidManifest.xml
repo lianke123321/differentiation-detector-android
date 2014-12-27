@@ -6,8 +6,8 @@
 
     <!-- Rememeber this change. Changed min API version from 8 to 11 to support executeOnExecutor -->
     <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="18" />
+        android:minSdkVersion="15"
+        android:targetSdkVersion="21" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
