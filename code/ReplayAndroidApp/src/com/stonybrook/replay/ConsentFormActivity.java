@@ -52,9 +52,9 @@ public class ConsentFormActivity extends Activity {
 
 	// @@@ this is consent form
 	public static final String STATUS = "MyPrefsFile";
-	Button agreeButton, disagreeButton;
+	private Button agreeButton, disagreeButton;
 
-	SharedPreferences settings;
+	private SharedPreferences settings;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

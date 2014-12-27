@@ -217,7 +217,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			Log.d("Replay",
 					"Server availability " + String.valueOf(isAvailable));
 
-			if (true) {
+			if (isAvailable) {
 				// If server is available. Change status from to processing
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.processing);
