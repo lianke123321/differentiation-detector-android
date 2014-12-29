@@ -7,8 +7,10 @@ public class RequestSet {
 	public String c_s_pair;
 	public int response_len;
 	public byte[] payload;
-	private double timestamp;
-
+	public double timestamp;
+	// adrian: for udp
+	public boolean end;
+	
 	// private int response_hash;
 
 	public String getc_s_pair() {
@@ -41,6 +43,14 @@ public class RequestSet {
 
 	public void setTimestamp(double timestamp) {
 		this.timestamp = timestamp;
+	}
+	
+	public boolean getEnd() {
+		return end;
+	}
+	
+	public void setEnd(boolean end) {
+		this.end = end;
 	}
 
 	@Override

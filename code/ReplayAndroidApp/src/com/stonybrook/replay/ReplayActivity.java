@@ -256,11 +256,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				applicationBean.getDataFile(), context);
 		Log.d("Parsing", applicationBean.getDataFile());
 		queueTCP = new QueueTCPAsync(this, "open");
-		
-/*		onVpnProfileSelected(null);
-		Log.d("Replay", "Testing VPN");
-		(new VPNConnected()).execute(this);
-*/		
+
+		/*
+		 * onVpnProfileSelected(null); Log.d("Replay", "Testing VPN"); (new
+		 * VPNConnected()).execute(this);
+		 */
 		queueTCP.execute("");
 
 	}
@@ -277,7 +277,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			throws Exception {
 
 		currentTask = "udp";
-		appData_udp = UnpickleDataStream.unpickleUDP(
+		appData_udp = UnpickleDataStream.unpickleUDPJSON(
 				applicationBean.getDataFile(), context);
 		queueUDP = new QueueUDPAsync(this, "open");
 		queueUDP.execute("");
@@ -480,7 +480,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 */
 	class QueueUDPAsync extends AsyncTask<String, String, String> {
 
-		HashMap<String, ClientThread> CSPairMapping = null;
+//		HashMap<String, ClientThread> CSPairMapping = null;
 		UDPAppJSONInfoBean appData = null;
 		long timeStarted = 0;
 		// This is Lister which will be called when this method finishes. More
@@ -518,35 +518,40 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			this.timeStarted = System.currentTimeMillis();
 			SparseArray<Integer> NATMap = new SparseArray<Integer>();
 			SparseArray<ClientThread> PortMap = new SparseArray<ClientThread>();
-			this.CSPairMapping = new HashMap<String, ClientThread>();
+			// adrian: for some reason rajesh used ClientThread instead of UDPClient, which might create some confusion
+			HashMap<String, ClientThread> CSPairMapping = new HashMap<String, ClientThread>();
 			ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
 
 			try {
-				/*
-				 * Here we are checking if we are on VPN channel. If we are on
-				 * VPN, wait for 5 sec for VPN to connect. TODO: This is very
-				 * bad. Remove this and try finding out some other way whether
-				 * VPN is connected. One way can be to get IP that's visible
-				 * outside. If it's of Meddle server then we are connected to
-				 * VPN. Implemented this in VPNConnected AsyncTask but never got
-				 * chance to integrate it.
+				/**
+				 * used to wait 5 secs here, now checkVPN is called in 
+				 * openFinishCompleteCallBack instead of here. So don't
+				 * need to do anything here
+				 * 
+				 * @author Adrian
+				 * 
 				 */
-				if (this.channel.equalsIgnoreCase("vpn"))
-					Thread.sleep(5000);
-				Log.d("VPNUDP", this.channel);
 				int sideChannelPort = Integer.valueOf(Config
 						.get("udp_sidechannel_port"));
 				String randomID = null;
 				SocketInstance socketInstance = new SocketInstance(
 						Config.get("server"), sideChannelPort, null);
+				Log.d("Server", Config.get("server"));
+				
 				UDPSideChannel sideChannel = null;
 
-				SparseArray<Integer> serverPortsMap = null;
+				HashMap<String, HashMap<String, ServerInstance>> serverPortsMap = null;
+				
+				// adrian: add senderCounts
+				int senderCounts = 0;
+				
+				sideChannel.ask4Permission();
 
 				/**
 				 * Ask for port mapping from server. For some reason, port map
 				 * info parsing was throwing error. so, I put while loop to do
 				 * this untill port mapping is parsed successfully.
+				 * Adrian: add receiving senderCounts part
 				 */
 
 				boolean s = false;
@@ -558,6 +563,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						sideChannel.declareID(appData.getReplayName());
 						serverPortsMap = sideChannel
 								.receivePortMappingNonBlock();
+						senderCounts = sideChannel.receiveSenderCounts();
 						s = true;
 					} catch (JSONException ex) {
 						ex.printStackTrace();
@@ -654,14 +660,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			HashMap<String, TCPClient> CSPairMapping = new HashMap<String, TCPClient>();
 
 			try {
-				/*
-				 * Here we are checking if we are on VPN channel. If we are on
-				 * VPN, wait for 5 sec for VPN to connect. TODO: This is very
-				 * bad. Remove this and try finding out some other way whether
-				 * VPN is connected. One way can be to get IP that's visible
-				 * outside. If it's of Meddle server then we are connected to
-				 * VPN. Implemented this in VPNConnected AsyncTask but never got
-				 * chance to integrate it.
+				/**
+				 * used to wait 5 secs here, now checkVPN is called in 
+				 * openFinishCompleteCallBack instead of here. So don't
+				 * need to do anything here
+				 * 
+				 * @author Adrian
+				 * 
 				 */
 				int sideChannelPort = Integer.valueOf(Config
 						.get("tcp_sidechannel_port"));
@@ -675,14 +680,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				TCPSideChannel sideChannel = new TCPSideChannel(socketInstance,
 						randomID);
 				HashMap<String, HashMap<String, ServerInstance>> serverPortsMap = null;
-				
+
 				sideChannel.ask4Permission();
-				
-				/*if (sideChannel.ask4Permission() == 0) {
-					Log.d("Error", "No permission: another client with same IP address is running. Wait for them to finish!");
-					return null;
-				}*/
-				
+
+				/*
+				 * if (sideChannel.ask4Permission() == 0) { Log.d("Error",
+				 * "No permission: another client with same IP address is running. Wait for them to finish!"
+				 * ); return null; }
+				 */
+
 				/**
 				 * Ask for port mapping from server. For some reason, port map
 				 * info parsing was throwing error. so, I put while loop to do
@@ -693,7 +699,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				while (!s) {
 					try {
 						randomID = new RandomString(10).nextString();
-						
+
 						sideChannel.declareID(appData.getReplayName());
 						serverPortsMap = sideChannel
 								.receivePortMappingNonBlock();
@@ -707,13 +713,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * Create clients from CSPairs
 				 */
 				for (String key : appData.getCsPairs()) {
-					String destIP = key.substring(key.lastIndexOf('-') + 1, key.lastIndexOf("."));
-					String destPort = key.substring(key.lastIndexOf('.') + 1, key.length());
-					ServerInstance instance = serverPortsMap.get(destIP).get(destPort);
+					String destIP = key.substring(key.lastIndexOf('-') + 1,
+							key.lastIndexOf("."));
+					String destPort = key.substring(key.lastIndexOf('.') + 1,
+							key.length());
+					ServerInstance instance = serverPortsMap.get(destIP).get(
+							destPort);
 					if (instance.server.trim().equals(""))
-						instance.server = server; //serverPortsMap.get(destPort);
+						instance.server = server; // serverPortsMap.get(destPort);
 					TCPClient c = new TCPClient(key, instance.server,
-							Integer.valueOf(instance.port), randomID, appData.getReplayName());
+							Integer.valueOf(instance.port), randomID,
+							appData.getReplayName());
 					CSPairMapping.put(key, c);
 				}
 
@@ -809,9 +819,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				onVpnProfileSelected(null);
 				Log.d("Replay", "VPN started");
-				
+
 				(new VPNConnected()).execute(this);
-				
 
 			} else {
 				// Update status on screen and stop processing
@@ -825,13 +834,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 
 	}
-	
+
 	@Override
 	public void vpnConnectedCallBack() {
-		
-		
+
 	}
-	
+
 	/**
 	 * From this point on, all the code related to VPN is taken from Meddle App.
 	 */
@@ -1074,15 +1082,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 	}
 
-	/**
-	 * This task can be used to identify whether VPN is connected. For this i am
-	 * asking external service to return the IP address which is visible outside
-	 * and if the IP address is same as meddle server than VPN is connected
-	 * otherwise not. TODO: This is very rough idea of code. Needs more thinking
-	 * 
-	 * @author rajesh
-	 * 
-	 */
+	// adrian: implemented and working
 	class VPNConnected extends AsyncTask<ReplayActivity, Void, Boolean> {
 
 		@Override
@@ -1106,7 +1106,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						// Change screen status
 						selectedApps.get(currentReplayCount).status = getResources()
 								.getString(R.string.vpn);
-						//adapter.notifyDataSetChanged();
+						// adapter.notifyDataSetChanged();
 
 						// Start the replay again for same app
 						if (currentTask.equalsIgnoreCase("tcp")) {
