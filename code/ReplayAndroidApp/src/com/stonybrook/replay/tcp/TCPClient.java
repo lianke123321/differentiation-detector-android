@@ -21,8 +21,8 @@ public class TCPClient /*implements Runnable */{
 	private String destIP = null;
 	private int destPort;
 	public Socket socket = null;
-	private int port;
-	private int NATPort;
+/*	private int port;
+	private int NATPort;*/
 	private String id = null;
 	private String replayName = null;
 	public SocketChannel sc = null;

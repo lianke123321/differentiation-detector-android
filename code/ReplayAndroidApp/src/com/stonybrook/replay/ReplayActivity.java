@@ -70,6 +70,8 @@ import com.stonybrook.replay.bean.SocketInstance;
 import com.stonybrook.replay.bean.TCPAppJSONInfoBean;
 import com.stonybrook.replay.bean.UDPAppJSONInfoBean;
 import com.stonybrook.replay.bean.combinedAppJSONInfoBean;
+import com.stonybrook.replay.combined.CombinedQueue;
+import com.stonybrook.replay.combined.CombinedSideChannel;
 import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.tcp.OldTCPSideChannel;
@@ -820,9 +822,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected String doInBackground(String... str) {
-			this.appData = appData_tcp;
+			this.appData = appData;
 			this.timeStarted = System.currentTimeMillis();
 			HashMap<String, TCPClient> CSPairMapping = new HashMap<String, TCPClient>();
+			// adrian: create a hash map for udp
+			HashMap<String, UDPClient> udpPortMapping = new HashMap<String, UDPClient>();
 
 			try {
 				/**
@@ -834,17 +838,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * 
 				 */
 				int sideChannelPort = Integer.valueOf(Config
-						.get("tcp_sidechannel_port"));
+						.get("combined_sidechannel_port"));
 				String randomID = null;
 				SocketInstance socketInstance = new SocketInstance(
 						Config.get("server"), sideChannelPort, null);
 				Log.d("Server", Config.get("server"));
 
-				// OldTCPSiceChannel is being used as TCPSideChannel is for
-				// gevent branch.
-				TCPSideChannel sideChannel = new TCPSideChannel(socketInstance,
+				CombinedSideChannel sideChannel = new CombinedSideChannel(socketInstance,
 						randomID);
 				HashMap<String, HashMap<String, ServerInstance>> serverPortsMap = null;
+				// adrian: add senderCounts
+				int senderCount = 0;
 
 				sideChannel.ask4Permission();
 
@@ -868,6 +872,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						sideChannel.declareID(appData.getReplayName());
 						serverPortsMap = sideChannel
 								.receivePortMappingNonBlock();
+						senderCount = sideChannel.receiveSenderCount();
 						s = true;
 					} catch (JSONException ex) {
 						ex.printStackTrace();
@@ -877,7 +882,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				/**
 				 * Create clients from CSPairs
 				 */
-				for (String key : appData.getCsPairs()) {
+				for (String key : appData.getTcpCSPs()) {
 					String destIP = key.substring(key.lastIndexOf('-') + 1,
 							key.lastIndexOf("."));
 					String destPort = key.substring(key.lastIndexOf('.') + 1,
@@ -891,12 +896,20 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							appData.getReplayName());
 					CSPairMapping.put(key, c);
 				}
+				
+				// adrian: create clients from udpClientPorts
+				for (String key : appData.getUdpClientPorts()) {
+					int destPort = Integer.valueOf(key);
+					UDPClient c = new UDPClient(key, Config.get("server"),
+							destPort);
+					udpPortMapping.put(key, c);
+				}
 
 				Log.d("Replay", String.valueOf(CSPairMapping.size()));
 
 				// Running the Queue
-				TCPQueue queue = new TCPQueue(appData.getQ());
-				queue.run(CSPairMapping, Boolean.valueOf(Config.get("timing")));
+				CombinedQueue queue = new CombinedQueue(appData.getQ());
+				queue.run(CSPairMapping, udpPortMapping, Boolean.valueOf(Config.get("timing")));
 
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");

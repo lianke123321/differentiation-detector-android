@@ -340,6 +340,8 @@ public class UnpickleDataStream {
 				// adrian: for tcp
 				if (dictionary.has("response_len"))
 					tempRS.setResponse_len((Integer) dictionary.get("response_len"));
+				else
+					tempRS.setResponse_len(-1);
 				if (dictionary.has("response_hash"))
 					tempRS.setResponse_hash((String) dictionary.get("response_hash"));
 				// adrian: for udp
