@@ -69,6 +69,7 @@ import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
 import com.stonybrook.replay.bean.TCPAppJSONInfoBean;
 import com.stonybrook.replay.bean.UDPAppJSONInfoBean;
+import com.stonybrook.replay.bean.combinedAppJSONInfoBean;
 import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.tcp.OldTCPSideChannel;
@@ -107,6 +108,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 */
 	QueueTCPAsync queueTCP = null;
 	QueueUDPAsync queueUDP = null;
+	// adrian: for combined task
+	QueueCombinedAsync queueCombined = null;
 	String currentTask = "none";
 
 	// VPN Changes
@@ -122,6 +125,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	// Objects to store data for apps
 	TCPAppJSONInfoBean appData_tcp = null;
 	UDPAppJSONInfoBean appData_udp = null;
+	// adrian: For combined app
+	combinedAppJSONInfoBean appData = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -224,11 +229,19 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				adapter.notifyDataSetChanged();
 
 				// Forward request to respective method with required data
-				if (selectedApps.get(currentReplayCount).getType()
+				/*if (selectedApps.get(currentReplayCount).getType()
 						.equalsIgnoreCase("tcp"))
 					processTCPApplication(selectedApps.get(currentReplayCount));
 				else
-					processUDPApplication(selectedApps.get(currentReplayCount));
+					processUDPApplication(selectedApps.get(currentReplayCount));*/
+				
+				/**
+				 * start combined method
+				 * 
+				 * @author Adrian
+				 * 
+				 */
+				processCombinedApplication(selectedApps.get(currentReplayCount));
 			} else {
 				Toast.makeText(ReplayActivity.this,
 						"Server Not Available. Try after some time.",
@@ -281,6 +294,31 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				applicationBean.getDataFile(), context);
 		queueUDP = new QueueUDPAsync(this, "open");
 		queueUDP.execute("");
+	}
+	
+	/**
+	 * This method processes Replay for TCP application. 1) Parse pickle file 2)
+	 * Start AsyncTask for TCP with the parsed pickle data TODO: Remove the
+	 * parameter to AsyncTask as it is no longer required
+	 * 
+	 * @param applicationBean
+	 * @throws Exception
+	 */
+	private void processCombinedApplication(ApplicationBean applicationBean)
+			throws Exception {
+
+		currentTask = "combined";
+		appData = UnpickleDataStream.unpickleCombinedJSON(
+				applicationBean.getDataFile(), context);
+		Log.d("Parsing", applicationBean.getDataFile());
+		queueCombined = new QueueCombinedAsync(this, "open");
+
+		/*
+		 * onVpnProfileSelected(null); Log.d("Replay", "Testing VPN"); (new
+		 * VPNConnected()).execute(this);
+		 */
+		queueCombined.execute("");
+
 	}
 
 	void updateSelectedTextViews(ArrayList<ApplicationBean> list) {
@@ -543,7 +581,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				HashMap<String, HashMap<String, ServerInstance>> serverPortsMap = null;
 				
 				// adrian: add senderCounts
-				int senderCounts = 0;
+				int senderCount = 0;
 				
 				sideChannel.ask4Permission();
 
@@ -563,7 +601,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						sideChannel.declareID(appData.getReplayName());
 						serverPortsMap = sideChannel
 								.receivePortMappingNonBlock();
-						senderCounts = sideChannel.receiveSenderCounts();
+						senderCount = sideChannel.receiveSenderCount();
 						s = true;
 					} catch (JSONException ex) {
 						ex.printStackTrace();
@@ -639,6 +677,133 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		protected void onPostExecute(String result) {
 			Log.d("Replay",
 					"TCP Replay lasted for "
+							+ (System.currentTimeMillis() - this.timeStarted));
+
+			// Callback according to type of Replay with status of Replay
+			if (channel.equalsIgnoreCase("open"))
+				listener.openFinishCompleteCallback(success);
+			else
+				listener.vpnFinishCompleteCallback(success);
+
+		}
+
+		protected void onProgressUpdate(String... a) {
+			Log.d("Replay", "You are in progress update ... " + a[0]);
+		}
+
+		@Override
+		protected String doInBackground(String... str) {
+			this.appData = appData_tcp;
+			this.timeStarted = System.currentTimeMillis();
+			HashMap<String, TCPClient> CSPairMapping = new HashMap<String, TCPClient>();
+
+			try {
+				/**
+				 * used to wait 5 secs here, now checkVPN is called in 
+				 * openFinishCompleteCallBack instead of here. So don't
+				 * need to do anything here
+				 * 
+				 * @author Adrian
+				 * 
+				 */
+				int sideChannelPort = Integer.valueOf(Config
+						.get("tcp_sidechannel_port"));
+				String randomID = null;
+				SocketInstance socketInstance = new SocketInstance(
+						Config.get("server"), sideChannelPort, null);
+				Log.d("Server", Config.get("server"));
+
+				// OldTCPSiceChannel is being used as TCPSideChannel is for
+				// gevent branch.
+				TCPSideChannel sideChannel = new TCPSideChannel(socketInstance,
+						randomID);
+				HashMap<String, HashMap<String, ServerInstance>> serverPortsMap = null;
+
+				sideChannel.ask4Permission();
+
+				/*
+				 * if (sideChannel.ask4Permission() == 0) { Log.d("Error",
+				 * "No permission: another client with same IP address is running. Wait for them to finish!"
+				 * ); return null; }
+				 */
+
+				/**
+				 * Ask for port mapping from server. For some reason, port map
+				 * info parsing was throwing error. so, I put while loop to do
+				 * this untill port mapping is parsed successfully.
+				 */
+
+				boolean s = false;
+				while (!s) {
+					try {
+						randomID = new RandomString(10).nextString();
+
+						sideChannel.declareID(appData.getReplayName());
+						serverPortsMap = sideChannel
+								.receivePortMappingNonBlock();
+						s = true;
+					} catch (JSONException ex) {
+						ex.printStackTrace();
+					}
+				}
+
+				/**
+				 * Create clients from CSPairs
+				 */
+				for (String key : appData.getCsPairs()) {
+					String destIP = key.substring(key.lastIndexOf('-') + 1,
+							key.lastIndexOf("."));
+					String destPort = key.substring(key.lastIndexOf('.') + 1,
+							key.length());
+					ServerInstance instance = serverPortsMap.get(destIP).get(
+							destPort);
+					if (instance.server.trim().equals(""))
+						instance.server = server; // serverPortsMap.get(destPort);
+					TCPClient c = new TCPClient(key, instance.server,
+							Integer.valueOf(instance.port), randomID,
+							appData.getReplayName());
+					CSPairMapping.put(key, c);
+				}
+
+				Log.d("Replay", String.valueOf(CSPairMapping.size()));
+
+				// Running the Queue
+				TCPQueue queue = new TCPQueue(appData.getQ());
+				queue.run(CSPairMapping, Boolean.valueOf(Config.get("timing")));
+
+			} catch (JSONException ex) {
+				Log.d("Replay", "Error parsing JSON");
+				ex.printStackTrace();
+			} catch (Exception ex) {
+				success = false;
+				ex.printStackTrace();
+
+			}
+			return null;
+		}
+
+	}
+	
+	class QueueCombinedAsync extends AsyncTask<String, String, String> {
+
+		combinedAppJSONInfoBean appData = null;
+		long timeStarted = 0;
+		// This is Listener which will be called when this method finishes. More
+		// information about this is provided in ReplayCompleteListener file.
+		private ReplayCompleteListener listener;
+		boolean success = true;
+		// This simply identifies whether we are in open or VPN
+		public String channel = null;
+
+		public QueueCombinedAsync(ReplayCompleteListener listener, String channel) {
+			this.listener = listener;
+			this.channel = channel;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			Log.d("Replay",
+					"Combined Replay lasted for "
 							+ (System.currentTimeMillis() - this.timeStarted));
 
 			// Callback according to type of Replay with status of Replay
@@ -837,7 +1002,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	@Override
 	public void vpnConnectedCallBack() {
-
+		Log.d("Replay", "Two replays finished");
 	}
 
 	/**
@@ -1109,15 +1274,26 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						// adapter.notifyDataSetChanged();
 
 						// Start the replay again for same app
-						if (currentTask.equalsIgnoreCase("tcp")) {
+						// adrian: start the combined thread
+						if (currentTask.equalsIgnoreCase("combined")) {
+							queueCombined.cancel(true);
+							queueCombined = new QueueCombinedAsync(params[0], "vpn");
+							Log.d("Replay", "Starting combined replay");
+							queueCombined.execute("");
+						}
+						else if (currentTask.equalsIgnoreCase("tcp")) {
 							queueTCP.cancel(true);
 							queueTCP = new QueueTCPAsync(params[0], "vpn");
+							Log.d("Replay", "Starting tcp replay");
 							queueTCP.execute("");
 						} else {
 							queueUDP.cancel(true);
 							queueUDP = new QueueUDPAsync(params[0], "vpn");
+							Log.d("Replay", "Starting udp replay");
 							queueUDP.execute("");
 						}
+						
+						
 						break;
 					}
 					Thread.sleep(1000);

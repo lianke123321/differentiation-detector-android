@@ -171,9 +171,13 @@ public class UDPSideChannel {
 		return ports;
 	}
 	
-	public int receiveSenderCounts() throws Exception {
-		int senderCounts = 0;
-		return senderCounts;
+	public int receiveSenderCount() throws Exception {
+		byte[] data = receiveObject(objLen);
+		int senderCount = data[0];
+		
+		Log.d("senderCount", String.valueOf(senderCount));
+		
+		return senderCount;
 	}
 
 	public int byteArrayToInt(byte[] b) {

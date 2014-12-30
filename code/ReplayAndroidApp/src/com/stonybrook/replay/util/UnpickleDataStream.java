@@ -29,6 +29,7 @@ import android.util.SparseArray;
 import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.bean.TCPAppJSONInfoBean;
 import com.stonybrook.replay.bean.UDPAppJSONInfoBean;
+import com.stonybrook.replay.bean.combinedAppJSONInfoBean;
 import com.stonybrook.replay.constant.ReplayConstants;
 
 public class UnpickleDataStream {
@@ -298,6 +299,73 @@ public class UnpickleDataStream {
 			appData.setClientPorts(intClientPorts);
 			Log.d("Name", (String) json.get(2));
 			appData.setReplayName((String) json.get(2));
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			Log.e("Error", ex.toString());
+			throw ex;
+		}
+		return appData;
+	}
+	
+	public static combinedAppJSONInfoBean unpickleCombinedJSON(String filename,
+			Context context) throws Exception {
+		AssetManager assetManager;
+		InputStream inputStream;
+		combinedAppJSONInfoBean appData = new combinedAppJSONInfoBean();
+		ArrayList<RequestSet> Q = new ArrayList<RequestSet>();
+		try {
+			assetManager = context.getAssets();
+			inputStream = assetManager.open(filename);
+			int size = inputStream.available();
+			byte[] buffer = new byte[size];
+			inputStream.read(buffer);
+			inputStream.close();
+
+			String jsonStr = new String(buffer, "UTF-8");
+			
+			JSONArray json = new JSONArray(jsonStr);
+			
+			JSONArray qArray = (JSONArray) json.get(0);
+			RequestSet tempRS = null;
+			for (int i = 0; i < qArray.length(); i++) {
+				JSONObject dictionary = qArray.getJSONObject(i) ;
+				tempRS = new RequestSet();
+				tempRS.setc_s_pair((String) dictionary.get("c_s_pair"));
+				tempRS.setPayload(DecodeHex.decodeHex(((String)dictionary.get("payload")).toCharArray()));
+				tempRS.setTimestamp((Double) dictionary.get("timestamp"));
+				// Log.d("Time", (i+1) + " " +
+				// String.valueOf(tempRS.getTimestamp()));
+				
+				// adrian: for tcp
+				if (dictionary.has("response_len"))
+					tempRS.setResponse_len((Integer) dictionary.get("response_len"));
+				if (dictionary.has("response_hash"))
+					tempRS.setResponse_hash((String) dictionary.get("response_hash"));
+				// adrian: for udp
+				if (dictionary.has("end"))
+					tempRS.setEnd(Boolean.parseBoolean((String) dictionary.get("end")));
+				
+				Q.add(tempRS);
+			}
+			appData.setQ(Q);
+			
+			// adrian: store udpClientPorts
+			JSONArray portArray = (JSONArray)json.get(1);
+			ArrayList<String> portStrArray = new ArrayList<String>(); 
+			for (int i = 0; i < portArray.length(); i++)
+				portStrArray.add((String)portArray.getString(i));
+			appData.setUdpClientPorts(portStrArray);
+			
+			
+			JSONArray csArray = (JSONArray)json.get(2);
+			ArrayList<String> csStrArray = new ArrayList<String>(); 
+			for (int i = 0; i < csArray.length(); i++)
+				csStrArray.add((String)csArray.get(i));
+			appData.setTcpCSPs(csStrArray);
+			
+			Log.d("Name", (String) json.get(3));
+			appData.setReplayName((String) json.get(3));
 
 		} catch (Exception ex) {
 			ex.printStackTrace();

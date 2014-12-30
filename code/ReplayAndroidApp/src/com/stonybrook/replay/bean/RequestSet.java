@@ -5,9 +5,11 @@ package com.stonybrook.replay.bean;
  */
 public class RequestSet {
 	public String c_s_pair;
-	public int response_len;
-	public byte[] payload;
 	public double timestamp;
+	public byte[] payload;
+	// adrian: for tcp
+	public int response_len;
+	public String response_hash;
 	// adrian: for udp
 	public boolean end;
 	
@@ -15,6 +17,14 @@ public class RequestSet {
 
 	public String getc_s_pair() {
 		return c_s_pair;
+	}
+
+	public String getResponse_hash() {
+		return response_hash;
+	}
+
+	public void setResponse_hash(String response_hash) {
+		this.response_hash = response_hash;
 	}
 
 	public void setc_s_pair(String c_s_pair) {
