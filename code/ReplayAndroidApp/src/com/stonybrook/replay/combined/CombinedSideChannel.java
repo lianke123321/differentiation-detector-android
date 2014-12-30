@@ -87,11 +87,9 @@ public class CombinedSideChannel {
 	
 	public int receiveSenderCount() throws Exception {
 		byte[] data = receiveObject(objLen);
-		int senderCount = data[0];
+		ByteBuffer wrapped = ByteBuffer.wrap(data);
+		return wrapped.getInt();
 		
-		Log.d("senderCount", String.valueOf(senderCount));
-		
-		return senderCount;
 	}
 	
 	public byte[] receiveObject(int objLen) throws Exception{

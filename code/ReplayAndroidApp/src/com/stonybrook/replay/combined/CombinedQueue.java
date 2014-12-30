@@ -54,22 +54,23 @@ public class CombinedQueue {
 			int len = this.Q.size();
 			// @@@ start all the treads here
 			for (RequestSet RS : this.Q) {
-
-				Semaphore sema = getSemaLock(cSPairMapping.get(RS.getc_s_pair()));
-				sema.acquire();
-
-				//Log.d("Replay", "Sending " + (i++) + "/" + len + " at time " + (System.currentTimeMillis() - timeOrigin) + " expected " + RS.getTimestamp() + " with response " + RS.getResponse_len());
-
-				// adrian: every time when calling next we create and start a new thread
-				// adrian: here we start different thread according to the type of RS
+				
 				if (RS.getResponse_len() == -1)
 					nextUDP(RS, udpSocketList);
-				else
+				else { 
+					Semaphore sema = getSemaLock(cSPairMapping.get(RS.getc_s_pair()));
+					sema.acquire();
+	
+					//Log.d("Replay", "Sending " + (i++) + "/" + len + " at time " + (System.currentTimeMillis() - timeOrigin) + " expected " + RS.getTimestamp() + " with response " + RS.getResponse_len());
+	
+					// adrian: every time when calling next we create and start a new thread
+					// adrian: here we start different thread according to the type of RS
 					nextTCP(cSPairMapping.get(RS.getc_s_pair()), RS, timing, sema);
-
-				
-				synchronized (this) {
-					this.wait();
+	
+					
+					synchronized (this) {
+						this.wait();
+					}
 				}
 				
 			}
@@ -126,7 +127,7 @@ public class CombinedQueue {
 		cThreadList.add(cThread);
 	}
 	
-	private void nextUDP(RequestSet RS, udpSocketList) throws Exception {
+	private void nextUDP(RequestSet RS, udpSocketList, Boolean timing) throws Exception {
 		String c_s_pair = RS.getc_s_pair();
 		String clientPort = c_s_pair.substring(16, 21);
 		String destIP = c_s_pair.substring(c_s_pair.lastIndexOf('-') + 1,
@@ -137,13 +138,23 @@ public class CombinedQueue {
 		String destAddr = serverPortsMap.get("udp").get("destIP").get("destPort");
 		CUDPClient client = udpPortMapping.get(clientPort);
 		
-		CUDPClientThread clientThread = new CUDPClientThread(client, RS, this);
-		Thread cThread = new Thread(clientThread);
-		cThread.start();
-		threadList.add(cThread);
-		++threads;
-		Log.d("count", String.valueOf(threads));
-		cThreadList.add(cThread);
+		if (client.socket == null)
+			client.createSocket();
+		
+		if (timing) {
+			double expectedTime = timeOrigin + RS.getTimestamp() * 1000;
+			if (System.currentTimeMillis() < expectedTime) {
+				long waitTime = Math.round(expectedTime - System.currentTimeMillis());
+				Log.d("Time", String.valueOf(waitTime));
+				if (waitTime > 0)
+					Thread.sleep(waitTime);
+			}
+		}
+		
+		client.sendUDPPacket(RS.payload, destIP, destPort);
+		
+		
+		
 	}
 
 }
