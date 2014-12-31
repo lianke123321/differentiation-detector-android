@@ -48,8 +48,10 @@ public class CombinedSideChannel {
 
 	}
 
-	public void declareID(String replayName) throws Exception {
-		sendObject((id+";"+replayName).getBytes(), objLen);
+	public void declareID(String replayName, String extraString) throws Exception {
+		String temp = extraString.replace('_', '-');
+		sendObject((id+";"+"SINGLE"+";"+replayName+";"+temp).getBytes(), objLen);
+		Log.d("id", id);
 
 	}
 
@@ -124,8 +126,11 @@ public class CombinedSideChannel {
 		return receiveKbytes(recvObjSize);
 	}
 	
-	public byte[] ask4Permission() throws Exception {
-		return receiveObject(10);
+	public String[] ask4Permission() throws Exception {
+		byte[] data = receiveObject(objLen);
+		String tempPermission = new String(data, "hex");
+		String[] permission = tempPermission.split(";");
+		return permission;
 	}
 	
 	int fromByteArray(byte[] bytes) {

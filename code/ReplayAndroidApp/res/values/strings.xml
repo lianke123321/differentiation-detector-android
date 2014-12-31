@@ -33,7 +33,7 @@
     <string name="timing_No">false</string>
     
     <string name="server_label">Select Server</string>
-    <string name="server_meddle2">54.90.255.129</string>
+    <string name="server_meddle2">54.163.170.96</string>
     <string name="server_meddle1">54.160.198.73</string>
     <string name="server_rajesh_ec2">54.186.125.120</string>
     <string name="server_something_else">54.186.125.120</string>

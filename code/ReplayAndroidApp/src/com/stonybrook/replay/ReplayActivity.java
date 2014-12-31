@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -70,6 +71,8 @@ import com.stonybrook.replay.bean.SocketInstance;
 import com.stonybrook.replay.bean.TCPAppJSONInfoBean;
 import com.stonybrook.replay.bean.UDPAppJSONInfoBean;
 import com.stonybrook.replay.bean.combinedAppJSONInfoBean;
+import com.stonybrook.replay.combined.CTCPClient;
+import com.stonybrook.replay.combined.CUDPClient;
 import com.stonybrook.replay.combined.CombinedQueue;
 import com.stonybrook.replay.combined.CombinedSideChannel;
 import com.stonybrook.replay.constant.ReplayConstants;
@@ -217,6 +220,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			Config.set("timing", enableTiming);
 			Config.set("server", server);
+			// adrian: added cause arash's code
+			Config.set("extraString", "extraString");
 
 			Log.d("Server", server);
 			// Check server reachability
@@ -824,13 +829,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		protected String doInBackground(String... str) {
 			this.appData = appData_combined;
 			this.timeStarted = System.currentTimeMillis();
-			HashMap<String, TCPClient> CSPairMapping = new HashMap<String, TCPClient>();
+			HashMap<String, CTCPClient> CSPairMapping = new HashMap<String, CTCPClient>();
 			// adrian: create a hash map for udp
-			HashMap<String, UDPClient> udpPortMapping = new HashMap<String, UDPClient>();
+			HashMap<String, CUDPClient> udpPortMapping = new HashMap<String, CUDPClient>();
 
 			try {
 				/**
-				 * used to wait 5 secs here, now checkVPN is called in 
+				 * used to wait 5 sec, now checkVPN is called in 
 				 * openFinishCompleteCallBack instead of here. So don't
 				 * need to do anything here
 				 * 
@@ -839,42 +844,57 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 */
 				int sideChannelPort = Integer.valueOf(Config
 						.get("combined_sidechannel_port"));
-				String randomID = null;
+				String randomID = new RandomString(10).nextString();
 				SocketInstance socketInstance = new SocketInstance(
 						Config.get("server"), sideChannelPort, null);
 				Log.d("Server", Config.get("server"));
 
 				CombinedSideChannel sideChannel = new CombinedSideChannel(socketInstance,
 						randomID);
+				// adrian: new format of serverPortsMap
 				HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> serverPortsMap = null;
 				// adrian: add senderCounts
 				int senderCount = 0;
+				
+				// adrian: new declareID() function
+				sideChannel.declareID(appData.getReplayName(), Config.get("extraString"));
 
-				sideChannel.ask4Permission();
-
-				/*
-				 * if (sideChannel.ask4Permission() == 0) { Log.d("Error",
-				 * "No permission: another client with same IP address is running. Wait for them to finish!"
-				 * ); return null; }
-				 */
+				String[] permission = sideChannel.ask4Permission();
+				
+				if (permission[0] == "0") {
+					if (permission[1] == "1") {
+						Log.d("Error",
+								"Unknown replay_name!!!");
+						return null;
+					} else if (permission[1] == "2") {
+						Log.d("Error",
+								"No permission: another client with same IP address is running. Wait for them to finish!");
+						return null;
+					} else {
+						Log.d("Error",
+								"Unknown error!!!");
+						return null;
+					}
+				}
+				
+				// TODO: how to implement sendIperf()?
 
 				/**
 				 * Ask for port mapping from server. For some reason, port map
 				 * info parsing was throwing error. so, I put while loop to do
-				 * this untill port mapping is parsed successfully.
+				 * this until port mapping is parsed successfully.
 				 */
 
 				boolean s = false;
 				while (!s) {
 					try {
-						randomID = new RandomString(10).nextString();
-
-						sideChannel.declareID(appData.getReplayName());
+//						randomID = new RandomString(10).nextString();
 						serverPortsMap = sideChannel
 								.receivePortMappingNonBlock();
 						senderCount = sideChannel.receiveSenderCount();
 						s = true;
 					} catch (JSONException ex) {
+						Log.d("Replay", "failed to receive serverPortsMap and senderCount!");
 						ex.printStackTrace();
 					}
 				}
@@ -882,35 +902,44 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				/**
 				 * Create clients from CSPairs
 				 */
-				for (String key : appData.getTcpCSPs()) {
-					String destIP = key.substring(key.lastIndexOf('-') + 1,
-							key.lastIndexOf("."));
-					String destPort = key.substring(key.lastIndexOf('.') + 1,
-							key.length());
+				for (String csp : appData.getTcpCSPs()) {
+					String destIP = csp.substring(csp.lastIndexOf('-') + 1,
+							csp.lastIndexOf("."));
+					String destPort = csp.substring(csp.lastIndexOf('.') + 1,
+							csp.length());
 					ServerInstance instance = serverPortsMap.get("tcp").get(destIP).get(
 							destPort);
 					if (instance.server.trim().equals(""))
 						instance.server = server; // serverPortsMap.get(destPort);
-					TCPClient c = new TCPClient(key, instance.server,
+					// adrian: pass two more parameters: randomID and replayName
+					// compared with python client
+					CTCPClient c = new CTCPClient(csp, instance.server,
 							Integer.valueOf(instance.port), randomID,
 							appData.getReplayName());
-					CSPairMapping.put(key, c);
+					CSPairMapping.put(csp, c);
 				}
 				
 				// adrian: create clients from udpClientPorts
-				for (String key : appData.getUdpClientPorts()) {
+				for (String originalClientPort : appData.getUdpClientPorts()) {
 					//ServerInstance instance = serverPortsMap.get("udp").get(destIP).get(
 //							destPort);
-					int destPort = Integer.valueOf(key);
-					TUDPClient c = new TUDPClient();
-					udpPortMapping.put(key, c);
+					int destPort = Integer.valueOf(originalClientPort);
+					CUDPClient c = new CUDPClient(getPublicIP());
+					udpPortMapping.put(originalClientPort, c);
 				}
 
-				Log.d("Replay", String.valueOf(CSPairMapping.size()));
+				Log.d("Replay", "Size of CSPairMapping is " + String.valueOf(CSPairMapping.size()));
+				Log.d("Replay", "Size of udpPortMapping is " + String.valueOf(udpPortMapping.size()));
+				
+				// TODO: start tcpdump?
+				
+				// TODO: running side channel notifier
+				
+				// TODO: running Receiver?
 
-				// Running the Queue
+				// Running the Queue (Sender)
 				CombinedQueue queue = new CombinedQueue(appData.getQ());
-				queue.run(CSPairMapping, udpPortMapping, Boolean.valueOf(Config.get("timing")));
+				queue.run(CSPairMapping, udpPortMapping, serverPortsMap.get("udp"), Boolean.valueOf(Config.get("timing")));
 
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
@@ -1260,6 +1289,23 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			}
 		}
 	}
+	
+	private String getPublicIP() {
+		String publicIP = "";
+		try {
+			HttpClient httpclient = new DefaultHttpClient();
+			HttpGet httpget = new HttpGet("http://myexternalip.com/raw");
+			HttpResponse response;
+			response = httpclient.execute(httpget);
+			HttpEntity entity = response.getEntity();
+			publicIP = EntityUtils.toString(entity).trim();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return publicIP;
+		
+	}
 
 	// adrian: implemented and working
 	class VPNConnected extends AsyncTask<ReplayActivity, Void, Boolean> {
@@ -1271,13 +1317,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				int i = 15;
 				while (i > 0) {
 					i--;
-					HttpClient httpclient = new DefaultHttpClient();
-					HttpGet httpget = new HttpGet("http://myexternalip.com/raw");
-					HttpResponse response;
-					response = httpclient.execute(httpget);
-					HttpEntity entity = response.getEntity();
-					String str = EntityUtils.toString(entity);
-					if (str.trim().equalsIgnoreCase(meddleIP)) {
+					String str = getPublicIP();
+					if (str.equalsIgnoreCase(meddleIP)) {
 						Log.d("VPN", "Got it!");
 						// Set flag indicating VPN connectivity status
 						isVPNConnected = true;
