@@ -21,8 +21,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.stonybrook.android.logic.CharonVpnService;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -31,6 +29,8 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
 import android.provider.OpenableColumns;
+
+import com.stonybrook.android.logic.CharonVpnService;
 
 public class LogContentProvider extends ContentProvider
 {

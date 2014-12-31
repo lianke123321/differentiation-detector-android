@@ -8,7 +8,6 @@ import java.util.concurrent.Semaphore;
 import android.util.Log;
 
 import com.stonybrook.replay.bean.RequestSet;
-import com.stonybrook.replay.util.UtilsManager;
 // @@@ Adrian add this
 
 public class CTCPClientThread implements Runnable {

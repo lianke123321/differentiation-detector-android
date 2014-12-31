@@ -19,7 +19,6 @@ import org.json.JSONObject;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.bean.SocketInstance;
 
 public class UDPSideChannel {

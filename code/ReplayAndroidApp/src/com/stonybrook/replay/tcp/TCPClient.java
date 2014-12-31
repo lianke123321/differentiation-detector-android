@@ -1,6 +1,5 @@
 package com.stonybrook.replay.tcp;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -9,12 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.http.util.EntityUtils;
-
 import android.util.Log;
-
-import com.stonybrook.replay.bean.RequestSet;
-import com.stonybrook.replay.util.UtilsManager;
 
 public class TCPClient /*implements Runnable */{
 	public String CSPair = null;

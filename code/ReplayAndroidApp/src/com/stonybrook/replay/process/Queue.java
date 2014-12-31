@@ -1,11 +1,10 @@
 package com.stonybrook.replay.process;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.stonybrook.replay.bean.RequestSet;
-
 import android.util.Log;
+
+import com.stonybrook.replay.bean.RequestSet;
 
 /**
  * This is the class which sends out the packets in the queue one-by-one.

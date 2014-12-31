@@ -12,7 +12,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -26,7 +25,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -79,7 +77,6 @@ import com.stonybrook.replay.combined.CombinedQueue;
 import com.stonybrook.replay.combined.CombinedSideChannel;
 import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
-import com.stonybrook.replay.tcp.OldTCPSideChannel;
 import com.stonybrook.replay.tcp.TCPClient;
 import com.stonybrook.replay.tcp.TCPQueue;
 import com.stonybrook.replay.tcp.TCPSideChannel;
@@ -919,6 +916,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						String.valueOf(udpPortMapping.size()));
 				
 				// TODO: start tcpdump?
+				
 				
 				// TODO: running side channel notifier
 				

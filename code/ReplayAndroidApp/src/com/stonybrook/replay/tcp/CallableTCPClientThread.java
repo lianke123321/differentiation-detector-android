@@ -5,9 +5,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.SocketChannel;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 

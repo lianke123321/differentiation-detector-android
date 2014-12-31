@@ -3,28 +3,26 @@ package com.stonybrook.replay.util;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import net.razorvine.pickle.Unpickler;
+import net.razorvine.pickle.objects.ClassDict;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import net.razorvine.pickle.Unpickler;
-import net.razorvine.pickle.objects.ClassDict;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.bean.TCPAppJSONInfoBean;

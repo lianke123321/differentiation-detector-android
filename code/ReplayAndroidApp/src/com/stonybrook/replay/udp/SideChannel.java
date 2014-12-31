@@ -2,7 +2,6 @@ package com.stonybrook.replay.udp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
@@ -10,7 +9,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -19,7 +17,6 @@ import org.json.JSONObject;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.bean.SocketInstance;
 
 /**

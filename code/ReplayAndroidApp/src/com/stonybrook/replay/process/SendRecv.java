@@ -1,19 +1,15 @@
 package com.stonybrook.replay.process;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Queue;
 
+import android.util.Log;
+
 import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.util.UtilsManager;
-
-import android.util.Log;
 
 
 /**

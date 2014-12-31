@@ -1,15 +1,14 @@
 package com.stonybrook.replay.process;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.HashMap;
 
+import android.util.Log;
+
 import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.InstanceManager;
-
-import android.util.Log;
 
 /**
  * This class handles connections to servers. 

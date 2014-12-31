@@ -1,53 +1,35 @@
 package com.stonybrook.replay;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import uk.co.senab.photoview.PhotoViewAttacher;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.rgolani.replay.R;
-import com.stonybrook.replay.adapter.CheckBoxListAdapter;
 import com.stonybrook.replay.adapter.ImageCheckBoxListAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
 import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.parser.JSONParser;
-import com.stonybrook.replay.util.UnpickleDataStream;
-
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Bundle;
-import android.os.StrictMode;
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.View.OnTouchListener;
-import android.view.Window;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ScrollView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.res.AssetManager;
 
 public class MainActivity extends Activity {
 

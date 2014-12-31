@@ -4,23 +4,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.rgolani.replay.R;
-import com.stonybrook.replay.MainActivity;
-import com.stonybrook.replay.bean.ApplicationBean;
-import com.stonybrook.replay.constant.ReplayConstants;
-import com.stonybrook.replay.parser.JSONParser;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebView.FindListener;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.rgolani.replay.R;
+import com.stonybrook.replay.MainActivity;
+import com.stonybrook.replay.bean.ApplicationBean;
+import com.stonybrook.replay.constant.ReplayConstants;
 
 public class CheckBoxListAdapter extends BaseAdapter implements OnClickListener {
 

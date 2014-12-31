@@ -4,7 +4,6 @@ import java.util.List;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;

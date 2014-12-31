@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 public class Zoom extends View {

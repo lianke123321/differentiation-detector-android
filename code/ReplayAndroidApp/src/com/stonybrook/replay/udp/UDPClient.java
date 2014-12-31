@@ -3,20 +3,16 @@ package com.stonybrook.replay.udp;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.stonybrook.replay.util.UtilsManager;
-
-import android.util.Log;
 import android.util.Pair;
+
+import com.stonybrook.replay.util.UtilsManager;
 
 public class UDPClient {
 	private String CSPair = null;

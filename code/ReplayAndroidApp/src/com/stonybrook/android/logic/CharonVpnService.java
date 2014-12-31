@@ -29,14 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.stonybrook.android.data.VpnProfile;
-import com.stonybrook.android.data.VpnProfileDataSource;
-import com.stonybrook.android.data.VpnType;
-import com.stonybrook.android.logic.VpnStateService.ErrorState;
-import com.stonybrook.android.logic.VpnStateService.State;
-import com.stonybrook.replay.ReplayActivity;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
@@ -56,6 +48,13 @@ import android.os.ParcelFileDescriptor;
 import android.security.KeyChain;
 import android.security.KeyChainException;
 import android.util.Log;
+
+import com.stonybrook.android.data.VpnProfile;
+import com.stonybrook.android.data.VpnProfileDataSource;
+import com.stonybrook.android.data.VpnType;
+import com.stonybrook.android.logic.VpnStateService.ErrorState;
+import com.stonybrook.android.logic.VpnStateService.State;
+import com.stonybrook.replay.ReplayActivity;
 
 @SuppressLint("NewApi")
 public class CharonVpnService extends VpnService implements Runnable {

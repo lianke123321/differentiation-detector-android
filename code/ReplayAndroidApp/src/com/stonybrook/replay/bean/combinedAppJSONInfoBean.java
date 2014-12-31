@@ -1,7 +1,6 @@
 package com.stonybrook.replay.bean;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class combinedAppJSONInfoBean {
 

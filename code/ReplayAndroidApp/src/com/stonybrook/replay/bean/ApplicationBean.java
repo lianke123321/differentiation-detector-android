@@ -1,7 +1,5 @@
 package com.stonybrook.replay.bean;
 
-import com.stonybrook.replay.bean.RequestSet;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 

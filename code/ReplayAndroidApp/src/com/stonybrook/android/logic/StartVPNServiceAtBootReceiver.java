@@ -5,14 +5,13 @@ package com.stonybrook.android.logic;
 
 
 
-import com.stonybrook.android.data.VpnProfileDataSource;
-import com.stonybrook.replay.ReplayActivity;
-
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
+
+import com.stonybrook.replay.ReplayActivity;
 
 
 /**
