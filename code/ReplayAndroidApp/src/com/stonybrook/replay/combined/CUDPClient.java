@@ -4,12 +4,13 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
+import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.util.UtilsManager;
 
 public class CUDPClient /* implements Runnable */{
 	public DatagramSocket socket = null;
-	public int port = 0;
 	public String publicIP = null;
+	public int port = 0;
 	public CUDPClient(String publicIP) {
 		super();
 		this.socket = null;
@@ -33,9 +34,10 @@ public class CUDPClient /* implements Runnable */{
 		}
 	}
 	
-	public void sendUDPPacket(Object payload, String destIP, int port) throws Exception {
+	public void sendUDPPacket(Object payload, ServerInstance instance) throws Exception {
 		byte[] buf = UtilsManager.serialize(payload);
-		DatagramPacket packet = new DatagramPacket(buf, buf.length, new InetSocketAddress(destIP, port));
+		DatagramPacket packet = new DatagramPacket(buf, buf.length,
+				new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));
 		this.socket.send(packet);
 	}
 

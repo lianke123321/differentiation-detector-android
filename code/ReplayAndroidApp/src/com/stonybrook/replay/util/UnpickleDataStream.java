@@ -88,7 +88,7 @@ public class UnpickleDataStream {
 	 * @return
 	 * @throws Exception
 	 */
-	/*public static UDPAppJSONInfoBean unpickleUDP(String filename,
+	public static UDPAppJSONInfoBean unpickleUDP(String filename,
 			Context context) throws Exception {
 		java.util.Queue<RequestSet> packets = new LinkedList<RequestSet>();
 		AssetManager assetManager;
@@ -125,7 +125,7 @@ public class UnpickleDataStream {
 			throw ex;
 		}
 		return appData;
-	}*/
+	}
 
 	/**
 	 * Unpickles received port mapping string from server
@@ -244,59 +244,6 @@ public class UnpickleDataStream {
 			}
 			
 			appData.setCsPairs(csStrArray);
-			Log.d("Name", (String) json.get(2));
-			appData.setReplayName((String) json.get(2));
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			Log.e("Error", ex.toString());
-			throw ex;
-		}
-		return appData;
-	}
-	
-	public static UDPAppJSONInfoBean unpickleUDPJSON(String filename,
-			Context context) throws Exception {
-		AssetManager assetManager;
-		InputStream inputStream;
-		UDPAppJSONInfoBean appData = new UDPAppJSONInfoBean();
-		ArrayList<RequestSet> Q = new ArrayList<RequestSet>();
-		try {
-			assetManager = context.getAssets();
-			inputStream = assetManager.open(filename);
-			int size = inputStream.available();
-			byte[] buffer = new byte[size];
-			inputStream.read(buffer);
-			inputStream.close();
-
-			String jsonStr = new String(buffer, "UTF-8");
-			
-			JSONArray json = new JSONArray(jsonStr);
-			
-			JSONArray qArray = (JSONArray) json.get(0);
-			RequestSet tempRS = null;
-			for (int i = 0; i < qArray.length(); i++) {
-				JSONObject dictionary = (JSONObject)qArray.get(i) ;
-				tempRS = new RequestSet();
-				tempRS.setc_s_pair((String) dictionary.get("c_s_pair"));
-				tempRS.setPayload(DecodeHex.decodeHex(((String)dictionary.get("payload")).toCharArray()));
-				tempRS.setTimestamp((Double) dictionary.get("timestamp"));
-				// Log.d("Time", (i+1) + " " +
-				// String.valueOf(tempRS.getTimestamp()));
-				// adrian: how to cast this to boolean? It seems like all end are false
-				//tempRS.setEnd((boolean) dictionary.get("end"));
-				tempRS.setEnd(false);
-				Q.add(tempRS);
-			}
-			appData.setQ(Q);
-			
-			JSONArray clientPorts = (JSONArray)json.get(1);
-			ArrayList<Integer> intClientPorts = new ArrayList<Integer>(); 
-			for (int i = 0; i < clientPorts.length(); i++) { 
-				intClientPorts.add(Integer.parseInt((String)clientPorts.get(i)));
-			}
-			
-			appData.setClientPorts(intClientPorts);
 			Log.d("Name", (String) json.get(2));
 			appData.setReplayName((String) json.get(2));
 

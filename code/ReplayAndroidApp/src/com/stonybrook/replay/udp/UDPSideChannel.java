@@ -1,11 +1,8 @@
 package com.stonybrook.replay.udp;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
@@ -17,14 +14,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.util.Log;
 import android.util.SparseArray;
 
 import com.stonybrook.replay.bean.RequestSet;
-import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
 
 public class UDPSideChannel {
@@ -33,10 +28,6 @@ public class UDPSideChannel {
 	public SocketChannel socketChannel = null;
 	public Selector selector = null;
 	public SelectionKey key = null;
-	// adrian: for sendObject
-	DataOutputStream dataOutputStream = null;
-	DataInputStream dataInputStream = null;
-	int objLen = 10;
 
 	public UDPSideChannel(SocketInstance instance, String id) {
 		this.id = id;
@@ -63,51 +54,21 @@ public class UDPSideChannel {
 
 	}
 
-	public void declareID(String replayName) throws Exception {
-		sendObject((id+";"+replayName).getBytes(), objLen);
+	public void declareID() throws Exception {
+		send(this.id.getBytes());
 
 	}
-	
-	private void sendObject(byte[] buf, int objLen) throws Exception {
-		dataOutputStream.writeBytes(String.format("%010d", buf.length));
-		dataOutputStream.write(buf);
-	}
-	
-	public byte[] ask4Permission() throws Exception {
-		return receiveObject(10);
-	}
-	
-	public byte[] receiveObject(int objLen) throws Exception{
-		byte[] recvObjSizeBytes = receiveKbytes(objLen);
-		Log.d("Obj", new String(recvObjSizeBytes));
-		int recvObjSize = (new BigInteger(new String(recvObjSizeBytes))).intValue();
-		Log.d("Obj", String.valueOf(recvObjSize));
-		return receiveKbytes(recvObjSize);
-	}
-	
-	public byte[] receiveKbytes(int k) throws Exception{
-    	int totalRead = 0;
-    	byte[] b = new byte[k];
-		while (totalRead < k) {
-			int bytesRead = dataInputStream.read(b);
-			if (bytesRead < 0) {
-				throw new IOException("Data stream ended prematurely");
-			}
-			totalRead += bytesRead;
-		}
-		return b;
-    }
 
-/*	private void send(byte[] buf) throws Exception {
+	private void send(byte[] buf) throws Exception {
 		ByteBuffer buffer = ByteBuffer.allocate(buf.length);
 		buffer.clear();
 		buffer.put(buf);
 		buffer.flip();
 		while (buffer.hasRemaining())
 			socketChannel.write(buffer);
-	}*/
+	}
 
-	/*public SparseArray<Integer> receivePortMappingNonBlock() throws Exception {
+	public SparseArray<Integer> receivePortMappingNonBlock() throws Exception {
 		SparseArray<Integer> ports = new SparseArray<Integer>();
 
 		ByteBuffer lenBuf = ByteBuffer.allocate(2);
@@ -148,38 +109,9 @@ public class UDPSideChannel {
 			keyIterator.remove();
 		}
 		return ports;
-	}*/
-	
-	public HashMap<String, HashMap<String, ServerInstance>> receivePortMappingNonBlock() throws Exception {
-		HashMap<String, HashMap<String, ServerInstance>> ports = new HashMap<String, HashMap<String, ServerInstance>>();
-		byte[] data = receiveObject(objLen);
-	
-		JSONObject jObject = new JSONObject(new String(data));
-		Iterator<String> keys = jObject.keys();
-		while (keys.hasNext()) {
-			HashMap<String, ServerInstance> tempHolder = new HashMap<String, ServerInstance>();
-			String key = keys.next();
-			JSONObject firstLevel = (JSONObject) jObject.get(key);
-			Iterator<String> firstLevelKeys = firstLevel.keys();
-			while(firstLevelKeys.hasNext()) {
-				String key1 = firstLevelKeys.next();
-				JSONArray pair = firstLevel.getJSONArray(key1);
-				tempHolder.put(key1, new ServerInstance(String.valueOf(pair.get(0)), String.valueOf(pair.get(1))));
-			}
-			ports.put(key, tempHolder);
-		}
-		return ports;
-	}
-	
-	public int receiveSenderCount() throws Exception {
-		byte[] data = receiveObject(objLen);
-		int senderCount = data[0];
-		
-		Log.d("senderCount", String.valueOf(senderCount));
-		
-		return senderCount;
 	}
 
+	
 	public int byteArrayToInt(byte[] b) {
 		return b[3] & 0xFF | (b[2] & 0xFF) << 8 | (b[1] & 0xFF) << 16
 				| (b[0] & 0xFF) << 24;

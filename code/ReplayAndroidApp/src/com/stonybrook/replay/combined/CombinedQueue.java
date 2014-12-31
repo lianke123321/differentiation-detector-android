@@ -1,7 +1,9 @@
 package com.stonybrook.replay.combined;
 
+import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import android.util.Log;
 
 import com.stonybrook.replay.bean.RequestSet;
+import com.stonybrook.replay.bean.ServerInstance;
 
 /**
  * This loads and de-serializes all necessary objects.
@@ -26,7 +29,7 @@ public class CombinedQueue {
 	long timeOrigin;
 	// @@@ comment this out, not used
 	//private Map<TCPClient, Lock> mLocks = new HashMap<TCPClient, Lock>();
-	private Map<TCPClient, Semaphore> mSema = new HashMap<TCPClient, Semaphore>();
+	private Map<CTCPClient, Semaphore> mSema = new HashMap<CTCPClient, Semaphore>();
 	private ArrayList<Thread> cThreadList = new ArrayList<Thread>();
 	public volatile boolean done = false;
 	public int threads = 0;
@@ -47,7 +50,11 @@ public class CombinedQueue {
 	 * @param timing
 	 * @throws Exception
 	 */
-	public void run(HashMap<String, TCPClient> cSPairMapping, HashMap<String, UDPClient> udpPortMapping, Boolean timing) throws Exception {
+	public void run(HashMap<String, CTCPClient> CSPairMapping,
+			HashMap<String, CUDPClient> udpPortMapping,
+			List<DatagramSocket> udpSocketList,
+			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping,
+			Boolean timing) throws Exception {
 		this.timeOrigin = System.currentTimeMillis();
 		try {
 			int i = 1;
@@ -56,16 +63,19 @@ public class CombinedQueue {
 			for (RequestSet RS : this.Q) {
 				
 				if (RS.getResponse_len() == -1)
-					nextUDP(RS, udpSocketList);
+					nextUDP(RS, udpPortMapping, udpSocketList, udpServerMapping, timing);
 				else { 
-					Semaphore sema = getSemaLock(cSPairMapping.get(RS.getc_s_pair()));
+					Semaphore sema = getSemaLock(CSPairMapping.get(RS.getc_s_pair()));
 					sema.acquire();
 	
-					//Log.d("Replay", "Sending " + (i++) + "/" + len + " at time " + (System.currentTimeMillis() - timeOrigin) + " expected " + RS.getTimestamp() + " with response " + RS.getResponse_len());
+					Log.d("Replay", "Sending " + (i++) + "/" + len +
+							" at time " + (System.currentTimeMillis() - timeOrigin) +
+							" expected " + RS.getTimestamp() + " with response " +
+							RS.getResponse_len());
 	
 					// adrian: every time when calling next we create and start a new thread
 					// adrian: here we start different thread according to the type of RS
-					nextTCP(cSPairMapping.get(RS.getc_s_pair()), RS, timing, sema);
+					nextTCP(CSPairMapping.get(RS.getc_s_pair()), RS, timing, sema);
 	
 					
 					synchronized (this) {
@@ -87,11 +97,11 @@ public class CombinedQueue {
 		}
 	}
 
-	private Semaphore getSemaLock(TCPClient tcpClient) {
-		Semaphore l = mSema.get(tcpClient);
+	private Semaphore getSemaLock(CTCPClient client) {
+		Semaphore l = mSema.get(client);
 		if (l == null) {
 			l = new Semaphore(1);
-			mSema.put(tcpClient, l);
+			mSema.put(client, l);
 		}
 		return l;
 	}
@@ -104,7 +114,8 @@ public class CombinedQueue {
 	 * @param sema
 	 * @throws Exception
 	 */
-	private void nextTCP(TCPClient client, RequestSet RS, Boolean timing, Semaphore sema) throws Exception {
+	private void nextTCP(CTCPClient client, RequestSet RS, Boolean timing,
+			Semaphore sema) throws Exception {
 
 		// @@@ if timing is set to be true, wait until expected Time to send this packet
 		if (timing) {
@@ -127,7 +138,10 @@ public class CombinedQueue {
 		cThreadList.add(cThread);
 	}
 	
-	private void nextUDP(RequestSet RS, udpSocketList, Boolean timing) throws Exception {
+	private void nextUDP(RequestSet RS, HashMap<String, CUDPClient> udpPortMapping,
+			List<DatagramSocket> udpSocketList,
+			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping, 
+			Boolean timing) throws Exception {
 		String c_s_pair = RS.getc_s_pair();
 		String clientPort = c_s_pair.substring(16, 21);
 		String destIP = c_s_pair.substring(c_s_pair.lastIndexOf('-') + 1,
@@ -135,11 +149,14 @@ public class CombinedQueue {
 		String destPort = c_s_pair.substring(c_s_pair.lastIndexOf('.') + 1,
 				c_s_pair.length());
 		
-		String destAddr = serverPortsMap.get("udp").get("destIP").get("destPort");
+		ServerInstance destAddr = udpServerMapping.get(destIP).get(destPort);
 		CUDPClient client = udpPortMapping.get(clientPort);
 		
-		if (client.socket == null)
+		if (client.socket == null) {
 			client.createSocket();
+			udpSocketList.add(client.socket);
+			
+		}
 		
 		if (timing) {
 			double expectedTime = timeOrigin + RS.getTimestamp() * 1000;
@@ -151,10 +168,10 @@ public class CombinedQueue {
 			}
 		}
 		
-		client.sendUDPPacket(RS.payload, destIP, destPort);
+		// TODO: send_jitter?
 		
-		
+		client.sendUDPPacket(RS.payload, destAddr);
 		
 	}
-
+	
 }

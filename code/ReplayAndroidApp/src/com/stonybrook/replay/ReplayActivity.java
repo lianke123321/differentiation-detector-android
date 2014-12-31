@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -16,6 +17,7 @@ import java.security.cert.X509Certificate;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -297,7 +299,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			throws Exception {
 
 		currentTask = "udp";
-		appData_udp = UnpickleDataStream.unpickleUDPJSON(
+		appData_udp = UnpickleDataStream.unpickleUDP(
 				applicationBean.getDataFile(), context);
 		queueUDP = new QueueUDPAsync(this, "open");
 		queueUDP.execute("");
@@ -525,14 +527,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 */
 	class QueueUDPAsync extends AsyncTask<String, String, String> {
 
-//		HashMap<String, ClientThread> CSPairMapping = null;
+		HashMap<String, ClientThread> CSPairMapping = null;
 		UDPAppJSONInfoBean appData = null;
 		long timeStarted = 0;
-		// This is Lister which will be called when this method finishes. More
-		// information about this is provided in ReplayCompleteListener file.
+		//This is Lister which will be called when this method finishes. More information about this is provided in ReplayCompleteListener file.
 		private ReplayCompleteListener listener;
 		boolean success = true;
-		// This simply identifies whether we are in open or VPN
+		//This simply identifies whether we are in open or VPN
 		public String channel = null;
 
 		public QueueUDPAsync(ReplayCompleteListener listener, String channel) {
@@ -542,10 +543,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected void onPostExecute(String result) {
-			Log.d("Replay", "Replay lasted for "
-					+ (System.currentTimeMillis() - this.timeStarted));
-
-			// Callback according to type of Replay with status of Replay
+			Log.d("Replay", "Replay lasted for " + (System.currentTimeMillis() - this.timeStarted));
+			
+			//Callback according to type of Replay with status of Replay
 			if (channel.equalsIgnoreCase("open"))
 				listener.openFinishCompleteCallback(success);
 			else
@@ -563,71 +563,53 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			this.timeStarted = System.currentTimeMillis();
 			SparseArray<Integer> NATMap = new SparseArray<Integer>();
 			SparseArray<ClientThread> PortMap = new SparseArray<ClientThread>();
-			// adrian: for some reason rajesh used ClientThread instead of UDPClient, which might create some confusion
-			HashMap<String, ClientThread> CSPairMapping = new HashMap<String, ClientThread>();
+			this.CSPairMapping = new HashMap<String, ClientThread>();
 			ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
 
 			try {
-				/**
-				 * used to wait 5 secs here, now checkVPN is called in 
-				 * openFinishCompleteCallBack instead of here. So don't
-				 * need to do anything here
-				 * 
-				 * @author Adrian
-				 * 
+				/*
+				 * Here we are checking if we are on VPN channel. If we are on VPN, wait for 5 sec for VPN to connect.
+				 * TODO: This is very bad. Remove this and try finding out some other way whether VPN is connected. One way can be to get IP that's visible outside.
+				 * If it's of Meddle server then we are connected to VPN. Implemented this in VPNConnected AsyncTask but never got chance to integrate it. 
 				 */
-				int sideChannelPort = Integer.valueOf(Config
-						.get("udp_sidechannel_port"));
+				if (this.channel.equalsIgnoreCase("vpn"))
+					Thread.sleep(5000);
+				Log.d("VPNUDP", this.channel);
+				int sideChannelPort = Integer.valueOf(Config.get("udp_sidechannel_port"));
 				String randomID = null;
-				SocketInstance socketInstance = new SocketInstance(
-						Config.get("server"), sideChannelPort, null);
-				Log.d("Server", Config.get("server"));
-				
+				SocketInstance socketInstance = new SocketInstance(Config.get("server"), sideChannelPort, null);
 				UDPSideChannel sideChannel = null;
 
-				HashMap<String, HashMap<String, ServerInstance>> serverPortsMap = null;
+				SparseArray<Integer> serverPortsMap = null;
 				
-				// adrian: add senderCounts
-				int senderCount = 0;
-				
-				sideChannel.ask4Permission();
-
 				/**
-				 * Ask for port mapping from server. For some reason, port map
-				 * info parsing was throwing error. so, I put while loop to do
-				 * this untill port mapping is parsed successfully.
-				 * Adrian: add receiving senderCounts part
+				 * Ask for port mapping from server. For some reason, port map info parsing was throwing error. so, I put while loop to do this untill
+				 * port mapping is parsed successfully.
 				 */
-
+				
 				boolean s = false;
 				while (!s) {
 					try {
 						randomID = new RandomString(10).nextString();
-						sideChannel = new UDPSideChannel(socketInstance,
-								randomID);
-						sideChannel.declareID(appData.getReplayName());
-						serverPortsMap = sideChannel
-								.receivePortMappingNonBlock();
-						senderCount = sideChannel.receiveSenderCount();
+						sideChannel = new UDPSideChannel(socketInstance, randomID);
+						sideChannel.declareID();
+						serverPortsMap = sideChannel.receivePortMappingNonBlock();
 						s = true;
 					} catch (JSONException ex) {
 						ex.printStackTrace();
 					}
 				}
-
+				
 				/**
 				 * Create clients from CSPairs
 				 */
 
 				for (String key : appData.getCsPairs().keySet()) {
-					int destPort = Integer.valueOf(key.substring(
-							key.lastIndexOf('.') + 1, key.length()));
+					int destPort = Integer.valueOf(key.substring(key.lastIndexOf('.') + 1, key.length()));
 					if (serverPortsMap.size() != 0)
 						destPort = serverPortsMap.get(destPort);
-					UDPClient c = new UDPClient(key, Config.get("server"),
-							destPort);
-					Pair<Integer, Integer> NATMapping = c.identify(sideChannel,
-							randomID, appData.getReplayName());
+					UDPClient c = new UDPClient(key, Config.get("server"), destPort);
+					Pair<Integer, Integer> NATMapping = c.identify(sideChannel, randomID, appData.getReplayName());
 					NATMap.put(NATMapping.first, NATMapping.second);
 
 					ClientThread client = new ClientThread(c);
@@ -639,8 +621,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					clients.add(client);
 				}
 
-				UDPQueue queue = new UDPQueue(appData.getQ(), CSPairMapping,
-						Boolean.valueOf(Config.get("timing")));
+
+				UDPQueue queue = new UDPQueue(appData.getQ(), CSPairMapping, Boolean.valueOf(Config.get("timing")));
 				Thread queueThread = new Thread(queue);
 
 				queueThread.start();
@@ -919,17 +901,22 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					CSPairMapping.put(csp, c);
 				}
 				
-				// adrian: create clients from udpClientPorts
+				/**
+				 * adrian: create clients from udpClientPorts
+				 */
+				List<DatagramSocket> udpSocketList = null;
 				for (String originalClientPort : appData.getUdpClientPorts()) {
 					//ServerInstance instance = serverPortsMap.get("udp").get(destIP).get(
 //							destPort);
-					int destPort = Integer.valueOf(originalClientPort);
+//					int destPort = Integer.valueOf(originalClientPort);
 					CUDPClient c = new CUDPClient(getPublicIP());
 					udpPortMapping.put(originalClientPort, c);
 				}
 
-				Log.d("Replay", "Size of CSPairMapping is " + String.valueOf(CSPairMapping.size()));
-				Log.d("Replay", "Size of udpPortMapping is " + String.valueOf(udpPortMapping.size()));
+				Log.d("Replay", "Size of CSPairMapping is " +
+						String.valueOf(CSPairMapping.size()));
+				Log.d("Replay", "Size of udpPortMapping is " +
+						String.valueOf(udpPortMapping.size()));
 				
 				// TODO: start tcpdump?
 				
@@ -939,7 +926,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// Running the Queue (Sender)
 				CombinedQueue queue = new CombinedQueue(appData.getQ());
-				queue.run(CSPairMapping, udpPortMapping, serverPortsMap.get("udp"), Boolean.valueOf(Config.get("timing")));
+				queue.run(CSPairMapping, udpPortMapping, udpSocketList,
+						serverPortsMap.get("udp"),
+						Boolean.valueOf(Config.get("timing")));
 
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
