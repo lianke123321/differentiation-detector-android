@@ -64,11 +64,11 @@ public class CombinedSideChannel {
 		byte[] result = receiveObject(objLen);
 	}
 	
-	public HashMap<String, HashMap<String, ServerInstance>> receivePortMappingNonBlock() throws Exception {
-		HashMap<String, HashMap<String, ServerInstance>> ports = new HashMap<String, HashMap<String, ServerInstance>>();
+	public HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> receivePortMappingNonBlock() throws Exception {
+		HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> ports = new HashMap<String, HashMap<String, HashMap<String, ServerInstance>>>();
 		byte[] data = receiveObject(objLen);
 	
-		JSONObject jObject = new JSONObject(new String(data));
+		/*JSONObject jObject = new JSONObject(new String(data));
 		Iterator<String> keys = jObject.keys();
 		while (keys.hasNext()) {
 			HashMap<String, ServerInstance> tempHolder = new HashMap<String, ServerInstance>();
@@ -81,8 +81,32 @@ public class CombinedSideChannel {
 				tempHolder.put(key1, new ServerInstance(String.valueOf(pair.get(0)), String.valueOf(pair.get(1))));
 			}
 			ports.put(key, tempHolder);
+		}*/
+		
+		JSONObject jObject = new JSONObject(new String(data));
+		Iterator<String> keys = jObject.keys();
+		while(keys.hasNext()) {
+			HashMap<String, HashMap<String, ServerInstance>> tempHolder = new HashMap<String, HashMap<String, ServerInstance>>();
+			String key = keys.next();
+			JSONObject firstLevel = (JSONObject) jObject.get(key);
+			Iterator<String> firstLevelKeys = firstLevel.keys();
+			while(firstLevelKeys.hasNext()) {
+				HashMap<String, ServerInstance> tempHolder1 = new HashMap<String, ServerInstance>();
+				String key1 = firstLevelKeys.next();
+				JSONObject secondLevel = (JSONObject) firstLevel.get(key1);
+				Iterator<String> secondLevelKeys = secondLevel.keys();
+				while(secondLevelKeys.hasNext()) {
+					String key2 = secondLevelKeys.next();
+					JSONArray pair = secondLevel.getJSONArray(key2);
+					tempHolder1.put(key2, new ServerInstance(String.valueOf(pair.get(0)), String.valueOf(pair.get(1))));
+				}
+				tempHolder.put(key1, tempHolder1);
+			}
+			ports.put(key, tempHolder);
 		}
+		
 		return ports;
+		
 	}
 	
 	public int receiveSenderCount() throws Exception {

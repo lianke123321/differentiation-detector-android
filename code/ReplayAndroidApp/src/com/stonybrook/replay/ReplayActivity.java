@@ -128,7 +128,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	TCPAppJSONInfoBean appData_tcp = null;
 	UDPAppJSONInfoBean appData_udp = null;
 	// adrian: For combined app
-	combinedAppJSONInfoBean appData = null;
+	combinedAppJSONInfoBean appData_combined = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -310,7 +310,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			throws Exception {
 
 		currentTask = "combined";
-		appData = UnpickleDataStream.unpickleCombinedJSON(
+		appData_combined = UnpickleDataStream.unpickleCombinedJSON(
 				applicationBean.getDataFile(), context);
 		Log.d("Parsing", applicationBean.getDataFile());
 		queueCombined = new QueueCombinedAsync(this, "open");
@@ -822,7 +822,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected String doInBackground(String... str) {
-			this.appData = appData;
+			this.appData = appData_combined;
 			this.timeStarted = System.currentTimeMillis();
 			HashMap<String, TCPClient> CSPairMapping = new HashMap<String, TCPClient>();
 			// adrian: create a hash map for udp
@@ -846,7 +846,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				CombinedSideChannel sideChannel = new CombinedSideChannel(socketInstance,
 						randomID);
-				HashMap<String, HashMap<String, ServerInstance>> serverPortsMap = null;
+				HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> serverPortsMap = null;
 				// adrian: add senderCounts
 				int senderCount = 0;
 
@@ -887,7 +887,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							key.lastIndexOf("."));
 					String destPort = key.substring(key.lastIndexOf('.') + 1,
 							key.length());
-					ServerInstance instance = serverPortsMap.get(destIP).get(
+					ServerInstance instance = serverPortsMap.get("tcp").get(destIP).get(
 							destPort);
 					if (instance.server.trim().equals(""))
 						instance.server = server; // serverPortsMap.get(destPort);
@@ -899,9 +899,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				
 				// adrian: create clients from udpClientPorts
 				for (String key : appData.getUdpClientPorts()) {
+					//ServerInstance instance = serverPortsMap.get("udp").get(destIP).get(
+//							destPort);
 					int destPort = Integer.valueOf(key);
-					UDPClient c = new UDPClient(key, Config.get("server"),
-							destPort);
+					TUDPClient c = new TUDPClient();
 					udpPortMapping.put(key, c);
 				}
 
