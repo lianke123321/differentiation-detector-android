@@ -22,11 +22,11 @@
     {
         "name" : "Skype",
         "configfile" : "",
-        "datafile" : "skype.pcap_client_pickle",
+        "datafile" : "skype_video_30secs.pcap_client_json_all",
         "size" : 8,
         "time" : "1 m",
         "image" : "skype",
-        "type" : "udp"
+        "type" : "combined"
      }
     ,
     {

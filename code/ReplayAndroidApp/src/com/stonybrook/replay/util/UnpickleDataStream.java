@@ -288,10 +288,10 @@ public class UnpickleDataStream {
 				else
 					tempRS.setResponse_len(-1);
 				if (dictionary.has("response_hash"))
-					tempRS.setResponse_hash((String) dictionary.get("response_hash"));
+					tempRS.setResponse_hash(dictionary.get("response_hash").toString());
 				// adrian: for udp
 				if (dictionary.has("end"))
-					tempRS.setEnd(Boolean.parseBoolean((String) dictionary.get("end")));
+					tempRS.setEnd((Boolean) dictionary.get("end"));
 				
 				Q.add(tempRS);
 			}

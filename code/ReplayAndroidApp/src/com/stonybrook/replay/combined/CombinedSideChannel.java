@@ -10,6 +10,7 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Queue;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,6 +27,8 @@ public class CombinedSideChannel {
 	DataOutputStream dataOutputStream = null;
 	DataInputStream dataInputStream = null;
 	int objLen = 10;
+	Queue<String> closeQ = null;
+	
 	public CombinedSideChannel(SocketInstance instance, String id) {
 		this.id = id;
 		try {
@@ -131,6 +134,21 @@ public class CombinedSideChannel {
 		String tempPermission = new String(data, "hex");
 		String[] permission = tempPermission.split(";");
 		return permission;
+	}
+	
+	public void notifier(int senderCount) throws Exception{
+		while (senderCount > 0) {
+			byte[] data = receiveObject(objLen);
+			String tempNotf = new String(data, "hex");
+			String[] Notf = tempNotf.split(";");
+			if (Notf[0].equalsIgnoreCase("DONE")) {
+				senderCount -= 1;
+				this.closeQ.add(Notf[1]);
+			} else {
+				Log.d("Notifier", "received unknown message!");
+				break;
+			}
+		}
 	}
 	
 	int fromByteArray(byte[] bytes) {

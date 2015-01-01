@@ -920,7 +920,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				
 				// TODO: running side channel notifier
 				
+				
 				// TODO: running Receiver?
+				
 
 				// Running the Queue (Sender)
 				CombinedQueue queue = new CombinedQueue(appData.getQ());
@@ -1072,7 +1074,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			try {
-				if (currentTask.equalsIgnoreCase("tcp") && queueTCP != null
+				if (currentTask.equalsIgnoreCase("combined") && queueCombined != null
+						&& queueCombined.getStatus() == AsyncTask.Status.RUNNING)
+					queueCombined.cancel(true);
+				else if (currentTask.equalsIgnoreCase("tcp") && queueTCP != null
 						&& queueTCP.getStatus() == AsyncTask.Status.RUNNING)
 					queueTCP.cancel(true);
 				else if (currentTask.equalsIgnoreCase("udp")
