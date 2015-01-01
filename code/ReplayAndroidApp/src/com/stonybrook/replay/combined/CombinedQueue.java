@@ -19,8 +19,9 @@ import com.stonybrook.replay.bean.ServerInstance;
 /**
  * This loads and de-serializes all necessary objects.
  * Complicated. I'll have to think what I did here. May be comments in python client can be helpful.
- * TODO: Find a way to get exceptions from child threads. Difficult than it looks. Tried using Callable Thread but it did not work out.
- * Callbacks can be used. When child thread gets Exception, it can callback to parent which can stop executing other threads and return Error to AsyncTask. 
+ * TODO: Find a way to get exceptions from child threads. Difficult than it looks. Tried using
+ * Callable Thread but it did not work out. Callbacks can be used. When child thread gets Exception,
+ * it can callback to parent which can stop executing other threads and return Error to AsyncTask. 
 */
 public class CombinedQueue {
 
@@ -147,13 +148,15 @@ public class CombinedQueue {
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping, 
 			Boolean timing) throws Exception {
 		String c_s_pair = RS.getc_s_pair();
-		String clientPort = c_s_pair.substring(16, 21);
-		String destIP = c_s_pair.substring(c_s_pair.lastIndexOf('-') + 1,
+		String clientPort = c_s_pair.substring(16, 21).replaceFirst("^0+(?!$)", "");
+		String dstIP = c_s_pair.substring(22, 37);
+		String dstPort = c_s_pair.substring(38, 43).replaceFirst("^0+(?!$)", "");
+		/*String destIP = c_s_pair.substring(c_s_pair.lastIndexOf('-') + 1,
 				c_s_pair.lastIndexOf("."));
 		String destPort = c_s_pair.substring(c_s_pair.lastIndexOf('.') + 1,
-				c_s_pair.length());
-		
-		ServerInstance destAddr = udpServerMapping.get(destIP).get(destPort);
+				c_s_pair.length());*/
+		//Log.d("nextUDP", "dstIP: " + dstIP + " dstPort: " + dstPort);
+		ServerInstance destAddr = udpServerMapping.get(dstIP).get(dstPort);
 		CUDPClient client = udpPortMapping.get(clientPort);
 		
 		if (client.socket == null) {

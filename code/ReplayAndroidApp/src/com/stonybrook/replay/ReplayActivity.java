@@ -919,9 +919,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Log.d("Replay", "Size of udpPortMapping is " +
 						String.valueOf(udpPortMapping.size()));
 				
-				// TODO: start tcpdump?
-				
-				
 				// TODO: change this to thread instead of plain method
 				//sideChannel.notifier(senderCount);
 				
@@ -1020,6 +1017,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				onVpnProfileSelected(null);
 				Log.d("Replay", "VPN started");
+				
+				// Change screen status
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.vpn);
+				adapter.notifyDataSetChanged();
 
 				(new VPNConnected()).execute(this);
 
@@ -1318,11 +1320,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						Log.d("VPN", "Got it!");
 						// Set flag indicating VPN connectivity status
 						isVPNConnected = true;
-
-						// Change screen status
-						selectedApps.get(currentReplayCount).status = getResources()
-								.getString(R.string.vpn);
-						// adapter.notifyDataSetChanged();
 
 						// Start the replay again for same app
 						// adrian: start the combined thread
