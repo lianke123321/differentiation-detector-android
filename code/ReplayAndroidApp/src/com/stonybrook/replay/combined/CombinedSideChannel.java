@@ -29,15 +29,18 @@ public class CombinedSideChannel {
 	int objLen = 10;
 	Queue<String> closeQ = null;
 	
+	//SocketInstance instance;
+	
 	public CombinedSideChannel(SocketInstance instance, String id) {
 		this.id = id;
+		//this.instance = instance;
 		try {
 			
 			socket = new Socket();
 			InetSocketAddress endPoint = new InetSocketAddress(instance.getIP(), instance.getPort());
 			socket.setTcpNoDelay(true);
 			socket.setReuseAddress(true);
-			socket.setKeepAlive(false);
+			socket.setKeepAlive(true);
 
 			socket.connect(endPoint);
 			dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -126,9 +129,9 @@ public class CombinedSideChannel {
 	
 	public byte[] receiveObject(int objLen) throws Exception{
 		byte[] recvObjSizeBytes = receiveKbytes(objLen);
-		Log.d("Obj", new String(recvObjSizeBytes));
+		//Log.d("Obj", new String(recvObjSizeBytes));
 		int recvObjSize = (new BigInteger(new String(recvObjSizeBytes))).intValue();
-		Log.d("Obj", String.valueOf(recvObjSize));
+		//Log.d("Obj", String.valueOf(recvObjSize));
 		return receiveKbytes(recvObjSize);
 	}
 	
@@ -145,19 +148,10 @@ public class CombinedSideChannel {
 		sendObject(noIperf.getBytes(), objLen);
 	}
 	
-	public void notifier(int senderCount) throws Exception{
-		while (senderCount > 0) {
-			byte[] data = receiveObject(objLen);
-			String tempNotf = new String(data);
-			String[] Notf = tempNotf.split(";");
-			if (Notf[0].equalsIgnoreCase("DONE")) {
-				senderCount -= 1;
-				this.closeQ.add(Notf[1]);
-			} else {
-				Log.d("Notifier", "received unknown message!");
-				break;
-			}
-		}
+	public void notifierUpCall(int senderCount) throws Exception{
+		CombinedNotifierThread notifier = new CombinedNotifierThread(senderCount, socket);
+		Thread notfThread = new Thread(notifier);
+		notfThread.start();
 	}
 	
 	int fromByteArray(byte[] bytes) {
@@ -187,5 +181,5 @@ public class CombinedSideChannel {
 			totalRead += bytesRead;
 		}
 		return b;
-    }    		
+    }
 }

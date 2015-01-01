@@ -919,8 +919,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Log.d("Replay", "Size of udpPortMapping is " +
 						String.valueOf(udpPortMapping.size()));
 				
-				// TODO: change this to thread instead of plain method
-				//sideChannel.notifier(senderCount);
+				// start notifier thread
+				sideChannel.notifierUpCall(senderCount);
 				
 				// TODO: running Receiver?
 				
