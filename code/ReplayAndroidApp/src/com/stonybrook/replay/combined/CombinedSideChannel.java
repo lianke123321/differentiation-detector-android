@@ -63,11 +63,11 @@ public class CombinedSideChannel {
 		dataOutputStream.write(buf);
 	}
 	
-	private void getResult() throws Exception
+	/*private void getResult() throws Exception
 	{
 		sendObject("GiveMeResults".getBytes(), objLen);
 		byte[] result = receiveObject(objLen);
-	}
+	}*/
 	
 	public HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> receivePortMappingNonBlock() throws Exception {
 		HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> ports = new HashMap<String, HashMap<String, HashMap<String, ServerInstance>>>();

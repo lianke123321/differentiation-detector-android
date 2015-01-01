@@ -62,13 +62,17 @@ public class CombinedQueue {
 			// @@@ start all the treads here
 			for (RequestSet RS : this.Q) {
 				
-				if (RS.getResponse_len() == -1)
+				if (RS.getResponse_len() == -1) {
 					nextUDP(RS, udpPortMapping, udpSocketList, udpServerMapping, timing);
+					Log.d("Replay", "Sending udp packet " + (i++) + "/" + len +
+							" at time " + (System.currentTimeMillis() - timeOrigin) +
+							" expected " + RS.getTimestamp());
+				}
 				else { 
 					Semaphore sema = getSemaLock(CSPairMapping.get(RS.getc_s_pair()));
 					sema.acquire();
 	
-					Log.d("Replay", "Sending " + (i++) + "/" + len +
+					Log.d("Replay", "Sending tcp packet " + (i++) + "/" + len +
 							" at time " + (System.currentTimeMillis() - timeOrigin) +
 							" expected " + RS.getTimestamp() + " with response " +
 							RS.getResponse_len());

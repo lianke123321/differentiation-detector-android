@@ -407,18 +407,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 * @author rajesh
 	 * 
 	 */
-	private class FileDownload extends AsyncTask<Void, Void, Void> {
+	/*private class FileDownload extends AsyncTask<Void, Void, Void> {
 
 		String serverName = null;
 		int portNo;
 		String appName;
 		ReplayCompleteListener listener;
 
-		/**
+		*//**
 		 * @param serverName
 		 * @param portNo
 		 * @param appName
-		 */
+		 *//*
 		public FileDownload(ReplayCompleteListener listener, String serverName,
 				int portNo, String appName) {
 			this.serverName = serverName;
@@ -434,11 +434,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			this.listener.fileExistsListener(success);
 		}
 
-		/**
+		*//**
 		 * Actual work will be done here. Check if file exists. If it does then
 		 * return otherwise Create socket and download file from server and save
 		 * it to internal storage.
-		 */
+		 *//*
 		@Override
 		protected Void doInBackground(Void... params) {
 			try {
@@ -512,7 +512,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			return null;
 		}
 	}
-
+*/
 	/**
 	 * This asyncTask processes the UDP Replay. TODO: Python client for UDP was
 	 * changed heavily in last couple of weeks of Semester. This code does not
@@ -842,18 +842,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				
 				if (permission[0] == "0") {
 					if (permission[1] == "1") {
-						Log.d("Error",
-								"Unknown replay_name!!!");
+						Log.d("Error", "Unknown replay_name!!!");
 						return null;
 					} else if (permission[1] == "2") {
 						Log.d("Error",
 								"No permission: another client with same IP address is running. Wait for them to finish!");
 						return null;
 					} else {
-						Log.d("Error",
-								"Unknown error!!!");
+						Log.d("Error", "Unknown error!!!");
 						return null;
 					}
+				} else {
+					Log.d("Replay", "Permission granted.");
 				}
 				
 				// TODO: how to implement sendIperf()?
@@ -918,8 +918,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// TODO: start tcpdump?
 				
 				
-				// TODO: running side channel notifier
-				
+				// TODO: change this to thread instead of plain method
+				sideChannel.notifier(senderCount);
 				
 				// TODO: running Receiver?
 				
