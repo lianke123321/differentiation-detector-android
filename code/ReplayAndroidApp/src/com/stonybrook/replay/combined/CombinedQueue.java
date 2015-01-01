@@ -52,7 +52,7 @@ public class CombinedQueue {
 	 */
 	public void run(HashMap<String, CTCPClient> CSPairMapping,
 			HashMap<String, CUDPClient> udpPortMapping,
-			List<DatagramSocket> udpSocketList,
+			ArrayList<DatagramSocket> udpSocketList,
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping,
 			Boolean timing) throws Exception {
 		this.timeOrigin = System.currentTimeMillis();
@@ -143,7 +143,7 @@ public class CombinedQueue {
 	}
 	
 	private void nextUDP(RequestSet RS, HashMap<String, CUDPClient> udpPortMapping,
-			List<DatagramSocket> udpSocketList,
+			ArrayList<DatagramSocket> udpSocketList,
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping, 
 			Boolean timing) throws Exception {
 		String c_s_pair = RS.getc_s_pair();

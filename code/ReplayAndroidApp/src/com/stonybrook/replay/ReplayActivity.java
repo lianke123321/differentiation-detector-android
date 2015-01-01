@@ -856,7 +856,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					Log.d("Replay", "Permission granted.");
 				}
 				
-				// TODO: how to implement sendIperf()?
+				// always send noIperf here
+				sideChannel.sendIperf();
 
 				/**
 				 * Ask for port mapping from server. For some reason, port map
@@ -872,6 +873,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								.receivePortMappingNonBlock();
 						senderCount = sideChannel.receiveSenderCount();
 						s = true;
+						Log.d("Replay", "Successfully received serverPortsMap and senderCount!");
 					} catch (JSONException ex) {
 						Log.d("Replay", "failed to receive serverPortsMap and senderCount!");
 						ex.printStackTrace();
@@ -897,11 +899,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							appData.getReplayName());
 					CSPairMapping.put(csp, c);
 				}
+				Log.d("Replay", "created clients from CSPairs");
 				
 				/**
 				 * adrian: create clients from udpClientPorts
 				 */
-				List<DatagramSocket> udpSocketList = null;
+				ArrayList<DatagramSocket> udpSocketList = new ArrayList<DatagramSocket>();
 				for (String originalClientPort : appData.getUdpClientPorts()) {
 					//ServerInstance instance = serverPortsMap.get("udp").get(destIP).get(
 //							destPort);
@@ -909,6 +912,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					CUDPClient c = new CUDPClient(getPublicIP());
 					udpPortMapping.put(originalClientPort, c);
 				}
+				Log.d("Replay", "created clients from udpClientPorts");
 
 				Log.d("Replay", "Size of CSPairMapping is " +
 						String.valueOf(CSPairMapping.size()));
@@ -919,7 +923,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				
 				
 				// TODO: change this to thread instead of plain method
-				sideChannel.notifier(senderCount);
+				//sideChannel.notifier(senderCount);
 				
 				// TODO: running Receiver?
 				

@@ -4,6 +4,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
+import android.util.Log;
+
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.util.UtilsManager;
 
@@ -34,11 +36,13 @@ public class CUDPClient /* implements Runnable */{
 		}
 	}
 	
-	public void sendUDPPacket(Object payload, ServerInstance instance) throws Exception {
+	public void sendUDPPacket(byte[] payload, ServerInstance instance) throws Exception {
 		byte[] buf = UtilsManager.serialize(payload);
 		DatagramPacket packet = new DatagramPacket(buf, buf.length,
 				new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));
 		this.socket.send(packet);
+		Log.d("sendUDPPacket", "packet w/ payload length " + buf.length +
+				" sent to server " + instance.server);
 	}
 
 }

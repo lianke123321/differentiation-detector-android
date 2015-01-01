@@ -69,34 +69,7 @@ public class MainActivity extends Activity {
 		 * StrictMode.setThreadPolicy(policy);
 		 */
 
-		try {
-			// @@@ check if user agreed
-			/*if(!userAgreed){
-				new AlertDialog.Builder(this)
-			    .setTitle("Consent Form")
-			    .setView(LayoutInflater.from(this).inflate(R.layout.consent_form_scroll_layout, null))
-			    .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-			        public void onClick(DialogInterface dialog, int which) { 
-			        	Editor editor = settings.edit();
-						editor.putBoolean("userAgreed", true);
-						editor.commit();
-			        }
-			     })
-			     .setNegativeButton("Not Accept", new DialogInterface.OnClickListener() {
-			        public void onClick(DialogInterface dialog, int which) { 
-			        	Editor editor = settings.edit();
-						editor.putBoolean("userAgreed", false);
-						editor.commit();
-						MainActivity.this.finish();
-			        }
-			     })
-			    .show();
-				
-				//Create Intent for ReplayActivity and make data of selected apps by user available to ReplayActivity
-				Intent intent = new Intent(MainActivity.this, ConsentFormActivity.class);
-				startActivity(intent);
-			}*/
-			
+		try {			
 			/*
 			 * First check to see of Internet access is available
 			 * TODO : Identify if connection is WiFi or Cellular

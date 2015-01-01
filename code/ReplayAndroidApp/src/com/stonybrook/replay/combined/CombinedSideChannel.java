@@ -87,8 +87,9 @@ public class CombinedSideChannel {
 			}
 			ports.put(key, tempHolder);
 		}*/
-		
-		JSONObject jObject = new JSONObject(new String(data));
+		String tempStr = new String(data);
+		Log.d("receivePortMapping", "length: " + tempStr.length());
+		JSONObject jObject = new JSONObject(tempStr);
 		Iterator<String> keys = jObject.keys();
 		while(keys.hasNext()) {
 			HashMap<String, HashMap<String, ServerInstance>> tempHolder = new HashMap<String, HashMap<String, ServerInstance>>();
@@ -116,8 +117,10 @@ public class CombinedSideChannel {
 	
 	public int receiveSenderCount() throws Exception {
 		byte[] data = receiveObject(objLen);
-		ByteBuffer wrapped = ByteBuffer.wrap(data);
-		return wrapped.getInt();
+		String tempStr = new String(data);
+		//ByteBuffer wrapped = ByteBuffer.wrap(data);
+		Log.d("receiveSenderCount", "senderCount: " + Integer.valueOf(tempStr));
+		return Integer.valueOf(tempStr);
 		
 	}
 	
@@ -131,15 +134,21 @@ public class CombinedSideChannel {
 	
 	public String[] ask4Permission() throws Exception {
 		byte[] data = receiveObject(objLen);
-		String tempPermission = new String(data, "hex");
+		String tempPermission = new String(data);
 		String[] permission = tempPermission.split(";");
 		return permission;
+	}
+	
+	public void sendIperf() throws Exception{
+		Log.d("sendIperf", "always no iperf!");
+		String noIperf = "NoIperf";
+		sendObject(noIperf.getBytes(), objLen);
 	}
 	
 	public void notifier(int senderCount) throws Exception{
 		while (senderCount > 0) {
 			byte[] data = receiveObject(objLen);
-			String tempNotf = new String(data, "hex");
+			String tempNotf = new String(data);
 			String[] Notf = tempNotf.split(";");
 			if (Notf[0].equalsIgnoreCase("DONE")) {
 				senderCount -= 1;
@@ -155,14 +164,26 @@ public class CombinedSideChannel {
 	     return ByteBuffer.wrap(bytes).getInt();
 	}
 	
+	/**
+	 * Rajesh's original code has bug, if message is more than 4096, this
+	 * method will return disordered byte
+	 * 
+	 * Fixed by adrian
+	 * 
+	 * @param k
+	 * @return
+	 * @throws Exception
+	 */
     public byte[] receiveKbytes(int k) throws Exception{
     	int totalRead = 0;
     	byte[] b = new byte[k];
 		while (totalRead < k) {
-			int bytesRead = dataInputStream.read(b);
+			int bytesRead = dataInputStream.read(b, totalRead, Math.min(k - totalRead, bufSize));
 			if (bytesRead < 0) {
 				throw new IOException("Data stream ended prematurely");
 			}
+			/*if (k - totalRead < bytesRead)
+				bytesRead = k - totalRead;*/
 			totalRead += bytesRead;
 		}
 		return b;
