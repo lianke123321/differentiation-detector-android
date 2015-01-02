@@ -19,6 +19,7 @@ import android.util.Log;
 
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
+import com.stonybrook.replay.bean.UDPReplayInfoBean;
 
 public class CombinedSideChannel {
 	private String id = null;
@@ -148,8 +149,8 @@ public class CombinedSideChannel {
 		sendObject(noIperf.getBytes(), objLen);
 	}
 	
-	public void notifierUpCall(int senderCount) throws Exception{
-		CombinedNotifierThread notifier = new CombinedNotifierThread(senderCount, socket);
+	public void notifierUpCall(UDPReplayInfoBean udpReplayInfoBean) throws Exception{
+		CombinedNotifierThread notifier = new CombinedNotifierThread(udpReplayInfoBean, socket);
 		Thread notfThread = new Thread(notifier);
 		notfThread.start();
 	}

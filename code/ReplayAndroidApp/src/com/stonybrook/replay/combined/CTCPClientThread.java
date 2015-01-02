@@ -18,7 +18,8 @@ public class CTCPClientThread implements Runnable {
 	private Semaphore sema = null;
 	long timeOrigin = 0;
 
-	public CTCPClientThread(CTCPClient client, RequestSet RS, CombinedQueue queue, Semaphore sema, long timeOrigin) {
+	public CTCPClientThread(CTCPClient client, RequestSet RS, CombinedQueue queue,
+			Semaphore sema, long timeOrigin) {
 		this.client = client;
 		this.RS = RS;
 		this.queue = queue;
@@ -46,7 +47,8 @@ public class CTCPClientThread implements Runnable {
 			dataOutputStream = new DataOutputStream(client.socket.getOutputStream());
 			dataInputStream = new DataInputStream(client.socket.getInputStream());
 
-			Log.d("Sending", "Sending payload for pair " + RS.getc_s_pair() + " " + RS.getResponse_len());
+			Log.d("Sending", "Sending payload for pair " + RS.getc_s_pair() +
+					" " + RS.getResponse_len());
 			
 			dataOutputStream.write(RS.getPayload()); //Data type for payload
 			Log.d("Sending", String.valueOf(RS.getPayload().length));
@@ -57,11 +59,13 @@ public class CTCPClientThread implements Runnable {
 
 			// Notify waiting Queue thread to start processing next packet
 			if (RS.getResponse_len() > 0) {
-				Log.d("Response", "Waiting for response for pair " + RS.getc_s_pair() + " of " + RS.getResponse_len() + " bytes");
+				Log.d("Response", "Waiting for response for pair " + RS.getc_s_pair() +
+						" of " + RS.getResponse_len() + " bytes");
 
 				int totalRead = 0;
 
-				Log.d(String.valueOf(RS.getResponse_len()), "start " + String.valueOf(System.currentTimeMillis() - timeOrigin));
+				Log.d(String.valueOf(RS.getResponse_len()), "start " +
+						String.valueOf(System.currentTimeMillis() - timeOrigin));
 				
 				// @@@ try another way
 				int bufferSize = 4096;
@@ -71,7 +75,8 @@ public class CTCPClientThread implements Runnable {
 				byte[] buffer = new byte[bufferSize];
 				while (totalRead < RS.getResponse_len()) {
 					// @@@ offset is wrong?
-					int bytesRead = dataInputStream.read(buffer, 0, Math.min(RS.getResponse_len() - totalRead, bufferSize));
+					int bytesRead = dataInputStream.read(buffer, 0,
+							Math.min(RS.getResponse_len() - totalRead, bufferSize));
 					//Log.d("Payload " + RS.getResponse_len(), String.valueOf(buffer));
 					//int bytesRead = dataInputStream.read(buffer);
 					//Log.d("Received " + RS.getResponse_len(), String.valueOf(bytesRead));
@@ -80,7 +85,8 @@ public class CTCPClientThread implements Runnable {
 					}
 					totalRead += bytesRead;
 				}
-				Log.d("Finished " + String.valueOf(RS.getResponse_len()), "end " + String.valueOf(System.currentTimeMillis() - timeOrigin));
+				Log.d("Finished " + String.valueOf(RS.getResponse_len()), "end " +
+						String.valueOf(System.currentTimeMillis() - timeOrigin));
 			}
 
 			

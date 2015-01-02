@@ -1,22 +1,10 @@
 package com.stonybrook.replay;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.security.cert.X509Certificate;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -70,10 +58,12 @@ import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
 import com.stonybrook.replay.bean.TCPAppJSONInfoBean;
 import com.stonybrook.replay.bean.UDPAppJSONInfoBean;
+import com.stonybrook.replay.bean.UDPReplayInfoBean;
 import com.stonybrook.replay.bean.combinedAppJSONInfoBean;
 import com.stonybrook.replay.combined.CTCPClient;
 import com.stonybrook.replay.combined.CUDPClient;
 import com.stonybrook.replay.combined.CombinedQueue;
+import com.stonybrook.replay.combined.CombinedReceiverThread;
 import com.stonybrook.replay.combined.CombinedSideChannel;
 import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
@@ -834,6 +824,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> serverPortsMap = null;
 				// adrian: add senderCounts
 				int senderCount = 0;
+				UDPReplayInfoBean udpReplayInfoBean = new UDPReplayInfoBean();
 				
 				// adrian: new declareID() function
 				sideChannel.declareID(appData.getReplayName(), Config.get("extraString"));
@@ -871,7 +862,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 //						randomID = new RandomString(10).nextString();
 						serverPortsMap = sideChannel
 								.receivePortMappingNonBlock();
-						senderCount = sideChannel.receiveSenderCount();
+						udpReplayInfoBean.setSenderCount(sideChannel.receiveSenderCount());
 						s = true;
 						Log.d("Replay", "Successfully received serverPortsMap and senderCount!");
 					} catch (JSONException ex) {
@@ -904,7 +895,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				/**
 				 * adrian: create clients from udpClientPorts
 				 */
-				ArrayList<DatagramSocket> udpSocketList = new ArrayList<DatagramSocket>();
+				//ArrayList<DatagramSocket> udpSocketList = new ArrayList<DatagramSocket>();
 				for (String originalClientPort : appData.getUdpClientPorts()) {
 					//ServerInstance instance = serverPortsMap.get("udp").get(destIP).get(
 //							destPort);
@@ -919,15 +910,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Log.d("Replay", "Size of udpPortMapping is " +
 						String.valueOf(udpPortMapping.size()));
 				
-				// start notifier thread
-				sideChannel.notifierUpCall(senderCount);
+				// starting notifier thread
+				sideChannel.notifierUpCall(udpReplayInfoBean);
 				
-				// TODO: running Receiver?
-				
+				// starting receiver thread
+				CombinedReceiverThread receiver = new CombinedReceiverThread(udpReplayInfoBean);
+				Thread rThread = new Thread(receiver);
+				rThread.start();
 
 				// Running the Queue (Sender)
 				CombinedQueue queue = new CombinedQueue(appData.getQ());
-				queue.run(CSPairMapping, udpPortMapping, udpSocketList,
+				queue.run(CSPairMapping, udpPortMapping, udpReplayInfoBean,
 						serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")));
 

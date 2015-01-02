@@ -4,10 +4,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
-import android.util.Log;
-
 import com.stonybrook.replay.bean.ServerInstance;
-import com.stonybrook.replay.util.UtilsManager;
 
 public class CUDPClient /* implements Runnable */{
 	public DatagramSocket socket = null;

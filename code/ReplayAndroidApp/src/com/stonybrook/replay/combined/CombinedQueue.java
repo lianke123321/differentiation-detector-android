@@ -1,9 +1,7 @@
 package com.stonybrook.replay.combined;
 
-import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,6 +10,7 @@ import android.util.Log;
 
 import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.bean.ServerInstance;
+import com.stonybrook.replay.bean.UDPReplayInfoBean;
 //import java.util.concurrent.locks.Lock;
 //import java.util.concurrent.locks.ReentrantLock;
 //import android.graphics.Paint.Join;
@@ -53,7 +52,7 @@ public class CombinedQueue {
 	 */
 	public void run(HashMap<String, CTCPClient> CSPairMapping,
 			HashMap<String, CUDPClient> udpPortMapping,
-			ArrayList<DatagramSocket> udpSocketList,
+			UDPReplayInfoBean udpReplayInfoBean,
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping,
 			Boolean timing) throws Exception {
 		this.timeOrigin = System.currentTimeMillis();
@@ -64,7 +63,7 @@ public class CombinedQueue {
 			for (RequestSet RS : this.Q) {
 				
 				if (RS.getResponse_len() == -1) {
-					nextUDP(RS, udpPortMapping, udpSocketList, udpServerMapping, timing);
+					nextUDP(RS, udpPortMapping, udpReplayInfoBean, udpServerMapping, timing);
 					Log.d("Replay", "Sending udp packet " + (i++) + "/" + len +
 							" at time " + (System.currentTimeMillis() - timeOrigin) +
 							" expected " + RS.getTimestamp());
@@ -144,7 +143,7 @@ public class CombinedQueue {
 	}
 	
 	private void nextUDP(RequestSet RS, HashMap<String, CUDPClient> udpPortMapping,
-			ArrayList<DatagramSocket> udpSocketList,
+			UDPReplayInfoBean udpReplayInfoBean,
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping, 
 			Boolean timing) throws Exception {
 		String c_s_pair = RS.getc_s_pair();
@@ -161,7 +160,7 @@ public class CombinedQueue {
 		
 		if (client.socket == null) {
 			client.createSocket();
-			udpSocketList.add(client.socket);
+			udpReplayInfoBean.addSocket(client.socket);
 			
 		}
 		

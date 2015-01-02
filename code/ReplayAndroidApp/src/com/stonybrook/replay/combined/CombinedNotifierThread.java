@@ -4,29 +4,28 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Queue;
-
-import com.stonybrook.replay.bean.SocketInstance;
 
 import android.util.Log;
 
+import com.stonybrook.replay.bean.UDPReplayInfoBean;
+
 public final class CombinedNotifierThread implements Runnable{
 
-	private int senderCount = 0;
+	//private int senderCount = 0;
+	UDPReplayInfoBean udpReplayInfoBean = null;
 	private int objLen = 10;
 	private int bufSize = 4096;
-	ArrayList<String> closeQ = new ArrayList<String>();
+	//ArrayList<String> closeQ = new ArrayList<String>();
 	Socket socket = null;
 	DataOutputStream dataOutputStream = null;
 	DataInputStream dataInputStream = null;
 	
-	public CombinedNotifierThread(int senderCount, Socket socket) {
+	public CombinedNotifierThread(UDPReplayInfoBean udpReplayInfoBean, Socket socket) {
 		super();
-		this.senderCount = senderCount;
+		//this.senderCount = senderCount;
+		this.udpReplayInfoBean = udpReplayInfoBean;
 		this.socket = socket;
 		
 		if (!this.socket.isConnected()) {
@@ -46,14 +45,16 @@ public final class CombinedNotifierThread implements Runnable{
 
 	@Override
 	public void run() {
-		while (senderCount > 0) {
+		while ((udpReplayInfoBean.getSenderCount()) > 0) {
 			byte[] data;
 			try {
 				data = receiveObject(objLen);
 				String[] Notf = new String(data).split(";");
 				if (Notf[0].equalsIgnoreCase("DONE")) {
-					senderCount -= 1;
-					closeQ.add(Notf[1]);
+					udpReplayInfoBean.decrement();
+					udpReplayInfoBean.offerCloseQ(Notf[1]);
+					//Log.d("Notifier", "Notf[1] " + Notf[1]);
+					//closeQ.add(Notf[1]);
 				} else {
 					Log.d("Notifier", "received unknown message!");
 					break;
@@ -62,7 +63,14 @@ public final class CombinedNotifierThread implements Runnable{
 				Log.d("Notifier", "receive data error!");
 				e.printStackTrace();
 			}
-			Log.d("Notifier", "current senderCount: " + senderCount);
+			Log.d("Notifier", "current senderCount: " + udpReplayInfoBean.getSenderCount());
+		}
+		
+		try {
+			socket.close();
+			Log.d("Notifier", "received all packets. close side channel connection and exit!");
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
