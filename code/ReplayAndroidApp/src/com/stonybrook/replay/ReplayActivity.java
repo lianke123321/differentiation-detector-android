@@ -822,8 +822,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						randomID);
 				// adrian: new format of serverPortsMap
 				HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> serverPortsMap = null;
-				// adrian: add senderCounts
-				int senderCount = 0;
 				UDPReplayInfoBean udpReplayInfoBean = new UDPReplayInfoBean();
 				
 				// adrian: new declareID() function

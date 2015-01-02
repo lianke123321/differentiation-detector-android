@@ -161,6 +161,7 @@ public class CombinedQueue {
 		if (client.socket == null) {
 			client.createSocket();
 			udpReplayInfoBean.addSocket(client.socket);
+			//Log.d("nextUDP", "read senderCount: " + udpReplayInfoBean.getSenderCount());
 			
 		}
 		

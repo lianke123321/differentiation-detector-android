@@ -22,6 +22,8 @@ public final class CombinedReceiverThread implements Runnable{
 	public void run() {
 		while (udpReplayInfoBean.getSenderCount() > 0) {
 			
+			//Log.d("Receiver", "senderCount: " + udpReplayInfoBean.getSenderCount());
+			
 			for (DatagramSocket socket : udpReplayInfoBean.getUdpSocketList()) {
 				byte[] data = new byte[bufSize];
 				DatagramPacket packet = new DatagramPacket(data, data.length);
@@ -35,16 +37,15 @@ public final class CombinedReceiverThread implements Runnable{
 			}
 			
 			while (true) {
-				if (udpReplayInfoBean.pollCloseQ() == "False") {
+				udpReplayInfoBean.pollCloseQ();
+				if (!udpReplayInfoBean.getCloseQ().isEmpty()) {
 					udpReplayInfoBean.decrement();
 					Log.d("Receiver", "decremented one from senderCount: " +
 							udpReplayInfoBean.getSenderCount());
-				}
-				if (udpReplayInfoBean.getCloseQ().isEmpty()) {
-					//Log.d("Receiver", "closeQ is empty!");
+				} else 
 					break;
-				}
 			}
+			
 		}
 		Log.d("Receiver", "finished!");
 	}

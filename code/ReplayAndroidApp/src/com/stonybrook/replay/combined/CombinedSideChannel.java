@@ -10,7 +10,6 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Queue;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,7 +27,6 @@ public class CombinedSideChannel {
 	DataOutputStream dataOutputStream = null;
 	DataInputStream dataInputStream = null;
 	int objLen = 10;
-	Queue<String> closeQ = null;
 	
 	//SocketInstance instance;
 	

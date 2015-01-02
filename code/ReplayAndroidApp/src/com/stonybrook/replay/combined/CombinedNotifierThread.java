@@ -66,12 +66,8 @@ public final class CombinedNotifierThread implements Runnable{
 			Log.d("Notifier", "current senderCount: " + udpReplayInfoBean.getSenderCount());
 		}
 		
-		try {
-			socket.close();
-			Log.d("Notifier", "received all packets. close side channel connection and exit!");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Log.d("Notifier", "received all packets!");
+		
 	}
 	
 	public byte[] receiveObject(int objLen) throws Exception{
