@@ -11,6 +11,7 @@ import android.util.Log;
 import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.UDPReplayInfoBean;
+import com.stonybrook.replay.bean.UpdateUIBean;
 //import java.util.concurrent.locks.Lock;
 //import java.util.concurrent.locks.ReentrantLock;
 //import android.graphics.Paint.Join;
@@ -27,13 +28,12 @@ public class CombinedQueue {
 	public AtomicBoolean flag = new AtomicBoolean();
 	private ArrayList<RequestSet> Q = null;
 	long timeOrigin;
-	// @@@ comment this out, not used
-	//private Map<TCPClient, Lock> mLocks = new HashMap<TCPClient, Lock>();
 	private Map<CTCPClient, Semaphore> mSema = new HashMap<CTCPClient, Semaphore>();
 	private ArrayList<Thread> cThreadList = new ArrayList<Thread>();
 	public volatile boolean done = false;
 	public int threads = 0;
 	ArrayList<Thread> threadList = new ArrayList<Thread>(); 
+	
 	public CombinedQueue(ArrayList<RequestSet> q) {
 		super();
 		Q = q;
@@ -50,12 +50,14 @@ public class CombinedQueue {
 	 * @param timing
 	 * @throws Exception
 	 */
-	public void run(HashMap<String, CTCPClient> CSPairMapping,
+	public void run(UpdateUIBean updateUIBean,
+			HashMap<String, CTCPClient> CSPairMapping,
 			HashMap<String, CUDPClient> udpPortMapping,
 			UDPReplayInfoBean udpReplayInfoBean,
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping,
 			Boolean timing) throws Exception {
 		this.timeOrigin = System.currentTimeMillis();
+		
 		try {
 			int i = 1;
 			int len = this.Q.size();
@@ -66,14 +68,20 @@ public class CombinedQueue {
 					nextUDP(RS, udpPortMapping, udpReplayInfoBean, udpServerMapping, timing);
 					Log.d("Replay", "Sending udp packet " + (i++) + "/" + len +
 							" at time " + (System.currentTimeMillis() - timeOrigin));
-				}
-				else { 
+					
+					// adrian: for updating progress bar
+					updateUIBean.setProgress((int) (i * 100 / len));
+					
+				} else { 
 					Semaphore sema = getSemaLock(CSPairMapping.get(RS.getc_s_pair()));
 					sema.acquire();
 	
 					Log.d("Replay", "Sending tcp packet " + (i++) + "/" + len +
 							" at time " + (System.currentTimeMillis() - timeOrigin));
-	
+					
+					// adrian: for updating progress bar
+					updateUIBean.setProgress((int) (i * 100 / len));
+					
 					// adrian: every time when calling next we create and start a new thread
 					// adrian: here we start different thread according to the type of RS
 					nextTCP(CSPairMapping.get(RS.getc_s_pair()), RS, timing, sema);

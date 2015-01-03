@@ -59,6 +59,7 @@ import com.stonybrook.replay.bean.SocketInstance;
 import com.stonybrook.replay.bean.TCPAppJSONInfoBean;
 import com.stonybrook.replay.bean.UDPAppJSONInfoBean;
 import com.stonybrook.replay.bean.UDPReplayInfoBean;
+import com.stonybrook.replay.bean.UpdateUIBean;
 import com.stonybrook.replay.bean.combinedAppJSONInfoBean;
 import com.stonybrook.replay.combined.CTCPClient;
 import com.stonybrook.replay.combined.CUDPClient;
@@ -88,6 +89,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	TextView selectedAppsSizeTextView = null;
 	Context context = null;
 	ProgressDialog progress = null;
+	
+	// adrian: for progress bar
+	ProgressBar prgBar;
+	UpdateUIBean updateUIBean;
+	
 	// ProgressDialog progressWait = null;
 	int currentReplayCount = 0;
 	ProgressBar progressBar = null;
@@ -120,6 +126,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	// Objects to store data for apps
 	TCPAppJSONInfoBean appData_tcp = null;
 	UDPAppJSONInfoBean appData_udp = null;
+	
 	// adrian: For combined app
 	combinedAppJSONInfoBean appData_combined = null;
 
@@ -174,6 +181,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		currentReplayCount = 0;
 
 		updateSelectedTextViews(selectedApps);
+		
+		// adrian: for progress bar
+		prgBar = (ProgressBar) findViewById(R.id.prgBar);
+		prgBar.setVisibility(View.GONE);
+		updateUIBean = new UpdateUIBean();
 
 		Log.d("Replay", "Loading VPN certificates");
 		new CertificateLoadTask().executeOnExecutor(
@@ -790,10 +802,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		boolean success = true;
 		// This simply identifies whether we are in open or VPN
 		public String channel = null;
+		//private ProgressBar prgBar;
 
 		public QueueCombinedAsync(ReplayCompleteListener listener, String channel) {
 			this.listener = listener;
 			this.channel = channel;
+			//this.prgBar = (ProgressBar) findViewById(R.id.prgBar);
 		}
 
 		@Override
@@ -928,20 +942,58 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Log.d("Replay", "Size of udpPortMapping is " +
 						String.valueOf(udpPortMapping.size()));
 				
-				// starting notifier thread
+				// adrian: starting notifier thread
 				sideChannel.notifierUpCall(udpReplayInfoBean);
 				
-				// starting receiver thread
+				// adrian: starting receiver thread
 				CombinedReceiverThread receiver = new CombinedReceiverThread(udpReplayInfoBean);
 				Thread rThread = new Thread(receiver);
 				rThread.start();
+				
+				// adrian: starting UI updating thread
+				new Thread(new Runnable(){
+					@Override
+					public void run() {
+						
+						// set progress bar to visible
+						ReplayActivity.this.runOnUiThread(new Runnable() {
+							public void run() {
+								prgBar.setVisibility(View.VISIBLE);
+							}
+						});
+						
+						while (updateUIBean.getProgress() < 100) {
+							ReplayActivity.this.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									prgBar.setProgress(updateUIBean.getProgress());
+								}
+							});
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								Log.d("UpdateUI", "try to sleep failed!");
+								e.printStackTrace();
+							}
+						}
+						
+						// set progress bar to invisible
+						ReplayActivity.this.runOnUiThread(new Runnable() {
+							public void run() {
+								prgBar.setVisibility(View.GONE);
+							}
+						});
+						
+						Log.d("UpdateUI", "completed!");
+					}
+				}).start();
 
 				// Running the Queue (Sender)
 				CombinedQueue queue = new CombinedQueue(appData.getQ());
-				queue.run(CSPairMapping, udpPortMapping, udpReplayInfoBean,
+				queue.run(updateUIBean, CSPairMapping, udpPortMapping, udpReplayInfoBean,
 						serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")));
-
+				
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
 				ex.printStackTrace();
@@ -950,6 +1002,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				ex.printStackTrace();
 
 			}
+			Log.d("Replay", "queueCombined finished execution!");
 			return null;
 		}
 
