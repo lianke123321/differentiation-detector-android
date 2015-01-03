@@ -1,28 +1,27 @@
 {
   "apps": [
     {
-        "name" : "DropBox",
-        "configfile" : "dropbox_d.pcap_config",
-        "datafile" : "dropbox_d1.pcap_client_pickle",
-        "size" : 16.0,
-        
-        "time" : "50 s",
-        "image" : "dropbox",
-        "type" : "tcp"
-    },
-    {
         "name" : "Youtube",
         "configfile" : "dropbox_d.config",
-        "datafile" : "youtube_d_org.pcap_client_json",
+        "datafile" : "youtube_360p.pcap_client_all.json",
         "size" : 0.5,
         "time" : "2 m",
-        "image" : "youtube1",
-        "type" : "tcp"
+        "image" : "youtube",
+        "type" : "combined"
+    },
+    {
+        "name" : "Hangouts",
+        "configfile" : "",
+        "datafile" : "hangout_video_10secs.pcap_client_all.json",
+        "size" : 0.5,
+        "time" : "2 m",
+        "image" : "hangouts",
+        "type" : "combined"
     },
     {
         "name" : "Skype",
         "configfile" : "",
-        "datafile" : "skype_video_30secs.pcap_client_json_all",
+        "datafile" : "skype_video_10secs.pcap_client_all.json",
         "size" : 8,
         "time" : "1 m",
         "image" : "skype",
@@ -32,20 +31,29 @@
     {
         "name" : "Spotify",
         "configfile" : "",
-        "datafile" : "spotify.pcap_client_pickle",
+        "datafile" : "spotify_high_15secs.pcap_client_all.json",
         "size" : 8,
         "time" : "50 s",
         "image" : "spotify",
-        "type" : "tcp"
+        "type" : "combined"
     },
     {
         "name" : "netflix",
         "configfile" : "",
-        "datafile" : "tmobile_hsdpa+_nfx.pcap_client_pickle",
+        "datafile" : "netflix_auto_5secs.pcap_client_all.json",
         "size" : 8,
         "time" : "30 s",
         "image" : "netflix",
-        "type" : "tcp"
+        "type" : "combined"
+    },
+    {
+        "name" : "viber",
+        "configfile" : "",
+        "datafile" : "viber_video_10secs.pcap_client_all.json",
+        "size" : 8,
+        "time" : "30 s",
+        "image" : "viber",
+        "type" : "combined"
     }
   ]
 }
