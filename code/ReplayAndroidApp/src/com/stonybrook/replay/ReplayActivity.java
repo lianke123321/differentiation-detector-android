@@ -969,7 +969,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			 */
 
 			if (!success) {
-				Toast.makeText(context, "Error while processing...", 1).show();
+				Toast.makeText(context, "Error while processing...", Toast.LENGTH_LONG).show();
 				return;
 			}
 

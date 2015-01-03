@@ -174,7 +174,7 @@ public class CombinedQueue {
 		
 		// TODO: send_jitter?
 		
-		client.sendUDPPacket(RS.payload, destAddr);
+		client.sendUDPPacket(RS.getPayload(), destAddr);
 		
 	}
 	

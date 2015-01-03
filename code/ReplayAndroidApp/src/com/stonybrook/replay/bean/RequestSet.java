@@ -4,16 +4,25 @@ package com.stonybrook.replay.bean;
  * @author rajesh RequestSet class for packet details
  */
 public class RequestSet {
-	public String c_s_pair;
-	public double timestamp;
-	public byte[] payload;
+	private String c_s_pair;
+	private double timestamp;
+	private byte[] payload;
 	// adrian: for tcp
-	public int response_len;
-	public String response_hash;
+	private int response_len;
+	private String response_hash;
 	// adrian: for udp
-	public boolean end;
+	private boolean end;
 	
 	// private int response_hash;
+	public RequestSet() {
+		super();
+		this.c_s_pair = null;
+		this.timestamp = 0;
+		this.payload = null;
+		this.response_len = -1;
+		this.response_hash = null;
+		this.end = false;
+	}
 
 	public String getc_s_pair() {
 		return c_s_pair;

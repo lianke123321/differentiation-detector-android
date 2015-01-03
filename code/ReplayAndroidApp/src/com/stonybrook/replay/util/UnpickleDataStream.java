@@ -272,10 +272,10 @@ public class UnpickleDataStream {
 			JSONArray json = new JSONArray(jsonStr);
 			
 			JSONArray qArray = (JSONArray) json.get(0);
-			RequestSet tempRS = null;
+			
 			for (int i = 0; i < qArray.length(); i++) {
+				RequestSet tempRS = new RequestSet();
 				JSONObject dictionary = qArray.getJSONObject(i) ;
-				tempRS = new RequestSet();
 				tempRS.setc_s_pair((String) dictionary.get("c_s_pair"));
 				tempRS.setPayload(DecodeHex.decodeHex(((String)dictionary.get("payload")).toCharArray()));
 				tempRS.setTimestamp((Double) dictionary.get("timestamp"));
@@ -285,10 +285,12 @@ public class UnpickleDataStream {
 				// adrian: for tcp
 				if (dictionary.has("response_len"))
 					tempRS.setResponse_len((Integer) dictionary.get("response_len"));
-				else
-					tempRS.setResponse_len(-1);
+				/*else
+					tempRS.setResponse_len(-1);*/
+				
 				if (dictionary.has("response_hash"))
 					tempRS.setResponse_hash(dictionary.get("response_hash").toString());
+				
 				// adrian: for udp
 				if (dictionary.has("end"))
 					tempRS.setEnd((Boolean) dictionary.get("end"));

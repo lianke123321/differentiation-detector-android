@@ -34,9 +34,10 @@ public final class CombinedReceiverThread implements Runnable{
 					Log.d("Receiver", "receiving udp packet error!");
 					e.printStackTrace();
 				}
+				data = null;
 			}
 			
-			while (true) {
+			/*while (true) {
 				udpReplayInfoBean.pollCloseQ();
 				if (!udpReplayInfoBean.getCloseQ().isEmpty()) {
 					//udpReplayInfoBean.decrement();
@@ -44,6 +45,17 @@ public final class CombinedReceiverThread implements Runnable{
 							udpReplayInfoBean.getSenderCount());
 				} else 
 					break;
+			}*/
+			
+			/**
+			 * adrian: force data to clean and sleep 2 seconds every iteration.
+			 * in order to solve the memory free problem
+			 */
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				Log.d("Receiver", "sleep went wrong!");
+				e.printStackTrace();
 			}
 			
 		}
