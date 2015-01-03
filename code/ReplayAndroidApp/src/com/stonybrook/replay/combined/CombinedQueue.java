@@ -65,15 +65,18 @@ public class CombinedQueue {
 			for (RequestSet RS : this.Q) {
 				
 				if (RS.getResponse_len() == -1) {
-					nextUDP(RS, udpPortMapping, udpReplayInfoBean, udpServerMapping, timing);
+					// adrian: sending udp is done in queue thread, no need to start
+					// new threads for udp since there is only one port
 					Log.d("Replay", "Sending udp packet " + (i++) + "/" + len +
 							" at time " + (System.currentTimeMillis() - timeOrigin));
+					nextUDP(RS, udpPortMapping, udpReplayInfoBean, udpServerMapping, timing);
 					
 					// adrian: for updating progress bar
 					updateUIBean.setProgress((int) (i * 100 / len));
 					
 				} else { 
 					Semaphore sema = getSemaLock(CSPairMapping.get(RS.getc_s_pair()));
+					Log.d("Replay", "waiting to get semaphore!");
 					sema.acquire();
 	
 					Log.d("Replay", "Sending tcp packet " + (i++) + "/" + len +
@@ -94,8 +97,7 @@ public class CombinedQueue {
 				
 			}
 			
-			//Wait for all threads to finish processing
-			// @@@ in other words, wait for every thread to die
+			Log.d("Replay", "waiting for all threads to die!");
 			for(Thread t : cThreadList)
 				t.join();
 			
@@ -141,7 +143,7 @@ public class CombinedQueue {
 		CTCPClientThread clientThread = new CTCPClientThread(client, RS, this, sema, timeOrigin);
 		Thread cThread = new Thread(clientThread);
 		cThread.start();
-		threadList.add(cThread);
+		//threadList.add(cThread);
 		++threads;
 		Log.d("nextTCP", "number of thread: " + String.valueOf(threads));
 		cThreadList.add(cThread);

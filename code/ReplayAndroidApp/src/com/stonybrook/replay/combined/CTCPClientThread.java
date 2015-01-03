@@ -43,19 +43,24 @@ public class CTCPClientThread implements Runnable {
 			if (client.socket == null)
 				client.createSocket();
 			
+			if (!client.socket.isConnected())
+				Log.w("TCPClientThread", "socket not connected!");
+			
 			// Get Input/Output stream for socket
 			dataOutputStream = new DataOutputStream(client.socket.getOutputStream());
 			dataInputStream = new DataInputStream(client.socket.getInputStream());
 
-			Log.d("Sending", "Sending payload w/ length " + RS.getPayload().length +
-					" expecting response_len " + RS.getResponse_len());
+			Log.d("Sending", "payload " + RS.getPayload().length +
+					" bytes, expecting " + RS.getResponse_len() + " bytes ");
 			
 			dataOutputStream.write(RS.getPayload()); //Data type for payload
-			//Log.d("Sending", String.valueOf(RS.getPayload().length));
+			
+			Log.d("Sended", "payload " + RS.getPayload().length +
+					" bytes, expecting " + RS.getResponse_len() + " bytes ");
 
 			// Notify waiting Queue thread to start processing next packet
 			if (RS.getResponse_len() > 0) {
-				Log.d("Response", "Waiting for response w/ length " + RS.getResponse_len() + " bytes");
+				Log.d("Response", "Waiting for response of " + RS.getResponse_len() + " bytes");
 
 				int totalRead = 0;
 
@@ -84,6 +89,8 @@ public class CTCPClientThread implements Runnable {
 				buffer = null;
 				
 				Log.d("Finished", String.valueOf(RS.getResponse_len()) + " bytes");
+			} else {
+				Log.d("Receiving", "nothing to receive");
 			}
 			
 			synchronized (queue) {
@@ -91,6 +98,7 @@ public class CTCPClientThread implements Runnable {
 			}
 			
 		} catch (Exception e) {
+			Log.d("TCPClientThread", "something bad happened!");
 			e.printStackTrace();
 		} finally {
 			sema.release();

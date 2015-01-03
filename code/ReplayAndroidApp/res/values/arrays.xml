@@ -5,8 +5,6 @@
         <item>@string/timing_No</item>
     </string-array>
     <string-array name="server">
-        <item>@string/server_meddle2</item>
-        <item>@string/server_meddle1</item>
-        <item>@string/server_adrian_local</item>
+        <item>@string/server_replay</item>
     </string-array>
 </resources>

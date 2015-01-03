@@ -1,6 +1,7 @@
 package com.stonybrook.replay;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -161,8 +162,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		// apps, server and timing
 		context = getApplicationContext();
 		selectedApps = getIntent().getParcelableArrayListExtra("selectedApps");
-
-		server = (String) getIntent().getStringExtra("server");
+		
+		(new GetReplayServerIP()).execute("");
+		
 		enableTiming = (String) getIntent().getStringExtra("timing");
 
 		// Create layout for this page
@@ -231,7 +233,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			 * Configuration file is located in assets/configuration.properties.
 			 */
 			Config.readConfigFile(ReplayConstants.CONFIG_FILE, context);
-
+			
 			Config.set("timing", enableTiming);
 			Config.set("server", server);
 			// adrian: added cause arash's code
@@ -1430,6 +1432,23 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		}
 
+	}
+	
+	class GetReplayServerIP extends AsyncTask<String, String, Boolean> {
+
+		@Override
+		protected Boolean doInBackground(String... params) {
+			// adrian: get IP from hostname
+			try {
+				server = InetAddress.getByName((String) getIntent().getStringExtra("server")).getHostAddress();
+				Log.d("GetReplayServerIP", "IP of replay server: " + server);
+			} catch (UnknownHostException e) {
+				Log.w("GetReplayServerIP", "get IP of replay server failed!");
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
 	}
 
 }
