@@ -51,7 +51,6 @@ import android.util.Log;
 
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
-import com.stonybrook.android.data.VpnType;
 import com.stonybrook.android.logic.VpnStateService.ErrorState;
 import com.stonybrook.android.logic.VpnStateService.State;
 import com.stonybrook.replay.ReplayActivity;
@@ -144,7 +143,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 			VpnProfile profile = null;
 
 			String action = (String) intent.getCharSequenceExtra("action");
-			Log.d("action", action);
+			//Log.d("action", action);
 			if (action.equalsIgnoreCase("stop")) {
 				setNextProfile(null);
 			} else {

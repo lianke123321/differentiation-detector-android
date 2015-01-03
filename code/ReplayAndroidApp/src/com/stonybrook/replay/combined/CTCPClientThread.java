@@ -47,11 +47,11 @@ public class CTCPClientThread implements Runnable {
 			dataOutputStream = new DataOutputStream(client.socket.getOutputStream());
 			dataInputStream = new DataInputStream(client.socket.getInputStream());
 
-			Log.d("Sending", "Sending payload for pair " + RS.getc_s_pair() +
-					" " + RS.getResponse_len());
+			Log.d("Sending", "Sending payload w/ length " + RS.getPayload().length +
+					" expecting response_len " + RS.getResponse_len());
 			
 			dataOutputStream.write(RS.getPayload()); //Data type for payload
-			Log.d("Sending", String.valueOf(RS.getPayload().length));
+			//Log.d("Sending", String.valueOf(RS.getPayload().length));
 
 			synchronized (queue) {
 				queue.notifyAll();
@@ -59,12 +59,11 @@ public class CTCPClientThread implements Runnable {
 
 			// Notify waiting Queue thread to start processing next packet
 			if (RS.getResponse_len() > 0) {
-				Log.d("Response", "Waiting for response for pair " + RS.getc_s_pair() +
-						" of " + RS.getResponse_len() + " bytes");
+				Log.d("Response", "Waiting for response w/ length " + RS.getResponse_len() + " bytes");
 
 				int totalRead = 0;
 
-				Log.d(String.valueOf(RS.getResponse_len()), "start " +
+				Log.d("Receiving", String.valueOf(RS.getResponse_len()) + " start at time " +
 						String.valueOf(System.currentTimeMillis() - timeOrigin));
 				
 				// @@@ try another way
@@ -85,8 +84,7 @@ public class CTCPClientThread implements Runnable {
 					}
 					totalRead += bytesRead;
 				}
-				Log.d("Finished " + String.valueOf(RS.getResponse_len()), "end " +
-						String.valueOf(System.currentTimeMillis() - timeOrigin));
+				Log.d("Finished", "receiving " + String.valueOf(RS.getResponse_len()) + " bytes");
 			}
 
 			

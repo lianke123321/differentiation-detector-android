@@ -65,17 +65,14 @@ public class CombinedQueue {
 				if (RS.getResponse_len() == -1) {
 					nextUDP(RS, udpPortMapping, udpReplayInfoBean, udpServerMapping, timing);
 					Log.d("Replay", "Sending udp packet " + (i++) + "/" + len +
-							" at time " + (System.currentTimeMillis() - timeOrigin) +
-							" expected " + RS.getTimestamp());
+							" at time " + (System.currentTimeMillis() - timeOrigin));
 				}
 				else { 
 					Semaphore sema = getSemaLock(CSPairMapping.get(RS.getc_s_pair()));
 					sema.acquire();
 	
 					Log.d("Replay", "Sending tcp packet " + (i++) + "/" + len +
-							" at time " + (System.currentTimeMillis() - timeOrigin) +
-							" expected " + RS.getTimestamp() + " with response " +
-							RS.getResponse_len());
+							" at time " + (System.currentTimeMillis() - timeOrigin));
 	
 					// adrian: every time when calling next we create and start a new thread
 					// adrian: here we start different thread according to the type of RS
@@ -126,7 +123,7 @@ public class CombinedQueue {
 			double expectedTime = timeOrigin + RS.getTimestamp() * 1000;
 			if (System.currentTimeMillis() < expectedTime) {
 				long waitTime = Math.round(expectedTime - System.currentTimeMillis());
-				Log.d("Time", String.valueOf(waitTime));
+				//Log.d("Time", String.valueOf(waitTime));
 				if (waitTime > 0)
 					Thread.sleep(waitTime);
 			}
@@ -138,7 +135,7 @@ public class CombinedQueue {
 		cThread.start();
 		threadList.add(cThread);
 		++threads;
-		Log.d("count", String.valueOf(threads));
+		Log.d("nextTCP", "number of thread: " + String.valueOf(threads));
 		cThreadList.add(cThread);
 	}
 	
@@ -169,7 +166,7 @@ public class CombinedQueue {
 			double expectedTime = timeOrigin + RS.getTimestamp() * 1000;
 			if (System.currentTimeMillis() < expectedTime) {
 				long waitTime = Math.round(expectedTime - System.currentTimeMillis());
-				Log.d("Time", String.valueOf(waitTime));
+				//Log.d("Time", String.valueOf(waitTime));
 				if (waitTime > 0)
 					Thread.sleep(waitTime);
 			}

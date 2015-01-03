@@ -39,7 +39,7 @@ public final class CombinedReceiverThread implements Runnable{
 			while (true) {
 				udpReplayInfoBean.pollCloseQ();
 				if (!udpReplayInfoBean.getCloseQ().isEmpty()) {
-					udpReplayInfoBean.decrement();
+					//udpReplayInfoBean.decrement();
 					Log.d("Receiver", "decremented one from senderCount: " +
 							udpReplayInfoBean.getSenderCount());
 				} else 

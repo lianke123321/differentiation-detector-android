@@ -322,12 +322,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				applicationBean.getDataFile(), context);
 		Log.d("Parsing", applicationBean.getDataFile());
 		queueCombined = new QueueCombinedAsync(this, "open");
-
-		/*
-		 * onVpnProfileSelected(null); Log.d("Replay", "Testing VPN"); (new
-		 * VPNConnected()).execute(this);
-		 */
+		
 		queueCombined.execute("");
+		
+		/* adrian: for testing VPN
+		onVpnProfileSelected(null);
+		Log.d("Replay", "Testing VPN");
+		
+		selectedApps.get(currentReplayCount).status = getResources()
+				.getString(R.string.vpn);
+		adapter.notifyDataSetChanged();
+
+		(new VPNConnected()).execute(this);*/
 
 	}
 
@@ -1322,8 +1328,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected Boolean doInBackground(ReplayActivity... params) {
-			String meddleIP = "54.160.198.73";
+			String gateway = "replay.meddle.mobi";
+			String meddleIP = null;
+			
 			try {
+				meddleIP = InetAddress.getByName(gateway).getHostAddress();
+				Log.d("VPN", "VPN IP address is: " + meddleIP);
 				int i = 15;
 				while (i > 0) {
 					i--;
@@ -1357,9 +1367,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						break;
 					}
 					Thread.sleep(1000);
-					Log.d("IP", str);
+					Log.d("VPN", "publicIP is: " + str);
 				}
 			} catch (Exception e) {
+				Log.d("VPN", "failed to get VPN IP address");
 				e.printStackTrace();
 			}
 			return false;
