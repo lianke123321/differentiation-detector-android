@@ -325,8 +325,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		
 		queueCombined.execute("");
 		
-		/* adrian: for testing VPN
-		onVpnProfileSelected(null);
+		//adrian: for testing VPN
+		/*onVpnProfileSelected(null);
 		Log.d("Replay", "Testing VPN");
 		
 		selectedApps.get(currentReplayCount).status = getResources()

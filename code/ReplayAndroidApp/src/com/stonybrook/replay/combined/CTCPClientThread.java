@@ -53,17 +53,13 @@ public class CTCPClientThread implements Runnable {
 			dataOutputStream.write(RS.getPayload()); //Data type for payload
 			//Log.d("Sending", String.valueOf(RS.getPayload().length));
 
-			synchronized (queue) {
-				queue.notifyAll();
-			}
-
 			// Notify waiting Queue thread to start processing next packet
 			if (RS.getResponse_len() > 0) {
 				Log.d("Response", "Waiting for response w/ length " + RS.getResponse_len() + " bytes");
 
 				int totalRead = 0;
 
-				Log.d("Receiving", String.valueOf(RS.getResponse_len()) + " start at time " +
+				Log.d("Receiving", String.valueOf(RS.getResponse_len()) + " bytes" + " start at time " +
 						String.valueOf(System.currentTimeMillis() - timeOrigin));
 				
 				// @@@ try another way
@@ -71,11 +67,11 @@ public class CTCPClientThread implements Runnable {
 				//if(RS.getResponse_len() < bufferSize)
 				//	bufferSize = RS.getResponse_len();
 				
-				byte[] buffer = new byte[bufferSize];
-				while (totalRead < RS.getResponse_len()) {
+				byte[] buffer = new byte[RS.getResponse_len()];
+				while (totalRead < buffer.length) {
 					// @@@ offset is wrong?
-					int bytesRead = dataInputStream.read(buffer, 0,
-							Math.min(RS.getResponse_len() - totalRead, bufferSize));
+					int bytesRead = dataInputStream.read(buffer, totalRead,
+							Math.min(buffer.length - totalRead, bufferSize));
 					//Log.d("Payload " + RS.getResponse_len(), String.valueOf(buffer));
 					//int bytesRead = dataInputStream.read(buffer);
 					//Log.d("Received " + RS.getResponse_len(), String.valueOf(bytesRead));
@@ -84,9 +80,15 @@ public class CTCPClientThread implements Runnable {
 					}
 					totalRead += bytesRead;
 				}
-				Log.d("Finished", "receiving " + String.valueOf(RS.getResponse_len()) + " bytes");
+				// adrian: manually free buffer
+				buffer = null;
+				
+				Log.d("Finished", String.valueOf(RS.getResponse_len()) + " bytes");
 			}
-
+			
+			synchronized (queue) {
+				queue.notifyAll();
+			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
