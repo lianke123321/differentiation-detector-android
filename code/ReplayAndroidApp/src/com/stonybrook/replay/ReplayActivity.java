@@ -1038,6 +1038,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			 * applications selected by user. ++ makes processing of next
 			 * application in list when processApplicationReplay() is called.
 			 */
+			
 			selectedApps.get(currentReplayCount).resultImg = "p";
 			selectedApps.get(currentReplayCount++).status = getResources()
 					.getString(R.string.finished);
@@ -1046,6 +1047,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			// If there are more apps that require processing then start with
 			// those.
 			if (selectedApps.size() != currentReplayCount) {
+				// sleep for 5 seconds to let vpn disconnect. TODO: change this later
+				Thread.sleep(8000);
 				processApplicationReplay();
 			} else {
 				// progressWait.setMessage("Finishing Analysis...");
