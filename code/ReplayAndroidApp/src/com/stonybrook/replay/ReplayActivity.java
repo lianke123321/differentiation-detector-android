@@ -181,7 +181,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		replayButton = (Button) findViewById(R.id.replayButton);
 		replayButton.setOnClickListener(replayButtonListener);
 		currentReplayCount = 0;
-
+		
 		updateSelectedTextViews(selectedApps);
 		
 		// adrian: for progress bar
@@ -995,6 +995,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				queue.run(updateUIBean, CSPairMapping, udpPortMapping, udpReplayInfoBean,
 						serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")));
+				
+				// Telling server done with replaying
+				double duration = ((double) (System.currentTimeMillis() - this.timeStarted)) / 1000;
+				sideChannel.sendDone(duration);
+				Log.d("Replay", "replay finished using time " + duration + " s");
 				
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");

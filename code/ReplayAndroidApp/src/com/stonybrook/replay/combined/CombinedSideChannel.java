@@ -57,7 +57,11 @@ public class CombinedSideChannel {
 		String temp = extraString.replace('_', '-');
 		sendObject((id+";"+"SINGLE"+";"+replayName+";"+temp).getBytes(), objLen);
 		Log.d("id", id);
-
+		
+	}
+	
+	public void sendDone (double duration) throws Exception {
+		sendObject(("DONE;" + String.valueOf(duration)).getBytes(), objLen);
 	}
 
 	private void sendObject(byte[] buf, int objLen) throws Exception {
