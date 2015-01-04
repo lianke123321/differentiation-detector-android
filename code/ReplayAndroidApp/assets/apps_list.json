@@ -14,7 +14,7 @@
         "configfile" : "",
         "datafile" : "hangout_video_10secs.pcap_client_all.json",
         "size" : 0.5,
-        "time" : "2 m",
+        "time" : "10 s",
         "image" : "hangouts",
         "type" : "combined"
     },
@@ -23,7 +23,7 @@
         "configfile" : "",
         "datafile" : "skype_video_10secs.pcap_client_all.json",
         "size" : 8,
-        "time" : "1 m",
+        "time" : "10 s",
         "image" : "skype",
         "type" : "combined"
      }
@@ -33,7 +33,7 @@
         "configfile" : "",
         "datafile" : "spotify_high_15secs.pcap_client_all.json",
         "size" : 8,
-        "time" : "50 s",
+        "time" : "15 s",
         "image" : "spotify",
         "type" : "combined"
     },
@@ -42,7 +42,7 @@
         "configfile" : "",
         "datafile" : "netflix_auto_5secs.pcap_client_all.json",
         "size" : 8,
-        "time" : "30 s",
+        "time" : "5 s",
         "image" : "netflix",
         "type" : "combined"
     },
@@ -51,7 +51,7 @@
         "configfile" : "",
         "datafile" : "viber_video_10secs.pcap_client_all.json",
         "size" : 8,
-        "time" : "30 s",
+        "time" : "10 s",
         "image" : "viber",
         "type" : "combined"
     }

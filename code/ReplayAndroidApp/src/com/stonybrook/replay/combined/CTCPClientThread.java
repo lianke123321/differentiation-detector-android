@@ -17,6 +17,8 @@ public class CTCPClientThread implements Runnable {
 	private CombinedQueue queue = null;
 	private Semaphore sema = null;
 	long timeOrigin = 0;
+	
+	int bufSize = 4096;
 
 	public CTCPClientThread(CTCPClient client, RequestSet RS, CombinedQueue queue,
 			Semaphore sema, long timeOrigin) {
@@ -43,8 +45,8 @@ public class CTCPClientThread implements Runnable {
 			if (client.socket == null)
 				client.createSocket();
 			
-			if (!client.socket.isConnected())
-				Log.w("TCPClientThread", "socket not connected!");
+			/*if (!client.socket.isConnected())
+				Log.w("TCPClientThread", "socket not connected!");*/
 			
 			// Get Input/Output stream for socket
 			dataOutputStream = new DataOutputStream(client.socket.getOutputStream());
@@ -67,8 +69,6 @@ public class CTCPClientThread implements Runnable {
 				Log.d("Receiving", String.valueOf(RS.getResponse_len()) + " bytes" + " start at time " +
 						String.valueOf(System.currentTimeMillis() - timeOrigin));
 				
-				// @@@ try another way
-				int bufferSize = 4096;
 				//if(RS.getResponse_len() < bufferSize)
 				//	bufferSize = RS.getResponse_len();
 				
@@ -76,7 +76,7 @@ public class CTCPClientThread implements Runnable {
 				while (totalRead < buffer.length) {
 					// @@@ offset is wrong?
 					int bytesRead = dataInputStream.read(buffer, totalRead,
-							Math.min(buffer.length - totalRead, bufferSize));
+							Math.min(buffer.length - totalRead, bufSize));
 					//Log.d("Payload " + RS.getResponse_len(), String.valueOf(buffer));
 					//int bytesRead = dataInputStream.read(buffer);
 					//Log.d("Received " + RS.getResponse_len(), String.valueOf(bytesRead));
@@ -90,7 +90,7 @@ public class CTCPClientThread implements Runnable {
 				
 				Log.d("Finished", String.valueOf(RS.getResponse_len()) + " bytes");
 			} else {
-				Log.d("Receiving", "nothing to receive");
+				Log.d("Receiving", "skipped");
 			}
 			
 			synchronized (queue) {

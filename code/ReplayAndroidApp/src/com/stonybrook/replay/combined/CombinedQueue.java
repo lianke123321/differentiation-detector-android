@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.util.Log;
 
@@ -25,19 +24,19 @@ import com.stonybrook.replay.bean.UpdateUIBean;
 */
 public class CombinedQueue {
 
-	public AtomicBoolean flag = new AtomicBoolean();
+	//public AtomicBoolean flag = new AtomicBoolean();
 	private ArrayList<RequestSet> Q = null;
 	long timeOrigin;
 	private Map<CTCPClient, Semaphore> mSema = new HashMap<CTCPClient, Semaphore>();
 	private ArrayList<Thread> cThreadList = new ArrayList<Thread>();
-	public volatile boolean done = false;
+	//public volatile boolean done = false;
 	public int threads = 0;
-	ArrayList<Thread> threadList = new ArrayList<Thread>(); 
+	//ArrayList<Thread> threadList = new ArrayList<Thread>(); 
 	
 	public CombinedQueue(ArrayList<RequestSet> q) {
 		super();
 		Q = q;
-		this.flag.set(false);
+		//this.flag.set(false);
 	}
 
 	/**
