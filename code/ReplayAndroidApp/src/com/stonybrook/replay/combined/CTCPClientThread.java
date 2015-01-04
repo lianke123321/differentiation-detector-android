@@ -93,10 +93,6 @@ public class CTCPClientThread implements Runnable {
 				Log.d("Receiving", "skipped");
 			}
 			
-			synchronized (queue) {
-				queue.notifyAll();
-			}
-			
 		} catch (Exception e) {
 			Log.d("TCPClientThread", "something bad happened!");
 			e.printStackTrace();
@@ -104,6 +100,9 @@ public class CTCPClientThread implements Runnable {
 			sema.release();
 			synchronized (queue) {
 				--queue.threads;
+			}
+			synchronized (queue) {
+				queue.notifyAll();
 			}
 
 		}

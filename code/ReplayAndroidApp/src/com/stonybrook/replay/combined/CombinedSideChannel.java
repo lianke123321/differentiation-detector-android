@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -23,7 +24,7 @@ import com.stonybrook.replay.bean.UDPReplayInfoBean;
 public class CombinedSideChannel {
 	private String id = null;
 	int bufSize = 4096;
-	Socket socket = null;
+	private Socket socket = null;
 	DataOutputStream dataOutputStream = null;
 	DataInputStream dataInputStream = null;
 	int objLen = 10;
@@ -151,10 +152,16 @@ public class CombinedSideChannel {
 		sendObject(noIperf.getBytes(), objLen);
 	}
 	
-	public void notifierUpCall(UDPReplayInfoBean udpReplayInfoBean) throws Exception{
+	public void notifierUpCall(UDPReplayInfoBean udpReplayInfoBean,
+			ArrayList<Thread> threadList) throws Exception{
 		CombinedNotifierThread notifier = new CombinedNotifierThread(udpReplayInfoBean, socket);
 		Thread notfThread = new Thread(notifier);
 		notfThread.start();
+		threadList.add(notfThread);
+	}
+	
+	public void closeSideChannelSocket () throws Exception {
+		socket.close();
 	}
 	
 	int fromByteArray(byte[] bytes) {

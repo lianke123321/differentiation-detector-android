@@ -77,6 +77,7 @@ public class CombinedQueue {
 					Semaphore sema = getSemaLock(CSPairMapping.get(RS.getc_s_pair()));
 					Log.d("Replay", "waiting to get semaphore!");
 					sema.acquire();
+					Log.d("Replay", "got the semaphore!");
 	
 					Log.d("Replay", "Sending tcp packet " + (i++) + "/" + len +
 							" at time " + (System.currentTimeMillis() - timeOrigin));
@@ -89,14 +90,14 @@ public class CombinedQueue {
 					nextTCP(CSPairMapping.get(RS.getc_s_pair()), RS, timing, sema);
 	
 					
-					synchronized (this) {
+					/*synchronized (this) {
 						this.wait();
-					}
+					}*/
 				}
 				
 			}
 			
-			Log.d("Replay", "waiting for all threads to die!");
+			Log.d("Queue", "waiting for all threads to die!");
 			for(Thread t : cThreadList)
 				t.join();
 			

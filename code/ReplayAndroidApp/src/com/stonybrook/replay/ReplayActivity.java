@@ -65,7 +65,6 @@ import com.stonybrook.replay.bean.combinedAppJSONInfoBean;
 import com.stonybrook.replay.combined.CTCPClient;
 import com.stonybrook.replay.combined.CUDPClient;
 import com.stonybrook.replay.combined.CombinedQueue;
-import com.stonybrook.replay.combined.CombinedReceiverThread;
 import com.stonybrook.replay.combined.CombinedSideChannel;
 import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
@@ -944,16 +943,20 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Log.d("Replay", "Size of udpPortMapping is " +
 						String.valueOf(udpPortMapping.size()));
 				
+				// adrian: for waiting for all threads to die
+				ArrayList<Thread> threadList = new ArrayList<Thread>();
+				
 				// adrian: starting notifier thread
-				sideChannel.notifierUpCall(udpReplayInfoBean);
+				sideChannel.notifierUpCall(udpReplayInfoBean, threadList);
 				
 				// adrian: starting receiver thread
-				CombinedReceiverThread receiver = new CombinedReceiverThread(udpReplayInfoBean);
+				/*CombinedReceiverThread receiver = new CombinedReceiverThread(udpReplayInfoBean);
 				Thread rThread = new Thread(receiver);
 				rThread.start();
+				threadList.add(rThread);*/
 				
 				// adrian: starting UI updating thread
-				new Thread(new Runnable(){
+				Thread UIUpdateThread = new Thread(new Runnable(){
 					@Override
 					public void run() {
 						
@@ -988,7 +991,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						
 						Log.d("UpdateUI", "completed!");
 					}
-				}).start();
+				});
+				
+				UIUpdateThread.start();
+				threadList.add(UIUpdateThread);
 
 				// Running the Queue (Sender)
 				CombinedQueue queue = new CombinedQueue(appData.getQ());
@@ -996,10 +1002,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")));
 				
+				// waiting for all threads to finish
+				Log.d("Replay", "waiting for all threads to die!");
+				for (Thread t : threadList)
+					t.join();
+				
 				// Telling server done with replaying
 				double duration = ((double) (System.currentTimeMillis() - this.timeStarted)) / 1000;
 				sideChannel.sendDone(duration);
 				Log.d("Replay", "replay finished using time " + duration + " s");
+				
+				// closing side channel socket
+				sideChannel.closeSideChannelSocket();
 				
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");

@@ -1,14 +1,10 @@
 package com.stonybrook.replay.combined;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import android.util.Log;
 
 public class CTCPClient /* implements Runnable */{
 	public String CSPair = null;
@@ -54,14 +50,14 @@ public class CTCPClient /* implements Runnable */{
 	}
 
 	// Not Used
-	public void identify_channel() throws IOException {
+	/*public void identify_channel() throws IOException {
 		// Log.d("Identify", id + ";" + this.CSPair + ";" + replayName);
 		byte[] message = (id + ";" + this.CSPair + ";" + replayName).getBytes();
 		ByteBuffer buf = ByteBuffer.wrap(message);
 		// this.sc.write(ByteBuffer.wrap(String.format("%010d",
 		// message.length).getBytes()));
 		this.sc.write(buf);
-	}
+	}*/
 
 	/**
 	 * Before anything, client needs to identify itself to the server and tell
@@ -69,19 +65,19 @@ public class CTCPClient /* implements Runnable */{
 	 * 
 	 * @throws IOException
 	 */
-	public void identify() throws Exception {
+	/*public void identify() throws Exception {
 		Log.d("Replay", id + ";" + this.CSPair + ";" + replayName);
 		byte[] message = (id + ";" + this.CSPair + ";" + replayName).getBytes();
 		sendObject(message);
 
-	}
+	}*/
 
-	private void sendObject(byte[] buf) throws Exception {
+	/*private void sendObject(byte[] buf) throws Exception {
 		DataOutputStream dataOutputStream = new DataOutputStream(
 				socket.getOutputStream());
 		dataOutputStream.writeBytes(String.format("%010d", buf.length));
 		dataOutputStream.write(buf);
-	}
+	}*/
 
 	public void close() throws Exception {
 		this.socket.close();

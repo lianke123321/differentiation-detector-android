@@ -37,7 +37,7 @@ public final class CombinedReceiverThread implements Runnable{
 				data = null;
 			}
 			
-			/*while (true) {
+			while (true) {
 				udpReplayInfoBean.pollCloseQ();
 				if (!udpReplayInfoBean.getCloseQ().isEmpty()) {
 					//udpReplayInfoBean.decrement();
@@ -45,7 +45,7 @@ public final class CombinedReceiverThread implements Runnable{
 							udpReplayInfoBean.getSenderCount());
 				} else 
 					break;
-			}*/
+			}
 			
 			/**
 			 * adrian: force data to clean and sleep 2 seconds every iteration.
