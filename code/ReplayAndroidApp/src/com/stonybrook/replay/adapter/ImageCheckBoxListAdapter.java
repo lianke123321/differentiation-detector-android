@@ -27,6 +27,7 @@ public class ImageCheckBoxListAdapter extends BaseAdapter implements OnClickList
 	private List<ApplicationBean> dataList;
 	
 	MainActivity mainAct;
+	
 	public ImageCheckBoxListAdapter(HashMap<String, ApplicationBean> apps, LayoutInflater inflator, MainActivity mainAct) {
 		super();
 		this.inflator = inflator;
