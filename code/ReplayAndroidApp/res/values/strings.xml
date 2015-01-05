@@ -11,7 +11,7 @@
     <string name="title_activity_replay">Remove this</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_crash">CrashActivity</string>
-    <string name="pending">Pending</string>
+    <string name="pending">Waiting to start</string>
     <string name="processing">Running on Open</string>
     <string name="downloading">Downloading File</string>
     <string name="vpn">Running on VPN</string>
@@ -42,6 +42,9 @@
     <string name="appSizeLabel">Size:</string>
     <string name="appTimeLabel">Time:</string>
     
+    <string name="install_cert_label">Click the button below if you want to reinstall the credential</string>
+    <string name="install_cert_button">Install credential</string>
+    
     <string name="consent_form_title">Consent Form</string>
     <string name="consent_form"><Data><![CDATA[ We would like to invite you to take part in a research project. The purpose of this research study is to understand how cellular Internet providers give different performance to different network traffic from your smartphone. For example, we would like to know if a provider is speeding up YouTube traffic and/or slowing down Netflix. We will use this information to understand how often this occurs, where this occurs and what are the implications. <br>
 We are asking you to participate in this study because you are a smartphone user who has installed our app for detecting traffic differentiation. The decision to participate in this research project is voluntary. You do not have to participate and you can uninstall the app at any time. Even if you begin using the app, you can stop at any time. You must be at least 18 years of age to participate. <br>
@@ -53,7 +56,7 @@ If you have any questions about this study, please feel free to email <strong>Da
 If you have any questions about your rights in this research, you may contact <strong>Nan C. Regina</strong>, Director, Human Subject Research Protection, 960 Renaissance Park, Northeastern University, Boston, MA 02115. Email: <strong>n.regina@neu.edu.</strong> You may contact anonymously if you wish. <br>
 If you have any questions regarding electronic privacy, please feel free to contact <strong>Mark Nardone</strong>, NU’s Director of Information Security via email at <strong>privacy@neu.edu</strong>. <br>
 This study has been reviewed and approved by the Northeastern University Institutional Review Board (#14-08-16). ]]> </Data> </string>
-    <string name="consent_form_condition"><Data><![CDATA[ <br> By clicking the \"Accept\" button below you are indicating that you consent to participate in this study. Please print out a copy of this consent form for your records. ]]> </Data> </string>
+    <string name="consent_form_condition"><Data><![CDATA[ <br> By clicking the \"Accept\" button above you are indicating that you consent to participate in this study. Please print out a copy of this consent form for your records. ]]> </Data> </string>
     <string name="user_agree">Accept</string>
     <string name="user_disagree">Not Accept</string>
     

@@ -73,7 +73,7 @@
                 android:layout_weight="1"
                 android:gravity="left"
                 android:padding="10dp"
-                android:text="Pending"
+                android:text="@string/pending"
                 android:textColor="@color/black"
                 android:textSize="@dimen/main_title_text_size"
                 android:textStyle="bold" />

@@ -12,7 +12,7 @@ public class ApplicationBean implements Parcelable {
 	private String image = null;
 	java.util.Queue<RequestSet> queue = null;
 	public boolean isProgressStarted = false;
-	public String status = "Pending";
+	public String status = "Waiting to start";
 	public String resultImg = null;
 	public String time = null;
 	

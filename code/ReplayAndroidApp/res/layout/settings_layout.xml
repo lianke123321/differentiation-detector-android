@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical" >
 
         <TextView
@@ -48,13 +48,25 @@
             android:padding="10dp"
             android:prompt="@string/server_label" />
         
-        <EditText 
-            android:id="@+id/settings_server_txt"
-            android:layout_width="fill_parent"
+        <TextView 
+            android:id = "@+id/installCertTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:padding="10dp"
-            />
+            android:text="@string/install_cert_label"
+            android:textColor="@color/blue11"
+            android:textSize="@dimen/main_title_text_size"
+            android:textStyle="bold" />
+        
+        <Button
+            android:id="@+id/installCertButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="center"
+            android:text="@string/install_cert_button"
+            android:textSize="15sp" />
+        
     </LinearLayout>
 
 </ScrollView>

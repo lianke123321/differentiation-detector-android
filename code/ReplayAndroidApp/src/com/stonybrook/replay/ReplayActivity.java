@@ -986,6 +986,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						ReplayActivity.this.runOnUiThread(new Runnable() {
 							public void run() {
 								prgBar.setVisibility(View.GONE);
+								prgBar.setProgress(0);
 							}
 						});
 						
