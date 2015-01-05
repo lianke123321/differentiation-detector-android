@@ -225,7 +225,7 @@ public class ConsentFormActivity extends Activity {
 			byte pkcsBytes[] = Base64.decode( pkcs12.getBytes(), Base64.DEFAULT );
 			InputStream sslInputStream = new ByteArrayInputStream( 
 					pkcsBytes );
-			keyStore.load( sslInputStream, alias.toCharArray() );
+			keyStore.load( sslInputStream, "".toCharArray());
 			
 			Intent installIntent = KeyChain.createInstallIntent();
 			
@@ -293,7 +293,7 @@ public class ConsentFormActivity extends Activity {
 
 	    	JSONObject json = null;
 			try {
-				json = new JSONObject(getWebPage("http://"+gateway+":50080/dyn/getTempCert"));
+				json = new JSONObject(getWebPage("http://"+gateway+":50080/dyn/getTempCertNoPass"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
