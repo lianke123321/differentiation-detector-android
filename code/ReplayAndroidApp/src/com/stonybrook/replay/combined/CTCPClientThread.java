@@ -7,6 +7,7 @@ import java.util.concurrent.Semaphore;
 
 import android.util.Log;
 
+import com.stonybrook.replay.bean.RecvQueueBean;
 import com.stonybrook.replay.bean.RequestSet;
 // @@@ Adrian add this
 
@@ -15,17 +16,21 @@ public class CTCPClientThread implements Runnable {
 	private CTCPClient client = null;
 	private RequestSet RS = null;
 	private CombinedQueue queue = null;
-	private Semaphore sema = null;
+	private Semaphore sendSema = null;
+	//private Semaphore recvSema = null;
+	private RecvQueueBean recvQueueBean = null;
 	long timeOrigin = 0;
 	
 	int bufSize = 4096;
 
 	public CTCPClientThread(CTCPClient client, RequestSet RS, CombinedQueue queue,
-			Semaphore sema, long timeOrigin) {
+			Semaphore sendSema, RecvQueueBean recvQueueBean, long timeOrigin) {
 		this.client = client;
 		this.RS = RS;
 		this.queue = queue;
-		this.sema = sema;
+		this.sendSema = sendSema;
+		//this.recvSema = recvSema;
+		this.recvQueueBean = recvQueueBean;
 		this.timeOrigin = timeOrigin;
 	}
 
@@ -59,9 +64,26 @@ public class CTCPClientThread implements Runnable {
 			
 			Log.d("Sended", "payload " + RS.getPayload().length +
 					" bytes, expecting " + RS.getResponse_len() + " bytes ");
-
+			
+			sendSema.release();
+			synchronized (queue) {
+				queue.notifyAll();
+			}
+			
 			// Notify waiting Queue thread to start processing next packet
 			if (RS.getResponse_len() > 0) {
+				// acquire the recvSema
+				Log.d("Response", "waiting to get receiving semaphore!");
+				int lineNum = 0;
+				synchronized (recvQueueBean) {
+					lineNum = recvQueueBean.queue ++;
+				}
+				while (lineNum != recvQueueBean.current) {
+					// spinning
+				}
+				//recvSema.acquire();
+				Log.d("Response", "got the receiving semaphore!");
+				
 				Log.d("Response", "Waiting for response of " + RS.getResponse_len() + " bytes");
 
 				int totalRead = 0;
@@ -85,6 +107,10 @@ public class CTCPClientThread implements Runnable {
 					}
 					totalRead += bytesRead;
 				}
+				synchronized (recvQueueBean) {
+					recvQueueBean.current ++;
+				}
+				//recvSema.release();
 				// adrian: manually free buffer
 				buffer = null;
 				
@@ -97,13 +123,10 @@ public class CTCPClientThread implements Runnable {
 			Log.d("TCPClientThread", "something bad happened!");
 			e.printStackTrace();
 		} finally {
-			sema.release();
 			synchronized (queue) {
 				--queue.threads;
 			}
-			synchronized (queue) {
-				queue.notifyAll();
-			}
+			
 
 		}
 

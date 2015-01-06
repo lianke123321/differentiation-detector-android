@@ -8,6 +8,7 @@ import java.util.concurrent.Semaphore;
 import android.util.Log;
 
 import com.stonybrook.replay.bean.JitterBean;
+import com.stonybrook.replay.bean.RecvQueueBean;
 import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.UDPReplayInfoBean;
@@ -29,7 +30,10 @@ public class CombinedQueue {
 	private ArrayList<RequestSet> Q = null;
 	long timeOrigin;
 	long jitterTimeOrigin;
-	private Map<CTCPClient, Semaphore> mSema = new HashMap<CTCPClient, Semaphore>();
+	private Map<CTCPClient, Semaphore> sendSemaMap = new HashMap<CTCPClient, Semaphore>();
+	//private Map<CTCPClient, Semaphore> recvSemaMap = new HashMap<CTCPClient, Semaphore>();
+	// for receiving packets. giving a number to every thread waiting for receiving
+	private RecvQueueBean recvQueueBean;
 	private ArrayList<Thread> cThreadList = new ArrayList<Thread>();
 	//public volatile boolean done = false;
 	public int threads = 0;
@@ -42,6 +46,7 @@ public class CombinedQueue {
 		super();
 		this.Q = q;
 		this.jitterBean = jitterBean;
+		this.recvQueueBean = new RecvQueueBean();
 		//this.flag.set(false);
 	}
 
@@ -81,10 +86,11 @@ public class CombinedQueue {
 					updateUIBean.setProgress((int) (i * 100 / len));
 					
 				} else { 
-					Semaphore sema = getSemaLock(CSPairMapping.get(RS.getc_s_pair()));
-					Log.d("Replay", "waiting to get semaphore!");
-					sema.acquire();
-					Log.d("Replay", "got the semaphore!");
+					Semaphore sendSema = getSendSemaLock(CSPairMapping.get(RS.getc_s_pair()));
+					//Semaphore recvSema = getRecvSemaLock(CSPairMapping.get(RS.getc_s_pair()));
+					Log.d("Replay", "waiting to get send semaphore!");
+					sendSema.acquire();
+					Log.d("Replay", "got the send semaphore!");
 	
 					Log.d("Replay", "Sending tcp packet " + (i++) + "/" + len +
 							" at time " + (System.currentTimeMillis() - timeOrigin));
@@ -94,7 +100,7 @@ public class CombinedQueue {
 					
 					// adrian: every time when calling next we create and start a new thread
 					// adrian: here we start different thread according to the type of RS
-					nextTCP(CSPairMapping.get(RS.getc_s_pair()), RS, timing, sema);
+					nextTCP(CSPairMapping.get(RS.getc_s_pair()), RS, timing, sendSema, recvQueueBean);
 	
 					
 					/*synchronized (this) {
@@ -114,15 +120,26 @@ public class CombinedQueue {
 			throw ex;
 		}
 	}
-
-	private Semaphore getSemaLock(CTCPClient client) {
-		Semaphore l = mSema.get(client);
+	
+	// adrian: this is the semaphore for sending packet
+	private Semaphore getSendSemaLock(CTCPClient client) {
+		Semaphore l = sendSemaMap.get(client);
 		if (l == null) {
 			l = new Semaphore(1);
-			mSema.put(client, l);
+			sendSemaMap.put(client, l);
 		}
 		return l;
 	}
+	
+	// adrian: this is the semaphore for receiving packet
+	/*private Semaphore getRecvSemaLock(CTCPClient client) {
+		Semaphore l = recvSemaMap.get(client);
+		if (l == null) {
+			l = new Semaphore(1);
+			recvSemaMap.put(client, l);
+		}
+		return l;
+	}*/
 
 	/**
 	 * Call the client thread which will send the payload and receive the response for RequestSet
@@ -133,7 +150,7 @@ public class CombinedQueue {
 	 * @throws Exception
 	 */
 	private void nextTCP(CTCPClient client, RequestSet RS, Boolean timing,
-			Semaphore sema) throws Exception {
+			Semaphore sendSema, RecvQueueBean recvQueueBean) throws Exception {
 
 		// @@@ if timing is set to be true, wait until expected Time to send this packet
 		if (timing) {
@@ -147,7 +164,8 @@ public class CombinedQueue {
 		}
 
 		// @@@ package this TCPClient into a TCPClientThread, then put it into a thread
-		CTCPClientThread clientThread = new CTCPClientThread(client, RS, this, sema, timeOrigin);
+		CTCPClientThread clientThread = new CTCPClientThread(client, RS, this,
+				sendSema, recvQueueBean, timeOrigin);
 		Thread cThread = new Thread(clientThread);
 		cThread.start();
 		//threadList.add(cThread);
