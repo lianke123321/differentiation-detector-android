@@ -7,6 +7,7 @@ import java.util.concurrent.Semaphore;
 
 import android.util.Log;
 
+import com.stonybrook.replay.bean.JitterBean;
 import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.UDPReplayInfoBean;
@@ -27,15 +28,20 @@ public class CombinedQueue {
 	//public AtomicBoolean flag = new AtomicBoolean();
 	private ArrayList<RequestSet> Q = null;
 	long timeOrigin;
+	long jitterTimeOrigin;
 	private Map<CTCPClient, Semaphore> mSema = new HashMap<CTCPClient, Semaphore>();
 	private ArrayList<Thread> cThreadList = new ArrayList<Thread>();
 	//public volatile boolean done = false;
 	public int threads = 0;
 	//ArrayList<Thread> threadList = new ArrayList<Thread>(); 
 	
-	public CombinedQueue(ArrayList<RequestSet> q) {
+	// for jitter
+	JitterBean jitterBean = null;
+	
+	public CombinedQueue(ArrayList<RequestSet> q, JitterBean jitterBean) {
 		super();
-		Q = q;
+		this.Q = q;
+		this.jitterBean = jitterBean;
 		//this.flag.set(false);
 	}
 
@@ -56,6 +62,7 @@ public class CombinedQueue {
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping,
 			Boolean timing) throws Exception {
 		this.timeOrigin = System.currentTimeMillis();
+		this.jitterTimeOrigin = System.currentTimeMillis();
 		
 		try {
 			int i = 1;
@@ -182,8 +189,15 @@ public class CombinedQueue {
 			}
 		}
 		
-		// TODO: send_jitter?
+		// update sentJitter
+		long currentTime = System.currentTimeMillis();
+		synchronized (jitterBean) {
+			jitterBean.sentJitter += (String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000)
+					+ "\t" + RS.getPayload() + "\n");
+		}
+		jitterTimeOrigin = currentTime;
 		
+		// adrian: send packet
 		client.sendUDPPacket(RS.getPayload(), destAddr);
 		
 	}

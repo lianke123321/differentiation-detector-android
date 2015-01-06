@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
+import com.stonybrook.replay.bean.JitterBean;
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
 import com.stonybrook.replay.bean.UDPReplayInfoBean;
@@ -158,6 +159,22 @@ public class CombinedSideChannel {
 		Thread notfThread = new Thread(notifier);
 		notfThread.start();
 		threadList.add(notfThread);
+	}
+	
+	public void sendJitter(String id, String jitter,
+			JitterBean jitterBean) throws Exception {
+		// if jitter is set to false, don't send jitter
+		if (jitter != "true") {
+			Log.d("sendJitter", "No jitter");
+			sendObject(("NoJitter;" + id).getBytes(), objLen);
+			return;
+		}
+		
+		sendObject(("WillSendClientJitter;" + id).getBytes(), objLen);
+		
+		sendObject(jitterBean.sentJitter.getBytes(), objLen);
+		sendObject(jitterBean.rcvdJitter.getBytes(), objLen);
+		Log.d("sendJitter", "finished sending jitter");
 	}
 	
 	public void closeSideChannelSocket () throws Exception {

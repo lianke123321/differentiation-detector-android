@@ -9,20 +9,29 @@ import java.util.Iterator;
 
 import android.util.Log;
 
+import com.stonybrook.replay.bean.JitterBean;
 import com.stonybrook.replay.bean.UDPReplayInfoBean;
 
 public final class CombinedReceiverThread implements Runnable{
 	
 	private UDPReplayInfoBean udpReplayInfoBean = null;
 	private int bufSize = 4096;
+	private long jitterTimeOrigin = 0;
 	
-	public CombinedReceiverThread(UDPReplayInfoBean udpReplayInfoBean) {
+	// adrian: for jitter
+	private JitterBean jitterBean = null;
+	
+	public CombinedReceiverThread(UDPReplayInfoBean udpReplayInfoBean,
+			JitterBean jitterBean) {
 		super();
 		this.udpReplayInfoBean = udpReplayInfoBean;
+		this.jitterBean = jitterBean;
 	}
 
 	@Override
 	public void run() {
+		
+		this.jitterTimeOrigin = System.currentTimeMillis();
 		
 		try {
 			Selector selector = Selector.open();
@@ -45,6 +54,14 @@ public final class CombinedReceiverThread implements Runnable{
 						selectedKeys.remove();
 						DatagramChannel tempChannel = (DatagramChannel) key.channel();
 						tempChannel.socket().receive(packet);
+						
+						// for receive jitter
+						long currentTime = System.currentTimeMillis();
+						synchronized (jitterBean) {
+							jitterBean.rcvdJitter += (String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000)
+									+ "\t" + data + "\n");
+						}
+						this.jitterTimeOrigin = currentTime;
 					}
 					data = null;
 				}

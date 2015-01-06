@@ -55,6 +55,7 @@ import com.stonybrook.android.logic.TrustedCertificateManager;
 import com.stonybrook.android.ui.LogActivity;
 import com.stonybrook.replay.adapter.ImageReplayListAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
+import com.stonybrook.replay.bean.JitterBean;
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
 import com.stonybrook.replay.bean.TCPAppJSONInfoBean;
@@ -238,6 +239,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			Config.set("server", server);
 			// adrian: added cause arash's code
 			Config.set("extraString", "extraString");
+			Config.set("jitter", "true");
 
 			Log.d("Server", server);
 			// Check server reachability
@@ -258,12 +260,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				else
 					processUDPApplication(selectedApps.get(currentReplayCount));*/
 				
-				/**
-				 * start combined method
-				 * 
-				 * @author Adrian
-				 * 
-				 */
+				// adrian: start combined method
 				processCombinedApplication(selectedApps.get(currentReplayCount));
 			} else {
 				Toast.makeText(ReplayActivity.this,
@@ -332,6 +329,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			throws Exception {
 
 		currentTask = "combined";
+		
+		// adrian: update progress
+		selectedApps.get(currentReplayCount).status = getResources()
+				.getString(R.string.load_q);
+		adapter.notifyDataSetChanged();
+		
 		appData_combined = UnpickleDataStream.unpickleCombinedJSON(
 				applicationBean.getDataFile(), context);
 		Log.d("Parsing", applicationBean.getDataFile());
@@ -842,6 +845,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * @author Adrian
 				 * 
 				 */
+				// adrian: update progress
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.create_side_channel);
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
 				int sideChannelPort = Integer.valueOf(Config
 						.get("combined_sidechannel_port"));
 				String randomID = new RandomString(10).nextString();
@@ -855,9 +867,21 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> serverPortsMap = null;
 				UDPReplayInfoBean udpReplayInfoBean = new UDPReplayInfoBean();
 				
+				// adrian: for jitter
+				JitterBean jitterBean = new JitterBean();
+				
 				// adrian: new declareID() function
 				sideChannel.declareID(appData.getReplayName(), Config.get("extraString"));
-
+				
+				// adrian: update progress
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.ask4permission);
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
 				String[] permission = sideChannel.ask4Permission();
 				
 				if (permission[0] == "0") {
@@ -884,7 +908,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * info parsing was throwing error. so, I put while loop to do
 				 * this until port mapping is parsed successfully.
 				 */
-
+				
+				// adrian: update progress
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.receive_server_port_mapping);
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
 				boolean s = false;
 				while (!s) {
 					try {
@@ -903,6 +936,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				/**
 				 * Create clients from CSPairs
 				 */
+				
+				// adrian: update progress
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.create_tcp_client);
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
 				for (String csp : appData.getTcpCSPs()) {
 					String destIP = csp.substring(csp.lastIndexOf('-') + 1,
 							csp.lastIndexOf("."));
@@ -924,11 +967,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				/**
 				 * adrian: create clients from udpClientPorts
 				 */
-				//ArrayList<DatagramSocket> udpSocketList = new ArrayList<DatagramSocket>();
+				
+				// adrian: update progress
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.create_udp_client);
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
 				for (String originalClientPort : appData.getUdpClientPorts()) {
-					//ServerInstance instance = serverPortsMap.get("udp").get(destIP).get(
-//							destPort);
-//					int destPort = Integer.valueOf(originalClientPort);
 					CUDPClient c = new CUDPClient(getPublicIP());
 					udpPortMapping.put(originalClientPort, c);
 				}
@@ -943,10 +992,31 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				ArrayList<Thread> threadList = new ArrayList<Thread>();
 				
 				// adrian: starting notifier thread
+				
+				// adrian: update progress
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.run_notf);
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
 				sideChannel.notifierUpCall(udpReplayInfoBean, threadList);
 				
 				// adrian: starting receiver thread
-				CombinedReceiverThread receiver = new CombinedReceiverThread(udpReplayInfoBean);
+				
+				// adrian: update progress
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.run_receiver);
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
+				CombinedReceiverThread receiver = new CombinedReceiverThread(udpReplayInfoBean,
+						jitterBean);
 				Thread rThread = new Thread(receiver);
 				rThread.start();
 				threadList.add(rThread);
@@ -994,10 +1064,20 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				threadList.add(UIUpdateThread);
 
 				// Running the Queue (Sender)
-				CombinedQueue queue = new CombinedQueue(appData.getQ());
+				
+				// adrian: update progress
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.run_sender);
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
+				CombinedQueue queue = new CombinedQueue(appData.getQ(), jitterBean);
 				this.timeStarted = System.currentTimeMillis();
-				queue.run(updateUIBean, CSPairMapping, udpPortMapping, udpReplayInfoBean,
-						serverPortsMap.get("udp"),
+				queue.run(updateUIBean, CSPairMapping, udpPortMapping,
+						udpReplayInfoBean, serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")));
 				
 				// waiting for all threads to finish
@@ -1006,9 +1086,35 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					t.join();
 				
 				// Telling server done with replaying
+				
+				// adrian: update progress
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.send_done);
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
 				double duration = ((double) (System.currentTimeMillis() - this.timeStarted)) / 1000;
 				sideChannel.sendDone(duration);
 				Log.d("Replay", "replay finished using time " + duration + " s");
+				
+				// Sending jitter
+				
+				// adrian: update progress
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.send_jitter);
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				
+				sideChannel.sendJitter(randomID, Config.get("jitter"), jitterBean);
+				
+				//Log.d("sentJitter", jitterBean.sentJitter);
+				//Log.d("rcvdJitter", jitterBean.rcvdJitter);
 				
 				// closing side channel socket
 				sideChannel.closeSideChannelSocket();

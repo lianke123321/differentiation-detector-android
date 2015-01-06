@@ -11,14 +11,29 @@
     <string name="title_activity_replay">Remove this</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_crash">CrashActivity</string>
+    
     <string name="pending">Waiting to start</string>
     <string name="processing">Running on Open</string>
-    <string name="downloading">Downloading File</string>
     <string name="vpn">Running on VPN</string>
+    <string name="load_q">Loading the queue</string>
+    <string name="create_side_channel">Creating side channel</string>
+    <string name="ask4permission">Asking for permission</string>
+    <string name="receive_server_port_mapping">Receiving server port mapping</string>
+    <string name="receive_sender_count">Receiving UDP sender count</string>
+    <string name="create_tcp_client">Creating all TCP client sockets</string>
+    <string name="create_udp_client">Creating all UDP client sockets</string>
+    <string name="run_notf">Running side channel notifier</string>
+    <string name="run_receiver">Running the Receiver process</string>
+    <string name="run_sender">Running the Sender process</string>
+    <string name="send_done">Telling server done with replaying</string>
+    <string name="send_jitter">Sending the jitter results on client</string>
+    <string name="receive_result">Receiving results</string>
+    <string name="finished">Finished</string>
+    
+    <string name="downloading">Downloading File</string>
     <string name="error">Error </string>
     <string name="vpn_connect">Trying to connect VPN</string>
     <string name="vpn_failed">Failed to connect VPN</string>
-    <string name="finished">Finished</string>
     <string name="appResultButton">Results</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>

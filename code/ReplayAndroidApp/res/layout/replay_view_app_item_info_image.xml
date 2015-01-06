@@ -72,11 +72,9 @@
                 android:layout_span="4"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:padding="10dp"
+                android:padding="5dp"
                 android:text="@string/pending"
-                android:textColor="@color/black"
-                android:textSize="@dimen/main_title_text_size"
-                android:textStyle="bold" />
+                android:textColor="@color/black" />
         </TableRow>
     </TableLayout>
 
