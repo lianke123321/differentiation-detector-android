@@ -78,9 +78,11 @@ public class CTCPClientThread implements Runnable {
 				synchronized (recvQueueBean) {
 					lineNum = recvQueueBean.queue ++;
 				}
+				
 				while (lineNum != recvQueueBean.current) {
-					// spinning
+					//recvQueueBean.wait();
 				}
+				
 				//recvSema.acquire();
 				Log.d("Response", "got the receiving semaphore!");
 				
@@ -107,8 +109,10 @@ public class CTCPClientThread implements Runnable {
 					}
 					totalRead += bytesRead;
 				}
+				
 				synchronized (recvQueueBean) {
 					recvQueueBean.current ++;
+					//recvQueueBean.notifyAll();
 				}
 				//recvSema.release();
 				// adrian: manually free buffer

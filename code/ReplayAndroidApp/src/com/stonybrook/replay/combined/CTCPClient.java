@@ -40,7 +40,7 @@ public class CTCPClient /* implements Runnable */{
 			InetSocketAddress endPoint = new InetSocketAddress(destIP, destPort);
 			socket.setTcpNoDelay(true);
 			socket.setReuseAddress(true);
-			//socket.setKeepAlive(true);
+			socket.setKeepAlive(true);
 			socket.connect(endPoint);
 
 			// this.identify();
