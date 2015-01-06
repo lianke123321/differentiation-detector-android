@@ -2,7 +2,10 @@ package com.stonybrook.replay.combined;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.util.Iterator;
 
 import android.util.Log;
 
@@ -20,45 +23,57 @@ public final class CombinedReceiverThread implements Runnable{
 
 	@Override
 	public void run() {
-		while (udpReplayInfoBean.getSenderCount() > 0) {
+		
+		try {
+			Selector selector = Selector.open();
 			
-			//Log.d("Receiver", "senderCount: " + udpReplayInfoBean.getSenderCount());
+			for (DatagramChannel channel : udpReplayInfoBean.getUdpSocketList())
+				channel.register(selector, SelectionKey.OP_READ);
 			
-			for (DatagramSocket socket : udpReplayInfoBean.getUdpSocketList()) {
-				byte[] data = new byte[bufSize];
-				DatagramPacket packet = new DatagramPacket(data, data.length);
-				try {
+			while (udpReplayInfoBean.getSenderCount() > 0) {
+				
+				//Log.d("Receiver", "senderCount: " + udpReplayInfoBean.getSenderCount());
+				
+				if (selector.selectNow() > 0) {
+					byte[] data = new byte[bufSize];
+					DatagramPacket packet = new DatagramPacket(data, data.length);
 					//Log.d("Receiver", "try to receive a udp packet");
-					socket.receive(packet);
-				} catch (IOException e) {
-					Log.d("Receiver", "receiving udp packet error!");
-					e.printStackTrace();
+					selector.select();
+					Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
+					while (selectedKeys.hasNext()) {
+						SelectionKey key = (SelectionKey) selectedKeys.next();
+						selectedKeys.remove();
+						DatagramChannel tempChannel = (DatagramChannel) key.channel();
+						tempChannel.socket().receive(packet);
+					}
+					data = null;
 				}
-				data = null;
+				
+				/*while (true) {
+					udpReplayInfoBean.pollCloseQ();
+					if (!udpReplayInfoBean.getCloseQ().isEmpty()) {
+						//udpReplayInfoBean.decrement();
+						Log.d("Receiver", "decremented one from senderCount: " +
+								udpReplayInfoBean.getSenderCount());
+					} else 
+						break;
+				}*/
+				
+				/**
+				 * adrian: force data to clean and sleep 2 seconds every iteration.
+				 * in order to solve the memory free problem
+				 */
+				Thread.sleep(500);
+				
 			}
-			
-			while (true) {
-				udpReplayInfoBean.pollCloseQ();
-				if (!udpReplayInfoBean.getCloseQ().isEmpty()) {
-					//udpReplayInfoBean.decrement();
-					Log.d("Receiver", "decremented one from senderCount: " +
-							udpReplayInfoBean.getSenderCount());
-				} else 
-					break;
-			}
-			
-			/**
-			 * adrian: force data to clean and sleep 2 seconds every iteration.
-			 * in order to solve the memory free problem
-			 */
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				Log.d("Receiver", "sleep went wrong!");
-				e.printStackTrace();
-			}
-			
+		} catch (IOException e1) {
+			Log.d("Receiver", "receiving udp packet error!");
+			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			Log.d("Receiver", "sleep went wrong!");
+			e.printStackTrace();
 		}
+		
 		Log.d("Receiver", "finished!");
 	}
 

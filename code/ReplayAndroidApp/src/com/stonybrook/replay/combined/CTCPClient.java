@@ -38,9 +38,9 @@ public class CTCPClient /* implements Runnable */{
 		try {
 			socket = new Socket();
 			InetSocketAddress endPoint = new InetSocketAddress(destIP, destPort);
-			socket.setTcpNoDelay(false);
+			socket.setTcpNoDelay(true);
 			socket.setReuseAddress(true);
-			socket.setKeepAlive(true);
+			//socket.setKeepAlive(true);
 			socket.connect(endPoint);
 
 			// this.identify();

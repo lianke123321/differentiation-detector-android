@@ -1,18 +1,18 @@
 package com.stonybrook.replay.combined;
 
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 
 import com.stonybrook.replay.bean.ServerInstance;
 
 public class CUDPClient /* implements Runnable */{
-	public DatagramSocket socket = null;
+	public DatagramChannel channel = null;
 	public String publicIP = null;
 	public int port = 0;
 	public CUDPClient(String publicIP) {
 		super();
-		this.socket = null;
 		this.publicIP = publicIP;
 	}
 
@@ -25,9 +25,9 @@ public class CUDPClient /* implements Runnable */{
 			byte[] buffer = "".getBytes();
 			InetSocketAddress endPoint = new InetSocketAddress(publicIP, 100);
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, endPoint);
-			socket = new DatagramSocket();
-			socket.send(packet);
-			this.port = socket.getLocalPort();
+			channel = DatagramChannel.open();
+			channel.socket().send(packet);
+			this.port = channel.socket().getLocalPort();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -37,9 +37,9 @@ public class CUDPClient /* implements Runnable */{
 		//byte[] buf = UtilsManager.serialize(payload);
 		/*Log.d("sending", "udp packet w/ payload length " + payload.length +
 				" sent to server " + instance.server);*/
-		DatagramPacket packet = new DatagramPacket(payload, payload.length,
-				new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));
-		this.socket.send(packet);
+		/*DatagramPacket packet = new DatagramPacket(payload, payload.length,
+				new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));*/
+		this.channel.send(ByteBuffer.wrap(payload), new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));
 		
 	}
 

@@ -1,13 +1,13 @@
 package com.stonybrook.replay.bean;
 
-import java.net.DatagramSocket;
+import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class UDPReplayInfoBean {
 	
-	private ArrayList<DatagramSocket> udpSocketList = new ArrayList<DatagramSocket>();
+	private ArrayList<DatagramChannel> udpSocketList = new ArrayList<DatagramChannel>();
 	private int senderCount = 0;
 	private Queue<String> closeQ = new LinkedList<String>();
 	
@@ -19,11 +19,11 @@ public class UDPReplayInfoBean {
 		this.closeQ = closeQ;
 	}
 
-	public synchronized ArrayList<DatagramSocket> getUdpSocketList() {
+	public synchronized ArrayList<DatagramChannel> getUdpSocketList() {
 		return udpSocketList;
 	}
 	
-	public synchronized void setUdpSocketList(ArrayList<DatagramSocket> udpSocketList) {
+	public synchronized void setUdpSocketList(ArrayList<DatagramChannel> udpSocketList) {
 		this.udpSocketList = udpSocketList;
 	}
 	
@@ -39,8 +39,8 @@ public class UDPReplayInfoBean {
 		senderCount -= 1;
 	}
 	
-	public synchronized void addSocket(DatagramSocket socket) {
-		udpSocketList.add(socket);
+	public synchronized void addSocket(DatagramChannel channel) {
+		udpSocketList.add(channel);
 	}
 	
 	public synchronized void offerCloseQ (String str) {

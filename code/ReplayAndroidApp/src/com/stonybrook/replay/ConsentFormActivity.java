@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.security.KeyChain;
 import android.text.Html;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -115,12 +116,22 @@ public class ConsentFormActivity extends Activity {
 			 * intent.setClass(ConsentFormActivity.this, MainActivity.class);
 			 * startActivity(intent); ConsentFormActivity.this.finish();
 			 */
-
-			// download credentials 
-			downloadAndInstallVpnCreds();
+			
+			new AlertDialog.Builder(ConsentFormActivity.this)
+			.setTitle("Credential installation")
+			.setMessage("We are going to install a certificate that allows our tests to run. " +
+					"When asked for a password, leave the field empty and click \"OK\".\n" +
+					"You could also install it later in \"settings\".\n" +
+					"Click \"OK\" to proceed.")
+			.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { 
+					Log.d("ConsentForm", "proceed to install credential");
+					// download credentials 
+					downloadAndInstallVpnCreds();
+				}
+			})
+			.show();
 		
-			
-			
 		}
 
 

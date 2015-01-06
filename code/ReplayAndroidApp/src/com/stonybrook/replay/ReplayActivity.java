@@ -65,6 +65,7 @@ import com.stonybrook.replay.bean.combinedAppJSONInfoBean;
 import com.stonybrook.replay.combined.CTCPClient;
 import com.stonybrook.replay.combined.CUDPClient;
 import com.stonybrook.replay.combined.CombinedQueue;
+import com.stonybrook.replay.combined.CombinedReceiverThread;
 import com.stonybrook.replay.combined.CombinedSideChannel;
 import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
@@ -803,8 +804,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		boolean success = true;
 		// This simply identifies whether we are in open or VPN
 		public String channel = null;
-		//private ProgressBar prgBar;
-
+		
 		public QueueCombinedAsync(ReplayCompleteListener listener, String channel) {
 			this.listener = listener;
 			this.channel = channel;
@@ -813,9 +813,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected void onPostExecute(String result) {
-			Log.d("Replay",
-					"Combined Replay lasted for "
-							+ (System.currentTimeMillis() - this.timeStarted));
 
 			// Callback according to type of Replay with status of Replay
 			if (channel.equalsIgnoreCase("open"))
@@ -832,7 +829,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		protected String doInBackground(String... str) {
 			this.appData = appData_combined;
-			this.timeStarted = System.currentTimeMillis();
 			HashMap<String, CTCPClient> CSPairMapping = new HashMap<String, CTCPClient>();
 			// adrian: create a hash map for udp
 			HashMap<String, CUDPClient> udpPortMapping = new HashMap<String, CUDPClient>();
@@ -950,10 +946,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				sideChannel.notifierUpCall(udpReplayInfoBean, threadList);
 				
 				// adrian: starting receiver thread
-				/*CombinedReceiverThread receiver = new CombinedReceiverThread(udpReplayInfoBean);
+				CombinedReceiverThread receiver = new CombinedReceiverThread(udpReplayInfoBean);
 				Thread rThread = new Thread(receiver);
 				rThread.start();
-				threadList.add(rThread);*/
+				threadList.add(rThread);
 				
 				// adrian: starting UI updating thread
 				Thread UIUpdateThread = new Thread(new Runnable(){
@@ -999,6 +995,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// Running the Queue (Sender)
 				CombinedQueue queue = new CombinedQueue(appData.getQ());
+				this.timeStarted = System.currentTimeMillis();
 				queue.run(updateUIBean, CSPairMapping, udpPortMapping, udpReplayInfoBean,
 						serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")));

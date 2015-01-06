@@ -42,7 +42,7 @@
     <string name="appSizeLabel">Size:</string>
     <string name="appTimeLabel">Time:</string>
     
-    <string name="install_cert_label">Click the button below if you want to reinstall the credential</string>
+    <string name="install_cert_label">Click the button below if you want to reinstall the credential. Please leave the field empty and click "OK"!</string>
     <string name="install_cert_button">Install credential</string>
     
     <string name="consent_form_title">Consent Form</string>

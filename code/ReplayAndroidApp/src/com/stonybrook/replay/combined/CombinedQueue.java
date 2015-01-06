@@ -154,9 +154,9 @@ public class CombinedQueue {
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping, 
 			Boolean timing) throws Exception {
 		String c_s_pair = RS.getc_s_pair();
-		String clientPort = c_s_pair.substring(16, 21).replaceFirst("^0+(?!$)", "");
+		String clientPort = c_s_pair.substring(16, 21);
 		String dstIP = c_s_pair.substring(22, 37);
-		String dstPort = c_s_pair.substring(38, 43).replaceFirst("^0+(?!$)", "");
+		String dstPort = c_s_pair.substring(38, 43);
 		/*String destIP = c_s_pair.substring(c_s_pair.lastIndexOf('-') + 1,
 				c_s_pair.lastIndexOf("."));
 		String destPort = c_s_pair.substring(c_s_pair.lastIndexOf('.') + 1,
@@ -165,9 +165,9 @@ public class CombinedQueue {
 		ServerInstance destAddr = udpServerMapping.get(dstIP).get(dstPort);
 		CUDPClient client = udpPortMapping.get(clientPort);
 		
-		if (client.socket == null) {
+		if (client.channel == null) {
 			client.createSocket();
-			udpReplayInfoBean.addSocket(client.socket);
+			udpReplayInfoBean.addSocket(client.channel);
 			//Log.d("nextUDP", "read senderCount: " + udpReplayInfoBean.getSenderCount());
 			
 		}
