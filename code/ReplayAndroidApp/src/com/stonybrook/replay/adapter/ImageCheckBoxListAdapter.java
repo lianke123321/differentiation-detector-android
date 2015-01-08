@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.rgolani.replay.R;
 import com.stonybrook.replay.MainActivity;
@@ -76,6 +77,9 @@ public class ImageCheckBoxListAdapter extends BaseAdapter implements OnClickList
 		ImageView img = (ImageView)view.findViewById(R.id.appImageView);
 		img.setImageDrawable(mainAct.getResources().getDrawable(mainAct.getResources().getIdentifier(app.getImage(), "drawable", mainAct.getPackageName())));
 		img.setTag(app);
+		
+		TextView text = (TextView)view.findViewById(R.id.appNameTextView);
+		text.setText(mainAct.getResources().getString(mainAct.getResources().getIdentifier(app.getName(), "string", mainAct.getPackageName())));
 		
 		return view;
 	}

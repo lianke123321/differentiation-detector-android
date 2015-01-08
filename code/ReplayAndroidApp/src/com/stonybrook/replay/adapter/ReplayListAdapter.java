@@ -63,7 +63,7 @@ public class ReplayListAdapter extends BaseExpandableListAdapter{
         
         ProgressBar progress = (ProgressBar)convertView.findViewById(R.id.appProgress);
         Button button = (Button)convertView.findViewById(R.id.appResultBtn);
-        if(app.status.equalsIgnoreCase(mainAct.getResources().getString(R.string.finished)))
+        if(app.status.equalsIgnoreCase(mainAct.getResources().getString(R.string.finish_vpn)))
         {
         	progress.setVisibility(ProgressBar.INVISIBLE);
         	button.setVisibility(Button.VISIBLE);

@@ -261,7 +261,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					processUDPApplication(selectedApps.get(currentReplayCount));*/
 				
 				// adrian: start combined method
-				processCombinedApplication(selectedApps.get(currentReplayCount));
+				processCombinedApplication(selectedApps.get(currentReplayCount), "open");
 			} else {
 				Toast.makeText(ReplayActivity.this,
 						"Server Not Available. Try after some time.",
@@ -325,20 +325,25 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 * @param applicationBean
 	 * @throws Exception
 	 */
-	private void processCombinedApplication(ApplicationBean applicationBean)
+	private void processCombinedApplication(ApplicationBean applicationBean, String env)
 			throws Exception {
 
 		currentTask = "combined";
 		
 		// adrian: update progress
-		selectedApps.get(currentReplayCount).status = getResources()
+		applicationBean.status = getResources()
 				.getString(R.string.load_q);
-		adapter.notifyDataSetChanged();
+		ReplayActivity.this.runOnUiThread(new Runnable() {
+			public void run() {
+				adapter.notifyDataSetChanged();
+			}
+		});
+		
 		
 		appData_combined = UnpickleDataStream.unpickleCombinedJSON(
 				applicationBean.getDataFile(), context);
 		Log.d("Parsing", applicationBean.getDataFile());
-		queueCombined = new QueueCombinedAsync(this, "open");
+		queueCombined = new QueueCombinedAsync(this, applicationBean, env);
 		
 		queueCombined.execute("");
 		
@@ -800,6 +805,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	class QueueCombinedAsync extends AsyncTask<String, String, String> {
 
 		combinedAppJSONInfoBean appData = null;
+		ApplicationBean applicationBean = null;
 		long timeStarted = 0;
 		// This is Listener which will be called when this method finishes. More
 		// information about this is provided in ReplayCompleteListener file.
@@ -808,9 +814,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		// This simply identifies whether we are in open or VPN
 		public String channel = null;
 		
-		public QueueCombinedAsync(ReplayCompleteListener listener, String channel) {
+		public QueueCombinedAsync(ReplayCompleteListener listener,
+				ApplicationBean applicationBean, String channel) {
 			this.listener = listener;
 			this.channel = channel;
+			this.applicationBean = applicationBean;
 			//this.prgBar = (ProgressBar) findViewById(R.id.prgBar);
 		}
 
@@ -846,7 +854,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * 
 				 */
 				// adrian: update progress
-				selectedApps.get(currentReplayCount).status = getResources()
+				applicationBean.status = getResources()
 						.getString(R.string.create_side_channel);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -874,7 +882,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				sideChannel.declareID(appData.getReplayName(), Config.get("extraString"));
 				
 				// adrian: update progress
-				selectedApps.get(currentReplayCount).status = getResources()
+				applicationBean.status = getResources()
 						.getString(R.string.ask4permission);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -910,7 +918,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 */
 				
 				// adrian: update progress
-				selectedApps.get(currentReplayCount).status = getResources()
+				applicationBean.status = getResources()
 						.getString(R.string.receive_server_port_mapping);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -938,7 +946,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 */
 				
 				// adrian: update progress
-				selectedApps.get(currentReplayCount).status = getResources()
+				applicationBean.status = getResources()
 						.getString(R.string.create_tcp_client);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -969,7 +977,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 */
 				
 				// adrian: update progress
-				selectedApps.get(currentReplayCount).status = getResources()
+				applicationBean.status = getResources()
 						.getString(R.string.create_udp_client);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -994,7 +1002,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: starting notifier thread
 				
 				// adrian: update progress
-				selectedApps.get(currentReplayCount).status = getResources()
+				applicationBean.status = getResources()
 						.getString(R.string.run_notf);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1007,7 +1015,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: starting receiver thread
 				
 				// adrian: update progress
-				selectedApps.get(currentReplayCount).status = getResources()
+				applicationBean.status = getResources()
 						.getString(R.string.run_receiver);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1066,7 +1074,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// Running the Queue (Sender)
 				
 				// adrian: update progress
-				selectedApps.get(currentReplayCount).status = getResources()
+				applicationBean.status = getResources()
 						.getString(R.string.run_sender);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1088,7 +1096,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// Telling server done with replaying
 				
 				// adrian: update progress
-				selectedApps.get(currentReplayCount).status = getResources()
+				applicationBean.status = getResources()
 						.getString(R.string.send_done);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1103,7 +1111,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// Sending jitter
 				
 				// adrian: update progress
-				selectedApps.get(currentReplayCount).status = getResources()
+				applicationBean.status = getResources()
 						.getString(R.string.send_jitter);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1139,13 +1147,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	@Override
 	public void vpnFinishCompleteCallback(Boolean success) {
 		try {
-
 			/**
 			 * If there was error. Display message and stop processing further.
 			 * TODO: If there are other apps which are waiting for replay then
 			 * start processing those. should be easy.
 			 */
-
 			if (!success) {
 				Toast.makeText(context, "Error while processing...", Toast.LENGTH_LONG).show();
 				return;
@@ -1158,29 +1164,37 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			 */
 			
 			selectedApps.get(currentReplayCount).resultImg = "p";
-			selectedApps.get(currentReplayCount++).status = getResources()
-					.getString(R.string.finished);
+			selectedApps.get(currentReplayCount).status = getResources()
+					.getString(R.string.finish_vpn);
 			adapter.notifyDataSetChanged();
 
 			// If there are more apps that require processing then start with
 			// those.
-			if (selectedApps.size() != currentReplayCount) {
-				// sleep for 5 seconds to let vpn disconnect. TODO: change this later
-				Thread.sleep(8000);
-				processApplicationReplay();
-			} else {
+			if (selectedApps.size() != (currentReplayCount + 1)) {
+				//(new StartNextApp()).execute(this);
+				//processCombinedApplication(selectedApps.get(++currentReplayCount), "vpn");
+				appData_combined = UnpickleDataStream.unpickleCombinedJSON(
+						selectedApps.get(++currentReplayCount).getDataFile(), context);
+				queueCombined.cancel(true);
+				queueCombined = new QueueCombinedAsync(this,
+						selectedApps.get(currentReplayCount), "vpn");
+				Log.d("Replay", "Starting combined replay");
+				queueCombined.execute("");
+			}
+			else {
 				// progressWait.setMessage("Finishing Analysis...");
 				// Thread.sleep(10000);
 				// progressWait.dismiss();
+				Log.d("Replay", "finished all replays!");
+				disconnectVPN();
 			}
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
-			// Disconnect VPN. Does not matter whether replay was successful or
-			// not
-			disconnectVPN();
+			// Disconnect VPN. No matter whether replay was successful or not
 		}
+		
 	}
 
 	/**
@@ -1190,33 +1204,43 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	@Override
 	public void openFinishCompleteCallback(Boolean success) {
 		try {
-
-			/*
-			 * if (success) { selectedApps.get(currentReplayCount).resultImg =
-			 * "p"; selectedApps.get(currentReplayCount++).status =
-			 * getResources().getString(R.string.finished);
-			 * adapter.notifyDataSetChanged(); }
-			 */
-
 			/**
 			 * If Replay on Open was successful then schedule on VPN TODO: If
 			 * there are other apps which are waiting for replay then start
 			 * processing those. should be easy.
 			 */
 			if (success) {
-
-				// Connect to VPN
-
-				onVpnProfileSelected(null);
-				Log.d("Replay", "VPN started");
-				
 				// Change screen status
 				selectedApps.get(currentReplayCount).status = getResources()
-						.getString(R.string.vpn);
+						.getString(R.string.finish_open);
 				adapter.notifyDataSetChanged();
 
-				(new VPNConnected()).execute(this);
-
+				if (selectedApps.size() != (currentReplayCount + 1)) {
+					//processCombinedApplication(selectedApps.get(++currentReplayCount), "open");
+					appData_combined = UnpickleDataStream.unpickleCombinedJSON(
+							selectedApps.get(++currentReplayCount).getDataFile(), context);
+					queueCombined.cancel(true);
+					queueCombined = new QueueCombinedAsync(this,
+							selectedApps.get(currentReplayCount), "open");
+					Log.d("Replay", "Starting combined replay");
+					queueCombined.execute("");
+				}
+				else {
+					currentReplayCount = 0;
+					// Connect to VPN
+					onVpnProfileSelected(null);
+					Log.d("Replay", "VPN started");
+					
+					// Change screen status
+					selectedApps.get(currentReplayCount).status = getResources()
+							.getString(R.string.vpn);
+					adapter.notifyDataSetChanged();
+					
+					appData_combined = UnpickleDataStream.unpickleCombinedJSON(
+							selectedApps.get(currentReplayCount).getDataFile(), context);
+					(new VPNConnected()).execute(this);
+				}
+					
 			} else {
 				// Update status on screen and stop processing
 				selectedApps.get(currentReplayCount).resultImg = "p";
@@ -1515,9 +1539,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			try {
 				meddleIP = InetAddress.getByName(gateway).getHostAddress();
 				Log.d("VPN", "VPN IP address is: " + meddleIP);
-				int i = 15;
-				while (i > 0) {
-					i--;
+				int i = 0;
+				while (i < 16) {
+					i ++;
 					String str = getPublicIP();
 					if (str.equalsIgnoreCase(meddleIP)) {
 						Log.d("VPN", "Got it!");
@@ -1528,7 +1552,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						// adrian: start the combined thread
 						if (currentTask.equalsIgnoreCase("combined")) {
 							queueCombined.cancel(true);
-							queueCombined = new QueueCombinedAsync(params[0], "vpn");
+							queueCombined = new QueueCombinedAsync(params[0],
+									selectedApps.get(currentReplayCount), "vpn");
 							Log.d("Replay", "Starting combined replay");
 							queueCombined.execute("");
 						}
@@ -1576,5 +1601,45 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 		
 	}
+	
+	/*class StartNextApp extends AsyncTask<ReplayActivity, Void, Boolean> {
 
+		@Override
+		protected Boolean doInBackground(ReplayActivity... params) {
+			String gateway = "replay.meddle.mobi";
+			String meddleIP = null;
+			
+			try {
+				meddleIP = "54.160.198.73";
+				Log.d("StartNext", "VPN IP address is: " + meddleIP);
+				int i = 0;
+				Thread.sleep(2000);
+				while (i < 16) {
+					i ++;
+					String str = getPublicIP();
+					Log.d("StartNext", "try " + i + " time, public IP: " + str);
+					if (!str.equalsIgnoreCase(meddleIP)) {
+						Log.d("StartNext", "vpn disconnected!");
+						
+						selectedApps.get(currentReplayCount).status = getResources()
+								.getString(R.string.processing);
+						ReplayActivity.this.runOnUiThread(new Runnable() {
+							public void run() {
+								adapter.notifyDataSetChanged();
+							}
+						});
+						
+						// adrian: start combined method
+						ReplayActivity.this.processCombinedApplication(selectedApps.get(currentReplayCount), "vpn");
+						return true;
+					}
+					Thread.sleep(1000);
+				}
+			} catch (Exception e) {
+				Log.d("StartNext", "failed to get VPN IP address");
+				e.printStackTrace();
+			}
+			return false;
+		}
+	}*/
 }

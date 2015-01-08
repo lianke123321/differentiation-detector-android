@@ -9,8 +9,15 @@
     <string name="selected_apps">Selected Applications</string>
     <string name="replay">Start</string>
     <string name="title_activity_replay">Remove this</string>
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_crash">CrashActivity</string>
+    <string name="image_name">App image</string>
+    
+    <string name="viber">Viber</string>
+    <string name="netflix">Netflix</string>
+    <string name="Spotify">Spotify</string>
+    <string name="Skype">Skype</string>
+    <string name="Youtube">Youtube</string>
+    <string name="Hangouts">Hangouts</string>
     
     <string name="pending">Waiting to start</string>
     <string name="processing">Running on Open</string>
@@ -28,7 +35,8 @@
     <string name="send_done">Telling server done with replaying</string>
     <string name="send_jitter">Sending the jitter results on client</string>
     <string name="receive_result">Receiving results</string>
-    <string name="finished">Finished</string>
+    <string name="finish_open">Finished replay on open</string>
+    <string name="finish_vpn">Finished replay on vpn</string>
     
     <string name="downloading">Downloading File</string>
     <string name="error">Error </string>

@@ -79,7 +79,7 @@ public class ImageReplayListAdapter extends BaseAdapter {
 		ProgressBar progress = (ProgressBar) view.findViewById(R.id.appProgress);
 		ImageButton button = (ImageButton) view.findViewById(R.id.appResultBtn);
 
-		if (app.status.equalsIgnoreCase(mainAct.getResources().getString(R.string.finished))) {
+		if (app.status.equalsIgnoreCase(mainAct.getResources().getString(R.string.finish_vpn))) {
 			progress.setVisibility(ProgressBar.GONE);
 			button.setVisibility(Button.VISIBLE);
 

@@ -78,13 +78,14 @@ public class CTCPClientThread implements Runnable {
 				synchronized (recvQueueBean) {
 					lineNum = recvQueueBean.queue ++;
 				}
+				Log.d("Response", "My line number is: " + lineNum + " current: " + recvQueueBean.current);
 				
 				while (lineNum != recvQueueBean.current) {
 					//recvQueueBean.wait();
 				}
 				
 				//recvSema.acquire();
-				Log.d("Response", "got the receiving semaphore!");
+				Log.d("Response", "got the receiving semaphore! current: " + recvQueueBean.current);
 				
 				Log.d("Response", "Waiting for response of " + RS.getResponse_len() + " bytes");
 
