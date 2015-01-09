@@ -112,12 +112,13 @@ public class CTCPClientThread implements Runnable {
 					}
 					totalRead += bytesRead;
 				}
-				
+				// adrian: increase current pointer
 				synchronized (recvQueueBean) {
 					recvQueueBean.current ++;
 					recvQueueBean.notifyAll();
 				}
 				//recvSema.release();
+				
 				// adrian: manually free buffer
 				buffer = null;
 				

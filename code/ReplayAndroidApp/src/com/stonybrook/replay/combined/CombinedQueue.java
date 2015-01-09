@@ -209,6 +209,7 @@ public class CombinedQueue {
 		
 		// update sentJitter
 		long currentTime = System.currentTimeMillis();
+		//Log.d("sentJitter", "" + (double)(currentTime-jitterTimeOrigin) / 1000);
 		synchronized (jitterBean) {
 			jitterBean.sentJitter += (String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000)
 					+ "\t" + RS.getPayload() + "\n");
