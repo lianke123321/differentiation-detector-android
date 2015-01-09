@@ -81,7 +81,9 @@ public class CTCPClientThread implements Runnable {
 				Log.d("Response", "My line number is: " + lineNum + " current: " + recvQueueBean.current);
 				
 				while (lineNum != recvQueueBean.current) {
-					//recvQueueBean.wait();
+					synchronized (recvQueueBean) {
+						recvQueueBean.wait();
+					}
 				}
 				
 				//recvSema.acquire();
@@ -113,7 +115,7 @@ public class CTCPClientThread implements Runnable {
 				
 				synchronized (recvQueueBean) {
 					recvQueueBean.current ++;
-					//recvQueueBean.notifyAll();
+					recvQueueBean.notifyAll();
 				}
 				//recvSema.release();
 				// adrian: manually free buffer
