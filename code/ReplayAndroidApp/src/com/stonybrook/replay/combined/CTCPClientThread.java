@@ -7,7 +7,6 @@ import java.util.concurrent.Semaphore;
 
 import android.util.Log;
 
-import com.stonybrook.replay.bean.RecvQueueBean;
 import com.stonybrook.replay.bean.RequestSet;
 // @@@ Adrian add this
 
@@ -17,20 +16,18 @@ public class CTCPClientThread implements Runnable {
 	private RequestSet RS = null;
 	private CombinedQueue queue = null;
 	private Semaphore sendSema = null;
-	//private Semaphore recvSema = null;
-	private RecvQueueBean recvQueueBean = null;
+	private Semaphore recvSema = null;
 	long timeOrigin = 0;
 	
 	int bufSize = 4096;
 
 	public CTCPClientThread(CTCPClient client, RequestSet RS, CombinedQueue queue,
-			Semaphore sendSema, RecvQueueBean recvQueueBean, long timeOrigin) {
+			Semaphore sendSema, Semaphore recvSema, long timeOrigin) {
 		this.client = client;
 		this.RS = RS;
 		this.queue = queue;
 		this.sendSema = sendSema;
-		//this.recvSema = recvSema;
-		this.recvQueueBean = recvQueueBean;
+		this.recvSema = recvSema;
 		this.timeOrigin = timeOrigin;
 	}
 
@@ -66,14 +63,14 @@ public class CTCPClientThread implements Runnable {
 					" bytes, expecting " + RS.getResponse_len() + " bytes ");
 			
 			sendSema.release();
-			synchronized (queue) {
+			/*synchronized (queue) {
 				queue.notifyAll();
-			}
+			}*/
 			
 			// Notify waiting Queue thread to start processing next packet
 			if (RS.getResponse_len() > 0) {
 				// acquire the recvSema
-				Log.d("Response", "waiting to get receiving semaphore!");
+				/*Log.d("Response", "waiting to get receiving semaphore!");
 				int lineNum = 0;
 				synchronized (recvQueueBean) {
 					lineNum = recvQueueBean.queue ++;
@@ -87,7 +84,7 @@ public class CTCPClientThread implements Runnable {
 				}
 				
 				//recvSema.acquire();
-				Log.d("Response", "got the receiving semaphore! current: " + recvQueueBean.current);
+				Log.d("Response", "got the receiving semaphore! current: " + recvQueueBean.current);*/
 				
 				Log.d("Response", "Waiting for response of " + RS.getResponse_len() + " bytes");
 
@@ -113,11 +110,10 @@ public class CTCPClientThread implements Runnable {
 					totalRead += bytesRead;
 				}
 				// adrian: increase current pointer
-				synchronized (recvQueueBean) {
+				/*synchronized (recvQueueBean) {
 					recvQueueBean.current ++;
 					recvQueueBean.notifyAll();
-				}
-				//recvSema.release();
+				}*/
 				
 				// adrian: manually free buffer
 				buffer = null;
@@ -131,11 +127,11 @@ public class CTCPClientThread implements Runnable {
 			Log.d("TCPClientThread", "something bad happened!");
 			e.printStackTrace();
 		} finally {
+			recvSema.release();
 			synchronized (queue) {
 				--queue.threads;
 			}
 			
-
 		}
 
 	}

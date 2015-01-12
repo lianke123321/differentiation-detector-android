@@ -1542,6 +1542,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				int i = 0;
 				while (i < 16) {
 					i ++;
+					Log.d("VPN", "about to get public IP");
 					String str = getPublicIP();
 					if (str.equalsIgnoreCase(meddleIP)) {
 						Log.d("VPN", "Got it!");
@@ -1572,7 +1573,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						
 						break;
 					}
-					Thread.sleep(1000);
+					Thread.sleep(5000);
 					Log.d("VPN", "publicIP is: " + str);
 				}
 			} catch (Exception e) {

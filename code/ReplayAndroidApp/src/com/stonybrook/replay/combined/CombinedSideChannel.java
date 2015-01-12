@@ -167,14 +167,18 @@ public class CombinedSideChannel {
 		if (jitter != "true") {
 			Log.d("sendJitter", "No jitter");
 			sendObject(("NoJitter;" + id).getBytes(), objLen);
-			return;
+		} else {
+			sendObject(("WillSendClientJitter;" + id).getBytes(), objLen);
+			
+			sendObject(jitterBean.sentJitter.getBytes(), objLen);
+			sendObject(jitterBean.rcvdJitter.getBytes(), objLen);
+			Log.d("sendJitter", "finished sending jitter");
 		}
 		
-		sendObject(("WillSendClientJitter;" + id).getBytes(), objLen);
-		
-		sendObject(jitterBean.sentJitter.getBytes(), objLen);
-		sendObject(jitterBean.rcvdJitter.getBytes(), objLen);
-		Log.d("sendJitter", "finished sending jitter");
+		byte[] data = receiveObject(objLen);
+		String str = new String(data);
+		if (str != "OK")
+			Log.d("sendJitter", "server return bad! " + str);
 	}
 	
 	public void closeSideChannelSocket () throws Exception {
