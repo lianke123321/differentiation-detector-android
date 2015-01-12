@@ -44,7 +44,7 @@ public class CallableTCPQueue {
 	}
 
 	public boolean run(HashMap<String, TCPClient> cSPairMapping, Boolean timing) throws Exception {
-		this.timeOrigin = System.currentTimeMillis();
+		this.timeOrigin = System.nanoTime();
 		boolean success = true;
 		try {
 			int i = 1;
@@ -59,7 +59,7 @@ public class CallableTCPQueue {
 				Semaphore sema = getSemaLock(cSPairMapping.get(RS.getc_s_pair()));
 				sema.acquire();
 
-				Log.d("TCPReplay", "Sending " + (i++) + "/" + len + " at time " + (System.currentTimeMillis() - timeOrigin) + " expected " + RS.getTimestamp() + " with response " + RS.getResponse_len());
+				Log.d("TCPReplay", "Sending " + (i++) + "/" + len + " at time " + (System.nanoTime() - timeOrigin) + " expected " + RS.getTimestamp() + " with response " + RS.getResponse_len());
 				/*
 				 * while
 				 * (cSPairMapping.get(RS.getc_s_pair()).flag.compareAndSet(
@@ -97,7 +97,7 @@ public class CallableTCPQueue {
 			}
 			
 			Log.d("Sema", String.valueOf(mSema.size()) + " / " +  String.valueOf(cSPairMapping.size()));
-			Log.d("Done", "Finished executing all Threads " + (System.currentTimeMillis() - timeOrigin));
+			Log.d("Done", "Finished executing all Threads " + (System.nanoTime() - timeOrigin));
 			Log.d("count", String.valueOf(threads));
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -119,8 +119,8 @@ public class CallableTCPQueue {
 
 		if (timing) {
 			double expectedTime = timeOrigin + RS.getTimestamp() * 1000;
-			if (System.currentTimeMillis() < expectedTime) {
-				long waitTime = Math.round(expectedTime - System.currentTimeMillis());
+			if (System.nanoTime() < expectedTime) {
+				long waitTime = Math.round(expectedTime - System.nanoTime());
 				Log.d("Time", String.valueOf(waitTime));
 				if (waitTime > 0)
 					Thread.sleep(waitTime);

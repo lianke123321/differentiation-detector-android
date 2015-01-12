@@ -61,7 +61,7 @@ public class TCPClientThread implements Runnable {
 
 				int totalRead = 0;
 
-				Log.d(String.valueOf(RS.getResponse_len()), "start " + String.valueOf(System.currentTimeMillis() - timeOrigin));
+				Log.d(String.valueOf(RS.getResponse_len()), "start " + String.valueOf(System.nanoTime() - timeOrigin));
 				
 				// @@@ try another way
 				int bufferSize = 4096;
@@ -80,7 +80,7 @@ public class TCPClientThread implements Runnable {
 					}
 					totalRead += bytesRead;
 				}
-				Log.d("Finished " + String.valueOf(RS.getResponse_len()), "end " + String.valueOf(System.currentTimeMillis() - timeOrigin));
+				Log.d("Finished " + String.valueOf(RS.getResponse_len()), "end " + String.valueOf(System.nanoTime() - timeOrigin));
 			}
 
 			

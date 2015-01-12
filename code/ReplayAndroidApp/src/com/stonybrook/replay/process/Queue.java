@@ -53,7 +53,7 @@ public class Queue {
 		int packetCnt;
 		try
 		{
-			timeOrigin = System.currentTimeMillis();
+			timeOrigin = System.nanoTime();
 			packetCnt = queue.size();
 			//Log.d("packetCnt", String.valueOf(packetCnt));
 			
@@ -85,10 +85,10 @@ public class Queue {
 				if(!waitList.contains(q.getc_s_pair()))
 				{
 					Log.d("Waitlist", q.getc_s_pair() + " --- " + q.getTimestamp());
-					double expectedTime = timeOrigin + q.getTimestamp()*1000;
-					if(System.currentTimeMillis() < expectedTime )
+					double expectedTime = timeOrigin + q.getTimestamp()*1000000000;
+					if(System.nanoTime() < expectedTime )
 					{
-						long waitTime =  Math.round(expectedTime - System.currentTimeMillis());
+						long waitTime =  Math.round(expectedTime - System.nanoTime()) / 1000000;
 						waitTime = (waitTime > 0) ? waitTime : 0;
 						Thread.sleep(waitTime);
 					}

@@ -71,7 +71,7 @@ public class CallableTCPClientThread implements Callable<Void> {
 
 				int totalRead = 0;
 
-				Log.d(String.valueOf(RS.getResponse_len()), "start " + String.valueOf(System.currentTimeMillis() - timeOrigin));
+				Log.d(String.valueOf(RS.getResponse_len()), "start " + String.valueOf(System.nanoTime() - timeOrigin));
 				
 				//ByteBuffer lenBuf = ByteBuffer.allocateDirect(RS.getResponse_len());
 				//ByteBuffer lenBuf = ByteBuffer.allocateDirect(4*1024*1024);
@@ -120,7 +120,7 @@ public class CallableTCPClientThread implements Callable<Void> {
 					}
 					totalRead += bytesRead;
 				}
-				Log.d(String.valueOf(RS.getResponse_len()), "end " + String.valueOf(System.currentTimeMillis() - timeOrigin));
+				Log.d(String.valueOf(RS.getResponse_len()), "end " + String.valueOf(System.nanoTime() - timeOrigin));
 			}
 
 			//Log.d("Test1", "After");

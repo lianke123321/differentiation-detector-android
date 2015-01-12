@@ -48,7 +48,7 @@ public class TCPQueue {
 	 * @throws Exception
 	 */
 	public void run(HashMap<String, TCPClient> cSPairMapping, Boolean timing) throws Exception {
-		this.timeOrigin = System.currentTimeMillis();
+		this.timeOrigin = System.nanoTime();
 		try {
 			int i = 1;
 			int len = this.Q.size();
@@ -58,7 +58,7 @@ public class TCPQueue {
 				Semaphore sema = getSemaLock(cSPairMapping.get(RS.getc_s_pair()));
 				sema.acquire();
 
-				Log.d("Replay", "Sending " + (i++) + "/" + len + " at time " + (System.currentTimeMillis() - timeOrigin) + " expected " + RS.getTimestamp() + " with response " + RS.getResponse_len());
+				Log.d("Replay", "Sending " + (i++) + "/" + len + " at time " + (System.nanoTime() - timeOrigin) + " expected " + RS.getTimestamp() + " with response " + RS.getResponse_len());
 
 				// @@@ every time when calling next we create and start a new thread
 				next(cSPairMapping.get(RS.getc_s_pair()), RS, timing, sema);
@@ -75,7 +75,7 @@ public class TCPQueue {
 			for(Thread t : cThreadList)
 				t.join();
 			
-			Log.d("Replay", "Finished executing all Threads " + (System.currentTimeMillis() - timeOrigin));
+			Log.d("Replay", "Finished executing all Threads " + (System.nanoTime() - timeOrigin));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw ex;
@@ -104,8 +104,8 @@ public class TCPQueue {
 		// @@@ if timing is set to be true, wait until expected Time to send this packet
 		if (timing) {
 			double expectedTime = timeOrigin + RS.getTimestamp() * 1000;
-			if (System.currentTimeMillis() < expectedTime) {
-				long waitTime = Math.round(expectedTime - System.currentTimeMillis());
+			if (System.nanoTime() < expectedTime) {
+				long waitTime = Math.round(expectedTime - System.nanoTime());
 				Log.d("Time", String.valueOf(waitTime));
 				if (waitTime > 0)
 					Thread.sleep(waitTime);

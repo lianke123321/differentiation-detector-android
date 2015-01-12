@@ -31,7 +31,7 @@ public final class CombinedReceiverThread implements Runnable{
 	@Override
 	public void run() {
 		
-		this.jitterTimeOrigin = System.currentTimeMillis();
+		this.jitterTimeOrigin = System.nanoTime();
 		
 		try {
 			Selector selector = Selector.open();
@@ -56,10 +56,12 @@ public final class CombinedReceiverThread implements Runnable{
 						tempChannel.socket().receive(packet);
 						
 						// for receive jitter
-						long currentTime = System.currentTimeMillis();
+						long currentTime = System.nanoTime();
+						Log.d("rcvdJitter", String.valueOf(currentTime-jitterTimeOrigin));
+						Log.d("rcvdJitter", String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000));
 						synchronized (jitterBean) {
-							jitterBean.rcvdJitter += (String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000)
-									+ "\t" + data + "\n");
+							jitterBean.rcvdJitter += (String.valueOf((double)(currentTime-jitterTimeOrigin)
+									/ 1000000000) + "\t" + data + "\n");
 						}
 						this.jitterTimeOrigin = currentTime;
 					}

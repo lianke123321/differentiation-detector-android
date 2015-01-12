@@ -44,7 +44,7 @@ public class UDPQueue implements Runnable {
 
 	@Override
 	public void run() {
-		long timeOrigin = System.currentTimeMillis();
+		long timeOrigin = System.nanoTime();
 		try {
 			int i = 1;
 			int len = this.Q.size();
@@ -52,9 +52,9 @@ public class UDPQueue implements Runnable {
 				Log.d("UDPReplay", "Sending " + (i++) +  "/" + len);
 				if (timing) {
 					double expectedTime = timeOrigin + RS.getTimestamp() * 1000;
-					if (System.currentTimeMillis() < expectedTime) {
+					if (System.nanoTime() < expectedTime) {
 						long waitTime = Math.round(expectedTime
-								- System.currentTimeMillis());
+								- System.nanoTime());
 						if(waitTime > 0)
 							Thread.sleep(waitTime);
 					}

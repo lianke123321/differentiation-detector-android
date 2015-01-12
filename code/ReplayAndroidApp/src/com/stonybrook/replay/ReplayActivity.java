@@ -589,7 +589,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		protected String doInBackground(String... String) {
 			this.appData = appData_udp;
-			this.timeStarted = System.currentTimeMillis();
+			this.timeStarted = System.nanoTime();
 			SparseArray<Integer> NATMap = new SparseArray<Integer>();
 			SparseArray<ClientThread> PortMap = new SparseArray<ClientThread>();
 			this.CSPairMapping = new HashMap<String, ClientThread>();
@@ -695,7 +695,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		protected void onPostExecute(String result) {
 			Log.d("Replay",
 					"TCP Replay lasted for "
-							+ (System.currentTimeMillis() - this.timeStarted));
+							+ (System.nanoTime() - this.timeStarted) / 1000000);
 
 			// Callback according to type of Replay with status of Replay
 			if (channel.equalsIgnoreCase("open"))
@@ -712,7 +712,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		protected String doInBackground(String... str) {
 			this.appData = appData_tcp;
-			this.timeStarted = System.currentTimeMillis();
+			this.timeStarted = System.nanoTime();
 			HashMap<String, TCPClient> CSPairMapping = new HashMap<String, TCPClient>();
 
 			try {
@@ -1083,7 +1083,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				});
 				
 				CombinedQueue queue = new CombinedQueue(appData.getQ(), jitterBean);
-				this.timeStarted = System.currentTimeMillis();
+				this.timeStarted = System.nanoTime();
 				queue.run(updateUIBean, CSPairMapping, udpPortMapping,
 						udpReplayInfoBean, serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")));
@@ -1104,7 +1104,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				});
 				
-				double duration = ((double) (System.currentTimeMillis() - this.timeStarted)) / 1000;
+				double duration = ((double) (System.nanoTime() - this.timeStarted)) / 1000000000;
 				sideChannel.sendDone(duration);
 				Log.d("Replay", "replay finished using time " + duration + " s");
 				

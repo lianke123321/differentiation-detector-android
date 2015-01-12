@@ -63,8 +63,8 @@ public class CombinedQueue {
 			UDPReplayInfoBean udpReplayInfoBean,
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping,
 			Boolean timing) throws Exception {
-		this.timeOrigin = System.currentTimeMillis();
-		this.jitterTimeOrigin = System.currentTimeMillis();
+		this.timeOrigin = System.nanoTime();
+		this.jitterTimeOrigin = System.nanoTime();
 		
 		try {
 			int i = 1;
@@ -76,7 +76,7 @@ public class CombinedQueue {
 					// adrian: sending udp is done in queue thread, no need to start
 					// new threads for udp since there is only one port
 					Log.d("Replay", "Sending udp packet " + (i++) + "/" + len +
-							" at time " + (System.currentTimeMillis() - timeOrigin));
+							" at time " + (System.nanoTime() - timeOrigin) / 1000000);
 					nextUDP(RS, udpPortMapping, udpReplayInfoBean, udpServerMapping, timing);
 					
 					// adrian: for updating progress bar
@@ -89,7 +89,7 @@ public class CombinedQueue {
 					Log.d("Replay", "got the receive semaphore!");
 	
 					Log.d("Replay", "Sending tcp packet " + (i++) + "/" + len +
-							" at time " + (System.currentTimeMillis() - timeOrigin));
+							" at time " + (System.nanoTime() - timeOrigin) / 1000000);
 					
 					// adrian: for updating progress bar
 					updateUIBean.setProgress((int) (i * 100 / len));
@@ -109,7 +109,7 @@ public class CombinedQueue {
 			for(Thread t : cThreadList)
 				t.join();
 			
-			Log.d("Replay", "Finished executing all Threads " + (System.currentTimeMillis() - timeOrigin));
+			Log.d("Replay", "Finished executing all Threads " + (System.nanoTime() - timeOrigin) / 1000000);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw ex;
@@ -139,9 +139,9 @@ public class CombinedQueue {
 
 		// @@@ if timing is set to be true, wait until expected Time to send this packet
 		if (timing) {
-			double expectedTime = timeOrigin + RS.getTimestamp() * 1000;
-			if (System.currentTimeMillis() < expectedTime) {
-				long waitTime = Math.round(expectedTime - System.currentTimeMillis());
+			double expectedTime = timeOrigin + RS.getTimestamp() * 1000000000;
+			if (System.nanoTime() < expectedTime) {
+				long waitTime = Math.round(expectedTime - System.nanoTime()) / 1000000;
 				//Log.d("Time", String.valueOf(waitTime));
 				if (waitTime > 0)
 					Thread.sleep(waitTime);
@@ -183,9 +183,9 @@ public class CombinedQueue {
 		}
 		
 		if (timing) {
-			double expectedTime = timeOrigin + RS.getTimestamp() * 1000;
-			if (System.currentTimeMillis() < expectedTime) {
-				long waitTime = Math.round(expectedTime - System.currentTimeMillis());
+			double expectedTime = timeOrigin + RS.getTimestamp() * 1000000000;
+			if (System.nanoTime() < expectedTime) {
+				long waitTime = Math.round(expectedTime - System.nanoTime()) / 1000000;
 				//Log.d("Time", String.valueOf(waitTime));
 				if (waitTime > 0)
 					Thread.sleep(waitTime);
@@ -193,10 +193,11 @@ public class CombinedQueue {
 		}
 		
 		// update sentJitter
-		long currentTime = System.currentTimeMillis();
-		//Log.d("sentJitter", "" + (double)(currentTime-jitterTimeOrigin) / 1000);
+		long currentTime = System.nanoTime();
+		//Log.d("sentJitter", String.valueOf(currentTime-jitterTimeOrigin));
+		//Log.d("sentJitter", String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000));
 		synchronized (jitterBean) {
-			jitterBean.sentJitter += (String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000)
+			jitterBean.sentJitter += (String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000)
 					+ "\t" + RS.getPayload() + "\n");
 		}
 		jitterTimeOrigin = currentTime;

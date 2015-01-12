@@ -91,7 +91,7 @@ public class CTCPClientThread implements Runnable {
 				int totalRead = 0;
 
 				Log.d("Receiving", String.valueOf(RS.getResponse_len()) + " bytes" + " start at time " +
-						String.valueOf(System.currentTimeMillis() - timeOrigin));
+						String.valueOf((System.nanoTime() - timeOrigin) / 1000000000));
 				
 				//if(RS.getResponse_len() < bufferSize)
 				//	bufferSize = RS.getResponse_len();
