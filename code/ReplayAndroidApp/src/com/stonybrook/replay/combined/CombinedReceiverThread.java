@@ -17,6 +17,8 @@ public final class CombinedReceiverThread implements Runnable{
 	private UDPReplayInfoBean udpReplayInfoBean = null;
 	private int bufSize = 4096;
 	private long jitterTimeOrigin = 0;
+	// changes of Arash
+	public boolean keepRunning;
 	
 	// adrian: for jitter
 	private JitterBean jitterBean = null;
@@ -26,6 +28,7 @@ public final class CombinedReceiverThread implements Runnable{
 		super();
 		this.udpReplayInfoBean = udpReplayInfoBean;
 		this.jitterBean = jitterBean;
+		this.keepRunning = true;
 	}
 
 	@Override
@@ -39,10 +42,9 @@ public final class CombinedReceiverThread implements Runnable{
 			for (DatagramChannel channel : udpReplayInfoBean.getUdpSocketList())
 				channel.register(selector, SelectionKey.OP_READ);
 			
-			while (udpReplayInfoBean.getSenderCount() > 0) {
-				
+			while (keepRunning) {
 				//Log.d("Receiver", "senderCount: " + udpReplayInfoBean.getSenderCount());
-				
+				Log.d("Receiver", String.valueOf(selector.selectNow()));
 				if (selector.selectNow() > 0) {
 					byte[] data = new byte[bufSize];
 					DatagramPacket packet = new DatagramPacket(data, data.length);

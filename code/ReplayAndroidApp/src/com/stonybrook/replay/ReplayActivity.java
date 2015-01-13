@@ -65,6 +65,7 @@ import com.stonybrook.replay.bean.UpdateUIBean;
 import com.stonybrook.replay.bean.combinedAppJSONInfoBean;
 import com.stonybrook.replay.combined.CTCPClient;
 import com.stonybrook.replay.combined.CUDPClient;
+import com.stonybrook.replay.combined.CombinedNotifierThread;
 import com.stonybrook.replay.combined.CombinedQueue;
 import com.stonybrook.replay.combined.CombinedReceiverThread;
 import com.stonybrook.replay.combined.CombinedSideChannel;
@@ -916,7 +917,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * info parsing was throwing error. so, I put while loop to do
 				 * this until port mapping is parsed successfully.
 				 */
-				
 				// adrian: update progress
 				applicationBean.status = getResources()
 						.getString(R.string.receive_server_port_mapping);
@@ -926,19 +926,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				});
 				
-				boolean s = false;
-				while (!s) {
-					try {
-//						randomID = new RandomString(10).nextString();
-						serverPortsMap = sideChannel
-								.receivePortMappingNonBlock();
-						udpReplayInfoBean.setSenderCount(sideChannel.receiveSenderCount());
-						s = true;
-						Log.d("Replay", "Successfully received serverPortsMap and senderCount!");
-					} catch (JSONException ex) {
-						Log.d("Replay", "failed to receive serverPortsMap and senderCount!");
-						ex.printStackTrace();
-					}
+				try {
+					//randomID = new RandomString(10).nextString();
+					serverPortsMap = sideChannel.receivePortMappingNonBlock();
+					udpReplayInfoBean.setSenderCount(sideChannel.receiveSenderCount());
+					Log.d("Replay", "Successfully received serverPortsMap and senderCount!");
+				} catch (JSONException ex) {
+					Log.d("Replay", "failed to receive serverPortsMap and senderCount!");
+					ex.printStackTrace();
+					return "";
 				}
 
 				/**
@@ -1010,7 +1006,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				});
 				
-				sideChannel.notifierUpCall(udpReplayInfoBean, threadList);
+				CombinedNotifierThread notifier =
+						sideChannel.notifierCreater(udpReplayInfoBean);
+				Thread notfThread = new Thread(notifier);
+				notfThread.start();
+				threadList.add(notfThread);
 				
 				// adrian: starting receiver thread
 				
@@ -1090,8 +1090,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				
 				// waiting for all threads to finish
 				Log.d("Replay", "waiting for all threads to die!");
-				for (Thread t : threadList)
-					t.join();
+				/*for (Thread t : threadList)
+					t.join();*/
+				Thread.sleep(1000);
+				notifier.doneSending = true;
+				notfThread.join();
+				receiver.keepRunning = false;
+				rThread.join();
 				
 				// Telling server done with replaying
 				
@@ -1123,6 +1128,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				
 				//Log.d("sentJitter", jitterBean.sentJitter);
 				//Log.d("rcvdJitter", jitterBean.rcvdJitter);
+				
+				// Getting result
+				sideChannel.getResult();
 				
 				// closing side channel socket
 				sideChannel.closeSideChannelSocket();

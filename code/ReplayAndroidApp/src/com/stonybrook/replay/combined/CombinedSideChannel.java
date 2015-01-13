@@ -8,7 +8,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -153,12 +152,10 @@ public class CombinedSideChannel {
 		sendObject(noIperf.getBytes(), objLen);
 	}
 	
-	public void notifierUpCall(UDPReplayInfoBean udpReplayInfoBean,
-			ArrayList<Thread> threadList) throws Exception{
+	public CombinedNotifierThread notifierCreater(UDPReplayInfoBean udpReplayInfoBean)
+			throws Exception{
 		CombinedNotifierThread notifier = new CombinedNotifierThread(udpReplayInfoBean, socket);
-		Thread notfThread = new Thread(notifier);
-		notfThread.start();
-		threadList.add(notfThread);
+		return notifier;
 	}
 	
 	public void sendJitter(String id, String jitter,
