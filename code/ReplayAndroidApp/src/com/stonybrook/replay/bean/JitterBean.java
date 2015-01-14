@@ -1,5 +1,6 @@
 package com.stonybrook.replay.bean;
 
+
 public class JitterBean {
 	
 	public String sentJitter;
