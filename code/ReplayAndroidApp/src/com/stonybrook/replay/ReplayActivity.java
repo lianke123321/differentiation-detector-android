@@ -239,8 +239,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			Config.set("timing", enableTiming);
 			Config.set("server", server);
 			// adrian: added cause arash's code
-			Config.set("extraString", "extraString");
+			Config.set("extraString", "MoblieApp");
 			Config.set("jitter", "true");
+			// adrian: set result
+			Config.set("result", "false");
+			// adrian: set public IP
+			new Thread(new Runnable() {
+				public void run() {
+					Config.set("publicIP", getPublicIP());
+				}
+				
+			}).start();
 
 			Log.d("Server", server);
 			// Check server reachability
@@ -982,7 +991,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				});
 				
 				for (String originalClientPort : appData.getUdpClientPorts()) {
-					CUDPClient c = new CUDPClient(getPublicIP());
+					CUDPClient c = new CUDPClient(Config.get("publicIP"));
 					udpPortMapping.put(originalClientPort, c);
 				}
 				Log.d("Replay", "created clients from udpClientPorts");
@@ -1086,7 +1095,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				this.timeStarted = System.nanoTime();
 				queue.run(updateUIBean, CSPairMapping, udpPortMapping,
 						udpReplayInfoBean, serverPortsMap.get("udp"),
-						Boolean.valueOf(Config.get("timing")));
+						Boolean.valueOf(Config.get("timing")), server);
 				
 				// waiting for all threads to finish
 				Log.d("Replay", "waiting for all threads to die!");
@@ -1130,7 +1139,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				//Log.d("rcvdJitter", jitterBean.rcvdJitter);
 				
 				// Getting result
-				sideChannel.getResult();
+				sideChannel.getResult(Config.get("result"));
 				
 				// closing side channel socket
 				sideChannel.closeSideChannelSocket();

@@ -62,7 +62,7 @@ public class CombinedQueue {
 			HashMap<String, CUDPClient> udpPortMapping,
 			UDPReplayInfoBean udpReplayInfoBean,
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping,
-			Boolean timing) throws Exception {
+			Boolean timing, String server) throws Exception {
 		this.timeOrigin = System.nanoTime();
 		this.jitterTimeOrigin = System.nanoTime();
 		
@@ -77,7 +77,8 @@ public class CombinedQueue {
 					// new threads for udp since there is only one port
 					Log.d("Replay", "Sending udp packet " + (i++) + "/" + len +
 							" at time " + (System.nanoTime() - timeOrigin) / 1000000);
-					nextUDP(RS, udpPortMapping, udpReplayInfoBean, udpServerMapping, timing);
+					nextUDP(RS, udpPortMapping, udpReplayInfoBean, udpServerMapping,
+							timing, server);
 					
 					// adrian: for updating progress bar
 					updateUIBean.setProgress((int) (i * 100 / len));
@@ -162,7 +163,7 @@ public class CombinedQueue {
 	private void nextUDP(RequestSet RS, HashMap<String, CUDPClient> udpPortMapping,
 			UDPReplayInfoBean udpReplayInfoBean,
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping, 
-			Boolean timing) throws Exception {
+			Boolean timing, String server) throws Exception {
 		String c_s_pair = RS.getc_s_pair();
 		String clientPort = c_s_pair.substring(16, 21);
 		String dstIP = c_s_pair.substring(22, 37);
@@ -173,6 +174,10 @@ public class CombinedQueue {
 				c_s_pair.length());*/
 		//Log.d("nextUDP", "dstIP: " + dstIP + " dstPort: " + dstPort);
 		ServerInstance destAddr = udpServerMapping.get(dstIP).get(dstPort);
+		
+		if (destAddr.server.trim().equals(""))
+			destAddr.server = server;
+		
 		CUDPClient client = udpPortMapping.get(clientPort);
 		
 		if (client.channel == null) {
@@ -198,7 +203,7 @@ public class CombinedQueue {
 		//Log.d("sentJitter", String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000));
 		synchronized (jitterBean) {
 			jitterBean.sentJitter += (String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000)
-					+ "\t" + RS.getPayload() + "\n");
+					+ "\t" + RS.getPayload().hashCode() + "\n");
 		}
 		jitterTimeOrigin = currentTime;
 		

@@ -22,14 +22,13 @@ public final class CombinedNotifierThread implements Runnable {
 	DataOutputStream dataOutputStream = null;
 	DataInputStream dataInputStream = null;
 	// changes of Arash
-	public boolean doneSending;
+	public volatile boolean doneSending;
 	private int inProcess = 0;
 	private int total = 0;
 
 	public CombinedNotifierThread(UDPReplayInfoBean udpReplayInfoBean,
 			Socket socket) {
 		super();
-		// this.senderCount = senderCount;
 		this.udpReplayInfoBean = udpReplayInfoBean;
 		this.socket = socket;
 		this.doneSending = false;
@@ -53,30 +52,32 @@ public final class CombinedNotifierThread implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			byte[] data;
-
+			//Log.d("Notifier", "current senderCount: " + udpReplayInfoBean.getSenderCount());
 			try {
 				if (dataInputStream.available() > 0) {
-					data = receiveObject(objLen);
+					byte[] data = receiveObject(objLen);
 					String[] Notf = new String(data).split(";");
 					if (Notf[0].equalsIgnoreCase("STARTED")) {
 						inProcess += 1;
 						total += 1;
-						// udpReplayInfoBean.decrement();
 						// udpReplayInfoBean.offerCloseQ(Notf[1]);
-						// Log.d("Notifier", "Notf[1] " + Notf[1]);
+						//Log.d("Notifier", "received STARTED!");
 						// closeQ.add(Notf[1]);
 					} else if (Notf[0].equalsIgnoreCase("DONE")) {
 						inProcess -= 1;
+						//udpReplayInfoBean.decrement();
+						//Log.d("Notifier", "received DONE!");
 					} else {
 						Log.d("Notifier", "WTF???");
 						break;
 					}
 				}
+				Thread.sleep(1000);
 			} catch (Exception e) {
 				Log.d("Notifier", "receive data error!");
 				e.printStackTrace();
 			}
+			//Log.d("Notifier", "current total: " + total + " inProcess: " + inProcess);
 
 			if (doneSending) {
 				if (inProcess == 0) {
@@ -87,9 +88,10 @@ public final class CombinedNotifierThread implements Runnable {
 					break;
 				}
 			}
+			
 		}
 
-		Log.d("Notifier", "received all packets!");
+		//Log.d("Notifier", "received all packets!");
 
 	}
 

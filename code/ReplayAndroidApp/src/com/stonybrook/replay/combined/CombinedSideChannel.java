@@ -24,7 +24,7 @@ import com.stonybrook.replay.bean.UDPReplayInfoBean;
 public class CombinedSideChannel {
 	private String id = null;
 	int bufSize = 4096;
-	private Socket socket = null;
+	public Socket socket = null;
 	DataOutputStream dataOutputStream = null;
 	DataInputStream dataInputStream = null;
 	int objLen = 10;
@@ -154,7 +154,7 @@ public class CombinedSideChannel {
 	
 	public CombinedNotifierThread notifierCreater(UDPReplayInfoBean udpReplayInfoBean)
 			throws Exception{
-		CombinedNotifierThread notifier = new CombinedNotifierThread(udpReplayInfoBean, socket);
+		CombinedNotifierThread notifier = new CombinedNotifierThread(udpReplayInfoBean, this.socket);
 		return notifier;
 	}
 	
@@ -176,6 +176,21 @@ public class CombinedSideChannel {
 		String str = new String(data);
 		if (str != "OK")
 			Log.d("sendJitter", "server return bad! " + str);
+	}
+	
+	public void getResult (String result) throws Exception {
+		if (result == "false") {
+			sendObject("Result;No".getBytes(), objLen);
+			byte[] data = receiveObject(objLen);
+			String str = new String(data);
+			if (str != "OK")
+				Log.d("getResult", "return value abnormal!");
+		} else {
+			sendObject("Result;Yes".getBytes(), objLen);
+			byte[] data = receiveObject(objLen);
+			String str = new String(data);
+			Log.d("getResult", "the result is : " + str);
+		}
 	}
 	
 	public void closeSideChannelSocket () throws Exception {

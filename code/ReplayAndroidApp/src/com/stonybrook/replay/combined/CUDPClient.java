@@ -5,6 +5,8 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
+import android.util.Log;
+
 import com.stonybrook.replay.bean.ServerInstance;
 
 public class CUDPClient /* implements Runnable */{
@@ -27,7 +29,10 @@ public class CUDPClient /* implements Runnable */{
 			DatagramPacket packet = new DatagramPacket(buffer, buffer.length, endPoint);
 			channel = DatagramChannel.open();
 			channel.socket().send(packet);
+			channel.configureBlocking(false);
 			this.port = channel.socket().getLocalPort();
+			Log.d("UDPClient", "port is " + port);
+			//channel.socket().bind(new InetSocketAddress(this.publicIP, this.port));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -36,10 +41,14 @@ public class CUDPClient /* implements Runnable */{
 	public void sendUDPPacket(byte[] payload, ServerInstance instance) throws Exception {
 		//byte[] buf = UtilsManager.serialize(payload);
 		/*Log.d("sending", "udp packet w/ payload length " + payload.length +
-				" sent to server " + instance.server);*/
-		/*DatagramPacket packet = new DatagramPacket(payload, payload.length,
-				new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));*/
-		this.channel.send(ByteBuffer.wrap(payload), new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));
+				" sent to server " + instance.server);
+		DatagramPacket packet = new DatagramPacket(payload, payload.length,
+				new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));
+		Log.d("sendUDP", "server: " + instance.server + " port: " + Integer.parseInt(instance.port));*/
+		this.channel.send(ByteBuffer.wrap(payload),
+				new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));
+		/*DatagramSocket socket = channel.socket();
+		socket.send(packet);*/
 		
 	}
 
