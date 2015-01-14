@@ -39,6 +39,7 @@ public final class CombinedReceiverThread implements Runnable {
 
 		try {
 			Selector selector = Selector.open();
+			ByteBuffer buf = ByteBuffer.allocate(bufSize);
 
 			while (keepRunning) {
 				/*Log.d("Receiver", "size of udpSocketList: " +
@@ -61,13 +62,15 @@ public final class CombinedReceiverThread implements Runnable {
 				// DatagramPacket packet = new DatagramPacket(data,
 				// data.length);
 				//Log.d("Receiver", "ready to receive packet!");
-				ByteBuffer buf = ByteBuffer.allocate(bufSize);
+				
 				buf.clear();
 				Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
 				while (selectedKeys.hasNext()) {
 					SelectionKey key = selectedKeys.next();
 					DatagramChannel tmpChannel = (DatagramChannel) key.channel();
 					tmpChannel.receive(buf);
+					byte[] data = new byte[buf.remaining()];
+					buf.get(data);
 
 					// for receive jitter
 					long currentTime = System.nanoTime();
@@ -78,12 +81,11 @@ public final class CombinedReceiverThread implements Runnable {
 					synchronized (jitterBean) {
 						jitterBean.rcvdJitter += (String
 								.valueOf((double) (currentTime - jitterTimeOrigin) / 1000000000)
-								+ "\t" + buf.hashCode() + "\n");
+								+ "\t" + new String(data).hashCode() + "\n");
 					}
 					this.jitterTimeOrigin = currentTime;
 					selectedKeys.remove();
 				}
-				buf = null;
 
 				/*
 				 * while (true) { udpReplayInfoBean.pollCloseQ(); if
