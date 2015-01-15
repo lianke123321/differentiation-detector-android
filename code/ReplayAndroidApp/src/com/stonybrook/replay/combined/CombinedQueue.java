@@ -67,7 +67,10 @@ public class CombinedQueue {
 		this.jitterTimeOrigin = System.nanoTime();
 		
 		try {
+			// for calculating packets
 			int i = 1;
+			// for jitter
+			int m = 0;
 			int len = this.Q.size();
 			// @@@ start all the treads here
 			for (RequestSet RS : this.Q) {
@@ -78,7 +81,8 @@ public class CombinedQueue {
 					Log.d("Replay", "Sending udp packet " + (i++) + "/" + len +
 							" at time " + (System.nanoTime() - timeOrigin) / 1000000);
 					nextUDP(RS, udpPortMapping, udpReplayInfoBean, udpServerMapping,
-							timing, server);
+							timing, server, m);
+					m ++;
 					
 					// adrian: for updating progress bar
 					updateUIBean.setProgress((int) (i * 100 / len));
@@ -110,7 +114,7 @@ public class CombinedQueue {
 			for(Thread t : cThreadList)
 				t.join();
 			
-			Log.d("Replay", "Finished executing all Threads " + (System.nanoTime() - timeOrigin) / 1000000);
+			Log.d("Queue", "Finished executing all Threads " + (System.nanoTime() - timeOrigin) / 1000000);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw ex;
@@ -163,7 +167,7 @@ public class CombinedQueue {
 	private void nextUDP(RequestSet RS, HashMap<String, CUDPClient> udpPortMapping,
 			UDPReplayInfoBean udpReplayInfoBean,
 			HashMap<String, HashMap<String, ServerInstance>> udpServerMapping, 
-			Boolean timing, String server) throws Exception {
+			Boolean timing, String server, int m) throws Exception {
 		String c_s_pair = RS.getc_s_pair();
 		String clientPort = c_s_pair.substring(16, 21);
 		String dstIP = c_s_pair.substring(22, 37);
@@ -187,6 +191,8 @@ public class CombinedQueue {
 			
 		}
 		
+		String[] tmpStr = {"", ""};
+		
 		if (timing) {
 			double expectedTime = timeOrigin + RS.getTimestamp() * 1000000000;
 			if (System.nanoTime() < expectedTime) {
@@ -199,11 +205,13 @@ public class CombinedQueue {
 		
 		// update sentJitter
 		long currentTime = System.nanoTime();
+		tmpStr[0] = String.
+				valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000);
+		tmpStr[1] = new String(RS.getPayload());
 		//Log.d("sentJitter", String.valueOf(currentTime-jitterTimeOrigin));
 		//Log.d("sentJitter", String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000));
 		synchronized (jitterBean) {
-			jitterBean.sentJitter += (String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000)
-					+ "\t" + new String(RS.getPayload()).hashCode() + "\n");
+			jitterBean.sentJitter.add(tmpStr);
 		}
 		jitterTimeOrigin = currentTime;
 		

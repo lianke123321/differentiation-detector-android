@@ -25,6 +25,7 @@ public class CombinedSideChannel {
 	private String id = null;
 	int bufSize = 4096;
 	public Socket socket = null;
+	//public SocketChannel channel = null;
 	DataOutputStream dataOutputStream = null;
 	DataInputStream dataInputStream = null;
 	int objLen = 10;
@@ -37,12 +38,18 @@ public class CombinedSideChannel {
 		try {
 			
 			socket = new Socket();
+			//channel = SocketChannel.open();
 			InetSocketAddress endPoint = new InetSocketAddress(instance.getIP(), instance.getPort());
 			socket.setTcpNoDelay(true);
+			//channel.socket().setTcpNoDelay(true);
 			socket.setReuseAddress(true);
+			//channel.socket().setReuseAddress(true);
 			socket.setKeepAlive(true);
+			//channel.socket().setKeepAlive(true);
+			//channel.configureBlocking(false);
 
 			socket.connect(endPoint);
+			//channel.connect(endPoint);
 			dataOutputStream = new DataOutputStream(socket.getOutputStream());
 			dataInputStream = new DataInputStream(socket.getInputStream());
 			
@@ -167,8 +174,23 @@ public class CombinedSideChannel {
 		} else {
 			sendObject(("WillSendClientJitter;" + id).getBytes(), objLen);
 			
-			sendObject(jitterBean.sentJitter.getBytes(), objLen);
-			sendObject(jitterBean.rcvdJitter.getBytes(), objLen);
+			int i;
+			String sentJitter = "";
+			String rcvdJitter = "";
+			
+			for (i = 0; i < jitterBean.sentJitter.size(); i++) {
+				//Log.d("sendJitter", jitterBean.sentJitter.get(i)[1]);
+				sentJitter += (jitterBean.sentJitter.get(i)[0] + "\t" +
+						jitterBean.sentJitter.get(i)[1].hashCode() + "\n");
+			}
+			
+			for (i = 0; i < jitterBean.rcvdJitter.size(); i++) {
+				rcvdJitter += (jitterBean.rcvdJitter.get(i)[0] + "\t" +
+						jitterBean.rcvdJitter.get(i)[1].hashCode() + "\n");
+			}
+			
+			sendObject(sentJitter.getBytes(), objLen);
+			sendObject(rcvdJitter.getBytes(), objLen);
 			Log.d("sendJitter", "finished sending jitter");
 		}
 		

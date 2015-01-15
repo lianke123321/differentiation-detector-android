@@ -39,16 +39,9 @@ public class CUDPClient /* implements Runnable */{
 	}
 	
 	public void sendUDPPacket(byte[] payload, ServerInstance instance) throws Exception {
-		//byte[] buf = UtilsManager.serialize(payload);
-		/*Log.d("sending", "udp packet w/ payload length " + payload.length +
-				" sent to server " + instance.server);
-		DatagramPacket packet = new DatagramPacket(payload, payload.length,
-				new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));
-		Log.d("sendUDP", "server: " + instance.server + " port: " + Integer.parseInt(instance.port));*/
+		//Log.d("sendUDP", "payload length: " + payload.length + " payload: " + new String(payload));
 		this.channel.send(ByteBuffer.wrap(payload),
 				new InetSocketAddress(instance.server, Integer.parseInt(instance.port)));
-		/*DatagramSocket socket = channel.socket();
-		socket.send(packet);*/
 		
 	}
 

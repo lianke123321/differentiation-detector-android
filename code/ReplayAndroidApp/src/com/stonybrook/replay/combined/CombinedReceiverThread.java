@@ -19,7 +19,7 @@ public final class CombinedReceiverThread implements Runnable {
 	private long jitterTimeOrigin = 0;
 	// changes of Arash
 	public volatile boolean keepRunning;
-	private int timeout = 1000;
+	private int TIME_OUT = 1000;
 
 	// adrian: for jitter
 	private JitterBean jitterBean = null;
@@ -54,7 +54,7 @@ public final class CombinedReceiverThread implements Runnable {
 				// Log.d("Receiver", "senderCount: " +
 				// udpReplayInfoBean.getSenderCount());
 				// Log.d("Receiver", String.valueOf(selector.selectNow()));
-				if (selector.select(timeout) == 0) {
+				if (selector.select(TIME_OUT) == 0) {
 					//Log.d("Receiver", "no socket has data");
 					continue;
 				}
@@ -71,17 +71,18 @@ public final class CombinedReceiverThread implements Runnable {
 					tmpChannel.receive(buf);
 					byte[] data = new byte[buf.remaining()];
 					buf.get(data);
-
+					
+					String[] tmpStr = {"", ""};
+					
 					// for receive jitter
 					long currentTime = System.nanoTime();
-					/*Log.d("rcvdJitter",
-							String.valueOf(currentTime - jitterTimeOrigin));
-					Log.d("rcvdJitter",
-							String.valueOf((double) (currentTime - jitterTimeOrigin) / 1000000000));*/
+					
+					tmpStr[0] = String.
+							valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000);
+					tmpStr[1] = new String(data);
+					
 					synchronized (jitterBean) {
-						jitterBean.rcvdJitter += (String
-								.valueOf((double) (currentTime - jitterTimeOrigin) / 1000000000)
-								+ "\t" + new String(data).hashCode() + "\n");
+						jitterBean.rcvdJitter.add(tmpStr);
 					}
 					this.jitterTimeOrigin = currentTime;
 					selectedKeys.remove();

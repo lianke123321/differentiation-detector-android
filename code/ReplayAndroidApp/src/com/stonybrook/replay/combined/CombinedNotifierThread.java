@@ -19,6 +19,9 @@ public final class CombinedNotifierThread implements Runnable {
 	private int bufSize = 4096;
 	// ArrayList<String> closeQ = new ArrayList<String>();
 	Socket socket = null;
+	// SocketChannel channel = null;
+	// private int TIME_OUT = 1000;
+
 	DataOutputStream dataOutputStream = null;
 	DataInputStream dataInputStream = null;
 	// changes of Arash
@@ -51,47 +54,52 @@ public final class CombinedNotifierThread implements Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
-			//Log.d("Notifier", "current senderCount: " + udpReplayInfoBean.getSenderCount());
-			try {
+
+		try {
+			// Selector selector = Selector.open();
+			// channel.register(selector, SelectionKey.OP_READ);
+
+			while (true) {
 				if (dataInputStream.available() > 0) {
+
 					byte[] data = receiveObject(objLen);
 					String[] Notf = new String(data).split(";");
 					if (Notf[0].equalsIgnoreCase("STARTED")) {
 						inProcess += 1;
 						total += 1;
 						// udpReplayInfoBean.offerCloseQ(Notf[1]);
-						//Log.d("Notifier", "received STARTED!");
+						// Log.d("Notifier", "received STARTED!");
 						// closeQ.add(Notf[1]);
 					} else if (Notf[0].equalsIgnoreCase("DONE")) {
 						inProcess -= 1;
-						//udpReplayInfoBean.decrement();
-						//Log.d("Notifier", "received DONE!");
+						// udpReplayInfoBean.decrement();
+						// Log.d("Notifier", "received DONE!");
 					} else {
 						Log.d("Notifier", "WTF???");
 						break;
 					}
+				} else {
+					Thread.sleep(500);
 				}
-				Thread.sleep(1000);
-			} catch (Exception e) {
-				Log.d("Notifier", "receive data error!");
-				e.printStackTrace();
+				
+				if (doneSending) {
+					if (inProcess == 0) {
+						//selector.close();
+						Log.d("Notifier",
+								"Done notifier! total: " + total
+										+ " udpSenderCount: "
+										+ udpReplayInfoBean.getSenderCount());
+						break;
+					}
+				}
 			}
-			//Log.d("Notifier", "current total: " + total + " inProcess: " + inProcess);
 
-			if (doneSending) {
-				if (inProcess == 0) {
-					Log.d("Notifier",
-							"Done notifier! total: " + total
-									+ " udpSenderCount: "
-									+ udpReplayInfoBean.getSenderCount());
-					break;
-				}
-			}
-			
+		} catch (Exception e) {
+			Log.d("Notifier", "receive data error!");
+			e.printStackTrace();
 		}
 
-		//Log.d("Notifier", "received all packets!");
+		// Log.d("Notifier", "received all packets!");
 
 	}
 
