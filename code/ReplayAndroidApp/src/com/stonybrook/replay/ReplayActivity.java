@@ -41,6 +41,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -139,6 +140,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
 		setContentView(R.layout.replay_main_layout_images);
+		// keep the screen on
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		/*
 		 * First check to see of Internet access is available TODO : Identify if
