@@ -7,7 +7,6 @@ import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -197,7 +196,7 @@ public class CombinedSideChannel {
 		byte[] data = receiveObject(objLen);
 		String str = new String(data);
 		if (str != "OK")
-			Log.d("sendJitter", "server return bad! " + str);
+			Log.d("sendJitter", "server returned bad! " + str);
 	}
 	
 	public void getResult (String result) throws Exception {
@@ -211,7 +210,7 @@ public class CombinedSideChannel {
 			sendObject("Result;Yes".getBytes(), objLen);
 			byte[] data = receiveObject(objLen);
 			String str = new String(data);
-			Log.d("getResult", "the result is : " + str);
+			Log.d("getResult", "received result is: " + str);
 		}
 	}
 	
@@ -219,9 +218,9 @@ public class CombinedSideChannel {
 		socket.close();
 	}
 	
-	int fromByteArray(byte[] bytes) {
+	/*int fromByteArray(byte[] bytes) {
 	     return ByteBuffer.wrap(bytes).getInt();
-	}
+	}*/
 	
 	/**
 	 * Rajesh's original code has bug, if message is more than 4096, this

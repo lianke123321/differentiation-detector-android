@@ -277,7 +277,8 @@ public class UnpickleDataStream {
 				RequestSet tempRS = new RequestSet();
 				JSONObject dictionary = qArray.getJSONObject(i) ;
 				tempRS.setc_s_pair((String) dictionary.get("c_s_pair"));
-				tempRS.setPayload(DecodeHex.decodeHex(((String)dictionary.get("payload")).toCharArray()));
+				//tempRS.setPayload(DecodeHex.decodeHex(((String)dictionary.get("payload")).toCharArray()));
+				tempRS.setPayload(DecodeHex.hexStringToByteArray((String)dictionary.get("payload")));
 				tempRS.setTimestamp((Double) dictionary.get("timestamp"));
 				// Log.d("Time", (i+1) + " " +
 				// String.valueOf(tempRS.getTimestamp()));

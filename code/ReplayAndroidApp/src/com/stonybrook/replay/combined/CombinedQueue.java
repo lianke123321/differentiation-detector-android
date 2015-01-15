@@ -210,6 +210,7 @@ public class CombinedQueue {
 		tmpStr[1] = new String(RS.getPayload());
 		//Log.d("sentJitter", String.valueOf(currentTime-jitterTimeOrigin));
 		//Log.d("sentJitter", String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000));
+		//Log.d("nextUDP", tmpStr[1]);
 		synchronized (jitterBean) {
 			jitterBean.sentJitter.add(tmpStr);
 		}
