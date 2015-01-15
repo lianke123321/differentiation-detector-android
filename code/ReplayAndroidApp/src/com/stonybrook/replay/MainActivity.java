@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
 	SharedPreferences settings;
 	
 	String gateway = "replay.meddle.mobi";
-
+	
 	// Remove this
 	// @SuppressLint("NewApi")
 	@Override
@@ -135,6 +135,7 @@ public class MainActivity extends Activity {
 			Log.d(ReplayConstants.LOG_APPNAME, "Exception while parsing JSON file " + ReplayConstants.APPS_FILENAME);
 			ex.printStackTrace();
 		}
+		
 	}
 
 	

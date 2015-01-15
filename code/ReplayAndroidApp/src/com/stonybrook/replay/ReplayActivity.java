@@ -56,6 +56,7 @@ import com.stonybrook.android.logic.TrustedCertificateManager;
 import com.stonybrook.android.ui.LogActivity;
 import com.stonybrook.replay.adapter.ImageReplayListAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
+import com.stonybrook.replay.bean.DeviceInfoBean;
 import com.stonybrook.replay.bean.JitterBean;
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
@@ -80,6 +81,7 @@ import com.stonybrook.replay.udp.UDPClient;
 import com.stonybrook.replay.udp.UDPQueue;
 import com.stonybrook.replay.udp.UDPSideChannel;
 import com.stonybrook.replay.util.Config;
+import com.stonybrook.replay.util.Mobilyzer;
 import com.stonybrook.replay.util.RandomString;
 import com.stonybrook.replay.util.ReplayCompleteListener;
 import com.stonybrook.replay.util.UnpickleDataStream;
@@ -93,11 +95,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	TextView selectedAppsSizeTextView = null;
 	Context context = null;
 	ProgressDialog progress = null;
-	
+
 	// adrian: for progress bar
 	ProgressBar prgBar;
 	UpdateUIBean updateUIBean;
-	
+
 	// ProgressDialog progressWait = null;
 	int currentReplayCount = 0;
 	ProgressBar progressBar = null;
@@ -130,9 +132,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	// Objects to store data for apps
 	TCPAppJSONInfoBean appData_tcp = null;
 	UDPAppJSONInfoBean appData_udp = null;
-	
+
 	// adrian: For combined app
 	combinedAppJSONInfoBean appData_combined = null;
+
+	// for testing mobilyzer
+	public Mobilyzer mobilyzer = null;
+	public DeviceInfoBean deviceInfoBean = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -160,16 +166,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								}
 							}).show();
 		}
-		
-
 
 		// Extract data that was sent by previous activity. In our case, list of
 		// apps, server and timing
 		context = getApplicationContext();
 		selectedApps = getIntent().getParcelableArrayListExtra("selectedApps");
-		
+
 		(new GetReplayServerIP()).execute("");
-		
+
 		enableTiming = (String) getIntent().getStringExtra("timing");
 
 		// Create layout for this page
@@ -186,9 +190,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		replayButton = (Button) findViewById(R.id.replayButton);
 		replayButton.setOnClickListener(replayButtonListener);
 		currentReplayCount = 0;
-		
+
 		updateSelectedTextViews(selectedApps);
-		
+
 		// adrian: for progress bar
 		prgBar = (ProgressBar) findViewById(R.id.prgBar);
 		prgBar.setVisibility(View.GONE);
@@ -197,19 +201,32 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		Log.d("Replay", "Loading VPN certificates");
 		new CertificateLoadTask().executeOnExecutor(
 				AsyncTask.THREAD_POOL_EXECUTOR, false);
-		
-		KeyChain.choosePrivateKeyAlias(this, new SelectUserCertOnClickListener(), // Callback
-                new String[] {}, // Any key types.
-                null, // Any issuers.
-                "localhost", // Any host
-                -1, // Any port
-                DEFAULT_ALIAS);
-		
-		/** Dave commented out to test auto-credentials
-		KeyChain.choosePrivateKeyAlias(ReplayActivity.this,
-				new SelectUserCertOnClickListener(), new String[] { "RSA" },
-				null, null, -1, "adrian-replay"); 
-		*/
+
+		KeyChain.choosePrivateKeyAlias(this,
+				new SelectUserCertOnClickListener(), // Callback
+				new String[] {}, // Any key types.
+				null, // Any issuers.
+				"localhost", // Any host
+				-1, // Any port
+				DEFAULT_ALIAS);
+
+		/**
+		 * Dave commented out to test auto-credentials
+		 * KeyChain.choosePrivateKeyAlias(ReplayActivity.this, new
+		 * SelectUserCertOnClickListener(), new String[] { "RSA" }, null, null,
+		 * -1, "adrian-replay");
+		 */
+		// to test mobilyzer
+		// phoneUtils = new PhoneUtils(this.context);
+		mobilyzer = new Mobilyzer(this.context);
+		deviceInfoBean = mobilyzer.getDeviceInfo();
+		Log.d("Mobilyzer", "manufacturer: " + deviceInfoBean.manufacturer
+				+ " model: " + deviceInfoBean.model + " os: " + deviceInfoBean.os
+				+ " carrierName: " + deviceInfoBean.carrierName + " networkType: "
+				+ deviceInfoBean.networkType + " cellInfo: "
+				+ deviceInfoBean.cellInfo + " latitude: "
+				+ String.valueOf(deviceInfoBean.location.getLatitude())
+				+ " longitude: " + String.valueOf(deviceInfoBean.location.getLongitude()));
 	}
 
 	/**
@@ -238,7 +255,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			 * Configuration file is located in assets/configuration.properties.
 			 */
 			Config.readConfigFile(ReplayConstants.CONFIG_FILE, context);
-			
+
 			Config.set("timing", enableTiming);
 			Config.set("server", server);
 			// adrian: added cause arash's code
@@ -251,7 +268,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				public void run() {
 					Config.set("publicIP", getPublicIP());
 				}
-				
+
 			}).start();
 
 			Log.d("Server", server);
@@ -267,14 +284,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				adapter.notifyDataSetChanged();
 
 				// Forward request to respective method with required data
-				/*if (selectedApps.get(currentReplayCount).getType()
-						.equalsIgnoreCase("tcp"))
-					processTCPApplication(selectedApps.get(currentReplayCount));
-				else
-					processUDPApplication(selectedApps.get(currentReplayCount));*/
-				
+				/*
+				 * if (selectedApps.get(currentReplayCount).getType()
+				 * .equalsIgnoreCase("tcp"))
+				 * processTCPApplication(selectedApps.get(currentReplayCount));
+				 * else
+				 * processUDPApplication(selectedApps.get(currentReplayCount));
+				 */
+
 				// adrian: start combined method
-				processCombinedApplication(selectedApps.get(currentReplayCount), "open");
+				processCombinedApplication(
+						selectedApps.get(currentReplayCount), "open");
 			} else {
 				Toast.makeText(ReplayActivity.this,
 						"Server Not Available. Try after some time.",
@@ -301,7 +321,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		appData_tcp = UnpickleDataStream.unpickleTCPJSON(
 				applicationBean.getDataFile(), context);
 		Log.d("Parsing", applicationBean.getDataFile());
-		
+
 		queueTCP = new QueueTCPAsync(this, "open");
 
 		/*
@@ -329,7 +349,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		queueUDP = new QueueUDPAsync(this, "open");
 		queueUDP.execute("");
 	}
-	
+
 	/**
 	 * This method processes Replay for TCP application. 1) Parse pickle file 2)
 	 * Start AsyncTask for TCP with the parsed pickle data TODO: Remove the
@@ -338,37 +358,35 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 * @param applicationBean
 	 * @throws Exception
 	 */
-	private void processCombinedApplication(ApplicationBean applicationBean, String env)
-			throws Exception {
+	private void processCombinedApplication(ApplicationBean applicationBean,
+			String env) throws Exception {
 
 		currentTask = "combined";
-		
+
 		// adrian: update progress
-		applicationBean.status = getResources()
-				.getString(R.string.load_q);
+		applicationBean.status = getResources().getString(R.string.load_q);
 		ReplayActivity.this.runOnUiThread(new Runnable() {
 			public void run() {
 				adapter.notifyDataSetChanged();
 			}
 		});
-		
-		
+
 		appData_combined = UnpickleDataStream.unpickleCombinedJSON(
 				applicationBean.getDataFile(), context);
 		Log.d("Parsing", applicationBean.getDataFile());
 		queueCombined = new QueueCombinedAsync(this, applicationBean, env);
-		
-		queueCombined.execute("");
-		
-		//adrian: for testing VPN
-		/*onVpnProfileSelected(null);
-		Log.d("Replay", "Testing VPN");
-		
-		selectedApps.get(currentReplayCount).status = getResources()
-				.getString(R.string.vpn);
-		adapter.notifyDataSetChanged();
 
-		(new VPNConnected()).execute(this);*/
+		queueCombined.execute("");
+
+		// adrian: for testing VPN
+		/*
+		 * onVpnProfileSelected(null); Log.d("Replay", "Testing VPN");
+		 * 
+		 * selectedApps.get(currentReplayCount).status = getResources()
+		 * .getString(R.string.vpn); adapter.notifyDataSetChanged();
+		 * 
+		 * (new VPNConnected()).execute(this);
+		 */
 
 	}
 
@@ -452,112 +470,68 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 * @author rajesh
 	 * 
 	 */
-	/*private class FileDownload extends AsyncTask<Void, Void, Void> {
-
-		String serverName = null;
-		int portNo;
-		String appName;
-		ReplayCompleteListener listener;
-
-		*//**
-		 * @param serverName
-		 * @param portNo
-		 * @param appName
-		 *//*
-		public FileDownload(ReplayCompleteListener listener, String serverName,
-				int portNo, String appName) {
-			this.serverName = serverName;
-			this.portNo = portNo;
-			this.appName = appName;
-			this.listener = listener;
-		}
-
-		boolean success = true;
-
-		@Override
-		protected void onPostExecute(Void result) {
-			this.listener.fileExistsListener(success);
-		}
-
-		*//**
-		 * Actual work will be done here. Check if file exists. If it does then
-		 * return otherwise Create socket and download file from server and save
-		 * it to internal storage.
-		 *//*
-		@Override
-		protected Void doInBackground(Void... params) {
-			try {
-				Socket client = null;
-				PrintWriter writer;
-				BufferedReader reader;
-				int bytesRead;
-				int currentTot = 0;
-				File file = null;
-				FileOutputStream fos = null;
-				BufferedOutputStream bos = null;
-				try {
-
-					// Check to see whether file exists
-					file = new File(context.getFilesDir(), appName
-							+ ".pcap_client_pickle");
-					if (file.exists()) {
-						Log.d("Replay", "File " + file.getName() + " exists!!!");
-						return null;
-					}
-					// If not download
-					client = new Socket();
-					client.connect(new InetSocketAddress(serverName, portNo));
-					reader = new BufferedReader(new InputStreamReader(
-							client.getInputStream()));
-					writer = new PrintWriter(client.getOutputStream(), true);
-
-					writer.println(appName);
-
-					long fileLen = Long.parseLong(reader.readLine());
-					Log.d("Replay", "File size is " + fileLen);
-
-					Log.d("Replay",
-							"context directory path is "
-									+ context.getFilesDir());
-
-					byte[] bytearray = new byte[(int) fileLen];
-					InputStream is = client.getInputStream();
-
-					fos = new FileOutputStream(file);
-					bos = new BufferedOutputStream(fos);
-					bytesRead = is.read(bytearray, 0, bytearray.length);
-					currentTot = bytesRead;
-
-					while (currentTot < fileLen && bytesRead > 0) {
-						bytesRead = is.read(bytearray, currentTot,
-								(bytearray.length - currentTot));
-						if (bytesRead >= 0)
-							currentTot += bytesRead;
-					}
-					// Put this code in finally
-					bos.write(bytearray, 0, currentTot);
-					bos.flush();
-
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				} finally {
-					if (bos != null)
-						bos.close();
-					try {
-						if (client != null)
-							client.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			} catch (Exception ex) {
-				success = false;
-				ex.printStackTrace();
-			}
-			return null;
-		}
-	}
-*/
+	/*
+	 * private class FileDownload extends AsyncTask<Void, Void, Void> {
+	 * 
+	 * String serverName = null; int portNo; String appName;
+	 * ReplayCompleteListener listener;
+	 *//**
+	 * @param serverName
+	 * @param portNo
+	 * @param appName
+	 */
+	/*
+	 * public FileDownload(ReplayCompleteListener listener, String serverName,
+	 * int portNo, String appName) { this.serverName = serverName; this.portNo =
+	 * portNo; this.appName = appName; this.listener = listener; }
+	 * 
+	 * boolean success = true;
+	 * 
+	 * @Override protected void onPostExecute(Void result) {
+	 * this.listener.fileExistsListener(success); }
+	 *//**
+	 * Actual work will be done here. Check if file exists. If it does then
+	 * return otherwise Create socket and download file from server and save it
+	 * to internal storage.
+	 */
+	/*
+	 * @Override protected Void doInBackground(Void... params) { try { Socket
+	 * client = null; PrintWriter writer; BufferedReader reader; int bytesRead;
+	 * int currentTot = 0; File file = null; FileOutputStream fos = null;
+	 * BufferedOutputStream bos = null; try {
+	 * 
+	 * // Check to see whether file exists file = new
+	 * File(context.getFilesDir(), appName + ".pcap_client_pickle"); if
+	 * (file.exists()) { Log.d("Replay", "File " + file.getName() +
+	 * " exists!!!"); return null; } // If not download client = new Socket();
+	 * client.connect(new InetSocketAddress(serverName, portNo)); reader = new
+	 * BufferedReader(new InputStreamReader( client.getInputStream())); writer =
+	 * new PrintWriter(client.getOutputStream(), true);
+	 * 
+	 * writer.println(appName);
+	 * 
+	 * long fileLen = Long.parseLong(reader.readLine()); Log.d("Replay",
+	 * "File size is " + fileLen);
+	 * 
+	 * Log.d("Replay", "context directory path is " + context.getFilesDir());
+	 * 
+	 * byte[] bytearray = new byte[(int) fileLen]; InputStream is =
+	 * client.getInputStream();
+	 * 
+	 * fos = new FileOutputStream(file); bos = new BufferedOutputStream(fos);
+	 * bytesRead = is.read(bytearray, 0, bytearray.length); currentTot =
+	 * bytesRead;
+	 * 
+	 * while (currentTot < fileLen && bytesRead > 0) { bytesRead =
+	 * is.read(bytearray, currentTot, (bytearray.length - currentTot)); if
+	 * (bytesRead >= 0) currentTot += bytesRead; } // Put this code in finally
+	 * bos.write(bytearray, 0, currentTot); bos.flush();
+	 * 
+	 * } catch (Exception ex) { ex.printStackTrace(); } finally { if (bos !=
+	 * null) bos.close(); try { if (client != null) client.close(); } catch
+	 * (IOException e) { e.printStackTrace(); } } } catch (Exception ex) {
+	 * success = false; ex.printStackTrace(); } return null; } }
+	 */
 	/**
 	 * This asyncTask processes the UDP Replay. TODO: Python client for UDP was
 	 * changed heavily in last couple of weeks of Semester. This code does not
@@ -572,10 +546,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		HashMap<String, ClientThread> CSPairMapping = null;
 		UDPAppJSONInfoBean appData = null;
 		long timeStarted = 0;
-		//This is Lister which will be called when this method finishes. More information about this is provided in ReplayCompleteListener file.
+		// This is Lister which will be called when this method finishes. More
+		// information about this is provided in ReplayCompleteListener file.
 		private ReplayCompleteListener listener;
 		boolean success = true;
-		//This simply identifies whether we are in open or VPN
+		// This simply identifies whether we are in open or VPN
 		public String channel = null;
 
 		public QueueUDPAsync(ReplayCompleteListener listener, String channel) {
@@ -585,9 +560,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected void onPostExecute(String result) {
-			Log.d("Replay", "Replay lasted for " + (System.currentTimeMillis() - this.timeStarted));
-			
-			//Callback according to type of Replay with status of Replay
+			Log.d("Replay", "Replay lasted for "
+					+ (System.currentTimeMillis() - this.timeStarted));
+
+			// Callback according to type of Replay with status of Replay
 			if (channel.equalsIgnoreCase("open"))
 				listener.openFinishCompleteCallback(success);
 			else
@@ -610,48 +586,60 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			try {
 				/*
-				 * Here we are checking if we are on VPN channel. If we are on VPN, wait for 5 sec for VPN to connect.
-				 * TODO: This is very bad. Remove this and try finding out some other way whether VPN is connected. One way can be to get IP that's visible outside.
-				 * If it's of Meddle server then we are connected to VPN. Implemented this in VPNConnected AsyncTask but never got chance to integrate it. 
+				 * Here we are checking if we are on VPN channel. If we are on
+				 * VPN, wait for 5 sec for VPN to connect. TODO: This is very
+				 * bad. Remove this and try finding out some other way whether
+				 * VPN is connected. One way can be to get IP that's visible
+				 * outside. If it's of Meddle server then we are connected to
+				 * VPN. Implemented this in VPNConnected AsyncTask but never got
+				 * chance to integrate it.
 				 */
 				if (this.channel.equalsIgnoreCase("vpn"))
 					Thread.sleep(5000);
 				Log.d("VPNUDP", this.channel);
-				int sideChannelPort = Integer.valueOf(Config.get("udp_sidechannel_port"));
+				int sideChannelPort = Integer.valueOf(Config
+						.get("udp_sidechannel_port"));
 				String randomID = null;
-				SocketInstance socketInstance = new SocketInstance(Config.get("server"), sideChannelPort, null);
+				SocketInstance socketInstance = new SocketInstance(
+						Config.get("server"), sideChannelPort, null);
 				UDPSideChannel sideChannel = null;
 
 				SparseArray<Integer> serverPortsMap = null;
-				
+
 				/**
-				 * Ask for port mapping from server. For some reason, port map info parsing was throwing error. so, I put while loop to do this untill
-				 * port mapping is parsed successfully.
+				 * Ask for port mapping from server. For some reason, port map
+				 * info parsing was throwing error. so, I put while loop to do
+				 * this untill port mapping is parsed successfully.
 				 */
-				
+
 				boolean s = false;
 				while (!s) {
 					try {
 						randomID = new RandomString(10).nextString();
-						sideChannel = new UDPSideChannel(socketInstance, randomID);
+						sideChannel = new UDPSideChannel(socketInstance,
+								randomID);
 						sideChannel.declareID();
-						serverPortsMap = sideChannel.receivePortMappingNonBlock();
+						serverPortsMap = sideChannel
+								.receivePortMappingNonBlock();
 						s = true;
 					} catch (JSONException ex) {
 						ex.printStackTrace();
 					}
 				}
-				
+
 				/**
 				 * Create clients from CSPairs
 				 */
 
 				for (String key : appData.getCsPairs().keySet()) {
-					int destPort = Integer.valueOf(key.substring(key.lastIndexOf('.') + 1, key.length()));
+					int destPort = Integer.valueOf(key.substring(
+							key.lastIndexOf('.') + 1, key.length()));
 					if (serverPortsMap.size() != 0)
 						destPort = serverPortsMap.get(destPort);
-					UDPClient c = new UDPClient(key, Config.get("server"), destPort);
-					Pair<Integer, Integer> NATMapping = c.identify(sideChannel, randomID, appData.getReplayName());
+					UDPClient c = new UDPClient(key, Config.get("server"),
+							destPort);
+					Pair<Integer, Integer> NATMapping = c.identify(sideChannel,
+							randomID, appData.getReplayName());
 					NATMap.put(NATMapping.first, NATMapping.second);
 
 					ClientThread client = new ClientThread(c);
@@ -663,8 +651,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					clients.add(client);
 				}
 
-
-				UDPQueue queue = new UDPQueue(appData.getQ(), CSPairMapping, Boolean.valueOf(Config.get("timing")));
+				UDPQueue queue = new UDPQueue(appData.getQ(), CSPairMapping,
+						Boolean.valueOf(Config.get("timing")));
 				Thread queueThread = new Thread(queue);
 
 				queueThread.start();
@@ -706,9 +694,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected void onPostExecute(String result) {
-			Log.d("Replay",
-					"TCP Replay lasted for "
-							+ (System.nanoTime() - this.timeStarted) / 1000000);
+			Log.d("Replay", "TCP Replay lasted for "
+					+ (System.nanoTime() - this.timeStarted) / 1000000);
 
 			// Callback according to type of Replay with status of Replay
 			if (channel.equalsIgnoreCase("open"))
@@ -730,9 +717,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			try {
 				/**
-				 * used to wait 5 secs here, now checkVPN is called in 
-				 * openFinishCompleteCallBack instead of here. So don't
-				 * need to do anything here
+				 * used to wait 5 secs here, now checkVPN is called in
+				 * openFinishCompleteCallBack instead of here. So don't need to
+				 * do anything here
 				 * 
 				 * @author Adrian
 				 * 
@@ -814,7 +801,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 
 	}
-	
+
 	class QueueCombinedAsync extends AsyncTask<String, String, String> {
 
 		combinedAppJSONInfoBean appData = null;
@@ -826,13 +813,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		boolean success = true;
 		// This simply identifies whether we are in open or VPN
 		public String channel = null;
-		
+
 		public QueueCombinedAsync(ReplayCompleteListener listener,
 				ApplicationBean applicationBean, String channel) {
 			this.listener = listener;
 			this.channel = channel;
 			this.applicationBean = applicationBean;
-			//this.prgBar = (ProgressBar) findViewById(R.id.prgBar);
+			// this.prgBar = (ProgressBar) findViewById(R.id.prgBar);
 		}
 
 		@Override
@@ -859,22 +846,22 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			try {
 				/**
-				 * used to wait 5 sec, now checkVPN is called in 
-				 * openFinishCompleteCallBack instead of here. So don't
-				 * need to do anything here
+				 * used to wait 5 sec, now checkVPN is called in
+				 * openFinishCompleteCallBack instead of here. So don't need to
+				 * do anything here
 				 * 
 				 * @author Adrian
 				 * 
 				 */
 				// adrian: update progress
-				applicationBean.status = getResources()
-						.getString(R.string.create_side_channel);
+				applicationBean.status = getResources().getString(
+						R.string.create_side_channel);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
+
 				int sideChannelPort = Integer.valueOf(Config
 						.get("combined_sidechannel_port"));
 				String randomID = new RandomString(10).nextString();
@@ -882,29 +869,30 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						Config.get("server"), sideChannelPort, null);
 				Log.d("Server", Config.get("server"));
 
-				CombinedSideChannel sideChannel = new CombinedSideChannel(socketInstance,
-						randomID);
+				CombinedSideChannel sideChannel = new CombinedSideChannel(
+						socketInstance, randomID);
 				// adrian: new format of serverPortsMap
 				HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> serverPortsMap = null;
 				UDPReplayInfoBean udpReplayInfoBean = new UDPReplayInfoBean();
-				
+
 				// adrian: for jitter
 				JitterBean jitterBean = new JitterBean();
-				
+
 				// adrian: new declareID() function
-				sideChannel.declareID(appData.getReplayName(), Config.get("extraString"));
-				
+				sideChannel.declareID(appData.getReplayName(),
+						Config.get("extraString"));
+
 				// adrian: update progress
-				applicationBean.status = getResources()
-						.getString(R.string.ask4permission);
+				applicationBean.status = getResources().getString(
+						R.string.ask4permission);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
+
 				String[] permission = sideChannel.ask4Permission();
-				
+
 				if (permission[0] == "0") {
 					if (permission[1] == "1") {
 						Log.d("Error", "Unknown replay_name!!!");
@@ -920,7 +908,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				} else {
 					Log.d("Replay", "Permission granted.");
 				}
-				
+
 				// always send noIperf here
 				sideChannel.sendIperf();
 
@@ -930,21 +918,24 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * this until port mapping is parsed successfully.
 				 */
 				// adrian: update progress
-				applicationBean.status = getResources()
-						.getString(R.string.receive_server_port_mapping);
+				applicationBean.status = getResources().getString(
+						R.string.receive_server_port_mapping);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
+
 				try {
-					//randomID = new RandomString(10).nextString();
+					// randomID = new RandomString(10).nextString();
 					serverPortsMap = sideChannel.receivePortMappingNonBlock();
-					udpReplayInfoBean.setSenderCount(sideChannel.receiveSenderCount());
-					Log.d("Replay", "Successfully received serverPortsMap and senderCount!");
+					udpReplayInfoBean.setSenderCount(sideChannel
+							.receiveSenderCount());
+					Log.d("Replay",
+							"Successfully received serverPortsMap and senderCount!");
 				} catch (JSONException ex) {
-					Log.d("Replay", "failed to receive serverPortsMap and senderCount!");
+					Log.d("Replay",
+							"failed to receive serverPortsMap and senderCount!");
 					ex.printStackTrace();
 					return "";
 				}
@@ -952,23 +943,23 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				/**
 				 * Create clients from CSPairs
 				 */
-				
+
 				// adrian: update progress
-				applicationBean.status = getResources()
-						.getString(R.string.create_tcp_client);
+				applicationBean.status = getResources().getString(
+						R.string.create_tcp_client);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
+
 				for (String csp : appData.getTcpCSPs()) {
 					String destIP = csp.substring(csp.lastIndexOf('-') + 1,
 							csp.lastIndexOf("."));
 					String destPort = csp.substring(csp.lastIndexOf('.') + 1,
 							csp.length());
-					ServerInstance instance = serverPortsMap.get("tcp").get(destIP).get(
-							destPort);
+					ServerInstance instance = serverPortsMap.get("tcp")
+							.get(destIP).get(destPort);
 					if (instance.server.trim().equals(""))
 						instance.server = server; // serverPortsMap.get(destPort);
 					// adrian: pass two more parameters: randomID and replayName
@@ -979,85 +970,88 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					CSPairMapping.put(csp, c);
 				}
 				Log.d("Replay", "created clients from CSPairs");
-				
+
 				/**
 				 * adrian: create clients from udpClientPorts
 				 */
-				
+
 				// adrian: update progress
-				applicationBean.status = getResources()
-						.getString(R.string.create_udp_client);
+				applicationBean.status = getResources().getString(
+						R.string.create_udp_client);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
+
 				for (String originalClientPort : appData.getUdpClientPorts()) {
 					CUDPClient c = new CUDPClient(Config.get("publicIP"));
 					udpPortMapping.put(originalClientPort, c);
 				}
 				Log.d("Replay", "created clients from udpClientPorts");
 
-				Log.d("Replay", "Size of CSPairMapping is " +
-						String.valueOf(CSPairMapping.size()));
-				Log.d("Replay", "Size of udpPortMapping is " +
-						String.valueOf(udpPortMapping.size()));
-				
+				Log.d("Replay",
+						"Size of CSPairMapping is "
+								+ String.valueOf(CSPairMapping.size()));
+				Log.d("Replay",
+						"Size of udpPortMapping is "
+								+ String.valueOf(udpPortMapping.size()));
+
 				// adrian: for waiting for all threads to die
 				ArrayList<Thread> threadList = new ArrayList<Thread>();
-				
+
 				// adrian: starting notifier thread
-				
+
 				// adrian: update progress
-				applicationBean.status = getResources()
-						.getString(R.string.run_notf);
+				applicationBean.status = getResources().getString(
+						R.string.run_notf);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
-				CombinedNotifierThread notifier =
-						sideChannel.notifierCreater(udpReplayInfoBean);
+
+				CombinedNotifierThread notifier = sideChannel
+						.notifierCreater(udpReplayInfoBean);
 				Thread notfThread = new Thread(notifier);
 				notfThread.start();
 				threadList.add(notfThread);
-				
+
 				// adrian: starting receiver thread
-				
+
 				// adrian: update progress
-				applicationBean.status = getResources()
-						.getString(R.string.run_receiver);
+				applicationBean.status = getResources().getString(
+						R.string.run_receiver);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
-				CombinedReceiverThread receiver = new CombinedReceiverThread(udpReplayInfoBean,
-						jitterBean);
+
+				CombinedReceiverThread receiver = new CombinedReceiverThread(
+						udpReplayInfoBean, jitterBean);
 				Thread rThread = new Thread(receiver);
 				rThread.start();
 				threadList.add(rThread);
-				
+
 				// adrian: starting UI updating thread
-				Thread UIUpdateThread = new Thread(new Runnable(){
+				Thread UIUpdateThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
-						
+
 						// set progress bar to visible
 						ReplayActivity.this.runOnUiThread(new Runnable() {
 							public void run() {
 								prgBar.setVisibility(View.VISIBLE);
 							}
 						});
-						
+
 						while (updateUIBean.getProgress() < 100) {
 							ReplayActivity.this.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									prgBar.setProgress(updateUIBean.getProgress());
+									prgBar.setProgress(updateUIBean
+											.getProgress());
 								}
 							});
 							try {
@@ -1067,7 +1061,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								e.printStackTrace();
 							}
 						}
-						
+
 						// set progress bar to invisible
 						ReplayActivity.this.runOnUiThread(new Runnable() {
 							public void run() {
@@ -1075,78 +1069,81 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								prgBar.setProgress(0);
 							}
 						});
-						
+
 						Log.d("UpdateUI", "completed!");
 					}
 				});
-				
+
 				UIUpdateThread.start();
 				threadList.add(UIUpdateThread);
 
 				// Running the Queue (Sender)
-				
+
 				// adrian: update progress
-				applicationBean.status = getResources()
-						.getString(R.string.run_sender);
+				applicationBean.status = getResources().getString(
+						R.string.run_sender);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
-				CombinedQueue queue = new CombinedQueue(appData.getQ(), jitterBean);
+
+				CombinedQueue queue = new CombinedQueue(appData.getQ(),
+						jitterBean);
 				this.timeStarted = System.nanoTime();
 				queue.run(updateUIBean, CSPairMapping, udpPortMapping,
 						udpReplayInfoBean, serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")), server);
-				
+
 				// waiting for all threads to finish
 				Log.d("Replay", "waiting for all threads to die!");
-				/*for (Thread t : threadList)
-					t.join();*/
+				/*
+				 * for (Thread t : threadList) t.join();
+				 */
 				Thread.sleep(1000);
 				notifier.doneSending = true;
 				notfThread.join();
 				receiver.keepRunning = false;
 				rThread.join();
-				
+
 				// Telling server done with replaying
-				
+
 				// adrian: update progress
-				applicationBean.status = getResources()
-						.getString(R.string.send_done);
+				applicationBean.status = getResources().getString(
+						R.string.send_done);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
+
 				double duration = ((double) (System.nanoTime() - this.timeStarted)) / 1000000000;
 				sideChannel.sendDone(duration);
 				Log.d("Replay", "replay finished using time " + duration + " s");
-				
+
 				// Sending jitter
-				
+
 				// adrian: update progress
-				applicationBean.status = getResources()
-						.getString(R.string.send_jitter);
+				applicationBean.status = getResources().getString(
+						R.string.send_jitter);
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
-				sideChannel.sendJitter(randomID, Config.get("jitter"), jitterBean);
-				
-				//Log.d("sentJitter", jitterBean.sentJitter);
-				//Log.d("rcvdJitter", jitterBean.rcvdJitter);
-				
+
+				sideChannel.sendJitter(randomID, Config.get("jitter"),
+						jitterBean);
+
+				// Log.d("sentJitter", jitterBean.sentJitter);
+				// Log.d("rcvdJitter", jitterBean.rcvdJitter);
+
 				// Getting result
 				sideChannel.getResult(Config.get("result"));
-				
+
 				// closing side channel socket
 				sideChannel.closeSideChannelSocket();
-				
+
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
 				ex.printStackTrace();
@@ -1173,7 +1170,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			 * start processing those. should be easy.
 			 */
 			if (!success) {
-				Toast.makeText(context, "Error while processing...", Toast.LENGTH_LONG).show();
+				Toast.makeText(context, "Error while processing...",
+						Toast.LENGTH_LONG).show();
 				return;
 			}
 
@@ -1182,7 +1180,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			 * applications selected by user. ++ makes processing of next
 			 * application in list when processApplicationReplay() is called.
 			 */
-			
+
 			selectedApps.get(currentReplayCount).resultImg = "p";
 			selectedApps.get(currentReplayCount).status = getResources()
 					.getString(R.string.finish_vpn);
@@ -1191,17 +1189,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			// If there are more apps that require processing then start with
 			// those.
 			if (selectedApps.size() != (currentReplayCount + 1)) {
-				//(new StartNextApp()).execute(this);
-				//processCombinedApplication(selectedApps.get(++currentReplayCount), "vpn");
+				// (new StartNextApp()).execute(this);
+				// processCombinedApplication(selectedApps.get(++currentReplayCount),
+				// "vpn");
 				appData_combined = UnpickleDataStream.unpickleCombinedJSON(
-						selectedApps.get(++currentReplayCount).getDataFile(), context);
+						selectedApps.get(++currentReplayCount).getDataFile(),
+						context);
 				queueCombined.cancel(true);
 				queueCombined = new QueueCombinedAsync(this,
 						selectedApps.get(currentReplayCount), "vpn");
 				Log.d("Replay", "Starting combined replay");
 				queueCombined.execute("");
-			}
-			else {
+			} else {
 				// progressWait.setMessage("Finishing Analysis...");
 				// Thread.sleep(10000);
 				// progressWait.dismiss();
@@ -1214,7 +1213,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		} finally {
 			// Disconnect VPN. No matter whether replay was successful or not
 		}
-		
+
 	}
 
 	/**
@@ -1236,31 +1235,33 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				adapter.notifyDataSetChanged();
 
 				if (selectedApps.size() != (currentReplayCount + 1)) {
-					//processCombinedApplication(selectedApps.get(++currentReplayCount), "open");
+					// processCombinedApplication(selectedApps.get(++currentReplayCount),
+					// "open");
 					appData_combined = UnpickleDataStream.unpickleCombinedJSON(
-							selectedApps.get(++currentReplayCount).getDataFile(), context);
+							selectedApps.get(++currentReplayCount)
+									.getDataFile(), context);
 					queueCombined.cancel(true);
 					queueCombined = new QueueCombinedAsync(this,
 							selectedApps.get(currentReplayCount), "open");
 					Log.d("Replay", "Starting combined replay");
 					queueCombined.execute("");
-				}
-				else {
+				} else {
 					currentReplayCount = 0;
 					// Connect to VPN
 					onVpnProfileSelected(null);
 					Log.d("Replay", "VPN started");
-					
+
 					// Change screen status
 					selectedApps.get(currentReplayCount).status = getResources()
 							.getString(R.string.vpn);
 					adapter.notifyDataSetChanged();
-					
+
 					appData_combined = UnpickleDataStream.unpickleCombinedJSON(
-							selectedApps.get(currentReplayCount).getDataFile(), context);
+							selectedApps.get(currentReplayCount).getDataFile(),
+							context);
 					(new VPNConnected()).execute(this);
 				}
-					
+
 			} else {
 				// Update status on screen and stop processing
 				selectedApps.get(currentReplayCount).resultImg = "p";
@@ -1316,10 +1317,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			try {
-				if (currentTask.equalsIgnoreCase("combined") && queueCombined != null
+				if (currentTask.equalsIgnoreCase("combined")
+						&& queueCombined != null
 						&& queueCombined.getStatus() == AsyncTask.Status.RUNNING)
 					queueCombined.cancel(true);
-				else if (currentTask.equalsIgnoreCase("tcp") && queueTCP != null
+				else if (currentTask.equalsIgnoreCase("tcp")
+						&& queueTCP != null
 						&& queueTCP.getStatus() == AsyncTask.Status.RUNNING)
 					queueTCP.cancel(true);
 				else if (currentTask.equalsIgnoreCase("udp")
@@ -1391,13 +1394,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		profile = mDataSource.getAllVpnProfiles().get(0);
 		Bundle profileInfo = new Bundle();
 		profileInfo.putLong(VpnProfileDataSource.KEY_ID, profile.getId());
-//		
-//		// TODO: Move this to settings Pop-up which should be pretty straight
-//		// forward
-//		profileInfo.putString(VpnProfileDataSource.KEY_USERNAME, "rajesh");
-//		profileInfo.putString(VpnProfileDataSource.KEY_PASSWORD, "rajesh");
-		
-		
+		//
+		// // TODO: Move this to settings Pop-up which should be pretty straight
+		// // forward
+		// profileInfo.putString(VpnProfileDataSource.KEY_USERNAME, "rajesh");
+		// profileInfo.putString(VpnProfileDataSource.KEY_PASSWORD, "rajesh");
+
 		prepareVpnService(profileInfo);
 
 	}
@@ -1530,7 +1532,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			}
 		}
 	}
-	
+
 	private String getPublicIP() {
 		String publicIP = "";
 		try {
@@ -1543,9 +1545,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return publicIP;
-		
+
 	}
 
 	// adrian: implemented and working
@@ -1555,13 +1557,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		protected Boolean doInBackground(ReplayActivity... params) {
 			String gateway = "replay.meddle.mobi";
 			String meddleIP = null;
-			
+
 			try {
 				meddleIP = InetAddress.getByName(gateway).getHostAddress();
 				Log.d("VPN", "VPN IP address is: " + meddleIP);
 				int i = 0;
 				while (i < 16) {
-					i ++;
+					i++;
 					Log.d("VPN", "about to get public IP");
 					String str = getPublicIP();
 					if (str.equalsIgnoreCase(meddleIP)) {
@@ -1577,8 +1579,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									selectedApps.get(currentReplayCount), "vpn");
 							Log.d("Replay", "Starting combined replay");
 							queueCombined.execute("");
-						}
-						else if (currentTask.equalsIgnoreCase("tcp")) {
+						} else if (currentTask.equalsIgnoreCase("tcp")) {
 							queueTCP.cancel(true);
 							queueTCP = new QueueTCPAsync(params[0], "vpn");
 							Log.d("Replay", "Starting tcp replay");
@@ -1589,8 +1590,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							Log.d("Replay", "Starting udp replay");
 							queueUDP.execute("");
 						}
-						
-						
+
 						break;
 					}
 					Thread.sleep(5000);
@@ -1605,14 +1605,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 
 	}
-	
+
 	class GetReplayServerIP extends AsyncTask<String, String, Boolean> {
 
 		@Override
 		protected Boolean doInBackground(String... params) {
 			// adrian: get IP from hostname
 			try {
-				server = InetAddress.getByName((String) getIntent().getStringExtra("server")).getHostAddress();
+				server = InetAddress.getByName(
+						(String) getIntent().getStringExtra("server"))
+						.getHostAddress();
 				Log.d("GetReplayServerIP", "IP of replay server: " + server);
 			} catch (UnknownHostException e) {
 				Log.w("GetReplayServerIP", "get IP of replay server failed!");
@@ -1620,47 +1622,29 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			}
 			return false;
 		}
-		
-	}
-	
-	/*class StartNextApp extends AsyncTask<ReplayActivity, Void, Boolean> {
 
-		@Override
-		protected Boolean doInBackground(ReplayActivity... params) {
-			String gateway = "replay.meddle.mobi";
-			String meddleIP = null;
-			
-			try {
-				meddleIP = "54.160.198.73";
-				Log.d("StartNext", "VPN IP address is: " + meddleIP);
-				int i = 0;
-				Thread.sleep(2000);
-				while (i < 16) {
-					i ++;
-					String str = getPublicIP();
-					Log.d("StartNext", "try " + i + " time, public IP: " + str);
-					if (!str.equalsIgnoreCase(meddleIP)) {
-						Log.d("StartNext", "vpn disconnected!");
-						
-						selectedApps.get(currentReplayCount).status = getResources()
-								.getString(R.string.processing);
-						ReplayActivity.this.runOnUiThread(new Runnable() {
-							public void run() {
-								adapter.notifyDataSetChanged();
-							}
-						});
-						
-						// adrian: start combined method
-						ReplayActivity.this.processCombinedApplication(selectedApps.get(currentReplayCount), "vpn");
-						return true;
-					}
-					Thread.sleep(1000);
-				}
-			} catch (Exception e) {
-				Log.d("StartNext", "failed to get VPN IP address");
-				e.printStackTrace();
-			}
-			return false;
-		}
-	}*/
+	}
+
+	/*
+	 * class StartNextApp extends AsyncTask<ReplayActivity, Void, Boolean> {
+	 * 
+	 * @Override protected Boolean doInBackground(ReplayActivity... params) {
+	 * String gateway = "replay.meddle.mobi"; String meddleIP = null;
+	 * 
+	 * try { meddleIP = "54.160.198.73"; Log.d("StartNext",
+	 * "VPN IP address is: " + meddleIP); int i = 0; Thread.sleep(2000); while
+	 * (i < 16) { i ++; String str = getPublicIP(); Log.d("StartNext", "try " +
+	 * i + " time, public IP: " + str); if (!str.equalsIgnoreCase(meddleIP)) {
+	 * Log.d("StartNext", "vpn disconnected!");
+	 * 
+	 * selectedApps.get(currentReplayCount).status = getResources()
+	 * .getString(R.string.processing); ReplayActivity.this.runOnUiThread(new
+	 * Runnable() { public void run() { adapter.notifyDataSetChanged(); } });
+	 * 
+	 * // adrian: start combined method
+	 * ReplayActivity.this.processCombinedApplication
+	 * (selectedApps.get(currentReplayCount), "vpn"); return true; }
+	 * Thread.sleep(1000); } } catch (Exception e) { Log.d("StartNext",
+	 * "failed to get VPN IP address"); e.printStackTrace(); } return false; } }
+	 */
 }

@@ -82,5 +82,9 @@ This study has been reviewed and approved by the Northeastern University Institu
     <string name="consent_form_condition"><Data><![CDATA[ <br> By clicking the \"Accept\" button above you are indicating that you consent to participate in this study. Please print out a copy of this consent form for your records. ]]> </Data> </string>
     <string name="user_agree">Accept</string>
     <string name="user_disagree">Not Accept</string>
+    
+    <!-- This is for mobilyzer -->
+    <string name="scheduler_version_name">1.0</string>
+    <string name="scheduler_priority">2</string>
         
 </resources>
