@@ -191,8 +191,6 @@ public class CombinedQueue {
 			
 		}
 		
-		String[] tmpStr = {"", ""};
-		
 		if (timing) {
 			double expectedTime = timeOrigin + RS.getTimestamp() * 1000000000;
 			if (System.nanoTime() < expectedTime) {
@@ -205,14 +203,13 @@ public class CombinedQueue {
 		
 		// update sentJitter
 		long currentTime = System.nanoTime();
-		tmpStr[0] = String.
-				valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000);
-		tmpStr[1] = new String(RS.getPayload());
 		//Log.d("sentJitter", String.valueOf(currentTime-jitterTimeOrigin));
 		//Log.d("sentJitter", String.valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000));
 		//Log.d("nextUDP", String.valueOf(Arrays.hashCode(RS.getPayload())));
 		synchronized (jitterBean) {
-			jitterBean.sentJitter.add(tmpStr);
+			jitterBean.sentJitter.add(String.
+					valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000));
+			jitterBean.sentPayload.add(RS.getPayload());
 		}
 		jitterTimeOrigin = currentTime;
 		

@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -19,6 +20,7 @@ import com.stonybrook.replay.bean.JitterBean;
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
 import com.stonybrook.replay.bean.UDPReplayInfoBean;
+import com.stonybrook.replay.util.UtilsManager;
 
 public class CombinedSideChannel {
 	private String id = null;
@@ -177,15 +179,23 @@ public class CombinedSideChannel {
 			String sentJitter = "";
 			String rcvdJitter = "";
 			
+			if ((jitterBean.sentJitter.size() != jitterBean.sentPayload.size())
+					|| (jitterBean.rcvdJitter.size() != jitterBean.rcvdPayload.size())) {
+				Log.d("sendJitter", "size not match!");
+				return;
+			}
+			
 			for (i = 0; i < jitterBean.sentJitter.size(); i++) {
 				//Log.d("sendJitter", jitterBean.sentJitter.get(i)[1]);
-				sentJitter += (jitterBean.sentJitter.get(i)[0] + "\t" +
-						jitterBean.sentJitter.get(i)[1].hashCode() + "\n");
+				sentJitter += (jitterBean.sentJitter.get(i) + "\t" +
+						UtilsManager.getUnsignedInt(Arrays
+								.hashCode(jitterBean.sentPayload.get(i))) + "\n");
 			}
 			
 			for (i = 0; i < jitterBean.rcvdJitter.size(); i++) {
-				rcvdJitter += (jitterBean.rcvdJitter.get(i)[0] + "\t" +
-						jitterBean.rcvdJitter.get(i)[1].hashCode() + "\n");
+				rcvdJitter += (jitterBean.rcvdJitter.get(i) + "\t" +
+						UtilsManager.getUnsignedInt(Arrays
+								.hashCode(jitterBean.rcvdPayload.get(i))) + "\n");
 			}
 			
 			sendObject(sentJitter.getBytes(), objLen);

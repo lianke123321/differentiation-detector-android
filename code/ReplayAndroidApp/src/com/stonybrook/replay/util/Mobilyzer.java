@@ -188,6 +188,13 @@ public class Mobilyzer {
 			deviceInfoBean.location = new Location("unknown");
 		}
 		locationManager.removeUpdates(locationListener);
+		
+		// get APN setting
+		/*final Uri PREFERRED_APN_URI = Uri.parse("content://telephony/carriers/preferapn");
+		Cursor c = this.context.getContentResolver().query(PREFERRED_APN_URI, null, null, null, null);
+		c.moveToFirst();
+		int index = c.getColumnIndex("name");
+		Log.d("Mobilyzer", c.getString(index));*/
 
 		return deviceInfoBean;
 	}

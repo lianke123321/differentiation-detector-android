@@ -42,47 +42,49 @@ public final class CombinedReceiverThread implements Runnable {
 			ByteBuffer buf = ByteBuffer.allocate(bufSize);
 
 			while (keepRunning) {
-				/*Log.d("Receiver", "size of udpSocketList: " +
-						udpReplayInfoBean.getUdpSocketList().size());*/
-				
-				for (DatagramChannel channel : udpReplayInfoBean.getUdpSocketList()) {
+				/*
+				 * Log.d("Receiver", "size of udpSocketList: " +
+				 * udpReplayInfoBean.getUdpSocketList().size());
+				 */
+
+				for (DatagramChannel channel : udpReplayInfoBean
+						.getUdpSocketList()) {
 					channel.register(selector, SelectionKey.OP_READ);
-					/*if (!channel.isConnected())
-						Log.d("Receiver", "channel not connected!");*/
 				}
-				
+
 				// Log.d("Receiver", "senderCount: " +
 				// udpReplayInfoBean.getSenderCount());
 				// Log.d("Receiver", String.valueOf(selector.selectNow()));
 				if (selector.select(TIME_OUT) == 0) {
-					//Log.d("Receiver", "no socket has data");
+					// Log.d("Receiver", "no socket has data");
 					continue;
 				}
 				// byte[] data = new byte[bufSize];
 				// DatagramPacket packet = new DatagramPacket(data,
 				// data.length);
-				//Log.d("Receiver", "ready to receive packet!");
-				
+				// Log.d("Receiver", "ready to receive packet!");
+
 				buf.clear();
-				Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
+				Iterator<SelectionKey> selectedKeys = selector.selectedKeys()
+						.iterator();
 				while (selectedKeys.hasNext()) {
 					SelectionKey key = selectedKeys.next();
-					DatagramChannel tmpChannel = (DatagramChannel) key.channel();
+					DatagramChannel tmpChannel = (DatagramChannel) key
+							.channel();
 					tmpChannel.receive(buf);
-					byte[] data = new byte[buf.remaining()];
+					byte[] data = new byte[buf.position()];
+					buf.position(0);
 					buf.get(data);
-					
-					String[] tmpStr = {"", ""};
-					
+					Log.d("Receiver", "length of data: " + data.length);
+
 					// for receive jitter
 					long currentTime = System.nanoTime();
-					
-					tmpStr[0] = String.
-							valueOf((double)(currentTime-jitterTimeOrigin) / 1000000000);
-					tmpStr[1] = new String(data);
-					
+
 					synchronized (jitterBean) {
-						jitterBean.rcvdJitter.add(tmpStr);
+						jitterBean.rcvdJitter
+								.add(String
+										.valueOf((double) (currentTime - jitterTimeOrigin) / 1000000000));
+						jitterBean.rcvdPayload.add(data);
 					}
 					this.jitterTimeOrigin = currentTime;
 					selectedKeys.remove();
@@ -95,7 +97,7 @@ public final class CombinedReceiverThread implements Runnable {
 				 * "decremented one from senderCount: " +
 				 * udpReplayInfoBean.getSenderCount()); } else break; }
 				 */
-				
+
 			}
 
 			selector.close();
