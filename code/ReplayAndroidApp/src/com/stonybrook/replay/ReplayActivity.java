@@ -46,7 +46,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.rgolani.replay.R;
+import com.stonybrook.replay.R;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
 import com.stonybrook.android.logic.CharonVpnService;

@@ -30,7 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.rgolani.replay.R;
+import com.stonybrook.replay.R;
 import com.stonybrook.android.logic.CharonVpnService;
 
 public class LogFragment extends Fragment implements Runnable

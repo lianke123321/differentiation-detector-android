@@ -40,7 +40,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.rgolani.replay.R;
+import com.stonybrook.replay.R;
 import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;

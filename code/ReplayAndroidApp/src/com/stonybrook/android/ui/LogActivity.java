@@ -20,7 +20,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.rgolani.replay.R;
+import com.stonybrook.replay.R;
 
 public class LogActivity extends Activity
 {

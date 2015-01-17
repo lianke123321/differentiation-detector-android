@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.Window;
 
-import com.rgolani.replay.R;
+import com.stonybrook.replay.R;
 
 public class CrashActivity extends Activity {
 

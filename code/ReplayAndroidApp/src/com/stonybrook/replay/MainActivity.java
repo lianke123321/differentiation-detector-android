@@ -44,7 +44,7 @@ import android.widget.GridView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.rgolani.replay.R;
+import com.stonybrook.replay.R;
 import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;

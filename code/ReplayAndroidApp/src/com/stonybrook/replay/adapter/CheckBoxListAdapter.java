@@ -14,7 +14,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.rgolani.replay.R;
+import com.stonybrook.replay.R;
 import com.stonybrook.replay.MainActivity;
 import com.stonybrook.replay.bean.ApplicationBean;
 import com.stonybrook.replay.constant.ReplayConstants;
