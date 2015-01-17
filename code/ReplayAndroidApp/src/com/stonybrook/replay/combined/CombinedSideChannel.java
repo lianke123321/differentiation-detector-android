@@ -12,8 +12,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.os.Build;
 import android.util.Log;
 
 import com.stonybrook.replay.bean.DeviceInfoBean;
@@ -76,15 +78,41 @@ public class CombinedSideChannel {
 
 	}
 
-	public void sendDeviceInfo(Mobilyzer mobilyzer) {
+	public void sendDeviceInfo(Mobilyzer mobilyzer) throws JSONException {
 		DeviceInfoBean deviceInfoBean = mobilyzer.getDeviceInfo();
-		Log.d("sendDeviceInfo", "manufacturer: " + deviceInfoBean.manufacturer
+		
+		JSONObject deviceInfo = new JSONObject();
+		JSONObject osInfo = new JSONObject();
+		JSONObject locationInfo = new JSONObject();
+		
+		deviceInfo.put("manufacturer", deviceInfoBean.manufacturer);
+		deviceInfo.put("model", deviceInfoBean.model);
+		
+		osInfo.put("INCREMENTAL", Build.VERSION.INCREMENTAL);
+		osInfo.put("RELEASE", Build.VERSION.RELEASE);
+		osInfo.put("SDK_INT", Build.VERSION.SDK_INT);
+		
+		deviceInfo.put("os", osInfo);
+		deviceInfo.put("carrierName", deviceInfoBean.carrierName);
+		deviceInfo.put("networkType", deviceInfoBean.networkType);
+		deviceInfo.put("cellInfo", deviceInfoBean.cellInfo);
+		
+		locationInfo.put("latitude", String
+				.valueOf(deviceInfoBean.location.getLatitude()));
+		locationInfo.put("longitude", String
+				.valueOf(deviceInfoBean.location.getLongitude()));
+		
+		deviceInfo.put("locationInfo", locationInfo);
+		
+		Log.d("sendDeviceInfo", deviceInfo.toString());
+		
+		/*Log.d("sendDeviceInfo", "manufacturer: " + deviceInfoBean.manufacturer
 				+ " model: " + deviceInfoBean.model + " os: " + deviceInfoBean.os
 				+ " carrierName: " + deviceInfoBean.carrierName + " networkType: "
 				+ deviceInfoBean.networkType + " cellInfo: "
 				+ deviceInfoBean.cellInfo + " latitude: "
 				+ String.valueOf(deviceInfoBean.location.getLatitude())
-				+ " longitude: " + String.valueOf(deviceInfoBean.location.getLongitude()));
+				+ " longitude: " + String.valueOf(deviceInfoBean.location.getLongitude()));*/
 	}
 
 	public void sendDone(double duration) throws Exception {

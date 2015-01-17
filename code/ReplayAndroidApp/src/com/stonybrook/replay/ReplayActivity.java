@@ -772,7 +772,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				rThread.join();
 
 				// Telling server done with replaying
-
+				double duration = ((double) (System.nanoTime()
+						- this.timeStarted)) / 1000000000;
+				
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
 						R.string.send_done);
@@ -782,7 +784,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				});
 
-				double duration = ((double) (System.nanoTime() - this.timeStarted)) / 1000000000;
 				sideChannel.sendDone(duration);
 				Log.d("Replay", "replay finished using time " + duration + " s");
 
