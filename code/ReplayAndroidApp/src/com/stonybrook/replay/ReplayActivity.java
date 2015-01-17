@@ -131,10 +131,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		// keep the screen on
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		/*
-		 * First check to see of Internet access is available TODO : Identify if
-		 * connection is WiFi or Cellular
-		 */
+		// First check to see of Internet access is available
 		if (!isNetworkAvailable()) {
 			new AlertDialog.Builder(this)
 					.setTitle("Network Error")
@@ -235,6 +232,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			// adrian: added cause arash's code
 			Config.set("extraString", "MoblieApp");
 			Config.set("jitter", "true");
+			Config.set("sendMobileStats", "true");
 			// adrian: set result
 			Config.set("result", "false");
 			// adrian: set public IP
@@ -282,8 +280,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	
 	/**
 	 * This method processes Replay for combined application. 1) Parse pickle file 
-	 * 2) Start AsyncTask for TCP with the parsed pickle data TODO: Remove the
-	 * parameter to AsyncTask as it is no longer required
+	 * 2) Start AsyncTask for combined with the parsed pickle data
 	 * 
 	 * @param applicationBean
 	 * @throws Exception
@@ -574,7 +571,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				sideChannel.sendIperf();
 				
 				// send device info
-				sideChannel.sendDeviceInfo(mobilyzer);
+				sideChannel.sendMobileStats(Config.get("sendMobileStats"), mobilyzer);
 
 				/**
 				 * Ask for port mapping from server. For some reason, port map
@@ -825,11 +822,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	@Override
 	public void vpnFinishCompleteCallback(Boolean success) {
 		try {
-			/**
-			 * If there was error. Display message and stop processing further.
-			 * TODO: If there are other apps which are waiting for replay then
-			 * start processing those. should be easy.
-			 */
+			// If there was error. Display message and stop processing further.
 			if (!success) {
 				Toast.makeText(context, "Error while processing...",
 						Toast.LENGTH_LONG).show();
@@ -884,11 +877,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	@Override
 	public void openFinishCompleteCallback(Boolean success) {
 		try {
-			/**
-			 * If Replay on Open was successful then schedule on VPN TODO: If
-			 * there are other apps which are waiting for replay then start
-			 * processing those. should be easy.
-			 */
+			// If Replay on Open was successful then schedule on VPN
 			if (success) {
 				// Change screen status
 				selectedApps.get(currentReplayCount).status = getResources()
@@ -957,7 +946,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.processing);
 				adapter.notifyDataSetChanged();
-				// TODO: not sure if "open" is correct
 				processCombinedApplication(selectedApps
 						.get(currentReplayCount), "open");
 			} else {
@@ -1034,10 +1022,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	}
 
 	/**
-	 * Right now VPN profile is hardcoded in code TODO: Think how do we want
-	 * user to create connection. May be dialog can be create in which user can
-	 * add the credentials and certificates. Note : Connection to VPN requires
-	 * installations of certificate on Android device
+	 * Right now VPN profile is hardcoded in code
 	 * 
 	 * @param profile
 	 */
@@ -1048,12 +1033,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		profile = mDataSource.getAllVpnProfiles().get(0);
 		Bundle profileInfo = new Bundle();
 		profileInfo.putLong(VpnProfileDataSource.KEY_ID, profile.getId());
-		//
-		// // TODO: Move this to settings Pop-up which should be pretty straight
-		// // forward
-		// profileInfo.putString(VpnProfileDataSource.KEY_USERNAME, "rajesh");
-		// profileInfo.putString(VpnProfileDataSource.KEY_PASSWORD, "rajesh");
-
 		prepareVpnService(profileInfo);
 
 	}

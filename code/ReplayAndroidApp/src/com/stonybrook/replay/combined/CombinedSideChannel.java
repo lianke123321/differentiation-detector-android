@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.Build;
@@ -78,41 +77,45 @@ public class CombinedSideChannel {
 
 	}
 
-	public void sendDeviceInfo(Mobilyzer mobilyzer) throws JSONException {
-		DeviceInfoBean deviceInfoBean = mobilyzer.getDeviceInfo();
-		
-		JSONObject deviceInfo = new JSONObject();
-		JSONObject osInfo = new JSONObject();
-		JSONObject locationInfo = new JSONObject();
-		
-		deviceInfo.put("manufacturer", deviceInfoBean.manufacturer);
-		deviceInfo.put("model", deviceInfoBean.model);
-		
-		osInfo.put("INCREMENTAL", Build.VERSION.INCREMENTAL);
-		osInfo.put("RELEASE", Build.VERSION.RELEASE);
-		osInfo.put("SDK_INT", Build.VERSION.SDK_INT);
-		
-		deviceInfo.put("os", osInfo);
-		deviceInfo.put("carrierName", deviceInfoBean.carrierName);
-		deviceInfo.put("networkType", deviceInfoBean.networkType);
-		deviceInfo.put("cellInfo", deviceInfoBean.cellInfo);
-		
-		locationInfo.put("latitude", String
-				.valueOf(deviceInfoBean.location.getLatitude()));
-		locationInfo.put("longitude", String
-				.valueOf(deviceInfoBean.location.getLongitude()));
-		
-		deviceInfo.put("locationInfo", locationInfo);
-		
-		Log.d("sendDeviceInfo", deviceInfo.toString());
-		
-		/*Log.d("sendDeviceInfo", "manufacturer: " + deviceInfoBean.manufacturer
-				+ " model: " + deviceInfoBean.model + " os: " + deviceInfoBean.os
-				+ " carrierName: " + deviceInfoBean.carrierName + " networkType: "
-				+ deviceInfoBean.networkType + " cellInfo: "
-				+ deviceInfoBean.cellInfo + " latitude: "
-				+ String.valueOf(deviceInfoBean.location.getLatitude())
-				+ " longitude: " + String.valueOf(deviceInfoBean.location.getLongitude()));*/
+	public void sendMobileStats(String sendMobileStat, Mobilyzer mobilyzer)
+			throws Exception {
+
+		if (sendMobileStat.equalsIgnoreCase("true")) {
+			Log.d("sendMobileStats", "will send mobile stats!");
+			DeviceInfoBean deviceInfoBean = mobilyzer.getDeviceInfo();
+
+			JSONObject deviceInfo = new JSONObject();
+			JSONObject osInfo = new JSONObject();
+			JSONObject locationInfo = new JSONObject();
+
+			deviceInfo.put("manufacturer", deviceInfoBean.manufacturer);
+			deviceInfo.put("model", deviceInfoBean.model);
+
+			osInfo.put("INCREMENTAL", Build.VERSION.INCREMENTAL);
+			osInfo.put("RELEASE", Build.VERSION.RELEASE);
+			osInfo.put("SDK_INT", Build.VERSION.SDK_INT);
+
+			deviceInfo.put("os", osInfo);
+			deviceInfo.put("carrierName", deviceInfoBean.carrierName);
+			deviceInfo.put("networkType", deviceInfoBean.networkType);
+			deviceInfo.put("cellInfo", deviceInfoBean.cellInfo);
+
+			locationInfo.put("latitude",
+					String.valueOf(deviceInfoBean.location.getLatitude()));
+			locationInfo.put("longitude",
+					String.valueOf(deviceInfoBean.location.getLongitude()));
+
+			deviceInfo.put("locationInfo", locationInfo);
+
+			Log.d("sendMobileStats", deviceInfo.toString());
+			
+			sendObject("WillSendMobileStats".getBytes(), objLen);
+			sendObject(deviceInfo.toString().getBytes(), objLen);
+
+		} else {
+			Log.d("sendMobileStats", "don't send mobile stats!");
+			sendObject("NoMobileStats".getBytes(), objLen);
+		}
 	}
 
 	public void sendDone(double duration) throws Exception {
@@ -289,7 +292,7 @@ public class CombinedSideChannel {
 			String str = new String(data);
 			Log.d("getResult", "received result is: " + str);
 		}
-		
+
 		Log.d("getResult", "finished getting result!");
 	}
 
