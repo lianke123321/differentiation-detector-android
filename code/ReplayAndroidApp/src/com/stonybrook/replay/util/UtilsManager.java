@@ -1,10 +1,6 @@
 package com.stonybrook.replay.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 public class UtilsManager {
 	/**
@@ -14,7 +10,7 @@ public class UtilsManager {
 	 * @return
 	 * @throws IOException
 	 */
-	public static byte[] serialize(Object obj) throws IOException {
+	/*public static byte[] serialize(Object obj) throws IOException {
 		ByteArrayOutputStream b = new ByteArrayOutputStream();
 		ObjectOutputStream o = new ObjectOutputStream(b);
 		o.writeObject(obj);
@@ -26,7 +22,7 @@ public class UtilsManager {
 		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
 		ObjectInputStream o = new ObjectInputStream(b);
 		return o.readObject();
-	}
+	}*/
 
 	public static long getUnsignedInt(int x) {
 		return x & 0x00000000ffffffffL;

@@ -46,7 +46,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.stonybrook.replay.R;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
 import com.stonybrook.android.logic.CharonVpnService;
@@ -703,18 +702,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Thread UIUpdateThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
-
-						// set progress bar to visible
-						ReplayActivity.this.runOnUiThread(new Runnable() {
-							public void run() {
-								prgBar.setVisibility(View.VISIBLE);
-							}
-						});
-
+						
 						while (updateUIBean.getProgress() < 100) {
 							ReplayActivity.this.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
+									// set progress bar to visible
+									if (prgBar.getVisibility() == View.GONE)
+										prgBar.setVisibility(View.VISIBLE);
 									prgBar.setProgress(updateUIBean
 											.getProgress());
 								}
