@@ -187,7 +187,9 @@ public class Mobilyzer {
 			Log.e("Mobilyzer", "Cannot obtain location", e);
 			deviceInfoBean.location = new Location("unknown");
 		}
-		locationManager.removeUpdates(locationListener);
+		// shouldn't remove the listener since the following replays also
+		// need to get location
+		//locationManager.removeUpdates(locationListener);
 		
 		// get APN setting
 		/*final Uri PREFERRED_APN_URI = Uri.parse("content://telephony/carriers/preferapn");

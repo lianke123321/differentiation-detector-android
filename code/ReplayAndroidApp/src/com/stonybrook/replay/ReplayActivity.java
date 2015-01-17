@@ -33,8 +33,6 @@ import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
 import android.util.Log;
-import android.util.Pair;
-import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,7 +54,6 @@ import com.stonybrook.android.logic.TrustedCertificateManager;
 import com.stonybrook.android.ui.LogActivity;
 import com.stonybrook.replay.adapter.ImageReplayListAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
-import com.stonybrook.replay.bean.DeviceInfoBean;
 import com.stonybrook.replay.bean.JitterBean;
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
@@ -73,13 +70,6 @@ import com.stonybrook.replay.combined.CombinedReceiverThread;
 import com.stonybrook.replay.combined.CombinedSideChannel;
 import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
-import com.stonybrook.replay.tcp.TCPClient;
-import com.stonybrook.replay.tcp.TCPQueue;
-import com.stonybrook.replay.tcp.TCPSideChannel;
-import com.stonybrook.replay.udp.ClientThread;
-import com.stonybrook.replay.udp.UDPClient;
-import com.stonybrook.replay.udp.UDPQueue;
-import com.stonybrook.replay.udp.UDPSideChannel;
 import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.Mobilyzer;
 import com.stonybrook.replay.util.RandomString;
@@ -108,13 +98,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	String server = null;
 	String enableTiming = null;
 
-	/**
-	 * These two are AsyncTasks for TCP and UDP. Both run in background. At a
-	 * time, only one of them should be running.
-	 */
-	QueueTCPAsync queueTCP = null;
-	QueueUDPAsync queueUDP = null;
-	// adrian: for combined task
+	// This is AsyncTasks for replay. Run in background.
 	QueueCombinedAsync queueCombined = null;
 	String currentTask = "none";
 
@@ -138,7 +122,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	// for testing mobilyzer
 	public Mobilyzer mobilyzer = null;
-	public DeviceInfoBean deviceInfoBean = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -216,17 +199,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		 * SelectUserCertOnClickListener(), new String[] { "RSA" }, null, null,
 		 * -1, "adrian-replay");
 		 */
-		// to test mobilyzer
-		// phoneUtils = new PhoneUtils(this.context);
+		// initialize mobilyzer
 		mobilyzer = new Mobilyzer(this.context);
-		deviceInfoBean = mobilyzer.getDeviceInfo();
-		Log.d("Mobilyzer", "manufacturer: " + deviceInfoBean.manufacturer
-				+ " model: " + deviceInfoBean.model + " os: " + deviceInfoBean.os
-				+ " carrierName: " + deviceInfoBean.carrierName + " networkType: "
-				+ deviceInfoBean.networkType + " cellInfo: "
-				+ deviceInfoBean.cellInfo + " latitude: "
-				+ String.valueOf(deviceInfoBean.location.getLatitude())
-				+ " longitude: " + String.valueOf(deviceInfoBean.location.getLongitude()));
+		
 	}
 
 	/**
@@ -305,54 +280,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			ex.printStackTrace();
 		}
 	}
-
+	
 	/**
-	 * This method processes Replay for TCP application. 1) Parse pickle file 2)
-	 * Start AsyncTask for TCP with the parsed pickle data TODO: Remove the
-	 * parameter to AsyncTask as it is no longer required
-	 * 
-	 * @param applicationBean
-	 * @throws Exception
-	 */
-	private void processTCPApplication(ApplicationBean applicationBean)
-			throws Exception {
-
-		currentTask = "tcp";
-		appData_tcp = UnpickleDataStream.unpickleTCPJSON(
-				applicationBean.getDataFile(), context);
-		Log.d("Parsing", applicationBean.getDataFile());
-
-		queueTCP = new QueueTCPAsync(this, "open");
-
-		/*
-		 * onVpnProfileSelected(null); Log.d("Replay", "Testing VPN"); (new
-		 * VPNConnected()).execute(this);
-		 */
-		queueTCP.execute("");
-
-	}
-
-	/**
-	 * This method processes Replay for UDP application. 1) Parse pickle file 2)
-	 * Start AsyncTask for UDP with the parsed pickle data TODO: Remove the
-	 * parameter to AsyncTask as it is no longer required
-	 * 
-	 * @param applicationBean
-	 * @throws Exception
-	 */
-	private void processUDPApplication(ApplicationBean applicationBean)
-			throws Exception {
-
-		currentTask = "udp";
-		appData_udp = UnpickleDataStream.unpickleUDP(
-				applicationBean.getDataFile(), context);
-		queueUDP = new QueueUDPAsync(this, "open");
-		queueUDP.execute("");
-	}
-
-	/**
-	 * This method processes Replay for TCP application. 1) Parse pickle file 2)
-	 * Start AsyncTask for TCP with the parsed pickle data TODO: Remove the
+	 * This method processes Replay for combined application. 1) Parse pickle file 
+	 * 2) Start AsyncTask for TCP with the parsed pickle data TODO: Remove the
 	 * parameter to AsyncTask as it is no longer required
 	 * 
 	 * @param applicationBean
@@ -532,275 +463,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 * (IOException e) { e.printStackTrace(); } } } catch (Exception ex) {
 	 * success = false; ex.printStackTrace(); } return null; } }
 	 */
-	/**
-	 * This asyncTask processes the UDP Replay. TODO: Python client for UDP was
-	 * changed heavily in last couple of weeks of Semester. This code does not
-	 * have those changes implemented. Need to implement those changes. Note :
-	 * First go through TCP then come to UDP.
-	 * 
-	 * @author rajesh
-	 * 
-	 */
-	class QueueUDPAsync extends AsyncTask<String, String, String> {
-
-		HashMap<String, ClientThread> CSPairMapping = null;
-		UDPAppJSONInfoBean appData = null;
-		long timeStarted = 0;
-		// This is Lister which will be called when this method finishes. More
-		// information about this is provided in ReplayCompleteListener file.
-		private ReplayCompleteListener listener;
-		boolean success = true;
-		// This simply identifies whether we are in open or VPN
-		public String channel = null;
-
-		public QueueUDPAsync(ReplayCompleteListener listener, String channel) {
-			this.listener = listener;
-			this.channel = channel;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			Log.d("Replay", "Replay lasted for "
-					+ (System.currentTimeMillis() - this.timeStarted));
-
-			// Callback according to type of Replay with status of Replay
-			if (channel.equalsIgnoreCase("open"))
-				listener.openFinishCompleteCallback(success);
-			else
-				listener.vpnFinishCompleteCallback(success);
-
-		}
-
-		protected void onProgressUpdate(String... a) {
-			Log.d("UDPReplay", "You are in progress update ... " + a[0]);
-		}
-
-		@Override
-		protected String doInBackground(String... String) {
-			this.appData = appData_udp;
-			this.timeStarted = System.nanoTime();
-			SparseArray<Integer> NATMap = new SparseArray<Integer>();
-			SparseArray<ClientThread> PortMap = new SparseArray<ClientThread>();
-			this.CSPairMapping = new HashMap<String, ClientThread>();
-			ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
-
-			try {
-				/*
-				 * Here we are checking if we are on VPN channel. If we are on
-				 * VPN, wait for 5 sec for VPN to connect. TODO: This is very
-				 * bad. Remove this and try finding out some other way whether
-				 * VPN is connected. One way can be to get IP that's visible
-				 * outside. If it's of Meddle server then we are connected to
-				 * VPN. Implemented this in VPNConnected AsyncTask but never got
-				 * chance to integrate it.
-				 */
-				if (this.channel.equalsIgnoreCase("vpn"))
-					Thread.sleep(5000);
-				Log.d("VPNUDP", this.channel);
-				int sideChannelPort = Integer.valueOf(Config
-						.get("udp_sidechannel_port"));
-				String randomID = null;
-				SocketInstance socketInstance = new SocketInstance(
-						Config.get("server"), sideChannelPort, null);
-				UDPSideChannel sideChannel = null;
-
-				SparseArray<Integer> serverPortsMap = null;
-
-				/**
-				 * Ask for port mapping from server. For some reason, port map
-				 * info parsing was throwing error. so, I put while loop to do
-				 * this untill port mapping is parsed successfully.
-				 */
-
-				boolean s = false;
-				while (!s) {
-					try {
-						randomID = new RandomString(10).nextString();
-						sideChannel = new UDPSideChannel(socketInstance,
-								randomID);
-						sideChannel.declareID();
-						serverPortsMap = sideChannel
-								.receivePortMappingNonBlock();
-						s = true;
-					} catch (JSONException ex) {
-						ex.printStackTrace();
-					}
-				}
-
-				/**
-				 * Create clients from CSPairs
-				 */
-
-				for (String key : appData.getCsPairs().keySet()) {
-					int destPort = Integer.valueOf(key.substring(
-							key.lastIndexOf('.') + 1, key.length()));
-					if (serverPortsMap.size() != 0)
-						destPort = serverPortsMap.get(destPort);
-					UDPClient c = new UDPClient(key, Config.get("server"),
-							destPort);
-					Pair<Integer, Integer> NATMapping = c.identify(sideChannel,
-							randomID, appData.getReplayName());
-					NATMap.put(NATMapping.first, NATMapping.second);
-
-					ClientThread client = new ClientThread(c);
-					Thread cThread = new Thread(client);
-					cThread.start();
-
-					PortMap.put(c.getPort(), client);
-					CSPairMapping.put(key, client);
-					clients.add(client);
-				}
-
-				UDPQueue queue = new UDPQueue(appData.getQ(), CSPairMapping,
-						Boolean.valueOf(Config.get("timing")));
-				Thread queueThread = new Thread(queue);
-
-				queueThread.start();
-
-				sideChannel.waitForFinish(PortMap, NATMap);
-				sideChannel.terminate(clients);
-			} catch (Exception ex) {
-				success = false;
-				ex.printStackTrace();
-			}
-			return null;
-		}
-
-	}
-
-	/**
-	 * This is TCP AsyncTask. Here replay will be performed in background. From
-	 * this point, I have tried to keep code similar to Python Client for easy
-	 * future changes.
-	 * 
-	 * @author rajesh
-	 * 
-	 */
-	class QueueTCPAsync extends AsyncTask<String, String, String> {
-
-		TCPAppJSONInfoBean appData = null;
-		long timeStarted = 0;
-		// This is Listener which will be called when this method finishes. More
-		// information about this is provided in ReplayCompleteListener file.
-		private ReplayCompleteListener listener;
-		boolean success = true;
-		// This simply identifies whether we are in open or VPN
-		public String channel = null;
-
-		public QueueTCPAsync(ReplayCompleteListener listener, String channel) {
-			this.listener = listener;
-			this.channel = channel;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			Log.d("Replay", "TCP Replay lasted for "
-					+ (System.nanoTime() - this.timeStarted) / 1000000);
-
-			// Callback according to type of Replay with status of Replay
-			if (channel.equalsIgnoreCase("open"))
-				listener.openFinishCompleteCallback(success);
-			else
-				listener.vpnFinishCompleteCallback(success);
-
-		}
-
-		protected void onProgressUpdate(String... a) {
-			Log.d("Replay", "You are in progress update ... " + a[0]);
-		}
-
-		@Override
-		protected String doInBackground(String... str) {
-			this.appData = appData_tcp;
-			this.timeStarted = System.nanoTime();
-			HashMap<String, TCPClient> CSPairMapping = new HashMap<String, TCPClient>();
-
-			try {
-				/**
-				 * used to wait 5 secs here, now checkVPN is called in
-				 * openFinishCompleteCallBack instead of here. So don't need to
-				 * do anything here
-				 * 
-				 * @author Adrian
-				 * 
-				 */
-				int sideChannelPort = Integer.valueOf(Config
-						.get("tcp_sidechannel_port"));
-				String randomID = null;
-				SocketInstance socketInstance = new SocketInstance(
-						Config.get("server"), sideChannelPort, null);
-				Log.d("Server", Config.get("server"));
-
-				// OldTCPSiceChannel is being used as TCPSideChannel is for
-				// gevent branch.
-				TCPSideChannel sideChannel = new TCPSideChannel(socketInstance,
-						randomID);
-				HashMap<String, HashMap<String, ServerInstance>> serverPortsMap = null;
-
-				sideChannel.ask4Permission();
-
-				/*
-				 * if (sideChannel.ask4Permission() == 0) { Log.d("Error",
-				 * "No permission: another client with same IP address is running. Wait for them to finish!"
-				 * ); return null; }
-				 */
-
-				/**
-				 * Ask for port mapping from server. For some reason, port map
-				 * info parsing was throwing error. so, I put while loop to do
-				 * this untill port mapping is parsed successfully.
-				 */
-
-				boolean s = false;
-				while (!s) {
-					try {
-						randomID = new RandomString(10).nextString();
-
-						sideChannel.declareID(appData.getReplayName());
-						serverPortsMap = sideChannel
-								.receivePortMappingNonBlock();
-						s = true;
-					} catch (JSONException ex) {
-						ex.printStackTrace();
-					}
-				}
-
-				/**
-				 * Create clients from CSPairs
-				 */
-				for (String key : appData.getCsPairs()) {
-					String destIP = key.substring(key.lastIndexOf('-') + 1,
-							key.lastIndexOf("."));
-					String destPort = key.substring(key.lastIndexOf('.') + 1,
-							key.length());
-					ServerInstance instance = serverPortsMap.get(destIP).get(
-							destPort);
-					if (instance.server.trim().equals(""))
-						instance.server = server; // serverPortsMap.get(destPort);
-					TCPClient c = new TCPClient(key, instance.server,
-							Integer.valueOf(instance.port), randomID,
-							appData.getReplayName());
-					CSPairMapping.put(key, c);
-				}
-
-				Log.d("Replay", String.valueOf(CSPairMapping.size()));
-
-				// Running the Queue
-				TCPQueue queue = new TCPQueue(appData.getQ());
-				queue.run(CSPairMapping, Boolean.valueOf(Config.get("timing")));
-
-			} catch (JSONException ex) {
-				Log.d("Replay", "Error parsing JSON");
-				ex.printStackTrace();
-			} catch (Exception ex) {
-				success = false;
-				ex.printStackTrace();
-
-			}
-			return null;
-		}
-
-	}
 
 	class QueueCombinedAsync extends AsyncTask<String, String, String> {
 
@@ -911,6 +573,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// always send noIperf here
 				sideChannel.sendIperf();
+				
+				// send device info
+				sideChannel.sendDeviceInfo(mobilyzer);
 
 				/**
 				 * Ask for port mapping from server. For some reason, port map
@@ -1296,11 +961,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.processing);
 				adapter.notifyDataSetChanged();
-				if (selectedApps.get(currentReplayCount).getType()
-						.equalsIgnoreCase("tcp"))
-					processTCPApplication(selectedApps.get(currentReplayCount));
-				else
-					processUDPApplication(selectedApps.get(currentReplayCount));
+				// TODO: not sure if "open" is correct
+				processCombinedApplication(selectedApps
+						.get(currentReplayCount), "open");
 			} else {
 				selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
@@ -1321,14 +984,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						&& queueCombined != null
 						&& queueCombined.getStatus() == AsyncTask.Status.RUNNING)
 					queueCombined.cancel(true);
-				else if (currentTask.equalsIgnoreCase("tcp")
-						&& queueTCP != null
-						&& queueTCP.getStatus() == AsyncTask.Status.RUNNING)
-					queueTCP.cancel(true);
-				else if (currentTask.equalsIgnoreCase("udp")
-						&& queueUDP != null
-						&& queueUDP.getStatus() == AsyncTask.Status.RUNNING)
-					queueUDP.cancel(true);
+				else {
+					Log.d("fileExistsListener", "unknown replay type!");
+				}
 			} catch (Exception e) {
 			}
 		}
@@ -1579,16 +1237,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									selectedApps.get(currentReplayCount), "vpn");
 							Log.d("Replay", "Starting combined replay");
 							queueCombined.execute("");
-						} else if (currentTask.equalsIgnoreCase("tcp")) {
-							queueTCP.cancel(true);
-							queueTCP = new QueueTCPAsync(params[0], "vpn");
-							Log.d("Replay", "Starting tcp replay");
-							queueTCP.execute("");
 						} else {
-							queueUDP.cancel(true);
-							queueUDP = new QueueUDPAsync(params[0], "vpn");
-							Log.d("Replay", "Starting udp replay");
-							queueUDP.execute("");
+							Log.d("VPNConnected", "unknown replay type!");
+							return false;
 						}
 
 						break;
@@ -1600,7 +1251,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Log.d("VPN", "failed to get VPN IP address");
 				e.printStackTrace();
 			}
-			return false;
+			return true;
 
 		}
 

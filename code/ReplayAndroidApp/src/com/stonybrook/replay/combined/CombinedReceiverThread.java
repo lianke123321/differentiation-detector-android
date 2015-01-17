@@ -75,7 +75,7 @@ public final class CombinedReceiverThread implements Runnable {
 					byte[] data = new byte[buf.position()];
 					buf.position(0);
 					buf.get(data);
-					Log.d("Receiver", "length of data: " + data.length);
+					//Log.d("Receiver", "length of data: " + data.length);
 
 					// for receive jitter
 					long currentTime = System.nanoTime();

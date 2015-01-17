@@ -40,8 +40,6 @@ public class CTCPClientThread implements Runnable {
 	 */
 	@Override
 	public void run() {
-		DataOutputStream dataOutputStream = null;
-		DataInputStream dataInputStream = null;
 		try {
 
 			if (client.socket == null)
@@ -51,16 +49,18 @@ public class CTCPClientThread implements Runnable {
 				Log.w("TCPClientThread", "socket not connected!");*/
 			
 			// Get Input/Output stream for socket
-			dataOutputStream = new DataOutputStream(client.socket.getOutputStream());
-			dataInputStream = new DataInputStream(client.socket.getInputStream());
+			DataOutputStream dataOutputStream =
+					new DataOutputStream(client.socket.getOutputStream());
+			DataInputStream dataInputStream =
+					new DataInputStream(client.socket.getInputStream());
 
-			Log.d("Sending", "payload " + RS.getPayload().length +
-					" bytes, expecting " + RS.getResponse_len() + " bytes ");
+			/*Log.d("Sending", "payload " + RS.getPayload().length +
+					" bytes, expecting " + RS.getResponse_len() + " bytes ");*/
 			
 			dataOutputStream.write(RS.getPayload()); //Data type for payload
 			
-			Log.d("Sended", "payload " + RS.getPayload().length +
-					" bytes, expecting " + RS.getResponse_len() + " bytes ");
+			/*Log.d("Sended", "payload " + RS.getPayload().length +
+					" bytes, expecting " + RS.getResponse_len() + " bytes ");*/
 			
 			sendSema.release();
 			/*synchronized (queue) {
@@ -86,12 +86,13 @@ public class CTCPClientThread implements Runnable {
 				//recvSema.acquire();
 				Log.d("Response", "got the receiving semaphore! current: " + recvQueueBean.current);*/
 				
-				Log.d("Response", "Waiting for response of " + RS.getResponse_len() + " bytes");
+				//Log.d("Response", "Waiting for response of " + RS.getResponse_len() + " bytes");
 
 				int totalRead = 0;
 
-				Log.d("Receiving", String.valueOf(RS.getResponse_len()) + " bytes" + " start at time " +
-						String.valueOf((System.nanoTime() - timeOrigin) / 1000000000));
+				/*Log.d("Receiving", String.valueOf(RS.getResponse_len()) + " bytes"
+						+ " start at time " +
+						String.valueOf((System.nanoTime() - timeOrigin) / 1000000000));*/
 				
 				//if(RS.getResponse_len() < bufferSize)
 				//	bufferSize = RS.getResponse_len();
@@ -118,7 +119,7 @@ public class CTCPClientThread implements Runnable {
 				// adrian: manually free buffer
 				buffer = null;
 				
-				Log.d("Finished", String.valueOf(RS.getResponse_len()) + " bytes");
+				Log.d("Finished", "receiving " + String.valueOf(RS.getResponse_len()) + " bytes");
 			} else {
 				Log.d("Receiving", "skipped");
 			}
