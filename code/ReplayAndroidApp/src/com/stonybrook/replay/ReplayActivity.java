@@ -2,7 +2,6 @@ package com.stonybrook.replay;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.cert.X509Certificate;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,9 +28,6 @@ import android.net.NetworkInfo;
 import android.net.VpnService;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.security.KeyChain;
-import android.security.KeyChainAliasCallback;
-import android.security.KeyChainException;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -56,8 +52,6 @@ import com.stonybrook.replay.bean.ApplicationBean;
 import com.stonybrook.replay.bean.JitterBean;
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.SocketInstance;
-import com.stonybrook.replay.bean.TCPAppJSONInfoBean;
-import com.stonybrook.replay.bean.UDPAppJSONInfoBean;
 import com.stonybrook.replay.bean.UDPReplayInfoBean;
 import com.stonybrook.replay.bean.UpdateUIBean;
 import com.stonybrook.replay.bean.combinedAppJSONInfoBean;
@@ -96,7 +90,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	String server = null;
 	String enableTiming = null;
-	
+
 	String GATE_WAY = "replay.meddle.mobi";
 	String meddleIP = null;
 
@@ -109,17 +103,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	/**
 	 * We can provide email account here on which VPN logs can be received
 	 */
-	public static final String CONTACT_EMAIL = "demo@gmail.com";
 	private static final int PREPARE_VPN_SERVICE = 0;
-	private static final String DEFAULT_ALIAS = "replay-cert";
 	boolean isKeyChainInitialized = false;
 	boolean isVPNConnected = false;
 
 	// Objects to store data for apps
-	TCPAppJSONInfoBean appData_tcp = null;
-	UDPAppJSONInfoBean appData_udp = null;
-
-	// adrian: For combined app
 	combinedAppJSONInfoBean appData_combined = null;
 
 	// for testing mobilyzer
@@ -184,13 +172,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		new CertificateLoadTask().executeOnExecutor(
 				AsyncTask.THREAD_POOL_EXECUTOR, false);
 
-		KeyChain.choosePrivateKeyAlias(this,
-				new SelectUserCertOnClickListener(), // Callback
-				new String[] {}, // Any key types.
-				null, // Any issuers.
-				"localhost", // Any host
-				-1, // Any port
-				DEFAULT_ALIAS);
+		
 
 		/**
 		 * Dave commented out to test auto-credentials
@@ -202,6 +184,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		// initialize mobilyzer
 		mobilyzer = new Mobilyzer(this.context);
 
+	}
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		this.finish();
 	}
 
 	/**
@@ -232,13 +221,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			Config.readConfigFile(ReplayConstants.CONFIG_FILE, context);
 
 			Config.set("timing", enableTiming);
-			
+
 			// make sure server is initialized!
 			while (server == null) {
 				Thread.sleep(1000);
 			}
 			Config.set("server", server);
-			
+
 			// adrian: added cause arash's code
 			Config.set("extraString", "MoblieApp");
 			Config.set("jitter", "true");
@@ -861,7 +850,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	}
 
 	}*/
-	
+
 	/**
 	 * This method is called when replay over VPN is finished
 	 */
@@ -899,6 +888,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// progressWait.setMessage("Finishing Analysis...");
 				// Thread.sleep(10000);
 				// progressWait.dismiss();
+				currentReplayCount = 0;
 				Log.d("Replay", "finished all replays!");
 			}
 
@@ -958,7 +948,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 
 	}*/
-	
+
 	/**
 	 * Called when Replay is finished over Open channel. Connects to VPN and
 	 * starts replay for same App again
@@ -1044,7 +1034,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					Log.d("fileExistsListener", "unknown replay type!");
 				}
 			} catch (Exception e) {
+				Log.d("ReplayActivity", "exception while press back key!");
+				e.printStackTrace();
 			}
+			
+			ReplayActivity.this.finish();
+			ReplayActivity.this.overridePendingTransition(
+					android.R.anim.slide_in_left,
+					android.R.anim.slide_out_right);
 		}
 		return super.onKeyDown(keyCode, event);
 	}
@@ -1220,25 +1217,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		intent.putExtra("action", "stop");
 		context.startService(intent);
 	}
-
-	private class SelectUserCertOnClickListener implements
-			KeyChainAliasCallback {
-		@Override
-		public void alias(final String alias) {
-			if (alias != null) {
-				try {
-					final X509Certificate[] chain = KeyChain
-							.getCertificateChain(ReplayActivity.this, alias);
-
-				} catch (KeyChainException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
+	
 	private String getPublicIP() {
 		String publicIP = "";
 		try {
@@ -1262,7 +1241,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected Boolean doInBackground(ReplayActivity... params) {
-			
+
 			try {
 				int i = 0;
 				while (i < 16) {
@@ -1312,8 +1291,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						(String) getIntent().getStringExtra("server"))
 						.getHostAddress();
 				meddleIP = InetAddress.getByName(GATE_WAY).getHostAddress();
-				Log.d("GetReplayServerIP", "Server IP: " + server
-						+ " VPN IP: " + meddleIP);
+				Log.d("GetReplayServerIP", "Server IP: " + server + " VPN IP: "
+						+ meddleIP);
 			} catch (UnknownHostException e) {
 				Log.w("GetReplayServerIP", "get IP of replay server failed!");
 				e.printStackTrace();
