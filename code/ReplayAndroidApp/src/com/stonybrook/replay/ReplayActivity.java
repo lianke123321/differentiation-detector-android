@@ -559,9 +559,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				});
 
-				Log.d("fuck you", "1");
 				String[] permission = sideChannel.ask4Permission();
-				Log.d("fuck you", "2");
 				if (permission[0] == "0") {
 					if (permission[1] == "1") {
 						Log.d("Error", "Unknown replay_name!!!");

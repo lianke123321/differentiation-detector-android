@@ -3,7 +3,6 @@ package com.stonybrook.replay.combined;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -106,8 +105,7 @@ public final class CombinedNotifierThread implements Runnable {
 	public byte[] receiveObject(int objLen) throws Exception {
 		byte[] recvObjSizeBytes = receiveKbytes(objLen);
 		// Log.d("Obj", new String(recvObjSizeBytes));
-		int recvObjSize = (new BigInteger(new String(recvObjSizeBytes)))
-				.intValue();
+		int recvObjSize = Integer.parseInt((new String(recvObjSizeBytes)));
 		// Log.d("Obj", String.valueOf(recvObjSize));
 		return receiveKbytes(recvObjSize);
 	}

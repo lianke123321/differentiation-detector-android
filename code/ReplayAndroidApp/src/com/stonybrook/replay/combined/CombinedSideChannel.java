@@ -3,7 +3,6 @@ package com.stonybrook.replay.combined;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -135,7 +134,8 @@ public class CombinedSideChannel {
 
 	public HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> receivePortMappingNonBlock()
 			throws Exception {
-		HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> ports = new HashMap<String, HashMap<String, HashMap<String, ServerInstance>>>();
+		HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> ports =
+				new HashMap<String, HashMap<String, HashMap<String, ServerInstance>>>();
 		byte[] data = receiveObject(objLen);
 
 		/*
@@ -155,12 +155,14 @@ public class CombinedSideChannel {
 		JSONObject jObject = new JSONObject(tempStr);
 		Iterator<String> keys = jObject.keys();
 		while (keys.hasNext()) {
-			HashMap<String, HashMap<String, ServerInstance>> tempHolder = new HashMap<String, HashMap<String, ServerInstance>>();
+			HashMap<String, HashMap<String, ServerInstance>> tempHolder =
+					new HashMap<String, HashMap<String, ServerInstance>>();
 			String key = keys.next();
 			JSONObject firstLevel = (JSONObject) jObject.get(key);
 			Iterator<String> firstLevelKeys = firstLevel.keys();
 			while (firstLevelKeys.hasNext()) {
-				HashMap<String, ServerInstance> tempHolder1 = new HashMap<String, ServerInstance>();
+				HashMap<String, ServerInstance> tempHolder1 =
+						new HashMap<String, ServerInstance>();
 				String key1 = firstLevelKeys.next();
 				JSONObject secondLevel = (JSONObject) firstLevel.get(key1);
 				Iterator<String> secondLevelKeys = secondLevel.keys();
@@ -192,8 +194,7 @@ public class CombinedSideChannel {
 	public byte[] receiveObject(int objLen) throws Exception {
 		byte[] recvObjSizeBytes = receiveKbytes(objLen);
 		// Log.d("Obj", new String(recvObjSizeBytes));
-		int recvObjSize = (new BigInteger(new String(recvObjSizeBytes)))
-				.intValue();
+		int recvObjSize = Integer.parseInt(new String(recvObjSizeBytes));
 		// Log.d("Obj", String.valueOf(recvObjSize));
 		return receiveKbytes(recvObjSize);
 	}
