@@ -143,15 +143,16 @@ public class CharonVpnService extends VpnService implements Runnable {
 			VpnProfile profile = null;
 
 			String action = (String) intent.getCharSequenceExtra("action");
-			//Log.d("action", action);
+			// Log.d("action", action);
 			if (action.equalsIgnoreCase("stop")) {
 				setNextProfile(null);
 			} else {
 				if (bundle != null && mNextProfile == null) {
-					
-					//Set up the following properties for VPN connection. Move this values to configuration properties file
+
+					// Set up the following properties for VPN connection. Move
+					// this values to configuration properties file
 					profile = mDataSource.getAllVpnProfiles().get(0);
-					
+
 					/*
 					profile = new VpnProfile();
 					profile.setName("meddle");
@@ -168,8 +169,8 @@ public class CharonVpnService extends VpnService implements Runnable {
 						profile.setUsername(bundle
 								.getString(VpnProfileDataSource.KEY_USERNAME));
 					}*/
-				
-				setNextProfile(profile);
+
+					setNextProfile(profile);
 				}
 			}
 
@@ -177,8 +178,6 @@ public class CharonVpnService extends VpnService implements Runnable {
 		return START_NOT_STICKY;
 	}
 
-	
-	
 	@Override
 	public void onCreate() {
 		Log.d("VPN", "start command");
@@ -200,10 +199,10 @@ public class CharonVpnService extends VpnService implements Runnable {
 
 	@Override
 	public void onRevoke() { /*
-							 * the system revoked the rights grated with the
-							 * initial prepare() call. called when the user
-							 * clicks disconnect in the system's VPN dialog
-							 */
+								* the system revoked the rights grated with the
+								* initial prepare() call. called when the user
+								* clicks disconnect in the system's VPN dialog
+								*/
 		setNextProfile(null);
 	}
 
@@ -773,8 +772,5 @@ public class CharonVpnService extends VpnService implements Runnable {
 		System.loadLibrary("ipsec");
 		System.loadLibrary("androidbridge");
 	}
-	
-	
-	
-	
+
 }

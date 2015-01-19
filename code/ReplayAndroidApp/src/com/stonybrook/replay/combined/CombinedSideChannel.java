@@ -73,7 +73,7 @@ public class CombinedSideChannel {
 				(id + ";" + "SINGLE" + ";" + replayName + ";" + temp)
 						.getBytes(),
 				objLen);
-		Log.d("id", id);
+		Log.d("declareID", id);
 
 	}
 
