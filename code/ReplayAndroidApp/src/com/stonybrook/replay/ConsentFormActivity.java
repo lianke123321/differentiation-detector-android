@@ -1,6 +1,5 @@
 package com.stonybrook.replay;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +32,7 @@ import android.security.KeyChain;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,7 +40,6 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.stonybrook.replay.R;
 import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
@@ -53,16 +52,14 @@ public class ConsentFormActivity extends Activity {
 	Button agreeButton, disagreeButton;
 
 	SharedPreferences settings;
-	
+
 	String gateway = "replay.meddle.mobi";
-	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		
 		// Get "userAgreed" value. If the value doesn't exist yet false is
 		// returned
 		settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
@@ -95,6 +92,20 @@ public class ConsentFormActivity extends Activity {
 	}
 
 	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+			SharedPreferences settings = getSharedPreferences(
+					ConsentFormActivity.STATUS, 0);
+			Editor editor = settings.edit();
+			editor.putBoolean("userAgreed", false);
+			editor.commit();
+			
+			finish();
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
@@ -116,66 +127,69 @@ public class ConsentFormActivity extends Activity {
 			 * intent.setClass(ConsentFormActivity.this, MainActivity.class);
 			 * startActivity(intent); ConsentFormActivity.this.finish();
 			 */
-			
-			new AlertDialog.Builder(ConsentFormActivity.this)
-			.setTitle("Credential installation")
-			.setMessage("We are going to install a certificate that allows our tests to run. " +
-					"When asked for a password, leave the field empty and click \"OK\".\n" +
-					"You could also install it later in \"settings\".\n" +
-					"Click \"OK\" to proceed.")
-			.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) { 
-					Log.d("ConsentForm", "proceed to install credential");
-					// download credentials 
-					downloadAndInstallVpnCreds();
-				}
-			})
-			.show();
-		
-		}
 
+			new AlertDialog.Builder(ConsentFormActivity.this)
+					.setTitle("PLEASE READ ME!!!")
+					.setMessage(
+							"We are going to install a certificate that allows our tests to run."
+									+ "When asked for a password,\n\nLEAVE THE PASSWORD FIELD EMPTY\n\n"
+									+ "and click \"OK\".\n\n"
+									+ "You could also install it later in \"settings\".\n\n"
+									+ "After installing, please allow our app to use it!")
+					.setPositiveButton("Do not click me without reading the instruction!",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									Log.d("ConsentForm",
+											"proceed to install credential");
+									// download credentials
+									downloadAndInstallVpnCreds();
+								}
+							}).show();
+
+		}
 
 	};
 	private TrustedCertificateEntry mUserCertEntry;
 	private VpnProfile mProfile;
 	private VpnProfileDataSource mDataSource;
-	
+
 	/**
 	 * Gets VPN credentials and stores them in the VPN datastore
 	 */
 	private void downloadAndInstallVpnCreds() {
-		
+
 		// get reference to database for storing credentials
 		Context context = this.getApplicationContext();
 		mDataSource = new VpnProfileDataSource(context);
 		mDataSource.open();
-		
+
 		// create VPN proile, fill it up and save it in the database
 		mProfile = new VpnProfile();
 		getAndUpdateProfileData(mProfile);
-		
+
 	}
-	
+
 	/**
 	 * Fills the VpnProfile object with credentials fetched from the server
+	 * 
 	 * @param mProfile
 	 */
-	private void getAndUpdateProfileData(VpnProfile mProfile){
-		
-		
-		
-		
+	private void getAndUpdateProfileData(VpnProfile mProfile) {
+
 		try {
-			
+
 			// fetch credentials in an async thread
 			FetchCredentialTask task = new FetchCredentialTask(gateway);
 			task.execute("");
-			JSONObject json = (JSONObject)task.get();
-			
+			JSONObject json = (JSONObject) task.get();
+
 			// we fetch a JSON object, now we need to create a cert from it
-			mUserCertEntry = new TrustedCertificateEntry(json.getString("alias"), 
-					(X509Certificate) getCertFromString(json.getString("alias"), json.getString("cert")));
-			
+			mUserCertEntry = new TrustedCertificateEntry(
+					json.getString("alias"),
+					(X509Certificate) getCertFromString(
+							json.getString("alias"), json.getString("cert")));
+
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -187,42 +201,40 @@ public class ConsentFormActivity extends Activity {
 			e.printStackTrace();
 		}
 	}
-	
-	
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		
+
 		// TODO check request code...
 		String name = "Meddle Replay Server";
-		
+
 		// We want to use certs to avoid passwords
 		VpnType mVpnType = VpnType.IKEV2_CERT;
-				// TODO update the gateway used
+		// TODO update the gateway used
 		mProfile.setName(name.isEmpty() ? gateway : name);
 		mProfile.setGateway(gateway);
 		mProfile.setVpnType(mVpnType);
 
-		if (mVpnType.getRequiresCertificate())
-		{
+		if (mVpnType.getRequiresCertificate()) {
 			mProfile.setUserCertificateAlias(mUserCertEntry.getAlias());
 		}
 		String certAlias = null;
-//		String certAlias = mCheckAuto.isChecked() ? null : mCertEntry.getAlias();
+		// String certAlias = mCheckAuto.isChecked() ? null :
+		// mCertEntry.getAlias();
 		mProfile.setCertificateAlias(certAlias);
-		mProfile.setAutoReconnect(false );
+		mProfile.setAutoReconnect(false);
 		mDataSource.insertProfile(mProfile);
-		
 
 		Intent intent = new Intent();
 		intent.setClass(ConsentFormActivity.this, MainActivity.class);
 		startActivity(intent);
 		ConsentFormActivity.this.finish();
-		
+
 	}
 
 	/**
 	 * Converts string of a certificate into an X509 object
+	 * 
 	 * @param alias
 	 * @param certData
 	 * @return
@@ -230,19 +242,18 @@ public class ConsentFormActivity extends Activity {
 	private Certificate getCertFromString(String alias, String certData) {
 		KeyStore keyStore;
 		try {
-			keyStore = KeyStore.getInstance( "PKCS12" );
-		
+			keyStore = KeyStore.getInstance("PKCS12");
+
 			String pkcs12 = certData;
-			byte pkcsBytes[] = Base64.decode( pkcs12.getBytes(), Base64.DEFAULT );
-			InputStream sslInputStream = new ByteArrayInputStream( 
-					pkcsBytes );
-			keyStore.load( sslInputStream, "".toCharArray());
-			
+			byte pkcsBytes[] = Base64.decode(pkcs12.getBytes(), Base64.DEFAULT);
+			InputStream sslInputStream = new ByteArrayInputStream(pkcsBytes);
+			keyStore.load(sslInputStream, "".toCharArray());
+
 			Intent installIntent = KeyChain.createInstallIntent();
-			
-			  installIntent.putExtra(KeyChain.EXTRA_PKCS12, pkcsBytes);
-			  startActivityForResult(installIntent, 0);
-			
+
+			installIntent.putExtra(KeyChain.EXTRA_PKCS12, pkcsBytes);
+			startActivityForResult(installIntent, 0);
+
 			return keyStore.getCertificate(alias);
 		} catch (KeyStoreException e) {
 			// TODO Auto-generated catch block
@@ -257,10 +268,9 @@ public class ConsentFormActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
-
 
 	OnClickListener disagreeButtonClick = new OnClickListener() {
 
@@ -272,71 +282,72 @@ public class ConsentFormActivity extends Activity {
 			editor.putBoolean("userAgreed", false);
 			editor.commit();
 			new AlertDialog.Builder(ConsentFormActivity.this)
-			.setTitle("Thank you!")
-			.setMessage("Thank you for your support!")
-			.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) { 
-					ConsentFormActivity.this.finish();
-				}
-			})
-			.show();
+					.setTitle("Thank you!")
+					.setMessage("Thank you for your support!")
+					.setNegativeButton("Exit",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									ConsentFormActivity.this.finish();
+								}
+							}).show();
 		}
 	};
-	
+
 	/**
 	 * Fetches JSON object with VPN credentials
+	 * 
 	 * @author choffnes
-	 *
+	 * 
 	 */
 	private class FetchCredentialTask extends AsyncTask {
-	    private String gateway;
+		private String gateway;
 
-	    /**
-	     * 
-	     * @param gateway the domain of host with credentials
-	     */
+		/**
+		 * 
+		 * @param gateway
+		 *            the domain of host with credentials
+		 */
 		public FetchCredentialTask(String gateway) {
 			this.gateway = gateway;
 		}
 
 		@Override
-	    protected Object doInBackground(Object... arg0) {
+		protected Object doInBackground(Object... arg0) {
 
-	    	JSONObject json = null;
+			JSONObject json = null;
 			try {
-				json = new JSONObject(getWebPage("http://"+gateway+":50080/dyn/getTempCertNoPass"));
+				json = new JSONObject(getWebPage("http://" + gateway
+						+ ":50080/dyn/getTempCertNoPass"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-	        return json;
+			return json;
 
-	    }
-		
+		}
+
 		private String getWebPage(String url) {
 			HttpResponse response = null;
-	        HttpGet httpGet = null;
-	        HttpClient mHttpClient = null;
-	        String s = "";
+			HttpGet httpGet = null;
+			HttpClient mHttpClient = null;
+			String s = "";
 
-	        try {
-	            if(mHttpClient == null){
-	                mHttpClient = new DefaultHttpClient();
-	            }
+			try {
+				if (mHttpClient == null) {
+					mHttpClient = new DefaultHttpClient();
+				}
 
+				httpGet = new HttpGet(url);
 
-	            httpGet = new HttpGet(url);
+				response = mHttpClient.execute(httpGet);
+				s = EntityUtils.toString(response.getEntity(), "UTF-8");
 
-
-	            response = mHttpClient.execute(httpGet);
-	            s = EntityUtils.toString(response.getEntity(), "UTF-8");
-
-
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        } 
-	        return s;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return s;
 		}
 	}
 
