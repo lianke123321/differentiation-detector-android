@@ -825,9 +825,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	}
 
-	/**
-	 * This method is called when replay over VPN is finished
-	 */
+	// here i kept the old version, (all on open)->(all over vpn)
 	/*@Override
 	public void vpnFinishCompleteCallback(Boolean success) {
 		try {
@@ -838,24 +836,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				return;
 			}
 
-			*//**
-	 * Change status on screen. Here currentReplayCount stores number of
-	 * applications selected by user. ++ makes processing of next application in
-	 * list when processApplicationReplay() is called.
-	 */
-	/*
-
 	selectedApps.get(currentReplayCount).resultImg = "p";
 	selectedApps.get(currentReplayCount).status = getResources()
 		.getString(R.string.finish_vpn);
 	adapter.notifyDataSetChanged();
 
-	// If there are more apps that require processing then start with
-	// those.
 	if (selectedApps.size() != (currentReplayCount + 1)) {
-	// (new StartNextApp()).execute(this);
-	// processCombinedApplication(selectedApps.get(++currentReplayCount),
-	// "vpn");
 	appData_combined = UnpickleDataStream.unpickleCombinedJSON(
 			selectedApps.get(++currentReplayCount).getDataFile(),
 			context);
@@ -865,9 +851,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	Log.d("Replay", "Starting combined replay");
 	queueCombined.execute("");
 	} else {
-	// progressWait.setMessage("Finishing Analysis...");
-	// Thread.sleep(10000);
-	// progressWait.dismiss();
 	Log.d("Replay", "finished all replays!");
 	disconnectVPN();
 	}
@@ -875,10 +858,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	} catch (Exception ex) {
 	ex.printStackTrace();
 	} finally {
-	// Disconnect VPN. No matter whether replay was successful or not
 	}
 
 	}*/
+	
+	/**
+	 * This method is called when replay over VPN is finished
+	 */
 	@Override
 	public void vpnFinishCompleteCallback(Boolean success) {
 		try {
@@ -924,10 +910,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	}
 
-	/**
-	 * Called when Replay is finished over Open channel. Connects to VPN and
-	 * starts replay for same App again
-	 */
+	// here i kept the old version, (all on open)->(all over vpn)
 	/*@Override
 	public void openFinishCompleteCallback(Boolean success) {
 		try {
@@ -939,8 +922,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				adapter.notifyDataSetChanged();
 
 				if (selectedApps.size() != (currentReplayCount + 1)) {
-					// processCombinedApplication(selectedApps.get(++currentReplayCount),
-					// "open");
 					appData_combined = UnpickleDataStream.unpickleCombinedJSON(
 							selectedApps.get(++currentReplayCount)
 									.getDataFile(), context);
@@ -967,7 +948,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				}
 
 			} else {
-				// Update status on screen and stop processing
 				selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
@@ -978,7 +958,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 
 	}*/
-
+	
+	/**
+	 * Called when Replay is finished over Open channel. Connects to VPN and
+	 * starts replay for same App again
+	 */
 	@Override
 	public void openFinishCompleteCallback(Boolean success) {
 		try {
