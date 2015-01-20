@@ -79,6 +79,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	Context context = null;
 	ProgressDialog progress = null;
 
+	boolean replayOngoing = false;
+
 	// adrian: for progress bar
 	ProgressBar prgBar;
 	UpdateUIBean updateUIBean;
@@ -172,8 +174,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		new CertificateLoadTask().executeOnExecutor(
 				AsyncTask.THREAD_POOL_EXECUTOR, false);
 
-		
-
 		/**
 		 * Dave commented out to test auto-credentials
 		 * KeyChain.choosePrivateKeyAlias(ReplayActivity.this, new
@@ -213,6 +213,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 * is forwarded to methos
 	 */
 	void processApplicationReplay() {
+
+		replayOngoing = true;
 		try {
 			/**
 			 * Read configuration file and long it into Config object.
@@ -341,10 +343,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		public void onClick(View v) {
-			ReplayActivity.this.finish();
-			ReplayActivity.this.overridePendingTransition(
-					android.R.anim.slide_in_left,
-					android.R.anim.slide_out_right);
+			if (!replayOngoing) {
+				ReplayActivity.this.finish();
+				ReplayActivity.this.overridePendingTransition(
+						android.R.anim.slide_in_left,
+						android.R.anim.slide_out_right);
+			} else
+				Toast.makeText(context,
+						"Replay is ongoing! Please do not touch your phone!",
+						Toast.LENGTH_LONG).show();
 		}
 	};
 
@@ -355,8 +362,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		public void onClick(View v) {
-
-			processApplicationReplay();
+			if (!replayOngoing)
+				processApplicationReplay();
+			else
+				Toast.makeText(context,
+						"Replay is ongoing! Please do not touch your phone!",
+						Toast.LENGTH_LONG).show();
 		}
 	};
 
@@ -861,6 +872,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			if (!success) {
 				Toast.makeText(context, "Error while processing...",
 						Toast.LENGTH_LONG).show();
+				replayOngoing = false;
 				return;
 			}
 
@@ -890,6 +902,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// progressWait.dismiss();
 				currentReplayCount = 0;
 				Log.d("Replay", "finished all replays!");
+				replayOngoing = false;
 			}
 
 		} catch (Exception ex) {
@@ -980,6 +993,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
+				replayOngoing = false;
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -1025,25 +1039,36 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			try {
-				if (currentTask.equalsIgnoreCase("combined")
-						&& queueCombined != null
-						&& queueCombined.getStatus() == AsyncTask.Status.RUNNING)
-					queueCombined.cancel(true);
-				else {
-					Log.d("fileExistsListener", "unknown replay type!");
+			if (!replayOngoing) {
+				try {
+					if (currentTask.equalsIgnoreCase("combined")
+							&& queueCombined != null
+							&& queueCombined.getStatus() == AsyncTask.Status.RUNNING)
+						queueCombined.cancel(true);
+					else {
+						Log.d("fileExistsListener", "unknown replay type!");
+					}
+				} catch (Exception e) {
+					Log.d("ReplayActivity", "exception while press back key!");
+					e.printStackTrace();
 				}
-			} catch (Exception e) {
-				Log.d("ReplayActivity", "exception while press back key!");
-				e.printStackTrace();
+
+				ReplayActivity.this.finish();
+				ReplayActivity.this.overridePendingTransition(
+						android.R.anim.slide_in_left,
+						android.R.anim.slide_out_right);
+				
+				return super.onKeyDown(keyCode, event);
+			} else {
+				Toast.makeText(context,
+						"Replay is ongoing! Please do not touch your phone!",
+						Toast.LENGTH_LONG).show();
+				return true;
 			}
-			
-			ReplayActivity.this.finish();
-			ReplayActivity.this.overridePendingTransition(
-					android.R.anim.slide_in_left,
-					android.R.anim.slide_out_right);
 		}
-		return super.onKeyDown(keyCode, event);
+		
+		return true;
+		
 	}
 
 	// VPN Changes
@@ -1217,7 +1242,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		intent.putExtra("action", "stop");
 		context.startService(intent);
 	}
-	
+
 	private String getPublicIP() {
 		String publicIP = "";
 		try {
