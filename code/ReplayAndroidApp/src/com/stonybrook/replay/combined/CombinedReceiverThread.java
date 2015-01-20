@@ -85,6 +85,7 @@ public final class CombinedReceiverThread implements Runnable {
 								.add(String
 										.valueOf((double) (currentTime - jitterTimeOrigin) / 1000000000));
 						jitterBean.rcvdPayload.add(data);
+						Log.d("Receiver", String.valueOf(jitterBean.rcvdJitter.size()));
 					}
 					this.jitterTimeOrigin = currentTime;
 					selectedKeys.remove();
@@ -105,7 +106,7 @@ public final class CombinedReceiverThread implements Runnable {
 			Log.d("Receiver", "receiving udp packet error!");
 			e1.printStackTrace();
 		}
-
+		
 		Log.d("Receiver", "finished!");
 	}
 

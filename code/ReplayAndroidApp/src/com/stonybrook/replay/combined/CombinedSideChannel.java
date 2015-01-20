@@ -238,7 +238,7 @@ public class CombinedSideChannel {
 				Log.d("sendJitter", "size does not match!");
 				return;
 			}
-
+			
 			if (jitterBean.sentJitter.size() > 0) {
 				sentJitter += (jitterBean.sentJitter.get(0) + "\t" + UtilsManager
 						.getUnsignedInt(Arrays.hashCode(jitterBean.sentPayload
@@ -250,21 +250,21 @@ public class CombinedSideChannel {
 									.hashCode(jitterBean.sentPayload.get(i))));
 				}
 			}
-
+			
 			if (jitterBean.rcvdJitter.size() > 0) {
 				rcvdJitter += (jitterBean.rcvdJitter.get(0) + "\t" + UtilsManager
 						.getUnsignedInt(Arrays.hashCode(jitterBean.rcvdPayload
 								.get(0))));
+				//Log.d("rcvdJitter", String.valueOf(jitterBean.rcvdJitter.size()));
 				for (i = 1; i < jitterBean.rcvdJitter.size(); i++) {
 					rcvdJitter += ("\n" + jitterBean.rcvdJitter.get(i) + "\t" + UtilsManager
 							.getUnsignedInt(Arrays
 									.hashCode(jitterBean.rcvdPayload.get(i))));
 				}
 			}
-
+			
 			sendObject(sentJitter.getBytes(), objLen);
 			sendObject(rcvdJitter.getBytes(), objLen);
-
 		}
 
 		// receive confirmation from server

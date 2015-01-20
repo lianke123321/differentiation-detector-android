@@ -1067,7 +1067,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			}
 		}
 		
-		return true;
+		return super.onKeyDown(keyCode, event);
 		
 	}
 
