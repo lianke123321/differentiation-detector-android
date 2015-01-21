@@ -231,7 +231,7 @@ public class CombinedSideChannel {
 			int i;
 			String sentJitter = "";
 			String rcvdJitter = "";
-
+			
 			if ((jitterBean.sentJitter.size() != jitterBean.sentPayload.size())
 					|| (jitterBean.rcvdJitter.size() != jitterBean.rcvdPayload
 							.size())) {

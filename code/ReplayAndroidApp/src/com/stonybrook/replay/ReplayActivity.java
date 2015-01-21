@@ -1057,7 +1057,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				ReplayActivity.this.overridePendingTransition(
 						android.R.anim.slide_in_left,
 						android.R.anim.slide_out_right);
-				
+
 				return super.onKeyDown(keyCode, event);
 			} else {
 				Toast.makeText(context,
@@ -1066,9 +1066,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				return true;
 			}
 		}
-		
+
 		return super.onKeyDown(keyCode, event);
-		
+
 	}
 
 	// VPN Changes
@@ -1215,14 +1215,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			return new AlertDialog.Builder(getActivity())
 					.setTitle("VPN Not supported")
-					.setMessage("Your device does not support VPN")
+					.setMessage(
+							"Your device does not support VPN.\n"
+									+ "Thank you for your time!\n\n"
+									+ "Click below to exit our app.")
 					.setCancelable(false)
 					.setPositiveButton(android.R.string.ok,
 							new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int id) {
-									dialog.dismiss();
+									System.exit(0);
 								}
 							}).create();
 		}

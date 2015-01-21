@@ -79,7 +79,7 @@ If you have any questions about this study, please feel free to email <strong>Da
 If you have any questions about your rights in this research, you may contact <strong>Nan C. Regina</strong>, Director, Human Subject Research Protection, 960 Renaissance Park, Northeastern University, Boston, MA 02115. Email: <strong>n.regina@neu.edu.</strong> You may contact anonymously if you wish. <br>
 If you have any questions regarding electronic privacy, please feel free to contact <strong>Mark Nardone</strong>, NU’s Director of Information Security via email at <strong>privacy@neu.edu</strong>. <br>
 This study has been reviewed and approved by the Northeastern University Institutional Review Board (#14-08-16). ]]> </Data> </string>
-    <string name="consent_form_condition"><Data><![CDATA[ <br> By clicking the \"Accept\" button above you are indicating that you consent to participate in this study. Please print out a copy of this consent form for your records. ]]> </Data> </string>
+    <string name="consent_form_condition"><Data><![CDATA[ <br> By clicking the \"Accept\" button above (top right) you are indicating that you consent to participate in this study. Please print out a copy of this consent form for your records. ]]> </Data> </string>
     <string name="user_agree">Accept</string>
     <string name="user_disagree">Not Accept</string>
     

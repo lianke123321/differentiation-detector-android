@@ -85,7 +85,7 @@ public final class CombinedReceiverThread implements Runnable {
 								.add(String
 										.valueOf((double) (currentTime - jitterTimeOrigin) / 1000000000));
 						jitterBean.rcvdPayload.add(data);
-						Log.d("Receiver", String.valueOf(jitterBean.rcvdJitter.size()));
+						//Log.d("Receiver", String.valueOf(jitterBean.rcvdJitter.size()));
 					}
 					this.jitterTimeOrigin = currentTime;
 					selectedKeys.remove();

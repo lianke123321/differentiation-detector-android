@@ -134,7 +134,6 @@ public class ConsentFormActivity extends Activity {
 							"We are going to install a certificate that allows our tests to run."
 									+ "When asked for a password,\n\nLEAVE THE PASSWORD FIELD EMPTY\n\n"
 									+ "and click \"OK\".\n\n"
-									+ "You could also install it later in \"settings\".\n\n"
 									+ "After installing, please allow our app to use it!")
 					.setPositiveButton("Do not click me without reading the instruction!",
 							new DialogInterface.OnClickListener() {
