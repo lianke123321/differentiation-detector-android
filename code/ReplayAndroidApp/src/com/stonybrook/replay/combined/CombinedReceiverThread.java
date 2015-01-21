@@ -1,6 +1,8 @@
 package com.stonybrook.replay.combined;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -40,8 +42,10 @@ public final class CombinedReceiverThread implements Runnable {
 		try {
 			Selector selector = Selector.open();
 			ByteBuffer buf = ByteBuffer.allocate(bufSize);
+			byte[] buff = new byte[bufSize];
 
 			while (keepRunning) {
+
 				/*
 				 * Log.d("Receiver", "size of udpSocketList: " +
 				 * udpReplayInfoBean.getUdpSocketList().size());
@@ -54,51 +58,42 @@ public final class CombinedReceiverThread implements Runnable {
 
 				// Log.d("Receiver", "senderCount: " +
 				// udpReplayInfoBean.getSenderCount());
-				// Log.d("Receiver", String.valueOf(selector.selectNow()));
 				if (selector.select(TIME_OUT) == 0) {
 					// Log.d("Receiver", "no socket has data");
 					continue;
 				}
-				// byte[] data = new byte[bufSize];
-				// DatagramPacket packet = new DatagramPacket(data,
-				// data.length);
-				// Log.d("Receiver", "ready to receive packet!");
+				// Log.d("Receiver", "got it!");
 
-				buf.clear();
 				Iterator<SelectionKey> selectedKeys = selector.selectedKeys()
 						.iterator();
 				while (selectedKeys.hasNext()) {
 					SelectionKey key = selectedKeys.next();
 					DatagramChannel tmpChannel = (DatagramChannel) key
 							.channel();
-					tmpChannel.receive(buf);
-					byte[] data = new byte[buf.position()];
-					buf.position(0);
-					buf.get(data);
-					//Log.d("Receiver", "length of data: " + data.length);
+					
+					if (tmpChannel.receive(buf) != null) {
+						byte[] data = new byte[buf.position()];
+						buf.position(0);
+						buf.get(data);
+						// Log.d("Receiver", "length of data: " + data.length);
 
-					// for receive jitter
-					long currentTime = System.nanoTime();
+						// for receive jitter
+						long currentTime = System.nanoTime();
 
-					synchronized (jitterBean) {
-						jitterBean.rcvdJitter
-								.add(String
-										.valueOf((double) (currentTime - jitterTimeOrigin) / 1000000000));
-						jitterBean.rcvdPayload.add(data);
-						//Log.d("Receiver", String.valueOf(jitterBean.rcvdJitter.size()));
+						synchronized (jitterBean) {
+							jitterBean.rcvdJitter
+									.add(String
+											.valueOf((double) (currentTime - jitterTimeOrigin) / 1000000000));
+							jitterBean.rcvdPayload.add(data);
+							// Log.d("Receiver",
+							// String.valueOf(jitterBean.rcvdJitter.size()));
+						}
+						this.jitterTimeOrigin = currentTime;
 					}
-					this.jitterTimeOrigin = currentTime;
 					selectedKeys.remove();
 				}
 
-				/*
-				 * while (true) { udpReplayInfoBean.pollCloseQ(); if
-				 * (!udpReplayInfoBean.getCloseQ().isEmpty()) {
-				 * //udpReplayInfoBean.decrement(); Log.d("Receiver",
-				 * "decremented one from senderCount: " +
-				 * udpReplayInfoBean.getSenderCount()); } else break; }
-				 */
-
+				buf.clear();
 			}
 
 			selector.close();
@@ -106,8 +101,9 @@ public final class CombinedReceiverThread implements Runnable {
 			Log.d("Receiver", "receiving udp packet error!");
 			e1.printStackTrace();
 		}
-		
-		Log.d("Receiver", "finished!");
-	}
 
+		Log.d("Receiver",
+				"finished! Packets received: "
+						+ String.valueOf(jitterBean.rcvdJitter.size()));
+	}
 }

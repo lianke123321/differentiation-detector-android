@@ -237,14 +237,19 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			// adrian: set result
 			Config.set("result", "false");
 			// adrian: set public IP
+			Config.set("publicIP", "");
 			new Thread(new Runnable() {
 				public void run() {
 					Config.set("publicIP", getPublicIP());
 				}
 
 			}).start();
+			
+			while (Config.get("publicIP") == "") {
+				Thread.sleep(500);
+			}
 
-			Log.d("Server", server);
+			Log.d("Replay", "public IP: " + Config.get("publicIP"));
 			// Check server reachability
 			boolean isAvailable = (new ServerReachable()).execute(server).get();
 			Log.d("Replay",
