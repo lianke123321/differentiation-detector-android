@@ -267,6 +267,14 @@ public class MainActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			downloadAndInstallVpnCreds();
+			
+			KeyChain.choosePrivateKeyAlias(MainActivity.this,
+					new SelectUserCertOnClickListener(), // Callback
+					new String[] {}, // Any key types.
+					null, // Any issuers.
+					"localhost", // Any host
+					-1, // Any port
+					DEFAULT_ALIAS);
 		}
 
 	};

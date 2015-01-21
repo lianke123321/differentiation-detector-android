@@ -143,7 +143,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 			VpnProfile profile = null;
 
 			String action = (String) intent.getCharSequenceExtra("action");
-			Log.d("action", action);
+			//Log.d("action", action);
 			if (action.equalsIgnoreCase("stop")) {
 				setNextProfile(null);
 			} else {
