@@ -186,6 +186,8 @@ public class MainActivity extends Activity {
 	    {
 	    	super.onDestroy();
 	        finish();
+	    	System.runFinalization();
+	    	System.exit(0);
 	    }
 	    return super.onKeyDown(keyCode, event);
 	}

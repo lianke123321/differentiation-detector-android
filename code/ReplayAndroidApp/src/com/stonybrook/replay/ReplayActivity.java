@@ -214,7 +214,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	 */
 	void processApplicationReplay() {
 
+		// update progress
+		selectedApps.get(currentReplayCount).status = getResources().getString(
+				R.string.start_replay);
+		adapter.notifyDataSetChanged();
+
 		replayOngoing = true;
+
 		try {
 			/**
 			 * Read configuration file and long it into Config object.
@@ -766,7 +772,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				queue.run(updateUIBean, CSPairMapping, udpPortMapping,
 						udpReplayInfoBean, serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")), server);
-				
+
 				// if sender aborted, throw exception here
 				if (queue.ABORT == true) {
 					Log.d("Replay", "replay aborted! Throw exception!");
@@ -775,7 +781,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// waiting for all threads to finish
 				Log.d("Replay", "waiting for all threads to die!");
-				
+
 				Thread.sleep(1000);
 				notifier.doneSending = true;
 				notfThread.join();
@@ -1007,7 +1013,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Toast.makeText(context,
 						"An error happened during replay! Please try again!",
 						Toast.LENGTH_LONG).show();
-				
+
 				// Update status on screen and stop processing
 				selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
@@ -1206,7 +1212,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// a alert dialog will pop up and the app will quite if user
 				// click "Cancel" for trust permission
 				AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-				alertDialog.setMessage("Meddle is closing now")
+				alertDialog.setMessage(
+						"Connecting VPN failed. App is closing now!")
 						.setNeutralButton("OK",
 								new DialogInterface.OnClickListener() {
 
