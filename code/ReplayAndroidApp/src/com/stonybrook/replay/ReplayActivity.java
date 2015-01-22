@@ -190,6 +190,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
+		queueCombined.cancel(true);
+		if (queueCombined.channel.equalsIgnoreCase("vpn"))
+			disconnectVPN();
 		this.finish();
 	}
 
@@ -361,7 +364,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						android.R.anim.slide_out_right);
 			} else
 				Toast.makeText(context,
-						"Replay is ongoing! Please do not touch your phone!",
+						"Replay is ongoing! Please do not touch any buttons.",
 						Toast.LENGTH_LONG).show();
 		}
 	};
@@ -377,7 +380,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				processApplicationReplay();
 			else
 				Toast.makeText(context,
-						"Replay is ongoing! Please do not touch your phone!",
+						"Replay is ongoing! Please do not touch any buttons.",
 						Toast.LENGTH_LONG).show();
 		}
 	};
@@ -1086,9 +1089,28 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				return super.onKeyDown(keyCode, event);
 			} else {
-				Toast.makeText(context,
+				new AlertDialog.Builder(ReplayActivity.this)
+				.setTitle("Replay is ongoing!")
+				.setMessage("Do you want to stop the process?")
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						queueCombined.cancel(true);
+						if (queueCombined.channel.equalsIgnoreCase("vpn"))
+							disconnectVPN();
+						ReplayActivity.this.finish();
+					}
+				})
+				.setNegativeButton("No",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// do nothing
+							}
+						}).show();
+				/*Toast.makeText(context,
 						"Replay is ongoing! Please do not touch your phone!",
-						Toast.LENGTH_LONG).show();
+						Toast.LENGTH_LONG).show();*/
 				return true;
 			}
 		}

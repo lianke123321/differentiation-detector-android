@@ -63,13 +63,13 @@ public class MainActivity extends Activity {
 	Button nextButton, settingsButton;
 	public HashMap<String, ApplicationBean> appsHashMap = null;
 	Context context;
-	
+
 	/**
 	 * We can provide email account here on which VPN logs can be received
 	 */
 	public static final String CONTACT_EMAIL = "demo@gmail.com";
 	private static final String DEFAULT_ALIAS = "replay-cert";
-	
+
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
 
 	String server = null;
@@ -152,6 +152,13 @@ public class MainActivity extends Activity {
 					-1, // Any port
 					DEFAULT_ALIAS);
 
+			Toast.makeText(
+					context,
+					"Please understand that there will be a \"Network may be monitored\" "
+							+ "message in your notification area after you allow us to use "
+							+ "our certificate. Nothing to worry about :)",
+					Toast.LENGTH_LONG).show();
+
 		} catch (Exception ex) {
 			Log.d(ReplayConstants.LOG_APPNAME,
 					"Exception while parsing JSON file "
@@ -178,20 +185,18 @@ public class MainActivity extends Activity {
 			}
 		}
 	}
-	
+
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event)
-	{
-	    if ((keyCode == KeyEvent.KEYCODE_BACK))
-	    {
-	    	super.onDestroy();
-	        finish();
-	    	System.runFinalization();
-	    	System.exit(0);
-	    }
-	    return super.onKeyDown(keyCode, event);
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+			super.onDestroy();
+			finish();
+			System.runFinalization();
+			System.exit(0);
+		}
+		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	/**
 	 * This method is executed when user clicks on settings button on main
 	 * screen. Comments are added inline.
@@ -270,7 +275,7 @@ public class MainActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			downloadAndInstallVpnCreds();
-			
+
 			KeyChain.choosePrivateKeyAlias(MainActivity.this,
 					new SelectUserCertOnClickListener(), // Callback
 					new String[] {}, // Any key types.
