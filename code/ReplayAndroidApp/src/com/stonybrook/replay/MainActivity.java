@@ -184,6 +184,7 @@ public class MainActivity extends Activity {
 	{
 	    if ((keyCode == KeyEvent.KEYCODE_BACK))
 	    {
+	    	super.onDestroy();
 	        finish();
 	    }
 	    return super.onKeyDown(keyCode, event);

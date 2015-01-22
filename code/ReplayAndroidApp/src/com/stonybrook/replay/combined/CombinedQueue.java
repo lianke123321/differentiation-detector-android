@@ -40,6 +40,9 @@ public class CombinedQueue {
 	// for jitter
 	JitterBean jitterBean = null;
 
+	// for indicating abortion!
+	public volatile boolean ABORT = false;
+
 	public CombinedQueue(ArrayList<RequestSet> q, JitterBean jitterBean) {
 		super();
 		this.Q = q;
@@ -93,9 +96,9 @@ public class CombinedQueue {
 				} else {
 					Semaphore recvSema = getRecvSemaLock(CSPairMapping.get(RS
 							.getc_s_pair()));
-					//Log.d("Replay", "waiting to get receive semaphore!");
+					// Log.d("Replay", "waiting to get receive semaphore!");
 					recvSema.acquire();
-					//Log.d("Replay", "got the receive semaphore!");
+					// Log.d("Replay", "got the receive semaphore!");
 
 					Log.d("Replay", "Sending tcp packet " + (i++) + "/" + len
 							+ " at time " + (System.nanoTime() - timeOrigin)
@@ -114,7 +117,11 @@ public class CombinedQueue {
 					sendSema.acquire();
 
 				}
-
+				
+				if (ABORT == true) {
+					Log.d("Queue", "replay aborted!");
+					break;
+				}
 			}
 
 			Log.d("Queue", "waiting for all threads to die!");
@@ -174,7 +181,7 @@ public class CombinedQueue {
 		cThread.start();
 		// threadList.add(cThread);
 		++threads;
-		//Log.d("nextTCP", "number of thread: " + String.valueOf(threads));
+		// Log.d("nextTCP", "number of thread: " + String.valueOf(threads));
 		cThreadList.add(cThread);
 	}
 
@@ -230,7 +237,13 @@ public class CombinedQueue {
 		jitterTimeOrigin = currentTime;
 
 		// adrian: send packet
-		client.sendUDPPacket(RS.getPayload(), destAddr);
+		try {
+			client.sendUDPPacket(RS.getPayload(), destAddr);
+		} catch (Exception e) {
+			Log.d("sendUDP", "something bad happened!");
+			e.printStackTrace();
+			ABORT = true;
+		}
 
 	}
 

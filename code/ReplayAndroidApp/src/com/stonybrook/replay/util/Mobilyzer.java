@@ -111,13 +111,13 @@ public class Mobilyzer {
 		 * {@see android.location.LocationManager.getLastKnownLocation}.
 		 */
 		locationListener = new LoggingLocationListener();
-		this.locationManager.requestLocationUpdates(locationProviderName, 0, 0,
-				locationListener, Looper.getMainLooper());
 	}
 
 	public DeviceInfoBean getDeviceInfo() {
 
 		DeviceInfoBean deviceInfoBean = new DeviceInfoBean();
+		locationManager.requestLocationUpdates(locationProviderName, 0, 0,
+				locationListener, Looper.getMainLooper());
 
 		// deviceInfoBean.deviceId = getDeviceId();
 		deviceInfoBean.manufacturer = Build.MANUFACTURER;
@@ -189,7 +189,7 @@ public class Mobilyzer {
 		}
 		// shouldn't remove the listener since the following replays also
 		// need to get location
-		//locationManager.removeUpdates(locationListener);
+		locationManager.removeUpdates(locationListener);
 		
 		// get APN setting
 		/*final Uri PREFERRED_APN_URI = Uri.parse("content://telephony/carriers/preferapn");

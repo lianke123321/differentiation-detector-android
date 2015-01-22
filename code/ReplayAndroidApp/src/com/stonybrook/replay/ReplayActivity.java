@@ -244,7 +244,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				}
 
 			}).start();
-			
+
 			while (Config.get("publicIP") == "") {
 				Thread.sleep(500);
 			}
@@ -766,12 +766,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				queue.run(updateUIBean, CSPairMapping, udpPortMapping,
 						udpReplayInfoBean, serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")), server);
+				
+				// if sender aborted, throw exception here
+				if (queue.ABORT == true) {
+					Log.d("Replay", "replay aborted! Throw exception!");
+					throw new Exception();
+				}
 
 				// waiting for all threads to finish
 				Log.d("Replay", "waiting for all threads to die!");
-				/*
-				 * for (Thread t : threadList) t.join();
-				 */
+				
 				Thread.sleep(1000);
 				notifier.doneSending = true;
 				notfThread.join();
@@ -807,9 +811,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				sideChannel.sendJitter(randomID, Config.get("jitter"),
 						jitterBean);
 
-				// Log.d("sentJitter", jitterBean.sentJitter);
-				// Log.d("rcvdJitter", jitterBean.rcvdJitter);
-
 				// Getting result
 				sideChannel.getResult(Config.get("result"));
 
@@ -821,6 +822,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				ex.printStackTrace();
 			} catch (Exception ex) {
 				success = false;
+				Log.d("Replay", "bad things happened, quiting process");
 				ex.printStackTrace();
 
 			}
@@ -875,8 +877,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		try {
 			// If there was error. Display message and stop processing further.
 			if (!success) {
-				Toast.makeText(context, "Error while processing...",
+				Toast.makeText(context,
+						"An error happened during replay! Please try again!",
 						Toast.LENGTH_LONG).show();
+				disconnectVPN();
+
+				// Update status on screen and stop processing
+				selectedApps.get(currentReplayCount).resultImg = "p";
+				selectedApps.get(currentReplayCount++).status = getResources()
+						.getString(R.string.error);
+				adapter.notifyDataSetChanged();
+
 				replayOngoing = false;
 				return;
 			}
@@ -993,6 +1004,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				(new VPNConnected()).execute(this);
 
 			} else {
+				Toast.makeText(context,
+						"An error happened during replay! Please try again!",
+						Toast.LENGTH_LONG).show();
+				
 				// Update status on screen and stop processing
 				selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()

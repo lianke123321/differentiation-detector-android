@@ -63,39 +63,15 @@ public class CTCPClientThread implements Runnable {
 					" bytes, expecting " + RS.getResponse_len() + " bytes ");*/
 			
 			sendSema.release();
-			/*synchronized (queue) {
-				queue.notifyAll();
-			}*/
 			
 			// Notify waiting Queue thread to start processing next packet
 			if (RS.getResponse_len() > 0) {
-				// acquire the recvSema
-				/*Log.d("Response", "waiting to get receiving semaphore!");
-				int lineNum = 0;
-				synchronized (recvQueueBean) {
-					lineNum = recvQueueBean.queue ++;
-				}
-				Log.d("Response", "My line number is: " + lineNum + " current: " + recvQueueBean.current);
-				
-				while (lineNum != recvQueueBean.current) {
-					synchronized (recvQueueBean) {
-						recvQueueBean.wait();
-					}
-				}
-				
-				//recvSema.acquire();
-				Log.d("Response", "got the receiving semaphore! current: " + recvQueueBean.current);*/
-				
-				//Log.d("Response", "Waiting for response of " + RS.getResponse_len() + " bytes");
 
 				int totalRead = 0;
 
 				/*Log.d("Receiving", String.valueOf(RS.getResponse_len()) + " bytes"
 						+ " start at time " +
 						String.valueOf((System.nanoTime() - timeOrigin) / 1000000000));*/
-				
-				//if(RS.getResponse_len() < bufferSize)
-				//	bufferSize = RS.getResponse_len();
 				
 				byte[] buffer = new byte[RS.getResponse_len()];
 				while (totalRead < buffer.length) {
@@ -127,6 +103,10 @@ public class CTCPClientThread implements Runnable {
 		} catch (Exception e) {
 			Log.d("TCPClientThread", "something bad happened!");
 			e.printStackTrace();
+			// abort replay if bad things happened!
+			synchronized (queue) {
+				queue.ABORT = true;
+			}
 		} finally {
 			recvSema.release();
 			synchronized (queue) {
