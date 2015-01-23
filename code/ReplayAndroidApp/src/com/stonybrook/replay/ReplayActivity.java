@@ -190,9 +190,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
-		queueCombined.cancel(true);
-		if (queueCombined.channel.equalsIgnoreCase("vpn"))
-			disconnectVPN();
+		if (queueCombined != null) {
+			queueCombined.cancel(true);
+			if (queueCombined.channel.equalsIgnoreCase("vpn"))
+				disconnectVPN();
+		}
 		this.finish();
 	}
 
@@ -572,7 +574,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						adapter.notifyDataSetChanged();
 					}
 				});
-				
+
 				String[] permission = sideChannel.ask4Permission();
 				Log.d("Replay", "permission[0]: " + permission[0]
 						+ " permission[1]: " + permission[1]);
@@ -1448,10 +1450,22 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				meddleIP = InetAddress.getByName(GATE_WAY).getHostAddress();
 				Log.d("GetReplayServerIP", "Server IP: " + server + " VPN IP: "
 						+ meddleIP);
+				// for testing exception handling
+				// throw new UnknownHostException();
 			} catch (UnknownHostException e) {
 				Log.w("GetReplayServerIP", "get IP of replay server failed!");
-				e.printStackTrace();
-				System.exit(0);
+
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(
+								ReplayActivity.this,
+								"Failed to get IP address of replay server!. Try after some time.",
+								Toast.LENGTH_LONG).show();
+					}
+
+				});
+
+				ReplayActivity.this.finish();
 			}
 			return false;
 		}
