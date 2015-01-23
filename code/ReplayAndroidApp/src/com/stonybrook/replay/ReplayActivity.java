@@ -1352,7 +1352,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// click "Cancel" for trust permission
 				AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 				alertDialog.setMessage(
-						"Connecting VPN failed. App is closing now!")
+						"Connecting VPN failed. Replay aborted.")
 						.setNeutralButton("OK",
 								new DialogInterface.OnClickListener() {
 
@@ -1360,7 +1360,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									public void onClick(DialogInterface dialog,
 											int which) {
 										// exit this application
-										System.exit(0);
+										ReplayActivity.this.finish();
 									}
 								});
 				// show this dialog on the screen
@@ -1384,7 +1384,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					.setMessage(
 							"Your device does not support VPN.\n"
 									+ "Thank you for your time!\n\n"
-									+ "Click below to exit our app.")
+									+ "Click below go back.")
 					.setCancelable(false)
 					.setPositiveButton(android.R.string.ok,
 							new DialogInterface.OnClickListener() {
