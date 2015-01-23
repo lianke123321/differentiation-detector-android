@@ -572,19 +572,94 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						adapter.notifyDataSetChanged();
 					}
 				});
-
+				
 				String[] permission = sideChannel.ask4Permission();
-				if (permission[0] == "0") {
-					if (permission[1] == "1") {
-						Log.d("Error", "Unknown replay_name!!!");
-						return null;
-					} else if (permission[1] == "2") {
-						Log.d("Error",
-								"No permission: another client with same IP address is running. Wait for them to finish!");
-						return null;
+				Log.d("Replay", "permission[0]: " + permission[0]
+						+ " permission[1]: " + permission[1]);
+				if (permission[0].trim().equalsIgnoreCase("0")) {
+					if (permission[1].trim().equalsIgnoreCase("1")) {
+						ReplayActivity.this.runOnUiThread(new Runnable() {
+							public void run() {
+								new AlertDialog.Builder(ReplayActivity.this)
+										.setTitle("Error")
+										.setMessage(
+												"No such replay on server!\n"
+														+ "Click \"OK\" to go back.")
+										.setPositiveButton(
+												"OK",
+												new DialogInterface.OnClickListener() {
+													@Override
+													public void onClick(
+															DialogInterface dialog,
+															int which) {
+														queueCombined
+																.cancel(true);
+														if (queueCombined.channel
+																.equalsIgnoreCase("vpn"))
+															disconnectVPN();
+														ReplayActivity.this
+																.finish();
+													}
+												}).show();
+							}
+
+						});
+						throw new Exception();
+					} else if (permission[1].trim().equalsIgnoreCase("2")) {
+						ReplayActivity.this.runOnUiThread(new Runnable() {
+							public void run() {
+								new AlertDialog.Builder(ReplayActivity.this)
+										.setTitle("Error")
+										.setMessage(
+												"No permission: another client with same IP address is running. "
+														+ "Wait for it to finish!\n"
+														+ "Click \"OK\" to go back.")
+										.setPositiveButton(
+												"OK",
+												new DialogInterface.OnClickListener() {
+													@Override
+													public void onClick(
+															DialogInterface dialog,
+															int which) {
+														queueCombined
+																.cancel(true);
+														if (queueCombined.channel
+																.equalsIgnoreCase("vpn"))
+															disconnectVPN();
+														ReplayActivity.this
+																.finish();
+													}
+												}).show();
+							}
+
+						});
+						throw new Exception();
 					} else {
-						Log.d("Error", "Unknown error!!!");
-						return null;
+						ReplayActivity.this.runOnUiThread(new Runnable() {
+							public void run() {
+								new AlertDialog.Builder(ReplayActivity.this)
+										.setTitle("Error")
+										.setMessage(
+												"Unknown error!\n"
+														+ "Click \"OK\" to go back.")
+										.setPositiveButton(
+												"OK",
+												new DialogInterface.OnClickListener() {
+													@Override
+													public void onClick(
+															DialogInterface dialog,
+															int which) {
+														queueCombined
+																.cancel(true);
+														if (queueCombined.channel
+																.equalsIgnoreCase("vpn"))
+															disconnectVPN();
+														ReplayActivity.this
+																.finish();
+													}
+												}).show();
+							}
+						});
 					}
 				} else {
 					Log.d("Replay", "Permission granted.");
@@ -1090,24 +1165,27 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				return super.onKeyDown(keyCode, event);
 			} else {
 				new AlertDialog.Builder(ReplayActivity.this)
-				.setTitle("Replay is ongoing!")
-				.setMessage("Do you want to stop the process?")
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						queueCombined.cancel(true);
-						if (queueCombined.channel.equalsIgnoreCase("vpn"))
-							disconnectVPN();
-						ReplayActivity.this.finish();
-					}
-				})
-				.setNegativeButton("No",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int which) {
-								// do nothing
-							}
-						}).show();
+						.setTitle("Replay is ongoing!")
+						.setMessage("Do you want to stop the process?")
+						.setPositiveButton("Yes",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										queueCombined.cancel(true);
+										if (queueCombined.channel
+												.equalsIgnoreCase("vpn"))
+											disconnectVPN();
+										ReplayActivity.this.finish();
+									}
+								})
+						.setNegativeButton("No",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										// do nothing
+									}
+								}).show();
 				/*Toast.makeText(context,
 						"Replay is ongoing! Please do not touch your phone!",
 						Toast.LENGTH_LONG).show();*/
