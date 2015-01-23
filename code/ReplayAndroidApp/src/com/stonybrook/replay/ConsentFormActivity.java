@@ -48,7 +48,7 @@ import com.stonybrook.android.data.VpnType;
 public class ConsentFormActivity extends Activity {
 
 	// @@@ this is consent form
-	public static final String STATUS = "MyPrefsFile";
+	public static final String STATUS = "ConsentFormPrefsFile";
 	Button agreeButton, disagreeButton;
 
 	SharedPreferences settings;
@@ -134,7 +134,7 @@ public class ConsentFormActivity extends Activity {
 							"We are going to install a certificate that allows our tests to run."
 									+ "When asked for a password,\n\nLEAVE THE PASSWORD FIELD EMPTY\n\n"
 									+ "and click \"OK\".\n\n"
-									+ "After installing, please click \"allow\" to allow our app to use it.")
+									+ "After installing, please click \"Allow\" to allow our app to use it.")
 					.setPositiveButton("Do not click me without reading the instruction!",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,

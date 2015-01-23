@@ -184,6 +184,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		// initialize mobilyzer
 		mobilyzer = new Mobilyzer(this.context);
 
+		Toast.makeText(context, "Please click \"Start\" to start the replay!",
+				Toast.LENGTH_LONG).show();
+
 	}
 
 	@Override
@@ -820,11 +823,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							}
 						}
 
-						// set progress bar to invisible
+						// make progress bar to be 100%
 						ReplayActivity.this.runOnUiThread(new Runnable() {
+							@Override
 							public void run() {
-								prgBar.setVisibility(View.GONE);
-								prgBar.setProgress(0);
+								// set progress bar to visible
+								if (prgBar.getVisibility() == View.GONE)
+									prgBar.setVisibility(View.VISIBLE);
+								prgBar.setProgress(100);
 							}
 						});
 
@@ -902,6 +908,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// closing side channel socket
 				sideChannel.closeSideChannelSocket();
+
+				// set progress bar to invisible
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						prgBar.setVisibility(View.GONE);
+						prgBar.setProgress(0);
+					}
+				});
 
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
@@ -1005,6 +1019,29 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				currentReplayCount = 0;
 				Log.d("Replay", "finished all replays!");
 				replayOngoing = false;
+
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						new AlertDialog.Builder(ReplayActivity.this)
+								.setTitle("Replay finished!")
+								.setMessage(
+										"Replay of all applications you have chosen is done!\n"
+												+ "We truly appreciate your support and contribution "
+												+ "to this research!\n\n"
+												+ "Thank you and have a nice day:)")
+								.setPositiveButton("Go back",
+										new DialogInterface.OnClickListener() {
+
+											@Override
+											public void onClick(
+													DialogInterface dialog,
+													int which) {
+												ReplayActivity.this.finish();
+											}
+										}).show();
+					}
+
+				});
 			}
 
 		} catch (Exception ex) {
@@ -1376,65 +1413,22 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	}
 
 	private String getPublicIP() {
-		String publicIP = "";
-		try {
-			HttpClient httpclient = new DefaultHttpClient();
-			HttpGet httpget = new HttpGet("http://myexternalip.com/raw");
-			HttpResponse response;
-			response = httpclient.execute(httpget);
-			HttpEntity entity = response.getEntity();
-			publicIP = EntityUtils.toString(entity).trim();
-		} catch (Exception e) {
-			Log.d("getPublicIP", "get public IP failed!");
-			e.printStackTrace();
+		String publicIP = null;
+		while (publicIP == null) {
+			try {
+				HttpClient httpclient = new DefaultHttpClient();
+				HttpGet httpget = new HttpGet("http://myexternalip.com/raw");
+				HttpResponse response;
+				response = httpclient.execute(httpget);
+				HttpEntity entity = response.getEntity();
+				publicIP = EntityUtils.toString(entity).trim();
+			} catch (Exception e) {
+				Log.d("getPublicIP", "get public IP failed!");
+				e.printStackTrace();
+			}
 		}
 
 		return publicIP;
-
-	}
-
-	// adrian: implemented and working
-	class VPNConnected extends AsyncTask<ReplayActivity, Void, Boolean> {
-
-		@Override
-		protected Boolean doInBackground(ReplayActivity... params) {
-
-			try {
-				int i = 0;
-				while (i < 16) {
-					i++;
-					Log.d("VPN", "about to get public IP");
-					String str = getPublicIP();
-					if (str.equalsIgnoreCase(meddleIP)) {
-						Log.d("VPN", "Got it!");
-						// Set flag indicating VPN connectivity status
-						isVPNConnected = true;
-
-						// Start the replay again for same app
-						// adrian: start the combined thread
-						if (currentTask.equalsIgnoreCase("combined")) {
-							queueCombined.cancel(true);
-							queueCombined = new QueueCombinedAsync(params[0],
-									selectedApps.get(currentReplayCount), "vpn");
-							Log.d("Replay", "Starting combined replay");
-							queueCombined.execute("");
-						} else {
-							Log.d("VPNConnected", "unknown replay type!");
-							return false;
-						}
-
-						break;
-					}
-					Thread.sleep(5000);
-					Log.d("VPN", "publicIP is: " + str);
-				}
-			} catch (Exception e) {
-				Log.d("VPN", "failed to get VPN IP address");
-				e.printStackTrace();
-			}
-			return true;
-
-		}
 
 	}
 
@@ -1472,6 +1466,74 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	}
 
+	// adrian: implemented and working
+	class VPNConnected extends AsyncTask<ReplayActivity, Void, Boolean> {
+
+		@Override
+		protected Boolean doInBackground(ReplayActivity... params) {
+
+			int i = 0;
+			while (i < 5) {
+				i++;
+				try {
+					Log.d("VPNConnected", "about to get public IP");
+					String str = getPublicIP();
+					if (str.equalsIgnoreCase(meddleIP)) {
+						Log.d("VPNConnected", "Got it!");
+						// Set flag indicating VPN connectivity status
+						isVPNConnected = true;
+
+						// Start the replay again for same app
+						// adrian: start the combined thread
+						if (currentTask.equalsIgnoreCase("combined")) {
+							queueCombined.cancel(true);
+							queueCombined = new QueueCombinedAsync(params[0],
+									selectedApps.get(currentReplayCount), "vpn");
+							Log.d("VPNConnected", "Starting combined replay");
+							queueCombined.execute("");
+						} else {
+							Log.d("VPNConnected", "unknown replay type!");
+							return false;
+						}
+
+						return true;
+					}
+					Thread.sleep(3000);
+					Log.d("VPNConnected", "Not yet! PublicIP is: " + str);
+				} catch (Exception e) {
+					Log.d("VPNConnected", "failed to get VPN IP address");
+					e.printStackTrace();
+				}
+			}
+
+			// show a dialogue to inform user
+			ReplayActivity.this.runOnUiThread(new Runnable() {
+				public void run() {
+					new AlertDialog.Builder(ReplayActivity.this)
+							.setTitle("Error")
+							.setMessage(
+									"Cannot connect to VPN!\n"
+											+ "Click \"OK\" to go back.")
+							.setPositiveButton("OK",
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											queueCombined.cancel(true);
+											ReplayActivity.this.finish();
+										}
+									}).show();
+				}
+
+			});
+
+			return false;
+
+		}
+
+	}
+
 	class VPNDisconnected extends AsyncTask<ReplayActivity, Void, Boolean> {
 
 		@Override
@@ -1485,7 +1547,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				e1.printStackTrace();
 			}
 
-			while (i < 16) {
+			while (i < 5) {
 				try {
 					i++;
 					String str = getPublicIP();
@@ -1514,7 +1576,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							return false;
 						}
 
-						break;
+						return true;
 
 					}
 				} catch (Exception e) {
@@ -1523,14 +1585,36 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				}
 
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					Log.d("DisconnectVPN", "sleep failed!");
-					// e.printStackTrace();
 				}
 			}
 
-			return true;
+			// show a dialogue to inform user
+			ReplayActivity.this.runOnUiThread(new Runnable() {
+				public void run() {
+					new AlertDialog.Builder(ReplayActivity.this)
+							.setTitle("Error")
+							.setMessage(
+									"Failed to disconnect VPN!\n"
+											+ "Click \"OK\" to go back.")
+							.setPositiveButton("OK",
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											queueCombined.cancel(true);
+											disconnectVPN();
+											ReplayActivity.this.finish();
+										}
+									}).show();
+				}
+
+			});
+
+			return false;
 
 		}
 

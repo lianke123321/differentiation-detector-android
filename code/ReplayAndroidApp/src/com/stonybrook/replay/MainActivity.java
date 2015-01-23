@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -58,6 +59,10 @@ import com.stonybrook.replay.parser.JSONParser;
 
 public class MainActivity extends Activity {
 
+	// add SharedPreferences for consent form
+	public static final String STATUS = "MainActPrefsFile";
+	SharedPreferences settings;
+
 	// GridView on Main Screen
 	GridView appList;
 	Button nextButton, settingsButton;
@@ -74,10 +79,6 @@ public class MainActivity extends Activity {
 
 	String server = null;
 	String enableTiming = null;
-
-	// @@@ add SharedPreferences for consent form
-	public static final String STATUS = "MyPrefsFile";
-	SharedPreferences settings;
 
 	String gateway = "replay.meddle.mobi";
 
@@ -144,20 +145,25 @@ public class MainActivity extends Activity {
 			settingsButton = (Button) findViewById(R.id.settingsButton);
 			settingsButton.setOnClickListener(settingsButtonclick);
 
-			KeyChain.choosePrivateKeyAlias(this,
-					new SelectUserCertOnClickListener(), // Callback
-					new String[] {}, // Any key types.
-					null, // Any issuers.
-					"localhost", // Any host
-					-1, // Any port
-					DEFAULT_ALIAS);
+			// to get certificate status
+			settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
+			boolean userAllowed = settings.getBoolean("userAllowed", false);
 
-			Toast.makeText(
-					context,
-					"Please understand that there will be a \"Network may be monitored\" "
-							+ "message in your notification area after you allow us to use "
-							+ "our certificate. Nothing to worry about :)",
-					Toast.LENGTH_LONG).show();
+			if (!userAllowed) {
+				KeyChain.choosePrivateKeyAlias(this,
+						new SelectUserCertOnClickListener(), // Callback
+						new String[] {}, // Any key types.
+						null, // Any issuers.
+						"localhost", // Any host
+						-1, // Any port
+						DEFAULT_ALIAS);
+
+				Toast.makeText(
+						context,
+						"Please click \"Allow\" to allow using certificate. "
+								+ "No need to worry about \"Network may be monitored\" "
+								+ "message :)", Toast.LENGTH_LONG).show();
+			}
 
 		} catch (Exception ex) {
 			Log.d(ReplayConstants.LOG_APPNAME,
@@ -177,11 +183,27 @@ public class MainActivity extends Activity {
 					final X509Certificate[] chain = KeyChain
 							.getCertificateChain(MainActivity.this, alias);
 
+					Editor editor = settings.edit();
+					editor.putBoolean("userAllowed", true);
+					editor.commit();
+
 				} catch (KeyChainException e) {
 					e.printStackTrace();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+			} else {
+				MainActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(MainActivity.this,
+								"Please allow us to use certificate!",
+								Toast.LENGTH_LONG).show();
+					}
+				});
+
+				Editor editor = settings.edit();
+				editor.putBoolean("userAllowed", false);
+				editor.commit();
 			}
 		}
 	}
@@ -191,8 +213,8 @@ public class MainActivity extends Activity {
 		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
 			super.onDestroy();
 			finish();
-			System.runFinalization();
-			System.exit(0);
+			/*System.runFinalization();
+			System.exit(0);*/
 		}
 		return super.onKeyDown(keyCode, event);
 	}
@@ -297,6 +319,24 @@ public class MainActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 
+			// check if user allowed to use certificate
+			boolean userAllowed = settings.getBoolean("userAllowed", false);
+			if (!userAllowed) {
+				KeyChain.choosePrivateKeyAlias(MainActivity.this,
+						new SelectUserCertOnClickListener(), // Callback
+						new String[] {}, // Any key types.
+						null, // Any issuers.
+						"localhost", // Any host
+						-1, // Any port
+						DEFAULT_ALIAS);
+
+				Toast.makeText(
+						context,
+						"Please click \"Allow\" to allow using certificate. "
+								+ "No need to worry about \"Network may be monitored\" "
+								+ "message :)", Toast.LENGTH_LONG).show();
+				return;
+			}
 			// Check to see if user has selected at least one app from the list.
 			if (selectedApps.size() == 0) {
 				Toast.makeText(MainActivity.this,

@@ -22,7 +22,7 @@
     <string name="pending">Waiting to start</string>
     <string name="start_replay">Starting the replay</string>
     <string name="processing">Running on Open</string>
-    <string name="vpn">Running on VPN</string>
+    <string name="vpn">Trying to connect to VPN</string>
     <string name="load_q">Loading the queue</string>
     <string name="create_side_channel">Creating side channel</string>
     <string name="ask4permission">Asking for permission</string>

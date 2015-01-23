@@ -138,42 +138,47 @@ public class CharonVpnService extends VpnService implements Runnable {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d("VPN", "start command");
-		if (intent != null) {
-			Bundle bundle = intent.getExtras();
-			VpnProfile profile = null;
+		try {
+			if (intent != null) {
+				Bundle bundle = intent.getExtras();
+				VpnProfile profile = null;
 
-			String action = (String) intent.getCharSequenceExtra("action");
-			//Log.d("action", action);
-			if (action.equalsIgnoreCase("stop")) {
-				setNextProfile(null);
-			} else {
-				if (bundle != null && mNextProfile == null) {
+				String action = (String) intent.getCharSequenceExtra("action");
+				// Log.d("action", action);
+				if (action.equalsIgnoreCase("stop")) {
+					setNextProfile(null);
+				} else {
+					if (bundle != null && mNextProfile == null) {
 
-					// Set up the following properties for VPN connection. Move
-					// this values to configuration properties file
-					profile = mDataSource.getAllVpnProfiles().get(0);
+						// Set up the following properties for VPN connection.
+						// Move
+						// this values to configuration properties file
+						profile = mDataSource.getAllVpnProfiles().get(0);
 
-					/*
-					profile = new VpnProfile();
-					profile.setName("meddle");
-					profile.setGateway("replay.meddle.mobi");
-					profile.setUserCertificateAlias("adrian-replay");
-					profile.setAutoReconnect(false);
-					profile.setURLAddress("www.google.com");
-					profile.setVpnType(VpnType.IKEV2_CERT);*/
+						/*
+						profile = new VpnProfile();
+						profile.setName("meddle");
+						profile.setGateway("replay.meddle.mobi");
+						profile.setUserCertificateAlias("adrian-replay");
+						profile.setAutoReconnect(false);
+						profile.setURLAddress("www.google.com");
+						profile.setVpnType(VpnType.IKEV2_CERT);*/
 
-					/*if (profile != null) {
-						String password = bundle
-								.getString(VpnProfileDataSource.KEY_PASSWORD);
-						profile.setPassword(password);
-						profile.setUsername(bundle
-								.getString(VpnProfileDataSource.KEY_USERNAME));
-					}*/
+						/*if (profile != null) {
+							String password = bundle
+									.getString(VpnProfileDataSource.KEY_PASSWORD);
+							profile.setPassword(password);
+							profile.setUsername(bundle
+									.getString(VpnProfileDataSource.KEY_USERNAME));
+						}*/
 
-					setNextProfile(profile);
+						setNextProfile(profile);
+					}
 				}
-			}
 
+			}
+		} catch (NullPointerException e) {
+			Log.e("VPN", "failed to connect VPN!");
 		}
 		return START_NOT_STICKY;
 	}
