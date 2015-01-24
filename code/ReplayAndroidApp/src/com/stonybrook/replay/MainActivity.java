@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
 	 * We can provide email account here on which VPN logs can be received
 	 */
 	public static final String CONTACT_EMAIL = "demo@gmail.com";
-	private static final String DEFAULT_ALIAS = "replay-cert";
+	private static final String DEFAULT_ALIAS = "replay";
 
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
 
@@ -306,15 +306,21 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
-			downloadAndInstallVpnCreds();
+			boolean userAllowed = settings.getBoolean("userAllowed", false);
+			if (!userAllowed) {
+				downloadAndInstallVpnCreds();
 
-			KeyChain.choosePrivateKeyAlias(MainActivity.this,
-					new SelectUserCertOnClickListener(), // Callback
-					new String[] {}, // Any key types.
-					null, // Any issuers.
-					"localhost", // Any host
-					-1, // Any port
-					DEFAULT_ALIAS);
+				KeyChain.choosePrivateKeyAlias(MainActivity.this,
+						new SelectUserCertOnClickListener(), // Callback
+						new String[] { "RSA" }, // Any key types.
+						null, // Any issuers.
+						"localhost", // Any host
+						-1, // Any port
+						null);
+			} else {
+				Toast.makeText(context, "Certificate has already been installed!",
+						Toast.LENGTH_LONG).show();
+			}
 		}
 
 	};
@@ -334,11 +340,11 @@ public class MainActivity extends Activity {
 			if (!userAllowed) {
 				KeyChain.choosePrivateKeyAlias(MainActivity.this,
 						new SelectUserCertOnClickListener(), // Callback
-						new String[] {}, // Any key types.
+						new String[] { "RSA" }, // Any key types.
 						null, // Any issuers.
 						"localhost", // Any host
 						-1, // Any port
-						DEFAULT_ALIAS);
+						null);
 
 				Toast.makeText(
 						context,
@@ -512,7 +518,7 @@ public class MainActivity extends Activity {
 			JSONObject json = null;
 			try {
 				json = new JSONObject(getWebPage("http://" + gateway
-						+ ":50080/dyn/getTempCertNoPass"));
+						+ ":50080/dyn/getTempCertNoPassRandom"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

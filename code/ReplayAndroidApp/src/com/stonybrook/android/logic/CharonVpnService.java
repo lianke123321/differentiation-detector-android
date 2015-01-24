@@ -559,6 +559,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 	private byte[][] getUserCertificate() throws KeyChainException,
 			InterruptedException, CertificateEncodingException {
 		ArrayList<byte[]> encodings = new ArrayList<byte[]>();
+		Log.d("CharonVpnService", mCurrentUserCertificateAlias);
 		X509Certificate[] chain = KeyChain.getCertificateChain(
 				getApplicationContext(), mCurrentUserCertificateAlias);
 		if (chain == null || chain.length == 0) {

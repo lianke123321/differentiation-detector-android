@@ -329,7 +329,7 @@ public class ConsentFormActivity extends Activity {
 			JSONObject json = null;
 			try {
 				json = new JSONObject(getWebPage("http://" + gateway
-						+ ":50080/dyn/getTempCertNoPass"));
+						+ ":50080/dyn/getTempCertNoPassRandom"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
