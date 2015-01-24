@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,33 +34,27 @@ public class CombinedSideChannel {
 
 	// SocketInstance instance;
 
-	public CombinedSideChannel(SocketInstance instance, String id) {
+	public CombinedSideChannel(SocketInstance instance, String id)
+			throws Exception {
 		this.id = id;
 		// this.instance = instance;
-		try {
 
-			socket = new Socket();
-			// channel = SocketChannel.open();
-			InetSocketAddress endPoint = new InetSocketAddress(
-					instance.getIP(), instance.getPort());
-			socket.setTcpNoDelay(true);
-			// channel.socket().setTcpNoDelay(true);
-			socket.setReuseAddress(true);
-			// channel.socket().setReuseAddress(true);
-			socket.setKeepAlive(true);
-			// channel.socket().setKeepAlive(true);
-			// channel.configureBlocking(false);
+		socket = new Socket();
+		// channel = SocketChannel.open();
+		InetSocketAddress endPoint = new InetSocketAddress(instance.getIP(),
+				instance.getPort());
+		socket.setTcpNoDelay(true);
+		// channel.socket().setTcpNoDelay(true);
+		socket.setReuseAddress(true);
+		// channel.socket().setReuseAddress(true);
+		socket.setKeepAlive(true);
+		// channel.socket().setKeepAlive(true);
+		// channel.configureBlocking(false);
 
-			socket.connect(endPoint);
-			// channel.connect(endPoint);
-			dataOutputStream = new DataOutputStream(socket.getOutputStream());
-			dataInputStream = new DataInputStream(socket.getInputStream());
-
-		} catch (SocketException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		socket.connect(endPoint);
+		// channel.connect(endPoint);
+		dataOutputStream = new DataOutputStream(socket.getOutputStream());
+		dataInputStream = new DataInputStream(socket.getInputStream());
 
 	}
 
@@ -107,7 +100,7 @@ public class CombinedSideChannel {
 			deviceInfo.put("locationInfo", locationInfo);
 
 			Log.d("sendMobileStats", deviceInfo.toString());
-			
+
 			sendObject("WillSendMobileStats".getBytes(), objLen);
 			sendObject(deviceInfo.toString().getBytes(), objLen);
 
@@ -134,8 +127,7 @@ public class CombinedSideChannel {
 
 	public HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> receivePortMappingNonBlock()
 			throws Exception {
-		HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> ports =
-				new HashMap<String, HashMap<String, HashMap<String, ServerInstance>>>();
+		HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> ports = new HashMap<String, HashMap<String, HashMap<String, ServerInstance>>>();
 		byte[] data = receiveObject(objLen);
 
 		/*
@@ -155,14 +147,12 @@ public class CombinedSideChannel {
 		JSONObject jObject = new JSONObject(tempStr);
 		Iterator<String> keys = jObject.keys();
 		while (keys.hasNext()) {
-			HashMap<String, HashMap<String, ServerInstance>> tempHolder =
-					new HashMap<String, HashMap<String, ServerInstance>>();
+			HashMap<String, HashMap<String, ServerInstance>> tempHolder = new HashMap<String, HashMap<String, ServerInstance>>();
 			String key = keys.next();
 			JSONObject firstLevel = (JSONObject) jObject.get(key);
 			Iterator<String> firstLevelKeys = firstLevel.keys();
 			while (firstLevelKeys.hasNext()) {
-				HashMap<String, ServerInstance> tempHolder1 =
-						new HashMap<String, ServerInstance>();
+				HashMap<String, ServerInstance> tempHolder1 = new HashMap<String, ServerInstance>();
 				String key1 = firstLevelKeys.next();
 				JSONObject secondLevel = (JSONObject) firstLevel.get(key1);
 				Iterator<String> secondLevelKeys = secondLevel.keys();
@@ -231,14 +221,14 @@ public class CombinedSideChannel {
 			int i;
 			String sentJitter = "";
 			String rcvdJitter = "";
-			
+
 			if ((jitterBean.sentJitter.size() != jitterBean.sentPayload.size())
 					|| (jitterBean.rcvdJitter.size() != jitterBean.rcvdPayload
 							.size())) {
 				Log.d("sendJitter", "size does not match!");
 				return;
 			}
-			
+
 			if (jitterBean.sentJitter.size() > 0) {
 				sentJitter += (jitterBean.sentJitter.get(0) + "\t" + UtilsManager
 						.getUnsignedInt(Arrays.hashCode(jitterBean.sentPayload
@@ -250,19 +240,20 @@ public class CombinedSideChannel {
 									.hashCode(jitterBean.sentPayload.get(i))));
 				}
 			}
-			
+
 			if (jitterBean.rcvdJitter.size() > 0) {
 				rcvdJitter += (jitterBean.rcvdJitter.get(0) + "\t" + UtilsManager
 						.getUnsignedInt(Arrays.hashCode(jitterBean.rcvdPayload
 								.get(0))));
-				//Log.d("rcvdJitter", String.valueOf(jitterBean.rcvdJitter.size()));
+				// Log.d("rcvdJitter",
+				// String.valueOf(jitterBean.rcvdJitter.size()));
 				for (i = 1; i < jitterBean.rcvdJitter.size(); i++) {
 					rcvdJitter += ("\n" + jitterBean.rcvdJitter.get(i) + "\t" + UtilsManager
 							.getUnsignedInt(Arrays
 									.hashCode(jitterBean.rcvdPayload.get(i))));
 				}
 			}
-			
+
 			sendObject(sentJitter.getBytes(), objLen);
 			sendObject(rcvdJitter.getBytes(), objLen);
 		}

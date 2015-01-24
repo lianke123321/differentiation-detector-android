@@ -56,6 +56,7 @@ import com.stonybrook.replay.bean.ApplicationBean;
 import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.parser.JSONParser;
+import com.stonybrook.replay.util.Config;
 
 public class MainActivity extends Activity {
 
@@ -80,7 +81,7 @@ public class MainActivity extends Activity {
 	String server = null;
 	String enableTiming = null;
 
-	String gateway = "replay.meddle.mobi";
+	String gateway = null;
 
 	// Remove this
 	// @SuppressLint("NewApi")
@@ -104,6 +105,15 @@ public class MainActivity extends Activity {
 		 * StrictMode.ThreadPolicy.Builder().permitAll().build();
 		 * StrictMode.setThreadPolicy(policy);
 		 */
+		// get vpn server hostname
+		try {
+			Config.readConfigFile(ReplayConstants.CONFIG_FILE,
+					getApplicationContext());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			this.finish();
+		}
+		gateway = Config.get("vpn_server");
 
 		try {
 			/*
@@ -147,7 +157,7 @@ public class MainActivity extends Activity {
 
 			// to get certificate status
 			settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
-			boolean userAllowed = settings.getBoolean("userAllowed", false);
+			/*boolean userAllowed = settings.getBoolean("userAllowed", false);
 
 			if (!userAllowed) {
 				KeyChain.choosePrivateKeyAlias(this,
@@ -163,7 +173,7 @@ public class MainActivity extends Activity {
 						"Please click \"Allow\" to allow using certificate. "
 								+ "No need to worry about \"Network may be monitored\" "
 								+ "message :)", Toast.LENGTH_LONG).show();
-			}
+			}*/
 
 		} catch (Exception ex) {
 			Log.d(ReplayConstants.LOG_APPNAME,
@@ -337,6 +347,7 @@ public class MainActivity extends Activity {
 								+ "message :)", Toast.LENGTH_LONG).show();
 				return;
 			}
+
 			// Check to see if user has selected at least one app from the list.
 			if (selectedApps.size() == 0) {
 				Toast.makeText(MainActivity.this,

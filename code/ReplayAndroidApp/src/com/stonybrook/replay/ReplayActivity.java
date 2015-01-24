@@ -1,5 +1,6 @@
 package com.stonybrook.replay;
 
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
@@ -61,7 +62,6 @@ import com.stonybrook.replay.combined.CombinedNotifierThread;
 import com.stonybrook.replay.combined.CombinedQueue;
 import com.stonybrook.replay.combined.CombinedReceiverThread;
 import com.stonybrook.replay.combined.CombinedSideChannel;
-import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.Mobilyzer;
@@ -93,7 +93,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	String server = null;
 	String enableTiming = null;
 
-	String GATE_WAY = "replay.meddle.mobi";
+	String GATE_WAY = Config.get("vpn_server");
 	String meddleIP = null;
 
 	// This is AsyncTasks for replay. Run in background.
@@ -234,7 +234,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			 * Read configuration file and long it into Config object.
 			 * Configuration file is located in assets/configuration.properties.
 			 */
-			Config.readConfigFile(ReplayConstants.CONFIG_FILE, context);
+			// Config.readConfigFile(ReplayConstants.CONFIG_FILE, context);
 
 			Config.set("timing", enableTiming);
 
@@ -368,9 +368,30 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						android.R.anim.slide_in_left,
 						android.R.anim.slide_out_right);
 			} else
-				Toast.makeText(context,
-						"Replay is ongoing! Please do not touch any buttons.",
-						Toast.LENGTH_LONG).show();
+				new AlertDialog.Builder(ReplayActivity.this)
+						.setTitle("Replay is ongoing!")
+						.setMessage("Do you want to stop the process?")
+						.setPositiveButton("Yes",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										queueCombined.cancel(true);
+										disconnectVPN();
+										ReplayActivity.this.finish();
+										ReplayActivity.this
+												.overridePendingTransition(
+														android.R.anim.slide_in_left,
+														android.R.anim.slide_out_right);
+									}
+								})
+						.setNegativeButton("No",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										// do nothing
+									}
+								}).show();
 		}
 	};
 
@@ -381,11 +402,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		public void onClick(View v) {
-			if (!replayOngoing)
+			if (!replayOngoing) {
+				currentReplayCount = 0;
 				processApplicationReplay();
-			else
+			} else
 				Toast.makeText(context,
-						"Replay is ongoing! Please do not touch any buttons.",
+						"Replay is ongoing! Please do not start again.",
 						Toast.LENGTH_LONG).show();
 		}
 	};
@@ -599,9 +621,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 															int which) {
 														queueCombined
 																.cancel(true);
-														if (queueCombined.channel
-																.equalsIgnoreCase("vpn"))
-															disconnectVPN();
+														disconnectVPN();
 														ReplayActivity.this
 																.finish();
 													}
@@ -628,9 +648,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 															int which) {
 														queueCombined
 																.cancel(true);
-														if (queueCombined.channel
-																.equalsIgnoreCase("vpn"))
-															disconnectVPN();
+														disconnectVPN();
 														ReplayActivity.this
 																.finish();
 													}
@@ -656,9 +674,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 															int which) {
 														queueCombined
 																.cancel(true);
-														if (queueCombined.channel
-																.equalsIgnoreCase("vpn"))
-															disconnectVPN();
+														disconnectVPN();
 														ReplayActivity.this
 																.finish();
 													}
@@ -917,6 +933,19 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				});
 
+			} catch (ConnectException ce) {
+				Log.d("Replay", "Server unavailable!");
+				ce.printStackTrace();
+				success = false;
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(
+								context,
+								"Sorry, our server is currently not running. "
+										+ "Please try another time.",
+								Toast.LENGTH_LONG).show();
+					}
+				});
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
 				ex.printStackTrace();
@@ -924,7 +953,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				success = false;
 				Log.d("Replay", "bad things happened, quiting process");
 				ex.printStackTrace();
-
 			}
 			Log.d("Replay", "queueCombined finished execution!");
 			return null;
@@ -977,8 +1005,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		try {
 			// If there was error. Display message and stop processing further.
 			if (!success) {
-				Toast.makeText(context,
-						"An error happened during replay! Please try again!",
+				Toast.makeText(context, "An error happened during replay!",
 						Toast.LENGTH_LONG).show();
 				disconnectVPN();
 
@@ -1127,8 +1154,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				(new VPNConnected()).execute(this);
 
 			} else {
-				Toast.makeText(context,
-						"An error happened during replay! Please try again!",
+				Toast.makeText(context, "An error happened during replay!",
 						Toast.LENGTH_LONG).show();
 
 				// Update status on screen and stop processing
@@ -1212,10 +1238,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									public void onClick(DialogInterface dialog,
 											int which) {
 										queueCombined.cancel(true);
-										if (queueCombined.channel
-												.equalsIgnoreCase("vpn"))
-											disconnectVPN();
+										disconnectVPN();
 										ReplayActivity.this.finish();
+										ReplayActivity.this
+												.overridePendingTransition(
+														android.R.anim.slide_in_left,
+														android.R.anim.slide_out_right);
 									}
 								})
 						.setNegativeButton("No",
@@ -1225,9 +1253,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 										// do nothing
 									}
 								}).show();
-				/*Toast.makeText(context,
-						"Replay is ongoing! Please do not touch your phone!",
-						Toast.LENGTH_LONG).show();*/
+
 				return true;
 			}
 		}
@@ -1351,8 +1377,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// a alert dialog will pop up and the app will quite if user
 				// click "Cancel" for trust permission
 				AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-				alertDialog.setMessage(
-						"Connecting VPN failed. Replay aborted.")
+				alertDialog
+						.setMessage("Connecting VPN failed. Replay aborted.")
 						.setNeutralButton("OK",
 								new DialogInterface.OnClickListener() {
 

@@ -155,22 +155,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 						// this values to configuration properties file
 						profile = mDataSource.getAllVpnProfiles().get(0);
 
-						/*
-						profile = new VpnProfile();
-						profile.setName("meddle");
-						profile.setGateway("replay.meddle.mobi");
-						profile.setUserCertificateAlias("adrian-replay");
-						profile.setAutoReconnect(false);
-						profile.setURLAddress("www.google.com");
-						profile.setVpnType(VpnType.IKEV2_CERT);*/
-
-						/*if (profile != null) {
-							String password = bundle
-									.getString(VpnProfileDataSource.KEY_PASSWORD);
-							profile.setPassword(password);
-							profile.setUsername(bundle
-									.getString(VpnProfileDataSource.KEY_USERNAME));
-						}*/
+						
 
 						setNextProfile(profile);
 					}

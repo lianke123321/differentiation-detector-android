@@ -44,6 +44,8 @@ import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
 import com.stonybrook.android.data.VpnType;
+import com.stonybrook.replay.constant.ReplayConstants;
+import com.stonybrook.replay.util.Config;
 
 public class ConsentFormActivity extends Activity {
 
@@ -53,13 +55,23 @@ public class ConsentFormActivity extends Activity {
 
 	SharedPreferences settings;
 
-	String gateway = "replay.meddle.mobi";
+	String gateway = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
+		
+		// get vpn server hostname
+		try {
+			Config.readConfigFile(ReplayConstants.CONFIG_FILE,
+					getApplicationContext());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			this.finish();
+		}
+		this.gateway = Config.get("vpn_server");
+		
 		// Get "userAgreed" value. If the value doesn't exist yet false is
 		// returned
 		settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
@@ -99,7 +111,7 @@ public class ConsentFormActivity extends Activity {
 			Editor editor = settings.edit();
 			editor.putBoolean("userAgreed", false);
 			editor.commit();
-			
+
 			finish();
 		}
 		return super.onKeyDown(keyCode, event);
@@ -133,9 +145,9 @@ public class ConsentFormActivity extends Activity {
 					.setMessage(
 							"We are going to install a certificate that allows our tests to run."
 									+ "When asked for a password,\n\nLEAVE THE PASSWORD FIELD EMPTY\n\n"
-									+ "and click \"OK\".\n\n"
-									+ "After installing, please click \"Allow\" to allow our app to use it.")
-					.setPositiveButton("Do not click me without reading the instruction!",
+									+ "and click \"OK\".")
+					.setPositiveButton(
+							"Do not click me without reading the instruction!",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int which) {

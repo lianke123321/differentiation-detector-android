@@ -61,8 +61,6 @@
     <string name="server_adrian_local">10.0.1.16</string>
     <string name="server_meddle2">54.163.170.96</string>
     <string name="server_meddle1">54.160.198.73</string>
-    <string name="server_rajesh_ec2">54.186.125.120</string>
-    <string name="server_something_else">54.186.125.120</string>
     <string name="appSizeLabel">Size:</string>
     <string name="appTimeLabel">Time:</string>
     

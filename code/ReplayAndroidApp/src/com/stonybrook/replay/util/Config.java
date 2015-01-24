@@ -15,7 +15,7 @@ import android.util.Log;
 public class Config {
 	
 	static private Context context = null;
-	static private Properties properties = properties = new Properties();
+	static private Properties properties = new Properties();
 
 	static int maxlen = 0;
 
