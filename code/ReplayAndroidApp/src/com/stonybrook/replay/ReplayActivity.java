@@ -1636,6 +1636,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							.setTitle("Error")
 							.setMessage(
 									"Cannot connect to VPN!\n"
+											+ "Please try rebooting your phone.\n\n"
 											+ "Click \"OK\" to go back.")
 							.setPositiveButton("OK",
 									new DialogInterface.OnClickListener() {
