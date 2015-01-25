@@ -30,7 +30,7 @@
             android:prompt="@string/timing_label" />
 
         <TextView
-            android:id="@+id/mainPageTitleTextView1"
+            android:id="@+id/selectServerTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
@@ -47,6 +47,33 @@
             android:entries="@array/server"
             android:padding="10dp"
             android:prompt="@string/server_label" />
+        
+        <TextView
+            android:id="@+id/selectIterationTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/select_iteration"
+            android:textColor="@color/blue11"
+            android:textSize="@dimen/main_title_text_size"
+            android:textStyle="bold" />
+        
+        <Spinner
+            android:id="@+id/settings_iteration"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:entries="@array/iteration"
+            android:padding="10dp"
+            android:prompt="@string/select_iteration" />
+        
+        <CheckBox 
+            android:id="@+id/selectRandomCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="10dp"
+            android:text="@string/select_random" />
         
         <TextView 
             android:id = "@+id/installCertTextView"

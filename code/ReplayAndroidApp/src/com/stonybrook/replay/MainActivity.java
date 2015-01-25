@@ -44,6 +44,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -73,13 +74,15 @@ public class MainActivity extends Activity {
 	/**
 	 * We can provide email account here on which VPN logs can be received
 	 */
-	public static final String CONTACT_EMAIL = "demo@gmail.com";
+	public static final String CONTACT_EMAIL = "lianke123321@gmail.com";
 	private static final String DEFAULT_ALIAS = "replay";
 
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
 
 	String server = null;
 	String enableTiming = null;
+	int iteration = 1;
+	boolean doRandom = false;
 
 	String gateway = null;
 
@@ -240,7 +243,7 @@ public class MainActivity extends Activity {
 			// Creating dialog to display to use
 			AlertDialog.Builder builder = new AlertDialog.Builder(
 					MainActivity.this);
-			builder.setTitle("Settings");
+			// builder.setTitle("Settings");
 
 			/**
 			 * Select which layout to use. For this dialog, settings_layout.xml
@@ -256,8 +259,12 @@ public class MainActivity extends Activity {
 					.findViewById(R.id.settings_timing);
 			final Spinner spinnerServer = (Spinner) view
 					.findViewById(R.id.settings_server);
+			final Spinner spinnerIteration = (Spinner) view
+					.findViewById(R.id.settings_iteration);
+			final CheckBox checkBoxRandom = (CheckBox) view
+					.findViewById(R.id.selectRandomCheckBox);
 
-			// adrian: set installCert button
+			// set installCert button
 			final Button installCertButton = (Button) view
 					.findViewById(R.id.installCertButton);
 			installCertButton.setOnClickListener(installOnClick);
@@ -280,8 +287,14 @@ public class MainActivity extends Activity {
 							server = (String) spinnerServer.getSelectedItem();
 							enableTiming = (String) spinnerTiming
 									.getSelectedItem();
-							/*if(!txtServer.getText().toString().trim().isEmpty())
-								server = txtServer.getText().toString().trim();*/
+							iteration = Integer
+									.parseInt((String) spinnerIteration
+											.getSelectedItem());
+							doRandom = checkBoxRandom.isChecked();
+							/*Log.d("MainActivity",
+									"Iteration time: "
+											+ String.valueOf(iteration));*/
+
 							dialog.dismiss();
 						}
 					});
@@ -318,7 +331,8 @@ public class MainActivity extends Activity {
 						-1, // Any port
 						null);
 			} else {
-				Toast.makeText(context, "Certificate has already been installed!",
+				Toast.makeText(context,
+						"Certificate has already been installed!",
 						Toast.LENGTH_LONG).show();
 			}
 		}
@@ -377,6 +391,8 @@ public class MainActivity extends Activity {
 
 			intent.putExtra("server", server);
 			intent.putExtra("timing", enableTiming);
+			intent.putExtra("iteration", iteration);
+			intent.putExtra("doRandom", doRandom);
 
 			// Start ReplayActivity with slideIn animation.
 			startActivity(intent);

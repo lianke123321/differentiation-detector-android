@@ -85,13 +85,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	ProgressBar prgBar;
 	UpdateUIBean updateUIBean;
 
-	// ProgressDialog progressWait = null;
 	int currentReplayCount = 0;
+	int currentIterationCount = 0;
 	ProgressBar progressBar = null;
 	ImageReplayListAdapter adapter = null;
 
 	String server = null;
 	String enableTiming = null;
+	int iteration = 1;
+	boolean doRandom = false;
 
 	String GATE_WAY = Config.get("vpn_server");
 	String meddleIP = null;
@@ -147,6 +149,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		(new GetReplayServerAndMeddleIP()).execute("");
 
 		enableTiming = (String) getIntent().getStringExtra("timing");
+		iteration = (int) getIntent().getIntExtra("iteration", 1);
+		doRandom = getIntent().getBooleanExtra("doRandom", false);
+		Log.d("ReplayActivity", "iteration: " + String.valueOf(iteration)
+				+ " doRandom: " + doRandom);
 
 		// Create layout for this page
 		adapter = new ImageReplayListAdapter(selectedApps, getLayoutInflater(),
@@ -548,6 +554,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected String doInBackground(String... str) {
+
+			if (channel.equalsIgnoreCase("open") && currentIterationCount == 0) {
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(ReplayActivity.this,
+								"First iteration of current replay!",
+								Toast.LENGTH_LONG).show();
+					}
+				});
+			}
+
 			this.appData = appData_combined;
 			HashMap<String, CTCPClient> CSPairMapping = new HashMap<String, CTCPClient>();
 			// adrian: create a hash map for udp
@@ -629,6 +646,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							}
 
 						});
+						Thread.sleep(30000);
 						throw new Exception();
 					} else if (permission[1].trim().equalsIgnoreCase("2")) {
 						ReplayActivity.this.runOnUiThread(new Runnable() {
@@ -656,6 +674,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							}
 
 						});
+						Thread.sleep(30000);
 						throw new Exception();
 					} else {
 						ReplayActivity.this.runOnUiThread(new Runnable() {
@@ -681,6 +700,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												}).show();
 							}
 						});
+						Thread.sleep(30000);
+						throw new Exception();
 					}
 				} else {
 					Log.d("Replay", "Permission granted.");
@@ -957,7 +978,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			Log.d("Replay", "queueCombined finished execution!");
 			return null;
 		}
-
 	}
 
 	// here i kept the old version, (all on open)->(all over vpn)
@@ -1005,10 +1025,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		try {
 			// If there was error. Display message and stop processing further.
 			if (!success) {
-				Toast.makeText(context, "An error happened during replay!",
-						Toast.LENGTH_LONG).show();
-				disconnectVPN();
-
 				// Update status on screen and stop processing
 				selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
@@ -1016,6 +1032,59 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				adapter.notifyDataSetChanged();
 
 				replayOngoing = false;
+
+				new AlertDialog.Builder(ReplayActivity.this)
+						.setTitle("Replay aborted!")
+						.setMessage(
+								"There is an error happened during replay and caused "
+										+ "replay to stop. All previous successful "
+										+ "replays are still recorded in our server.\n"
+										+ "You could try it again.\n\n"
+										+ "Thank you for your support and contribution "
+										+ "to this research!")
+						.setPositiveButton("Go back",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										queueCombined.cancel(true);
+										disconnectVPN();
+										ReplayActivity.this.finish();
+										ReplayActivity.this
+												.overridePendingTransition(
+														android.R.anim.slide_in_left,
+														android.R.anim.slide_out_right);
+									}
+								}).show();
+
+				return;
+			}
+
+			// updating progress
+			selectedApps.get(currentReplayCount).status = getResources()
+					.getString(R.string.disconnect_vpn);
+			adapter.notifyDataSetChanged();
+
+			disconnectVPN();
+			currentIterationCount++;
+
+			if (currentIterationCount != iteration) {
+
+				// tell user current iteration
+				if (currentIterationCount == 1)
+					Toast.makeText(ReplayActivity.this,
+							"Second iteration of current replay!",
+							Toast.LENGTH_LONG).show();
+				else if (currentIterationCount == 2)
+					Toast.makeText(ReplayActivity.this,
+							"Third iteration of current replay!",
+							Toast.LENGTH_LONG).show();
+				else {
+					Log.w("Replay", "Iteration number exceeds!");
+					System.exit(0);
+				}
+
+				(new VPNDisconnected()).execute(this);
 				return;
 			}
 
@@ -1030,7 +1099,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					.getString(R.string.finish_vpn);
 			adapter.notifyDataSetChanged();
 
-			disconnectVPN();
+			// initialize this for the next application
+			currentIterationCount = 0;
 
 			// If there are more apps that require processing then start with
 			// those.
@@ -1038,6 +1108,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// (new StartNextApp()).execute(this);
 				// processCombinedApplication(selectedApps.get(++currentReplayCount),
 				// "vpn");
+				currentReplayCount++;
 				(new VPNDisconnected()).execute(this);
 			} else {
 				// progressWait.setMessage("Finishing Analysis...");
@@ -1055,7 +1126,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 										"Replay of all applications you have chosen is done!\n"
 												+ "We truly appreciate your support and contribution "
 												+ "to this research!\n\n"
-												+ "Thank you and have a nice day:)")
+												+ "Thank you and have a nice day :-)")
 								.setPositiveButton("Go back",
 										new DialogInterface.OnClickListener() {
 
@@ -1064,6 +1135,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 													DialogInterface dialog,
 													int which) {
 												ReplayActivity.this.finish();
+												ReplayActivity.this
+														.overridePendingTransition(
+																android.R.anim.slide_in_left,
+																android.R.anim.slide_out_right);
 											}
 										}).show();
 					}
@@ -1154,15 +1229,37 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				(new VPNConnected()).execute(this);
 
 			} else {
-				Toast.makeText(context, "An error happened during replay!",
-						Toast.LENGTH_LONG).show();
-
 				// Update status on screen and stop processing
 				selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
 				replayOngoing = false;
+
+				new AlertDialog.Builder(ReplayActivity.this)
+						.setTitle("Replay aborted!")
+						.setMessage(
+								"There is an error happened during replay and caused "
+										+ "replay to stop. All previous successful "
+										+ "replays are still recorded in our server.\n"
+										+ "You could try it again.\n\n"
+										+ "Thank you for your support and contribution "
+										+ "to this research!")
+						.setPositiveButton("Go back",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										queueCombined.cancel(true);
+										disconnectVPN();
+										ReplayActivity.this.finish();
+										ReplayActivity.this
+												.overridePendingTransition(
+														android.R.anim.slide_in_left,
+														android.R.anim.slide_out_right);
+									}
+								}).show();
+				return;
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -1449,7 +1546,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				HttpEntity entity = response.getEntity();
 				publicIP = EntityUtils.toString(entity).trim();
 			} catch (Exception e) {
-				Log.d("getPublicIP", "get public IP failed!");
+				Log.w("getPublicIP", "failed to get public IP!");
 				e.printStackTrace();
 			}
 		}
@@ -1587,8 +1684,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						if (currentTask.equalsIgnoreCase("combined")) {
 							appData_combined = UnpickleDataStream
 									.unpickleCombinedJSON(
-											selectedApps.get(
-													++currentReplayCount)
+											selectedApps
+													.get(currentReplayCount)
 													.getDataFile(), context);
 							Log.d("DisconnectVPN", "loaded json!");
 							queueCombined.cancel(true);
@@ -1607,7 +1704,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				} catch (Exception e) {
 					Log.d("DisconnectVPN", "failed to get VPN IP address");
-					// e.printStackTrace();
+					e.printStackTrace();
 				}
 
 				try {

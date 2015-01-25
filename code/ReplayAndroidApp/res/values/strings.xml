@@ -23,6 +23,7 @@
     <string name="start_replay">Starting the replay</string>
     <string name="processing">Running on Open</string>
     <string name="vpn">Trying to connect to VPN</string>
+    <string name="disconnect_vpn">Disconnecting VPN</string>
     <string name="load_q">Loading the queue</string>
     <string name="create_side_channel">Creating side channel</string>
     <string name="ask4permission">Asking for permission</string>
@@ -61,6 +62,11 @@
     <string name="server_adrian_local">10.0.1.16</string>
     <string name="server_meddle2">54.163.170.96</string>
     <string name="server_meddle1">54.160.198.73</string>
+    <string name="select_iteration">Select Iteration Times</string>
+    <string name="iteration_1">1</string>
+    <string name="iteration_2">2</string>
+    <string name="iteration_3">3</string>
+    <string name="select_random">Check me if you also want to run random replay for each application.</string>
     <string name="appSizeLabel">Size:</string>
     <string name="appTimeLabel">Time:</string>
     
