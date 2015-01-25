@@ -191,11 +191,11 @@ public class MainActivity extends Activity {
 			KeyChainAliasCallback {
 		@Override
 		public void alias(final String alias) {
+			Log.d("cert", "in");
 			if (alias != null) {
 				try {
 					final X509Certificate[] chain = KeyChain
 							.getCertificateChain(MainActivity.this, alias);
-
 					Editor editor = settings.edit();
 					editor.putBoolean("userAllowed", true);
 					editor.commit();
