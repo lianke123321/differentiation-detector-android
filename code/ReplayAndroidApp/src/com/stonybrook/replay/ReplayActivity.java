@@ -236,11 +236,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		replayOngoing = true;
 
 		try {
-			/**
-			 * Read configuration file and long it into Config object.
-			 * Configuration file is located in assets/configuration.properties.
-			 */
-			// Config.readConfigFile(ReplayConstants.CONFIG_FILE, context);
 
 			Config.set("timing", enableTiming);
 
@@ -251,11 +246,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			Config.set("server", server);
 
 			// adrian: added cause arash's code
-			Config.set("extraString", "MoblieApp");
-			Config.set("jitter", "true");
-			Config.set("sendMobileStats", "true");
+			// Config.set("extraString", "MoblieApp");
+			// Config.set("jitter", "true");
+			// Config.set("sendMobileStats", "true");
 			// adrian: set result
-			Config.set("result", "false");
+			// Config.set("result", "false");
 			// adrian: set public IP
 			Config.set("publicIP", "");
 			new Thread(new Runnable() {
@@ -295,7 +290,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						selectedApps.get(currentReplayCount), "open");
 			} else {
 				Toast.makeText(ReplayActivity.this,
-						"Server Not Available. Try after some time.",
+						"Sorry, server is not available. Try after some time.",
 						Toast.LENGTH_LONG).show();
 			}
 
@@ -591,9 +586,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				int sideChannelPort = Integer.valueOf(Config
 						.get("combined_sidechannel_port"));
 				String randomID = new RandomString(10).nextString();
-				SocketInstance socketInstance = new SocketInstance(
-						Config.get("server"), sideChannelPort, null);
-				Log.d("Server", Config.get("server"));
+				SocketInstance socketInstance = new SocketInstance(server,
+						sideChannelPort, null);
+				Log.d("Server", server);
 
 				CombinedSideChannel sideChannel = new CombinedSideChannel(
 						socketInstance, randomID);
@@ -601,7 +596,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				HashMap<String, HashMap<String, HashMap<String, ServerInstance>>> serverPortsMap = null;
 				UDPReplayInfoBean udpReplayInfoBean = new UDPReplayInfoBean();
 
-				// adrian: for jitter
+				// adrian: for recording jitter and payload
 				JitterBean jitterBean = new JitterBean();
 
 				// adrian: new declareID() function
@@ -705,6 +700,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				} else {
 					Log.d("Replay", "Permission granted.");
+					Config.set("vpnPublicIP", permission[1].trim());
 				}
 
 				// always send noIperf here
@@ -787,7 +783,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				});
 
 				for (String originalClientPort : appData.getUdpClientPorts()) {
-					CUDPClient c = new CUDPClient(Config.get("publicIP"));
+					CUDPClient c = new CUDPClient(Config.get("vpnPublicIP"));
 					udpPortMapping.put(originalClientPort, c);
 				}
 				Log.d("Replay", "created clients from udpClientPorts");
@@ -1023,6 +1019,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	@Override
 	public void vpnFinishCompleteCallback(Boolean success) {
 		try {
+			server = Config.get("server");
 			// If there was error. Display message and stop processing further.
 			if (!success) {
 				// Update status on screen and stop processing
@@ -1605,6 +1602,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						Log.d("VPNConnected", "Got it!");
 						// Set flag indicating VPN connectivity status
 						isVPNConnected = true;
+						// set server ip to local ip
+						server = Config.get("vpn_replay_ip");
 
 						// Start the replay again for same app
 						// adrian: start the combined thread
@@ -1630,7 +1629,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			}
 
 			// show a dialogue to inform user
-			ReplayActivity.this.runOnUiThread(new Runnable() {
+			/*ReplayActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
 					new AlertDialog.Builder(ReplayActivity.this)
 							.setTitle("Error")
@@ -1650,6 +1649,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									}).show();
 				}
 
+			});*/
+			ReplayActivity.this.runOnUiThread(new Runnable() {
+				public void run() {
+					Toast.makeText(
+							ReplayActivity.this,
+							"Cannot connect to VPN, fall back to random replay. "
+									+ "If your are using Android 5.0, please try to reboot "
+									+ "your phone later.", Toast.LENGTH_LONG)
+							.show();
+				}
 			});
 
 			return false;
@@ -1703,6 +1712,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						return true;
 
 					}
+					Log.d("DisconnectVPN", "public IP: " + str);
 				} catch (Exception e) {
 					Log.d("DisconnectVPN", "failed to get VPN IP address");
 					e.printStackTrace();

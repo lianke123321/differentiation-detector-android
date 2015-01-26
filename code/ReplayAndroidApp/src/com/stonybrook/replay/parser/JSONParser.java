@@ -100,7 +100,7 @@ public class JSONParser {
 		
 	}
 
-	public static UDPAppJSONInfoBean parseUDPJSON(String appDataFile, Context context) throws Exception {
+	/*public static UDPAppJSONInfoBean parseUDPJSON(String appDataFile, Context context) throws Exception {
 
 		
 		UDPAppJSONInfoBean appData = new UDPAppJSONInfoBean();
@@ -191,6 +191,6 @@ public class JSONParser {
 		}
 		
 		return appData;
-	}
+	}*/
 	
 }

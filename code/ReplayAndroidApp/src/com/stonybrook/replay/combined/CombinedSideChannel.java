@@ -270,7 +270,7 @@ public class CombinedSideChannel {
 	}
 
 	public void getResult(String result) throws Exception {
-		if (result == "false") {
+		if (result.trim().equalsIgnoreCase("false")) {
 			sendObject("Result;No".getBytes(), objLen);
 			byte[] data = receiveObject(objLen);
 			String str = new String(data);

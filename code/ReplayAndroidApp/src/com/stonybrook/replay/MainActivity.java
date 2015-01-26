@@ -108,7 +108,10 @@ public class MainActivity extends Activity {
 		 * StrictMode.ThreadPolicy.Builder().permitAll().build();
 		 * StrictMode.setThreadPolicy(policy);
 		 */
-		// get vpn server hostname
+		/**
+		 * Read configuration file and long it into Config object.
+		 * Configuration file is located in assets/configuration.properties.
+		 */
 		try {
 			Config.readConfigFile(ReplayConstants.CONFIG_FILE,
 					getApplicationContext());

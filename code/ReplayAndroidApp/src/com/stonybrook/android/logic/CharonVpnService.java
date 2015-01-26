@@ -154,9 +154,8 @@ public class CharonVpnService extends VpnService implements Runnable {
 						// Move
 						// this values to configuration properties file
 						profile = mDataSource.getAllVpnProfiles().get(0);
-
 						
-
+						//throw new NullPointerException();
 						setNextProfile(profile);
 					}
 				}

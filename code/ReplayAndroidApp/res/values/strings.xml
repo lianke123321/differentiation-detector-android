@@ -12,12 +12,18 @@
     <string name="title_activity_crash">CrashActivity</string>
     <string name="image_name">App image</string>
     
-    <string name="viber">Viber</string>
-    <string name="netflix">Netflix</string>
+    <string name="Viber">Viber</string>
+    <string name="Viber_random">Viber (random)</string>
+    <string name="Netflix">Netflix</string>
+    <string name="Netflix_random">Netflix (random)</string>
     <string name="Spotify">Spotify</string>
+    <string name="Spotify_random">Spotify (random)</string>
     <string name="Skype">Skype</string>
+    <string name="Skype_random">Skype (random)</string>
     <string name="Youtube">Youtube</string>
+    <string name="Youtube_random">Youtube (random)</string>
     <string name="Hangouts">Hangouts</string>
+    <string name="Hangouts_random">Hangouts (random)</string>
     
     <string name="pending">Waiting to start</string>
     <string name="start_replay">Starting the replay</string>

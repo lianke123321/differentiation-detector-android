@@ -28,6 +28,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/appImageView"
         android:layout_centerInParent="true"
-        android:text="@string/viber" />
+        android:text="@string/Viber" />
 	
 </RelativeLayout>
