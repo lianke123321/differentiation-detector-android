@@ -58,6 +58,7 @@ import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.parser.JSONParser;
 import com.stonybrook.replay.util.Config;
+import com.stonybrook.replay.util.RandomString;
 
 public class MainActivity extends Activity {
 
@@ -76,7 +77,7 @@ public class MainActivity extends Activity {
 	 * We can provide email account here on which VPN logs can be received
 	 */
 	public static final String CONTACT_EMAIL = "lianke123321@gmail.com";
-	private static final String DEFAULT_ALIAS = "replay";
+	private static final String DEFAULT_ALIAS = "replay5";
 
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
 	public ArrayList<ApplicationBean> selectedAppsRandom = new ArrayList<ApplicationBean>();
@@ -87,6 +88,7 @@ public class MainActivity extends Activity {
 	boolean doRandom = false;
 
 	String gateway = null;
+	String randomID = null;
 
 	// Remove this
 	// @SuppressLint("NewApi")
@@ -166,24 +168,21 @@ public class MainActivity extends Activity {
 
 			// to get certificate status
 			settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
-			/*boolean userAllowed = settings.getBoolean("userAllowed", false);
-
-			if (!userAllowed) {
-				KeyChain.choosePrivateKeyAlias(this,
-						new SelectUserCertOnClickListener(), // Callback
-						new String[] {}, // Any key types.
-						null, // Any issuers.
-						"localhost", // Any host
-						-1, // Any port
-						DEFAULT_ALIAS);
-
-				Toast.makeText(
-						context,
-						"Please click \"Allow\" to allow using certificate. "
-								+ "No need to worry about \"Network may be monitored\" "
-								+ "message :)", Toast.LENGTH_LONG).show();
-			}*/
-
+			
+			// generate or retrieve an id for this phone
+			boolean hasID = settings.getBoolean("hasID", false);
+			if (!hasID) {
+				randomID = new RandomString(10).nextString();
+				Editor editor = settings.edit();
+				editor.putBoolean("hasID", true);
+				editor.putString("ID", randomID);
+				editor.commit();
+				Log.d("MainActivity", "generate new ID: " + randomID);
+			} else {
+				randomID = settings.getString("ID", null);
+				Log.d("MainActivity", "retrieve existing ID: " + randomID);
+			}
+				
 		} catch (Exception ex) {
 			Log.d(ReplayConstants.LOG_APPNAME,
 					"Exception while parsing JSON file "
@@ -335,7 +334,7 @@ public class MainActivity extends Activity {
 						null, // Any issuers.
 						"localhost", // Any host
 						-1, // Any port
-						null);
+						DEFAULT_ALIAS);
 			} else {
 				Toast.makeText(context,
 						"Certificate has already been installed!",
@@ -364,7 +363,7 @@ public class MainActivity extends Activity {
 						null, // Any issuers.
 						"localhost", // Any host
 						-1, // Any port
-						null);
+						DEFAULT_ALIAS);
 
 				Toast.makeText(
 						context,
@@ -401,6 +400,7 @@ public class MainActivity extends Activity {
 			intent.putExtra("timing", enableTiming);
 			intent.putExtra("iteration", iteration);
 			intent.putExtra("doRandom", doRandom);
+			intent.putExtra("randomID", randomID);
 
 			// Start ReplayActivity with slideIn animation.
 			startActivity(intent);
@@ -542,7 +542,7 @@ public class MainActivity extends Activity {
 			JSONObject json = null;
 			try {
 				json = new JSONObject(getWebPage("http://" + gateway
-						+ ":50080/dyn/getTempCertNoPassRandom"));
+						+ ":50080/dyn/getTempCertNoPass"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

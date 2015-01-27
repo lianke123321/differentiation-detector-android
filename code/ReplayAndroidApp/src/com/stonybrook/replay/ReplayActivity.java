@@ -103,6 +103,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	// This is AsyncTasks for replay. Run in background.
 	QueueCombinedAsync queueCombined = null;
 	String currentTask = "none";
+	String randomID = null;
 
 	// VPN Changes
 	private Bundle mProfileInfo;
@@ -159,8 +160,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		enableTiming = (String) getIntent().getStringExtra("timing");
 		iteration = (int) getIntent().getIntExtra("iteration", 1);
 		doRandom = getIntent().getBooleanExtra("doRandom", false);
+		randomID = getIntent().getStringExtra("randomID");
 		Log.d("ReplayActivity", "iteration: " + String.valueOf(iteration)
-				+ " doRandom: " + doRandom);
+				+ " doRandom: " + doRandom + " randomID: " + randomID);
 
 		// Create layout for this page
 		adapter = new ImageReplayListAdapter(selectedApps, getLayoutInflater(),
@@ -598,7 +600,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				int sideChannelPort = Integer.valueOf(Config
 						.get("combined_sidechannel_port"));
-				String randomID = new RandomString(10).nextString();
+				//String randomID = new RandomString(10).nextString();
+				if (randomID == null) {
+					Log.d("RecordReplay", "randomID does not exit!");
+					System.exit(0);
+				}
+				
 				SocketInstance socketInstance = new SocketInstance(server,
 						sideChannelPort, null);
 				Log.d("Server", server);
