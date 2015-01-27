@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,8 +14,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.stonybrook.replay.bean.ApplicationBean;
-import com.stonybrook.replay.bean.RequestSet;
-import com.stonybrook.replay.bean.UDPAppJSONInfoBean;
 import com.stonybrook.replay.constant.ReplayConstants;
 public class JSONParser {
 	
@@ -96,7 +92,76 @@ public class JSONParser {
 		
 		return hashMap;
 		
+	}
+	
+	public static HashMap<String, ApplicationBean> parseRandomJSON(Context context) throws Exception
+	{
+		HashMap<String, ApplicationBean> hashMap = new HashMap<String, ApplicationBean>();
+		BufferedReader in  = null;
+		try
+		{
+			StringBuilder buf=new StringBuilder();
+		    InputStream json= context.getAssets().open(ReplayConstants.RANDOM_FILENAME);
+		    in = new BufferedReader(new InputStreamReader(json));
+		    String str;
+
+		    while ((str=in.readLine()) != null) {
+		      buf.append(str);
+		    }
+
+		    in.close();
+		    
+		    JSONObject jObject = new JSONObject(buf.toString());
+		    JSONArray jArray = jObject.getJSONArray("apps");
+		    
+		    JSONObject appObj = null;
+		    ApplicationBean bean = null;
+		    for(int i = 0; i < jArray.length(); i++)
+		    {
+		    	appObj = jArray.getJSONObject(i);
+		    	bean = new ApplicationBean();
+		    	
+		    	bean.setName(appObj.getString("name"));
+		    	bean.setConfigfile(appObj.getString("configfile"));
+		    	bean.setDataFile(appObj.getString("datafile"));
+		    	bean.setSize(appObj.getDouble("size"));
+		    	bean.setImage(appObj.getString("image"));
+		    	bean.setType(appObj.getString("type"));
+		    	bean.setTime(appObj.getString("time"));
+		    	hashMap.put(bean.getName(), bean);
+		    	
+		    }   
+		}
+		catch(IOException ex)
+		{
+			Log.d(ReplayConstants.LOG_APPNAME , "IOException while reading file " + ReplayConstants.RANDOM_FILENAME   );
+			ex.printStackTrace();
+			throw ex;
+		}
+		catch(JSONException ex)
+		{
+			Log.d(ReplayConstants.LOG_APPNAME , "JSONException while parsing JSON file " + ReplayConstants.RANDOM_FILENAME   );
+			ex.printStackTrace();
+			throw ex;
+		}
+		catch(Exception ex)
+		{
+			Log.d(ReplayConstants.LOG_APPNAME , "Exception while parsing JSON file " + ReplayConstants.RANDOM_FILENAME   );
+			ex.printStackTrace();
+			throw ex;
+		}
+		finally
+		{
+			if(in != null)
+				try {
+					in.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
 		
+		return hashMap;
 		
 	}
 

@@ -69,6 +69,7 @@ public class MainActivity extends Activity {
 	GridView appList;
 	Button nextButton, settingsButton;
 	public HashMap<String, ApplicationBean> appsHashMap = null;
+	public HashMap<String, ApplicationBean> randomHashMap = null;
 	Context context;
 
 	/**
@@ -78,6 +79,7 @@ public class MainActivity extends Activity {
 	private static final String DEFAULT_ALIAS = "replay";
 
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
+	public ArrayList<ApplicationBean> selectedAppsRandom = new ArrayList<ApplicationBean>();
 
 	String server = null;
 	String enableTiming = null;
@@ -109,8 +111,8 @@ public class MainActivity extends Activity {
 		 * StrictMode.setThreadPolicy(policy);
 		 */
 		/**
-		 * Read configuration file and long it into Config object.
-		 * Configuration file is located in assets/configuration.properties.
+		 * Read configuration file and long it into Config object. Configuration
+		 * file is located in assets/configuration.properties.
 		 */
 		try {
 			Config.readConfigFile(ReplayConstants.CONFIG_FILE,
@@ -145,11 +147,12 @@ public class MainActivity extends Activity {
 			// Applications
 			// and returns HashMap of ApplicationBean type
 			appsHashMap = JSONParser.parseAppJSON(context);
+			randomHashMap = JSONParser.parseRandomJSON(context);
 
 			// Main screen checkbox Adapter. This is populated from HashMap
 			// retrieved from above method
 			ImageCheckBoxListAdapter adapter = new ImageCheckBoxListAdapter(
-					appsHashMap, getLayoutInflater(), this);
+					appsHashMap, randomHashMap, getLayoutInflater(), this);
 
 			appList = (GridView) findViewById(R.id.appsListView);
 			appList.setAdapter(adapter);
@@ -328,7 +331,7 @@ public class MainActivity extends Activity {
 
 				KeyChain.choosePrivateKeyAlias(MainActivity.this,
 						new SelectUserCertOnClickListener(), // Callback
-						new String[] { "RSA" }, // Any key types.
+						new String[] {}, // Any key types.
 						null, // Any issuers.
 						"localhost", // Any host
 						-1, // Any port
@@ -357,7 +360,7 @@ public class MainActivity extends Activity {
 			if (!userAllowed) {
 				KeyChain.choosePrivateKeyAlias(MainActivity.this,
 						new SelectUserCertOnClickListener(), // Callback
-						new String[] { "RSA" }, // Any key types.
+						new String[] {}, // Any key types.
 						null, // Any issuers.
 						"localhost", // Any host
 						-1, // Any port
@@ -382,6 +385,8 @@ public class MainActivity extends Activity {
 			// by user available to ReplayActivity
 			Intent intent = new Intent(MainActivity.this, ReplayActivity.class);
 			intent.putParcelableArrayListExtra("selectedApps", selectedApps);
+			intent.putParcelableArrayListExtra("selectedAppsRandom",
+					selectedAppsRandom);
 
 			// If user did not select anything from settings dialog then use
 			// default preferences and

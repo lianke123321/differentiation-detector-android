@@ -24,5 +24,7 @@ public interface ReplayCompleteListener {
 	 */
 	void vpnFinishCompleteCallback(Boolean success);
 	
+	void randomFinishCompleteCallback(Boolean success);
+	
 	void vpnConnectedCallBack();
 }

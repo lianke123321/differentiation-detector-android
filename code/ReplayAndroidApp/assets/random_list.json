@@ -1,54 +1,54 @@
 {
   "apps": [
     {
-        "name" : "Youtube",
+        "name" : "Youtube_random",
         "configfile" : "dropbox_d.config",
-        "datafile" : "youtube_360p.pcap_client_all.json",
+        "datafile" : "youtube_360p_random.pcap_client_all.json",
         "size" : 0.5,
         "time" : "2 m",
         "image" : "youtube",
         "type" : "combined"
     },
     {
-        "name" : "Hangouts",
+        "name" : "Hangouts_random",
         "configfile" : "",
-        "datafile" : "hangout_video_10secs.pcap_client_all.json",
+        "datafile" : "hangout_video_10secs_random.pcap_client_all.json",
         "size" : 0.5,
         "time" : "10 s",
         "image" : "hangouts",
         "type" : "combined"
     },
     {
-        "name" : "Skype",
+        "name" : "Skype_random",
         "configfile" : "",
-        "datafile" : "skype_video_10secs.pcap_client_all.json",
+        "datafile" : "skype_video_10secs_random.pcap_client_all.json",
         "size" : 8,
         "time" : "10 s",
         "image" : "skype",
         "type" : "combined"
-     },
+    },
     {
-        "name" : "Spotify",
+        "name" : "Spotify_random",
         "configfile" : "",
-        "datafile" : "spotify_high_15secs.pcap_client_all.json",
+        "datafile" : "spotify_high_15secs_random.pcap_client_all.json",
         "size" : 8,
         "time" : "15 s",
         "image" : "spotify",
         "type" : "combined"
     },
     {
-        "name" : "Netflix",
+        "name" : "Netflix_random",
         "configfile" : "",
-        "datafile" : "netflix_auto_5secs.pcap_client_all.json",
+        "datafile" : "netflix_auto_5secs_random.pcap_client_all.json",
         "size" : 8,
         "time" : "5 s",
         "image" : "netflix",
         "type" : "combined"
     },
     {
-        "name" : "Viber",
+        "name" : "Viber_random",
         "configfile" : "",
-        "datafile" : "viber_video_10secs.pcap_client_all.json",
+        "datafile" : "viber_video_10secs_random.pcap_client_all.json",
         "size" : 8,
         "time" : "10 s",
         "image" : "viber",
