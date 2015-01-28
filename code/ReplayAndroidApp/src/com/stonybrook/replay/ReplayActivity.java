@@ -430,8 +430,24 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		public void onClick(View v) {
 			if (!replayOngoing) {
-				currentReplayCount = 0;
-				processApplicationReplay();
+				new AlertDialog.Builder(ReplayActivity.this)
+						.setTitle("One more thing...")
+						.setMessage(
+								"Please leave the app running in the foreground "
+										+ "until replay is over in order to avoid "
+										+ "interruptions from other apps in your "
+										+ "phone. The screen will stay on during "
+										+ "the replay. Thank you for your cooperation!")
+						.setPositiveButton("OK",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										currentReplayCount = 0;
+										processApplicationReplay();
+									}
+								}).show();
+
 			} else
 				Toast.makeText(context,
 						"Replay is ongoing! Please do not start again.",
@@ -1425,7 +1441,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					Log.d("ReplayActivity", "exception while press back key!");
 					e.printStackTrace();
 				}
-				
+
 				vpnConnected.cancel(true);
 				vpnDisconnected.cancel(true);
 				randomReplay.cancel(true);
