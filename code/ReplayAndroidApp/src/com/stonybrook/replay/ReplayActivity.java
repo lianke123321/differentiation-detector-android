@@ -383,10 +383,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		public void onClick(View v) {
 			if (!replayOngoing) {
-				vpnConnected.cancel(true);
-				vpnDisconnected.cancel(true);
-				randomReplay.cancel(true);
-				queueCombined.cancel(true);
+				if (queueCombined != null) {
+					vpnConnected.cancel(true);
+					vpnDisconnected.cancel(true);
+					randomReplay.cancel(true);
+					queueCombined.cancel(true);
+				}
 				ReplayActivity.this.finish();
 				ReplayActivity.this.overridePendingTransition(
 						android.R.anim.slide_in_left,
@@ -400,10 +402,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										vpnConnected.cancel(true);
-										vpnDisconnected.cancel(true);
-										randomReplay.cancel(true);
-										queueCombined.cancel(true);
+										if (queueCombined != null) {
+											vpnConnected.cancel(true);
+											vpnDisconnected.cancel(true);
+											randomReplay.cancel(true);
+											queueCombined.cancel(true);
+										}
 										disconnectVPN();
 										ReplayActivity.this.finish();
 										ReplayActivity.this
@@ -1058,10 +1062,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										vpnConnected.cancel(true);
-										vpnDisconnected.cancel(true);
-										randomReplay.cancel(true);
-										queueCombined.cancel(true);
+										if (queueCombined != null) {
+											vpnConnected.cancel(true);
+											vpnDisconnected.cancel(true);
+											randomReplay.cancel(true);
+											queueCombined.cancel(true);
+										}
 										disconnectVPN();
 										ReplayActivity.this.finish();
 										ReplayActivity.this
@@ -1214,10 +1220,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										vpnConnected.cancel(true);
-										vpnDisconnected.cancel(true);
-										randomReplay.cancel(true);
-										queueCombined.cancel(true);
+										if (queueCombined != null) {
+											vpnConnected.cancel(true);
+											vpnDisconnected.cancel(true);
+											randomReplay.cancel(true);
+											queueCombined.cancel(true);
+										}
 										disconnectVPN();
 										ReplayActivity.this.finish();
 										ReplayActivity.this
@@ -1377,10 +1385,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										vpnConnected.cancel(true);
-										vpnDisconnected.cancel(true);
-										randomReplay.cancel(true);
-										queueCombined.cancel(true);
+										if (queueCombined != null) {
+											vpnConnected.cancel(true);
+											vpnDisconnected.cancel(true);
+											randomReplay.cancel(true);
+											queueCombined.cancel(true);
+										}
 										disconnectVPN();
 										ReplayActivity.this.finish();
 										ReplayActivity.this
@@ -1449,10 +1459,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					e.printStackTrace();
 				}
 
-				vpnConnected.cancel(true);
-				vpnDisconnected.cancel(true);
-				randomReplay.cancel(true);
-				queueCombined.cancel(true);
+				if (queueCombined != null) {
+					vpnConnected.cancel(true);
+					vpnDisconnected.cancel(true);
+					randomReplay.cancel(true);
+					queueCombined.cancel(true);
+				}
 				ReplayActivity.this.finish();
 				ReplayActivity.this.overridePendingTransition(
 						android.R.anim.slide_in_left,
@@ -1468,10 +1480,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
-										vpnConnected.cancel(true);
-										vpnDisconnected.cancel(true);
-										randomReplay.cancel(true);
-										queueCombined.cancel(true);
+										if (queueCombined != null) {
+											vpnConnected.cancel(true);
+											vpnDisconnected.cancel(true);
+											randomReplay.cancel(true);
+											queueCombined.cancel(true);
+										}
 										disconnectVPN();
 										ReplayActivity.this.finish();
 										ReplayActivity.this
