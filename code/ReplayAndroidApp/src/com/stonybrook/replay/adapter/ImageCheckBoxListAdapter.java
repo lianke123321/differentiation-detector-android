@@ -41,6 +41,7 @@ public class ImageCheckBoxListAdapter extends BaseAdapter implements
 		randomDataList = new ArrayList<ApplicationBean>();
 
 		for (String s : apps.keySet()) {
+			// make sure dataList and randomDataList have the same order
 			dataList.add(apps.get(s));
 			randomDataList.add(random.get(s + "_random"));
 		}
@@ -76,17 +77,21 @@ public class ImageCheckBoxListAdapter extends BaseAdapter implements
 			// view.findViewById(R.id.isSelectedCheckBox).setOnClickListener(this);
 			view.setOnClickListener(this);
 		}
-		
+
 		ApplicationBean app[] = new ApplicationBean[2];
 		// app[0] is normal json, app[1] is random json
 		app[0] = (ApplicationBean) getItem(position);
 		app[1] = (ApplicationBean) getRandomItem(position);
-		
+
 		Log.d("Item", "app name: " + app[0].name + ", random app name: "
 				+ app[1].name);
 		// Set the example text and the state of the checkbox
 		CheckBox cb = (CheckBox) view.findViewById(R.id.isSelectedCheckBox);
 		cb.setChecked(app[0].isSelected());
+		if (app[0].isSelected() && !mainAct.selectedApps.contains(app[0])) {
+			mainAct.selectedApps.add(app[0]);
+			mainAct.selectedAppsRandom.add(app[1]);
+		}
 		// We tag the data object to retrieve it on the click listener.
 		view.setTag(app);
 
@@ -98,8 +103,8 @@ public class ImageCheckBoxListAdapter extends BaseAdapter implements
 
 		TextView text = (TextView) view.findViewById(R.id.appNameTextView);
 		text.setText(mainAct.getResources().getString(
-				mainAct.getResources().getIdentifier(app[0].getName(), "string",
-						mainAct.getPackageName())));
+				mainAct.getResources().getIdentifier(app[0].getName(),
+						"string", mainAct.getPackageName())));
 
 		return view;
 	}

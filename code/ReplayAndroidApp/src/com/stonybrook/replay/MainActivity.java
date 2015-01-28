@@ -84,7 +84,7 @@ public class MainActivity extends Activity {
 
 	String server = null;
 	String enableTiming = null;
-	int iteration = 1;
+	int iteration = 2;
 	boolean doRandom = false;
 
 	String gateway = null;
@@ -266,6 +266,8 @@ public class MainActivity extends Activity {
 					.findViewById(R.id.settings_server);
 			final Spinner spinnerIteration = (Spinner) view
 					.findViewById(R.id.settings_iteration);
+			// set default to 2 iterations
+			spinnerIteration.setSelection(1);
 			final CheckBox checkBoxRandom = (CheckBox) view
 					.findViewById(R.id.selectRandomCheckBox);
 
@@ -274,7 +276,6 @@ public class MainActivity extends Activity {
 					.findViewById(R.id.installCertButton);
 			installCertButton.setOnClickListener(installOnClick);
 
-			// final EditText txtServer =
 			// (EditText)view.findViewById(R.id.settings_server_txt);
 
 			/**
@@ -334,7 +335,7 @@ public class MainActivity extends Activity {
 						null, // Any issuers.
 						"localhost", // Any host
 						-1, // Any port
-						DEFAULT_ALIAS);
+						null);
 			} else {
 				Toast.makeText(context,
 						"Certificate has already been installed!",
@@ -355,6 +356,8 @@ public class MainActivity extends Activity {
 		public void onClick(View v) {
 
 			// check if user allowed to use certificate
+			
+			
 			boolean userAllowed = settings.getBoolean("userAllowed", false);
 			if (!userAllowed) {
 				KeyChain.choosePrivateKeyAlias(MainActivity.this,
@@ -363,7 +366,7 @@ public class MainActivity extends Activity {
 						null, // Any issuers.
 						"localhost", // Any host
 						-1, // Any port
-						DEFAULT_ALIAS);
+						null);
 
 				Toast.makeText(
 						context,

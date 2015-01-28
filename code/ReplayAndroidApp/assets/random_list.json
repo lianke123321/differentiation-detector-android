@@ -30,7 +30,7 @@
     {
         "name" : "Spotify_random",
         "configfile" : "",
-        "datafile" : "spotify_high_15secs_random.pcap_client_all.json",
+        "datafile" : "spotify_normal_15secs_random.pcap_client_all.json",
         "size" : 8,
         "time" : "15 s",
         "image" : "spotify",

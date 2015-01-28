@@ -30,7 +30,7 @@
     {
         "name" : "Spotify",
         "configfile" : "",
-        "datafile" : "spotify_high_15secs.pcap_client_all.json",
+        "datafile" : "spotify_normal_15secs.pcap_client_all.json",
         "size" : 8,
         "time" : "15 s",
         "image" : "spotify",

@@ -65,7 +65,7 @@
             android:layout_margin="10dp"
             android:entries="@array/iteration"
             android:padding="10dp"
-            android:prompt="@string/select_iteration" />
+            android:prompt="@string/iteration_2" />
         
         <CheckBox 
             android:id="@+id/selectRandomCheckBox"

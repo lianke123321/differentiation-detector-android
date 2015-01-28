@@ -65,7 +65,6 @@ import com.stonybrook.replay.combined.CombinedSideChannel;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.Mobilyzer;
-import com.stonybrook.replay.util.RandomString;
 import com.stonybrook.replay.util.ReplayCompleteListener;
 import com.stonybrook.replay.util.UnpickleDataStream;
 
@@ -119,6 +118,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	// for testing mobilyzer
 	public Mobilyzer mobilyzer = null;
+
+	// for all asynctask, create here
+	VPNConnected vpnConnected = null;
+	VPNDisconnected vpnDisconnected = null;
+	RandomReplay randomReplay = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -199,6 +203,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		// initialize mobilyzer
 		mobilyzer = new Mobilyzer(this.context);
+
+		// create all asynctask
+		vpnConnected = new VPNConnected();
+		vpnDisconnected = new VPNDisconnected();
+		randomReplay = new RandomReplay();
 
 		Toast.makeText(context, "Please click \"Start\" to start the replay!",
 				Toast.LENGTH_LONG).show();
@@ -374,6 +383,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		public void onClick(View v) {
 			if (!replayOngoing) {
+				vpnConnected.cancel(true);
+				vpnDisconnected.cancel(true);
+				randomReplay.cancel(true);
+				queueCombined.cancel(true);
 				ReplayActivity.this.finish();
 				ReplayActivity.this.overridePendingTransition(
 						android.R.anim.slide_in_left,
@@ -387,6 +400,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
+										vpnConnected.cancel(true);
+										vpnDisconnected.cancel(true);
+										randomReplay.cancel(true);
 										queueCombined.cancel(true);
 										disconnectVPN();
 										ReplayActivity.this.finish();
@@ -600,12 +616,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				int sideChannelPort = Integer.valueOf(Config
 						.get("combined_sidechannel_port"));
-				//String randomID = new RandomString(10).nextString();
+				// String randomID = new RandomString(10).nextString();
 				if (randomID == null) {
 					Log.d("RecordReplay", "randomID does not exit!");
 					System.exit(0);
 				}
-				
+
 				SocketInstance socketInstance = new SocketInstance(server,
 						sideChannelPort, null);
 				Log.d("Server", server);
@@ -1026,6 +1042,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
+										vpnConnected.cancel(true);
+										vpnDisconnected.cancel(true);
+										randomReplay.cancel(true);
 										queueCombined.cancel(true);
 										disconnectVPN();
 										ReplayActivity.this.finish();
@@ -1052,17 +1071,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			adapter.notifyDataSetChanged();
 
 			disconnectVPN();
-			
+
 			if (doRandom) {
 				// updating progress
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.random);
 				adapter.notifyDataSetChanged();
-				
-				(new RandomReplay()).execute(ReplayActivity.this);
+
+				randomReplay.execute(ReplayActivity.this);
 				return;
 			}
-			
+
 			currentIterationCount++;
 
 			if (currentIterationCount != iteration) {
@@ -1081,7 +1100,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					System.exit(0);
 				}
 
-				(new VPNDisconnected()).execute(this);
+				vpnDisconnected.execute(this);
 				return;
 			}
 
@@ -1106,7 +1125,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// processCombinedApplication(selectedApps.get(++currentReplayCount),
 				// "vpn");
 				currentReplayCount++;
-				(new VPNDisconnected()).execute(this);
+				vpnDisconnected.execute(this);
 			} else {
 				// progressWait.setMessage("Finishing Analysis...");
 				// Thread.sleep(10000);
@@ -1150,7 +1169,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 
 	}
-	
+
 	@Override
 	public void randomFinishCompleteCallback(Boolean success) {
 		try {
@@ -1176,6 +1195,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
+										vpnConnected.cancel(true);
+										vpnDisconnected.cancel(true);
+										randomReplay.cancel(true);
 										queueCombined.cancel(true);
 										disconnectVPN();
 										ReplayActivity.this.finish();
@@ -1188,7 +1210,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				return;
 			}
-			
+
 			currentIterationCount++;
 
 			if (currentIterationCount != iteration) {
@@ -1207,7 +1229,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					System.exit(0);
 				}
 
-				(new VPNDisconnected()).execute(this);
+				vpnDisconnected.execute(this);
 				return;
 			}
 
@@ -1232,7 +1254,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// processCombinedApplication(selectedApps.get(++currentReplayCount),
 				// "vpn");
 				currentReplayCount++;
-				(new VPNDisconnected()).execute(this);
+				vpnDisconnected.execute(this);
 			} else {
 				// progressWait.setMessage("Finishing Analysis...");
 				// Thread.sleep(10000);
@@ -1268,7 +1290,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				});
 			}
-			
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -1287,18 +1309,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.finish_open);
 				adapter.notifyDataSetChanged();
-				
+
 				// check if onlyRandom is true
 				if (onlyRandom) {
 					// updating progress
 					selectedApps.get(currentReplayCount).status = getResources()
 							.getString(R.string.random);
 					adapter.notifyDataSetChanged();
-					
-					(new RandomReplay()).execute(this);
+
+					randomReplay.execute(this);
 					return;
 				}
-				
+
 				// Connect to VPN
 				onVpnProfileSelected(null);
 				Log.d("Replay", "VPN started");
@@ -1308,7 +1330,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						.getString(R.string.vpn);
 				adapter.notifyDataSetChanged();
 
-				(new VPNConnected()).execute(this);
+				vpnConnected.execute(this);
 
 			} else {
 				// Update status on screen and stop processing
@@ -1332,6 +1354,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
+										vpnConnected.cancel(true);
+										vpnDisconnected.cancel(true);
+										randomReplay.cancel(true);
 										queueCombined.cancel(true);
 										disconnectVPN();
 										ReplayActivity.this.finish();
@@ -1400,7 +1425,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					Log.d("ReplayActivity", "exception while press back key!");
 					e.printStackTrace();
 				}
-
+				
+				vpnConnected.cancel(true);
+				vpnDisconnected.cancel(true);
+				randomReplay.cancel(true);
+				queueCombined.cancel(true);
 				ReplayActivity.this.finish();
 				ReplayActivity.this.overridePendingTransition(
 						android.R.anim.slide_in_left,
@@ -1416,6 +1445,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
+										vpnConnected.cancel(true);
+										vpnDisconnected.cancel(true);
+										randomReplay.cancel(true);
 										queueCombined.cancel(true);
 										disconnectVPN();
 										ReplayActivity.this.finish();
@@ -1712,7 +1744,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					e.printStackTrace();
 				}
 			}
-			
+
 			ReplayActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
 					Toast.makeText(
@@ -1723,8 +1755,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							.show();
 				}
 			});
-			
-			(new RandomReplay()).execute(ReplayActivity.this);
+
+			randomReplay.execute(ReplayActivity.this);
 			onlyRandom = true;
 
 			return false;

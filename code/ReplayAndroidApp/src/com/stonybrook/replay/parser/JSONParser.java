@@ -57,6 +57,8 @@ public class JSONParser {
 		    	bean.setImage(appObj.getString("image"));
 		    	bean.setType(appObj.getString("type"));
 		    	bean.setTime(appObj.getString("time"));
+		    	// all beans are selected by default
+		    	bean.setSelected(true);
 		    	hashMap.put(bean.getName(), bean);
 		    	
 		    }   
