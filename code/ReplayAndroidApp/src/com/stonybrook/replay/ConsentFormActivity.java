@@ -145,7 +145,9 @@ public class ConsentFormActivity extends Activity {
 					.setMessage(
 							"We are going to install a certificate that allows our tests to run."
 									+ "When asked for a password,\n\nLEAVE THE PASSWORD FIELD EMPTY\n\n"
-									+ "and click \"OK\".")
+									+ "and click \"OK\".\n\n" +
+									"If you are using Android 5.0.x, please restart your phone after " +
+									"installing certificate to avoid a bug of Android.")
 					.setPositiveButton(
 							"Do not click me without reading the instruction!",
 							new DialogInterface.OnClickListener() {
@@ -329,7 +331,7 @@ public class ConsentFormActivity extends Activity {
 			JSONObject json = null;
 			try {
 				json = new JSONObject(getWebPage("http://" + gateway
-						+ ":50080/dyn/getTempCertNoPass"));
+						+ ":50080/dyn/getTempCertNoPassRandom"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
