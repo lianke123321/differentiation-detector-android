@@ -281,7 +281,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			// adrian: added cause arash's code
 			// Config.set("extraString", "MoblieApp");
-			// Config.set("jitter", "true");
+			Config.set("jitter", "true");
 			// Config.set("sendMobileStats", "true");
 			// adrian: set result
 			// Config.set("result", "false");

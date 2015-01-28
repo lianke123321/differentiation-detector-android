@@ -245,8 +245,8 @@ public class CombinedSideChannel {
 				rcvdJitter += (jitterBean.rcvdJitter.get(0) + "\t" + UtilsManager
 						.getUnsignedInt(Arrays.hashCode(jitterBean.rcvdPayload
 								.get(0))));
-				// Log.d("rcvdJitter",
-				// String.valueOf(jitterBean.rcvdJitter.size()));
+				Log.d("rcvdJitter",
+						String.valueOf(jitterBean.rcvdJitter.size()));
 				for (i = 1; i < jitterBean.rcvdJitter.size(); i++) {
 					rcvdJitter += ("\n" + jitterBean.rcvdJitter.get(i) + "\t" + UtilsManager
 							.getUnsignedInt(Arrays

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.stonybrook.replay"
-    android:versionCode="21"
-    android:versionName="2.2.11" >
+    android:versionCode="22"
+    android:versionName="2.2.12" >
 
     <!-- Rememeber this change. Changed min API version from 8 to 11 to support executeOnExecutor -->
     <uses-sdk
