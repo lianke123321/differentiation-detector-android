@@ -211,20 +211,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		Toast.makeText(context, "Please click \"Start\" to start the replay!",
 				Toast.LENGTH_LONG).show();
-		
+
 		new AlertDialog.Builder(ReplayActivity.this)
-		.setTitle("One more thing...")
-		.setMessage(
-				"Please leave the app running in the foreground "
-						+ "until replay is over in order to avoid "
-						+ "interruptions from other apps in your "
-						+ "phone. The screen will stay on during "
-						+ "the replay. Thank you for your cooperation!")
-		.setPositiveButton("OK",
-				new DialogInterface.OnClickListener() {
+				.setTitle("One more thing...")
+				.setMessage(
+						"Please leave the app running in the foreground "
+								+ "until replay is over in order to avoid "
+								+ "interruptions from other apps in your "
+								+ "phone. The screen will stay on during "
+								+ "the replay. Thank you for your cooperation!")
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(DialogInterface dialog,
-							int which) {
+					public void onClick(DialogInterface dialog, int which) {
 						// nothing
 					}
 				}).show();
@@ -321,9 +319,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * processUDPApplication(selectedApps.get(currentReplayCount));
 				 */
 
-				// adrian: start combined method
-				processCombinedApplication(
-						selectedApps.get(currentReplayCount), "open");
+				// start new task to test vpn
+				onVpnProfileSelected(null);
+				Log.d("Replay", "VPN started");
+
+				(new TestVPN()).execute(this);
+
 			} else {
 				Toast.makeText(ReplayActivity.this,
 						"Sorry, server is not available. Try after some time.",
@@ -355,12 +356,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			}
 		});
 
-		appData_combined = UnpickleDataStream.unpickleCombinedJSON(
+		/*appData_combined = UnpickleDataStream.unpickleCombinedJSON(
 				applicationBean.getDataFile(), context);
 		Log.d("Parsing", applicationBean.getDataFile());
 		queueCombined = new QueueCombinedAsync(this, applicationBean, env);
 
-		queueCombined.execute("");
+		queueCombined.execute("");*/
+		vpnDisconnected = new VPNDisconnected();
+		vpnDisconnected.execute(this);
 
 		// adrian: for testing VPN
 		/*
@@ -1101,7 +1104,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.random);
 				adapter.notifyDataSetChanged();
-				
+
 				randomReplay = new RandomReplay();
 				randomReplay.execute(ReplayActivity.this);
 				return;
@@ -1124,7 +1127,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					Log.w("Replay", "Iteration number exceeds!");
 					System.exit(0);
 				}
-				
+
 				vpnDisconnected = new VPNDisconnected();
 				vpnDisconnected.execute(this);
 				return;
@@ -1257,7 +1260,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					Log.w("Replay", "Iteration number exceeds!");
 					System.exit(0);
 				}
-				
+
 				vpnDisconnected = new VPNDisconnected();
 				vpnDisconnected.execute(this);
 				return;
@@ -1347,7 +1350,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					selectedApps.get(currentReplayCount).status = getResources()
 							.getString(R.string.random);
 					adapter.notifyDataSetChanged();
-					
+
 					randomReplay = new RandomReplay();
 					randomReplay.execute(this);
 					return;
@@ -1361,7 +1364,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.vpn);
 				adapter.notifyDataSetChanged();
-				
+
 				vpnConnected = new VPNConnected();
 				vpnConnected.execute(this);
 
@@ -1742,7 +1745,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	}
 
-	// adrian: implemented and working
+	/**
+	 * Check if VPN is connected and start the new replay. If not, display a
+	 * message and fall back to random replay
+	 * 
+	 * @author Adrian
+	 * 
+	 */
 	class VPNConnected extends AsyncTask<ReplayActivity, Void, Boolean> {
 
 		@Override
@@ -1794,10 +1803,100 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							.show();
 				}
 			});
-			
+
 			randomReplay = new RandomReplay();
 			randomReplay.execute(ReplayActivity.this);
 			onlyRandom = true;
+
+			return false;
+
+		}
+
+	}
+
+	/**
+	 * Startt this task first to test if vpn is working
+	 * 
+	 * @author Adrian
+	 * 
+	 */
+	class TestVPN extends AsyncTask<ReplayActivity, Void, Boolean> {
+
+		@Override
+		protected Boolean doInBackground(ReplayActivity... params) {
+
+			int i = 0;
+			while (i < 5) {
+				i++;
+				try {
+					Log.d("TestVPN", "about to get public IP");
+					String str = getPublicIP();
+					if (str.equalsIgnoreCase(meddleIP)) {
+						Log.d("TestVPN", "Got it!");
+						isVPNConnected = true;
+						// disconnect vpn and return
+						disconnectVPN();
+
+						try {
+							processCombinedApplication(
+									selectedApps.get(currentReplayCount),
+									"open");
+						} catch (Exception e) {
+							// TODO Auto-generated catch
+							// block
+							e.printStackTrace();
+						}
+
+						return true;
+					}
+					Thread.sleep(3000);
+					Log.d("TestVPN", "Not yet! PublicIP is: " + str);
+				} catch (Exception e) {
+					Log.d("TestVPN", "failed to get VPN IP address");
+					e.printStackTrace();
+				}
+			}
+
+			onlyRandom = true;
+
+			ReplayActivity.this.runOnUiThread(new Runnable() {
+				public void run() {
+					new AlertDialog.Builder(ReplayActivity.this)
+							.setTitle("Error")
+							.setMessage(
+									"Testing vpn connection failed! "
+											+ "If you are using Android "
+											+ "5.0.x, please try rebooting your phone.\n\n"
+											+ "Click \"OK\" to continue or click \"Go back\".")
+							.setPositiveButton("OK",
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											try {
+												processCombinedApplication(
+														selectedApps
+																.get(currentReplayCount),
+														"open");
+											} catch (Exception e) {
+												// TODO Auto-generated catch
+												// block
+												e.printStackTrace();
+											}
+										}
+									})
+							.setNegativeButton("Go back",
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											ReplayActivity.this.finish();
+										}
+									}).show();
+				}
+			});
 
 			return false;
 
@@ -1835,7 +1934,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 													.get(currentReplayCount)
 													.getDataFile(), context);
 							Log.d("DisconnectVPN", "loaded json!");
-							queueCombined.cancel(true);
+							if (queueCombined != null)
+								queueCombined.cancel(true);
 							queueCombined = new QueueCombinedAsync(params[0],
 									selectedApps.get(currentReplayCount),
 									"open");
