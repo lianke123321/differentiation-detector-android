@@ -1093,7 +1093,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.random);
 				adapter.notifyDataSetChanged();
-
+				
+				randomReplay = new RandomReplay();
 				randomReplay.execute(ReplayActivity.this);
 				return;
 			}
@@ -1115,7 +1116,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					Log.w("Replay", "Iteration number exceeds!");
 					System.exit(0);
 				}
-
+				
+				vpnDisconnected = new VPNDisconnected();
 				vpnDisconnected.execute(this);
 				return;
 			}
@@ -1141,6 +1143,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// processCombinedApplication(selectedApps.get(++currentReplayCount),
 				// "vpn");
 				currentReplayCount++;
+				vpnDisconnected = new VPNDisconnected();
 				vpnDisconnected.execute(this);
 			} else {
 				// progressWait.setMessage("Finishing Analysis...");
@@ -1244,7 +1247,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					Log.w("Replay", "Iteration number exceeds!");
 					System.exit(0);
 				}
-
+				
+				vpnDisconnected = new VPNDisconnected();
 				vpnDisconnected.execute(this);
 				return;
 			}
@@ -1270,6 +1274,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// processCombinedApplication(selectedApps.get(++currentReplayCount),
 				// "vpn");
 				currentReplayCount++;
+				vpnDisconnected = new VPNDisconnected();
 				vpnDisconnected.execute(this);
 			} else {
 				// progressWait.setMessage("Finishing Analysis...");
@@ -1332,7 +1337,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					selectedApps.get(currentReplayCount).status = getResources()
 							.getString(R.string.random);
 					adapter.notifyDataSetChanged();
-
+					
+					randomReplay = new RandomReplay();
 					randomReplay.execute(this);
 					return;
 				}
@@ -1345,7 +1351,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.vpn);
 				adapter.notifyDataSetChanged();
-
+				
+				vpnConnected = new VPNConnected();
 				vpnConnected.execute(this);
 
 			} else {
@@ -1771,7 +1778,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							.show();
 				}
 			});
-
+			
+			randomReplay = new RandomReplay();
 			randomReplay.execute(ReplayActivity.this);
 			onlyRandom = true;
 
