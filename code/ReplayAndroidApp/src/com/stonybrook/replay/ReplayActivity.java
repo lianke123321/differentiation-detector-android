@@ -211,6 +211,23 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		Toast.makeText(context, "Please click \"Start\" to start the replay!",
 				Toast.LENGTH_LONG).show();
+		
+		new AlertDialog.Builder(ReplayActivity.this)
+		.setTitle("One more thing...")
+		.setMessage(
+				"Please leave the app running in the foreground "
+						+ "until replay is over in order to avoid "
+						+ "interruptions from other apps in your "
+						+ "phone. The screen will stay on during "
+						+ "the replay. Thank you for your cooperation!")
+		.setPositiveButton("OK",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog,
+							int which) {
+						// nothing
+					}
+				}).show();
 
 	}
 
@@ -434,23 +451,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		public void onClick(View v) {
 			if (!replayOngoing) {
-				new AlertDialog.Builder(ReplayActivity.this)
-						.setTitle("One more thing...")
-						.setMessage(
-								"Please leave the app running in the foreground "
-										+ "until replay is over in order to avoid "
-										+ "interruptions from other apps in your "
-										+ "phone. The screen will stay on during "
-										+ "the replay. Thank you for your cooperation!")
-						.setPositiveButton("OK",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										currentReplayCount = 0;
-										processApplicationReplay();
-									}
-								}).show();
+				currentReplayCount = 0;
+				processApplicationReplay();
 
 			} else
 				Toast.makeText(context,
