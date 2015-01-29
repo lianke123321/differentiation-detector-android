@@ -661,7 +661,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				JitterBean jitterBean = new JitterBean();
 
 				// adrian: new declareID() function
-				sideChannel.declareID(appData.getReplayName(),
+				String testID = null;
+				if (channel.equalsIgnoreCase("random"))
+					testID = "RANDOM_" + String.valueOf(currentIterationCount + 1);
+				else if (channel.equalsIgnoreCase("vpn"))
+					testID = "VPN_" + String.valueOf(currentIterationCount + 1);
+				else
+					testID = "NOVPN_" + String.valueOf(currentIterationCount + 1);
+				
+				Log.d("testID", "testID is " + testID);
+				
+				sideChannel.declareID(appData.getReplayName(), testID,
 						Config.get("extraString"));
 
 				// adrian: update progress

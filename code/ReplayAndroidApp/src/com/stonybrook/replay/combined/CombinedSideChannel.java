@@ -58,11 +58,12 @@ public class CombinedSideChannel {
 
 	}
 
-	public void declareID(String replayName, String extraString)
+	public void declareID(String replayName, String testID, String extraString)
 			throws Exception {
-		String temp = extraString.replace('_', '-');
+		/*String round = testID.replace('_', '-');
+		String extra = extraString.replace('_', '-');*/
 		sendObject(
-				(id + ";" + "SINGLE" + ";" + replayName + ";" + temp)
+				(id + ";" + testID + ";" + replayName + ";" + extraString)
 						.getBytes(),
 				objLen);
 		Log.d("declareID", id);
