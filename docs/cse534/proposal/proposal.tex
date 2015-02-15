@@ -1,0 +1,205 @@
+\documentclass[letterpaper]{sig-alternate-10pt}
+\usepackage{xspace,subfigure,multirow}
+\usepackage{color,cite,lastpage}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage[font={small}]{caption}
+%\usepackage[hyphenbreaks]{breakurl}
+\usepackage[hyphens]{url}
+\usepackage{authblk}               % for adding multiple authors
+
+
+\def\full{0}			% set 1 for a full tech report version
+				% set 0 for submission version
+				
+\def\shownotes{1}   	% set 1 for version with author notes
+                    		% set 0 for no notes
+		
+\def\anon{1}        	% set 1 to anonymize
+                    		% set 0 for acks and author names
+
+\def\showedits{0} %set for 1 to turn edits red, 0 for them to become black.
+
+\newcommand{\namedref}[2]{#1~\ref{#2}}
+\newcommand{\tableref}[1]{\namedref{Table}{#1}}
+\newcommand{\sectionref}[1]{$\S$\ref{#1}}
+\newcommand{\appendixref}[1]{\namedref{Appendix}{#1}}
+\newcommand{\theoremref}[1]{\namedref{Theorem}{#1}}
+\newcommand{\remarkref}[1]{\namedref{Remark}{#1}}
+\newcommand{\definitionref}[1]{\namedref{Definition}{#1}}
+\newcommand{\figureref}[1]{\namedref{Figure}{#1}}
+\newcommand{\lemmaref}[1]{\namedref{Lemma}{#1}}
+\newcommand{\claimref}[1]{\namedref{Claim}{#1}}
+\newcommand{\propositionref}[1]{\namedref{Proposition}{#1}}
+\newcommand{\constructionref}[1]{\namedref{Construction}{#1}}
+\newcommand{\corollaryref}[1]{\namedref{Corollary}{#1}}
+\newcommand{\equationref}[1]{\namedref{Equation}{#1}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{obs}[theorem]{Observation}
+
+
+%%%%%%%  Author Notes %%%%%%%
+\ifnum\shownotes=1
+\newcommand{\authnote}[2]{{ $\ll$\textsf{\footnotesize #1 notes: #2}$\gg$}}
+\else
+\newcommand{\authnote}[2]{}
+\fi
+\newcommand{\Pnote}[1]{{\color{purple}{\bf{\authnote{Phillipa}{#1}}}}}
+\newcommand{\AMnote}[1]{{\color{cyan}{\bf{\authnote{Arash}{#1}}}}}
+\newcommand{\Anote}[1]{{\color{green}{\bf{\authnote{Alan}{#1}}}}}
+\newcommand{\Inote}[1]{{\authnote{Italo}{#1}}}
+\newcommand{\tbd}[1]{{\color{red}{\bf{\authnote{TBD:}{#1}}}}}
+\newcommand{\drc}[1]{{\color{blue}{\bf{\authnote{Dave: TBD:}{#1}}}}}
+\newcommand{\Dnote}[1]{{\color{blue}{\bf{\authnote{Dave}{#1}}}}}
+
+%edits
+\ifnum\showedits=1
+\newcommand{\edit}[1]{\textcolor{red}{#1}}
+
+\else
+\newcommand{\edit}[1]{\textcolor{black}{#1}}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\providecommand{\bgpmux}{TransitPortal\xspace}
+
+\providecommand{\vs}{vs. }
+\providecommand{\ie}{\emph{i.e.,} }
+\providecommand{\eg}{\emph{e.g.,} }
+\providecommand{\aka}{\emph{aka} }
+\providecommand{\cf}{\emph{cf.,} }
+\providecommand{\resp}{\emph{resp.,} }
+\providecommand{\etal}{\emph{et al. }}   %Removed trailing space here; usually want non-breaking space with following reference
+\providecommand{\etc}{\emph{etc.}}      % No trailing space here either
+\providecommand{\mypara}[1]{\smallskip\noindent\emph{#1} }
+\providecommand{\myparab}[1]{\smallskip\noindent\textbf{#1} }
+\providecommand{\myparasc}[1]{\smallskip\noindent\textsc{#1} }
+\providecommand{\para}{\smallskip\noindent}
+
+\title{Differentiation Detector}
+\subtitle{CSE 534 Research Project Proposal}
+
+\author[1]{Anke Li}
+\author[1]{Praveen Kumar Alam}
+\author[1]{Boyu Wang}
+\author[1]{Wen Zhong}
+\affil[1]{Dept. of Computer Science, Stony Brook University}
+\renewcommand\Authands{ and }
+
+
+\sloppy
+\newcounter{GraphCounter}
+\setcounter{GraphCounter}{0}
+\newcommand{\addfig}[1]{\stepcounter{GraphCounter} {\color{blue}{\bf{FIG. \theGraphCounter: #1}}}}
+
+
+\newenvironment{packedenumerate}{\begin{list}{\thepackednmbr.}{\usecounter{packednmbr}\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+\newenvironment{packeditemize}{\begin{list}{$\bullet$}{\setlength{\itemsep}{0.2pt}\addtolength{\labelwidth}{-4pt}\setlength{\leftmargin}{\labelwidth}\setlength{\listparindent}{\parindent}\setlength{\parsep}{1pt}\setlength{\topsep}{0pt}}}{\end{list}}
+
+\newcommand{\squishenum}{
+   \begin{enumerate}{}
+    { \setlength{\itemsep}{0pt}      \setlength{\parsep}{0pt}
+      \setlength{\topsep}{3pt}       \setlength{\partopsep}{0pt}
+      \setlength{\leftmargin}{1.5em} \setlength{\labelwidth}{1em}
+      \setlength{\labelsep}{0.5em} } }
+
+\newcommand{\squishlist}{
+   \begin{list}{$\bullet$}
+    { \setlength{\itemsep}{0pt}      \setlength{\parsep}{3pt}
+      \setlength{\topsep}{3pt}       \setlength{\partopsep}{0pt}
+      \setlength{\leftmargin}{1.5em} \setlength{\labelwidth}{1em}
+      \setlength{\labelsep}{0.5em} } }
+
+\newcommand{\squishlisttwo}{
+   \begin{list}{$\bullet$}
+    { \setlength{\itemsep}{0pt}    \setlength{\parsep}{0pt}
+      \setlength{\topsep}{0pt}     \setlength{\partopsep}{0pt}
+      \setlength{\leftmargin}{2em} \setlength{\labelwidth}{1.5em}
+      \setlength{\labelsep}{0.5em} } }
+
+\newcommand{\squishend}{
+    \end{list}  }
+
+\newcommand{\squishenumend}{
+	\end{enumerate}	}
+
+\begin{document}
+
+%% COPYRIGHT STUFF
+\iffalse
+\conferenceinfo{SIGCOMM'11,} {August 15-19, 2011, Toronto, Ontario, Canada.}
+\CopyrightYear{2011}
+\crdata{978-1-4503-0797-0/11/08}
+\fi
+
+\clubpenalty=10000
+\widowpenalty = 10000
+
+\maketitle
+
+\section{Abstract}
+\subsection{Motivation for this project}
+Traffic differentiation, which means to give better (or worse) performance to certain classes of Internet traffic, is a well-known and controversial traffic management policy. As one form of violating network neutrality, traffic differentiation has been discussed a lot, while similar instances in cellular network are still lack of sufficient attention and solid study. Prior to this semester, Anke Li and Rajesh Golani have developed an Android APP which could run a certain set of tests on user's phone to gather data of traffic differentiation. In this project, we aim at improving this APP to be stabler, more reliable, and possibly adding new features to investigate some interesting middlebox-related issues observed in previous work. This APP could collect much more helpful data from normal users if we could achieve these goals, hence help us to better understand what's happening in cellular networks.
+
+\subsection{Overview of previous work}
+This research project is proposed based on a paper named "Identifying Traffic Differentiation in Mobile Networks", which has been submitted to Sigcomm'15. This paper proposed a new method called "record-and-replay" to identify traffic differentiation in cellular networks. The main idea of record-and-replay is to record different classes of mobile network traffic using tcpdump first, then replay these traces between our replay server and replay client, so that we could trigger traffic differentiation during the replay. As comparisons, we also do the same replay while client connecting to VPN, which means that communication between client and VPN server is encrypted, and random replay, in which we replace all payload with random bytes.
+
+In previous work, Anke Li has developed a working APP, but there remains some issues:
+\begin{itemize}
+  \item VPN connection failure\\\\
+  This APP is using strongSwan~\cite{strongSwan} to connect to our VPN server. There are two known reasons that could cause VPN connection failure: 1. some phones have IPv6 addresses that are not supported yet; 2. Android 5.0.x has a bug that could cause a dialog asking users to give VPN connection permission to our APP failed to pop out at the first time. Other unknown reasons could also cause APP to fail.
+  \item DatagramChannel in JAVA not working properly in old Android system\\\\
+  This problem causes that UDP packet receiver could not receive UDP packets, and affects all replays which include UDP packets sent by server. For now APP could only run on Android version no less than 4.4.
+  \item Random crash and blank screen\\\\
+  APP is currently not stable enough and has these minor bugs.
+  \item Middlebox-related issues\\\\
+  We found that many carriers we tested manipulate the connection of this APP using various middleboxes, and break replay connection in different ways. The replay server and APP are unable to handle these cases for now. This is an interesting point and worth further investigation.
+\end{itemize}
+
+\section{Plan of steps}
+As mentioned before, there are two objectives for this project: 1. improving stability and reliability of this APP, and possibly supporting as many devices and Android versions as possible; 2. adding new functions to support-even detect-middleboxes in cellular networks.
+And eventually, distributing this APP to people to collect sufficient data for future analyzing.
+
+Thus, our research project is divided into three steps:
+\begin{description}
+  \item[Step One:] Improving APP stability.
+  \item[Step Two:] Further developing this APP to support new functions.
+  \item[Step Three:] Collecting data.
+\end{description}
+
+\section{Timeline for completion}
+Based on section 2, we split this project into three phases.
+\begin{description}
+  \item[Phase One:] Feb. 16th-Feb. 26th. In this period, Boyu, Praveen and Wen should get familiar with the APP with the help from Anke, and we mainly focus on improving APP stability, rewriting and reorganizing current code if necessary.
+  \item[Phase Two:] Feb. 27th-Apr. 6th. During this time, we discuss, design and implement new functions as well as fixing existing or new bugs. We also finish the midterm report.
+  \item[Phase Three:] Apr. 7th-May. 10th. We mainly focus on collecting data, writing final report and preparing for the presentation.
+\end{description}
+
+Please be aware that this timeline might be adjusted in the future depending on the progress of project.
+
+\begin{small}
+	\bibliographystyle{abbrv}%ieeetr}	
+	\bibliography{mobile-platform-unified}
+\end{small}
+
+\begin{thebibliography}{9}
+
+\bibitem{strongSwan}
+  https://www.strongswan.org/
+
+\iffalse
+\bibitem{lamport94}
+  Leslie Lamport,
+  \emph{\LaTeX: a document preparation system}.
+  Addison Wesley, Massachusetts,
+  2nd edition,
+  1994.
+\fi
+
+\end{thebibliography}
+
+\end{document}
