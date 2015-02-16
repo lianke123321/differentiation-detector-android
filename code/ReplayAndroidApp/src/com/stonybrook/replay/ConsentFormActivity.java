@@ -62,6 +62,9 @@ public class ConsentFormActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
+		//This is not working
+		//System.setProperty("java.net.preferIPv4Stack", "true");
+		
 		// get vpn server hostname
 		try {
 			Config.readConfigFile(ReplayConstants.CONFIG_FILE,
