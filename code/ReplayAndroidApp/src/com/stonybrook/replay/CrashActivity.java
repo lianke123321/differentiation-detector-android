@@ -1,9 +1,7 @@
 package com.stonybrook.replay;
 
-import com.rgolani.replay.R;
-
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.Window;
 

@@ -4,7 +4,6 @@ import java.util.List;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +17,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.rgolani.replay.R;
+import com.stonybrook.replay.R;
 import com.stonybrook.replay.ReplayActivity;
 import com.stonybrook.replay.bean.ApplicationBean;
 
@@ -80,7 +79,7 @@ public class ImageReplayListAdapter extends BaseAdapter {
 		ProgressBar progress = (ProgressBar) view.findViewById(R.id.appProgress);
 		ImageButton button = (ImageButton) view.findViewById(R.id.appResultBtn);
 
-		if (app.status.equalsIgnoreCase(mainAct.getResources().getString(R.string.finished))) {
+		if (app.status.equalsIgnoreCase(mainAct.getResources().getString(R.string.finish_vpn))) {
 			progress.setVisibility(ProgressBar.GONE);
 			button.setVisibility(Button.VISIBLE);
 

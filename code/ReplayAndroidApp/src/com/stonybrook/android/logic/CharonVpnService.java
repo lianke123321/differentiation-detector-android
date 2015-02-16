@@ -29,14 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.stonybrook.android.data.VpnProfile;
-import com.stonybrook.android.data.VpnProfileDataSource;
-import com.stonybrook.android.data.VpnType;
-import com.stonybrook.android.logic.VpnStateService.ErrorState;
-import com.stonybrook.android.logic.VpnStateService.State;
-import com.stonybrook.replay.ReplayActivity;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
@@ -56,6 +48,12 @@ import android.os.ParcelFileDescriptor;
 import android.security.KeyChain;
 import android.security.KeyChainException;
 import android.util.Log;
+
+import com.stonybrook.android.data.VpnProfile;
+import com.stonybrook.android.data.VpnProfileDataSource;
+import com.stonybrook.android.logic.VpnStateService.ErrorState;
+import com.stonybrook.android.logic.VpnStateService.State;
+import com.stonybrook.replay.ReplayActivity;
 
 @SuppressLint("NewApi")
 public class CharonVpnService extends VpnService implements Runnable {
@@ -140,44 +138,35 @@ public class CharonVpnService extends VpnService implements Runnable {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d("VPN", "start command");
-		if (intent != null) {
-			Bundle bundle = intent.getExtras();
-			VpnProfile profile = null;
+		try {
+			if (intent != null) {
+				Bundle bundle = intent.getExtras();
+				VpnProfile profile = null;
 
-			String action = (String) intent.getCharSequenceExtra("action");
-			Log.d("action", action);
-			if (action.equalsIgnoreCase("stop")) {
-				setNextProfile(null);
-			} else {
-				if (bundle != null && mNextProfile == null) {
-					
-					//Set up the following properties for VPN connection. Move this values to configuration properties file
-					profile = new VpnProfile();
-					profile.setName("test");
-					profile.setGateway("ec2-54-243-17-203.compute-1.amazonaws.com");
-					profile.setUserCertificateAlias(null);
-					profile.setAutoReconnect(false);
-					profile.setURLAddress("");
-					profile.setVpnType(VpnType.IKEV2_EAP);
+				String action = (String) intent.getCharSequenceExtra("action");
+				// Log.d("action", action);
+				if (action.equalsIgnoreCase("stop")) {
+					setNextProfile(null);
+				} else {
+					if (bundle != null && mNextProfile == null) {
 
-					if (profile != null) {
-						String password = bundle
-								.getString(VpnProfileDataSource.KEY_PASSWORD);
-						profile.setPassword(password);
-						profile.setUsername(bundle
-								.getString(VpnProfileDataSource.KEY_USERNAME));
+						// Set up the following properties for VPN connection.
+						// Move
+						// this values to configuration properties file
+						profile = mDataSource.getAllVpnProfiles().get(0);
+						
+						//throw new NullPointerException();
+						setNextProfile(profile);
 					}
-				
-				setNextProfile(profile);
 				}
-			}
 
+			}
+		} catch (NullPointerException e) {
+			Log.e("VPN", "failed to connect VPN!");
 		}
 		return START_NOT_STICKY;
 	}
 
-	
-	
 	@Override
 	public void onCreate() {
 		Log.d("VPN", "start command");
@@ -199,10 +188,10 @@ public class CharonVpnService extends VpnService implements Runnable {
 
 	@Override
 	public void onRevoke() { /*
-							 * the system revoked the rights grated with the
-							 * initial prepare() call. called when the user
-							 * clicks disconnect in the system's VPN dialog
-							 */
+								* the system revoked the rights grated with the
+								* initial prepare() call. called when the user
+								* clicks disconnect in the system's VPN dialog
+								*/
 		setNextProfile(null);
 	}
 
@@ -569,6 +558,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 	private byte[][] getUserCertificate() throws KeyChainException,
 			InterruptedException, CertificateEncodingException {
 		ArrayList<byte[]> encodings = new ArrayList<byte[]>();
+		//Log.d("CharonVpnService", mCurrentUserCertificateAlias);
 		X509Certificate[] chain = KeyChain.getCertificateChain(
 				getApplicationContext(), mCurrentUserCertificateAlias);
 		if (chain == null || chain.length == 0) {
@@ -772,8 +762,5 @@ public class CharonVpnService extends VpnService implements Runnable {
 		System.loadLibrary("ipsec");
 		System.loadLibrary("androidbridge");
 	}
-	
-	
-	
-	
+
 }

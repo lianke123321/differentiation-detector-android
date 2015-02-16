@@ -6,6 +6,7 @@ public class SocketInstance {
 	private String CSPair = null;
 	
 	public SocketInstance(String iP, int port, String cSPair) {
+		// @@@ a little confused, this class doesn't have a father class, why call super()?
 		super();
 		IP = iP;
 		this.port = port;

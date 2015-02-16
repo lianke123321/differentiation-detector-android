@@ -15,20 +15,12 @@
 
 package com.stonybrook.android.ui;
 
-import java.io.File;
-
-import com.stonybrook.android.data.LogContentProvider;
-import com.stonybrook.android.logic.CharonVpnService;
-
-import com.rgolani.replay.R;
-
 import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+
+import com.stonybrook.replay.R;
 
 public class LogActivity extends Activity
 {

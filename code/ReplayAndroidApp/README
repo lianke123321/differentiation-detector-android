@@ -16,5 +16,5 @@ http://wiki.strongswan.org/projects/strongswan/wiki/AndroidVPNClient
 	Line 155: src/com/stonybrook/android/logic/CharonVpnService.java (no change change should be needed here unless IP of Meddle server changes)
 	Line 858: src/com/stonybrook/replay/ReplayActivity.java (Username and Password)
 
-- After this, you should be able to connect to VPN and  run the Replays from App.
+- After this, you should be able to connect to VPN and run the Replays from App.
 

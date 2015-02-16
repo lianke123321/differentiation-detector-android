@@ -1,28 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.rgolani.replay"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    package="com.stonybrook.replay"
+    android:versionCode="23"
+    android:versionName="2.2.13" >
 
     <!-- Rememeber this change. Changed min API version from 8 to 11 to support executeOnExecutor -->
     <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="18" />
+        android:minSdkVersion="19"
+        android:targetSdkVersion="21" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!--
+        <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+        This will cause an "app stopped working" error dialogue when restarting the
+        phone
+    -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
-        android:debuggable="true"
         android:icon="@drawable/app_icon"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:theme="@style/LightThemeSelector" >
         <activity
-            android:name="com.stonybrook.replay.MainActivity"
+            android:name="com.stonybrook.replay.ConsentFormActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -39,6 +47,11 @@
         <activity
             android:name="com.stonybrook.replay.CrashActivity"
             android:label="@string/title_activity_crash"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.stonybrook.replay.MainActivity"
+            android:label="@string/title_activity_replay"
             android:screenOrientation="portrait" >
         </activity>
         <activity
@@ -64,7 +77,7 @@
             <!--
                  android:grantUriPermissions="true" combined with a custom permission does
                  not work (probably too many indirections with ACTION_SEND) so we secure
-                 this provider with a custom ticketing system
+                 this provider with a custom ticketing system
             -->
         </provider>
 

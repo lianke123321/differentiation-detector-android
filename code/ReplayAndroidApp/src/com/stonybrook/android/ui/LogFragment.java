@@ -21,10 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.StringReader;
 
-import com.stonybrook.android.logic.CharonVpnService;
-
-import com.rgolani.replay.R;
-
 import android.app.Fragment;
 import android.os.Bundle;
 import android.os.FileObserver;
@@ -33,6 +29,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.stonybrook.replay.R;
+import com.stonybrook.android.logic.CharonVpnService;
 
 public class LogFragment extends Fragment implements Runnable
 {

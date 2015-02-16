@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    
     <string-array name="timing">
         <item>@string/timing_Yes</item>
         <item>@string/timing_No</item>
     </string-array>
+    
     <string-array name="server">
-        <item>@string/server_rajesh_ec2</item>
-        <item>@string/server_something_else</item>
+        <item>@string/server_replay</item>
     </string-array>
+    
+    <string-array name="iteration">
+        <item>@string/iteration_1</item>
+        <item>@string/iteration_2</item>
+        <item>@string/iteration_3</item>
+    </string-array>
+    
 </resources>

@@ -8,7 +8,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/blue14"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:gravity="center" >
 
         <Button
             android:id="@+id/settingsButton"
@@ -83,10 +84,11 @@
           android:layout_height='fill_parent'
           android:columnWidth='100dip'
           android:gravity='center'
-          android:horizontalSpacing='4dip'
+          android:padding="5dp"
           android:numColumns='auto_fit'
           android:stretchMode='columnWidth'
-          android:verticalSpacing='2dip' 
+          android:horizontalSpacing='4dip'
+          android:verticalSpacing='4dip'
           android:layout_below="@+id/ll1"
           />
   

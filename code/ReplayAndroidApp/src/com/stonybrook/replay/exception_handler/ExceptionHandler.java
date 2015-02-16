@@ -3,11 +3,11 @@ package com.stonybrook.replay.exception_handler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import com.stonybrook.replay.CrashActivity;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
+
+import com.stonybrook.replay.CrashActivity;
 
 public class ExceptionHandler implements
 		java.lang.Thread.UncaughtExceptionHandler {
@@ -45,7 +45,7 @@ public class ExceptionHandler implements
 		errorReport.append(LINE_SEPARATOR);
 		errorReport.append("\n************ FIRMWARE ************\n");
 		errorReport.append("SDK: ");
-		errorReport.append(Build.VERSION.SDK);
+		errorReport.append(Build.VERSION.SDK_INT);
 		errorReport.append(LINE_SEPARATOR);
 		errorReport.append("Release: ");
 		errorReport.append(Build.VERSION.RELEASE);

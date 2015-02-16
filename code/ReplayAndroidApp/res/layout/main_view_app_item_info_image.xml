@@ -4,23 +4,30 @@
     android:layout_height="fill_parent"
     >
 	<ImageView
-      android:layout_width="100dp"
-      android:layout_height="100dp"
-      android:src="@drawable/dropbox"
-      android:id="@+id/appImageView"
-      android:paddingLeft="6dp"
-      android:paddingRight="6dp"
-      android:paddingTop="6dp"
-      android:paddingBottom="6dp"
-      />
+	    android:id="@+id/appImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/dropbox"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:contentDescription="@string/image_name" />
 	
 	<CheckBox
-            android:id="@+id/isSelectedCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignRight='@+id/appImageView'
-            android:layout_alignParentTop='true'
-            android:clickable="false"
-            />
+        android:id="@+id/isSelectedCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight='@+id/appImageView'
+        android:layout_alignParentTop='true'
+        android:clickable="false" />
+	
+	<TextView 
+	    android:id="@+id/appNameTextView"
+	    android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appImageView"
+        android:layout_centerInParent="true"
+        android:text="@string/Viber" />
 	
 </RelativeLayout>
