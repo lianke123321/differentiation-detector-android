@@ -48,6 +48,8 @@
     <string name="finish_vpn">Finished replay on vpn</string>
     <string name="finish_random">Finished random replay</string>
     
+    <string name="crash_toast_text">Sorry, app is crashed. Log will be sent to developer.</string>
+    
     <string name="downloading">Downloading File</string>
     <string name="error">Whoops! Replay aborted.</string>
     <string name="vpn_connect">Trying to connect VPN</string>

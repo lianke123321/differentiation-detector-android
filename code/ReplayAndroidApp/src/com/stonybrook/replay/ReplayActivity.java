@@ -226,7 +226,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						// nothing
 					}
 				}).show();
-
+		
+		// this is for testing log sending code
+		//throw new RuntimeException("Crash!");
 	}
 
 	@Override

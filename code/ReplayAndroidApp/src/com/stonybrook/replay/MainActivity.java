@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
 	/**
 	 * We can provide email account here on which VPN logs can be received
 	 */
-	public static final String CONTACT_EMAIL = "lianke123321@gmail.com";
+	public static final String CONTACT_EMAIL = "diffdetector.report@ankeli.me";
 	private static final String DEFAULT_ALIAS = "replay5";
 
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
