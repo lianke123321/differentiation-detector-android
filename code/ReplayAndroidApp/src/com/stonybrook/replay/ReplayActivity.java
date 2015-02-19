@@ -208,24 +208,38 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		vpnConnected = new VPNConnected();
 		vpnDisconnected = new VPNDisconnected();
 		randomReplay = new RandomReplay();
+		
+		while (server == null) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if (server.split("\\.").length == 4) {
+			Toast.makeText(context,
+					"Please click \"Start\" to start the replay!",
+					Toast.LENGTH_LONG).show();
 
-		Toast.makeText(context, "Please click \"Start\" to start the replay!",
-				Toast.LENGTH_LONG).show();
-
-		new AlertDialog.Builder(ReplayActivity.this)
-				.setTitle("One more thing...")
-				.setMessage(
-						"Please leave the app running in the foreground "
-								+ "until replay is over in order to avoid "
-								+ "interruptions from other apps in your "
-								+ "phone. The screen will stay on during "
-								+ "the replay. Thank you for your cooperation!")
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// nothing
-					}
-				}).show();
+			new AlertDialog.Builder(ReplayActivity.this)
+					.setTitle("One more thing...")
+					.setMessage(
+							"Please leave the app running in the foreground "
+									+ "until replay is over in order to avoid "
+									+ "interruptions from other apps in your "
+									+ "phone. The screen will stay on during "
+									+ "the replay. Thank you for your cooperation!")
+					.setPositiveButton("OK",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									// nothing
+								}
+							}).show();
+		}
 
 		// this is for testing log sending code
 		// throw new RuntimeException("Crash!");
@@ -1769,7 +1783,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								.setMessage(
 										"Sorry, your phone is using IPv6 address."
 												+ "Currently not supported!\n\n"
-												+ "Thank you for your time!")
+												+ "Thank you!")
 								.setPositiveButton("OK",
 										new DialogInterface.OnClickListener() {
 											@Override
