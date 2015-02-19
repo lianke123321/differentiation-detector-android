@@ -226,9 +226,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						// nothing
 					}
 				}).show();
-		
+
 		// this is for testing log sending code
-		//throw new RuntimeException("Crash!");
+		// throw new RuntimeException("Crash!");
 	}
 
 	@Override
@@ -665,14 +665,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: new declareID() function
 				String testID = null;
 				if (channel.equalsIgnoreCase("random"))
-					testID = "RANDOM_" + String.valueOf(currentIterationCount + 1);
+					testID = "RANDOM_"
+							+ String.valueOf(currentIterationCount + 1);
 				else if (channel.equalsIgnoreCase("vpn"))
 					testID = "VPN_" + String.valueOf(currentIterationCount + 1);
 				else
-					testID = "NOVPN_" + String.valueOf(currentIterationCount + 1);
-				
+					testID = "NOVPN_"
+							+ String.valueOf(currentIterationCount + 1);
+
 				Log.d("testID", "testID is " + testID);
-				
+
 				sideChannel.declareID(appData.getReplayName(), testID,
 						Config.get("extraString"));
 
@@ -1732,9 +1734,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				server = InetAddress.getByName(
 						(String) getIntent().getStringExtra("server"))
 						.getHostAddress();
+				String[] tmpServer = server.split("\\.");
+
 				meddleIP = InetAddress.getByName(GATE_WAY).getHostAddress();
 				Log.d("GetReplayServerIP", "Server IP: " + server + " VPN IP: "
-						+ meddleIP);
+						+ meddleIP + " # fields: " + tmpServer.length);
+
+				if (tmpServer.length != 4)
+					throw new NullPointerException();
+
 				// for testing exception handling
 				// throw new UnknownHostException();
 			} catch (UnknownHostException e) {
@@ -1751,6 +1759,37 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				});
 
 				ReplayActivity.this.finish();
+			} catch (NullPointerException e) {
+				Log.w("GetReplayServerIP", "not ipv4 address!");
+
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						new AlertDialog.Builder(ReplayActivity.this)
+								.setTitle("Error")
+								.setMessage(
+										"Sorry, your phone is using IPv6 address."
+												+ "Currently not supported!\n\n"
+												+ "Thank you for your time!")
+								.setPositiveButton("OK",
+										new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(
+													DialogInterface dialog,
+													int which) {
+												try {
+													disconnectVPN();
+													ReplayActivity.this
+															.finish();
+												} catch (Exception e) {
+													// TODO Auto-generated catch
+													// block
+													e.printStackTrace();
+												}
+											}
+										}).show();
+					}
+				});
+
 			}
 			return false;
 		}
@@ -1876,7 +1915,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					new AlertDialog.Builder(ReplayActivity.this)
 							.setTitle("Error")
 							.setMessage(
-									"Testing vpn connection failed! "
+									"Testing VPN connection failed! "
 											+ "If you are using Android "
 											+ "5.0.x, please try rebooting your phone.\n\n"
 											+ "Click \"OK\" to continue or click \"Go back\".")
@@ -1887,6 +1926,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												DialogInterface dialog,
 												int which) {
 											try {
+												disconnectVPN();
 												processCombinedApplication(
 														selectedApps
 																.get(currentReplayCount),
