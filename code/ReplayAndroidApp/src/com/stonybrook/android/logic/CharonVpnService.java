@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.acra.ACRA;
+
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -161,8 +163,9 @@ public class CharonVpnService extends VpnService implements Runnable {
 				}
 
 			}
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			Log.e("VPN", "failed to connect VPN!");
+			ACRA.getErrorReporter().handleException(e);
 		}
 		return START_NOT_STICKY;
 	}

@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
 	/**
 	 * We can provide email account here on which VPN logs can be received
 	 */
-	public static final String CONTACT_EMAIL = "diffdetector.report@ankeli.me";
+	public static final String CONTACT_EMAIL = "contact@ankeli.me";
 	private static final String DEFAULT_ALIAS = "replay5";
 
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
@@ -166,7 +166,7 @@ public class MainActivity extends Activity {
 			settingsButton = (Button) findViewById(R.id.settingsButton);
 			settingsButton.setOnClickListener(settingsButtonclick);
 
-			// to get certificate status
+			// to get randomID
 			settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
 			
 			// generate or retrieve an id for this phone

@@ -62,6 +62,11 @@ public class ConsentFormActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
+		if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
+			finish();
+			return;
+		}
+		
 		//This is not working
 		//System.setProperty("java.net.preferIPv4Stack", "true");
 		

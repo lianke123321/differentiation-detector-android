@@ -1,16 +1,14 @@
 package com.stonybrook.debug;
 
 import org.acra.ACRA;
-import org.acra.ReportField;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
-import org.acra.sender.HttpSender;
 
 import android.app.Application;
 
 import com.stonybrook.replay.R;
 
-@ReportsCrashes(
+/*@ReportsCrashes(
 	    formUri = "https://ankeli.cloudant.com/acra-diffdetector/_design/acra-storage/_update/report",
 	    reportType = HttpSender.Type.JSON,
 	    httpMethod = HttpSender.Method.POST,
@@ -28,12 +26,12 @@ import com.stonybrook.replay.R;
 	    },
 	    mode = ReportingInteractionMode.TOAST,
 	    resToastText = R.string.crash_toast_text
-	)
+	)*/
 
-/*@ReportsCrashes(formKey = "", // will not be used
+@ReportsCrashes(formKey = "", // will not be used
 				mailTo = "diffdetector.report@ankeli.me",
 				mode = ReportingInteractionMode.TOAST,
-				resToastText = R.string.crash_toast_text)*/
+				resToastText = R.string.crash_toast_text)
 
 public class MyApplication extends Application {
 	@Override

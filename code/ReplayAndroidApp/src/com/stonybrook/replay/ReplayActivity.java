@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.acra.ACRA;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -24,6 +25,8 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.VpnService;
@@ -70,6 +73,10 @@ import com.stonybrook.replay.util.UnpickleDataStream;
 
 public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
+	// add SharedPreferences for consent form
+	public static final String STATUS = "ReplayActPrefsFile";
+	SharedPreferences settings;
+
 	Button backButton, replayButton;
 	ArrayList<ApplicationBean> selectedApps = null;
 	ArrayList<ApplicationBean> selectedAppsRandom = null;
@@ -103,6 +110,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	QueueCombinedAsync queueCombined = null;
 	String currentTask = "none";
 	String randomID = null;
+	int historyCount;
 
 	// VPN Changes
 	private Bundle mProfileInfo;
@@ -185,6 +193,26 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		updateSelectedTextViews(selectedApps);
 
+		// to get historyCount
+		settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
+
+		// generate or retrieve an historyCount for this phone
+		boolean hasHistoryCount = settings.getBoolean("hasHistoryCount", false);
+		if (!hasHistoryCount) {
+			historyCount = 1;
+			Editor editor = settings.edit();
+			editor.putBoolean("hasHistoryCount", true);
+			editor.putInt("historyCount", historyCount);
+			editor.commit();
+			Log.d("Replay", "initialized history count.");
+		} else {
+			historyCount = settings.getInt("historyCount", -1);
+			Log.d("Replay", "retrieve existing historyCount: " + historyCount);
+		}
+		// check if retrieve historyCount succeeded
+		if (historyCount == -1)
+			throw new RuntimeException();
+
 		// adrian: for progress bar
 		prgBar = (ProgressBar) findViewById(R.id.prgBar);
 		prgBar.setVisibility(View.GONE);
@@ -208,7 +236,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		vpnConnected = new VPNConnected();
 		vpnDisconnected = new VPNDisconnected();
 		randomReplay = new RandomReplay();
-		
+
 		while (server == null) {
 			try {
 				Thread.sleep(1000);
@@ -217,7 +245,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				e.printStackTrace();
 			}
 		}
-		
+
 		if (server.split("\\.").length == 4) {
 			Toast.makeText(context,
 					"Please click \"Start\" to start the replay!",
@@ -242,17 +270,26 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 
 		// this is for testing log sending code
-		//throw new RuntimeException("Crash!");
+		// throw new RuntimeException("Crash!");
 	}
 
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
+		if (replayOngoing) {
+			ReplayActivity.this.runOnUiThread(new Runnable() {
+				public void run() {
+					Toast.makeText(ReplayActivity.this,
+							"You have pressed HOME button. Replay aborted.",
+							Toast.LENGTH_LONG).show();
+				}
+
+			});
+		}
+		disconnectVPN();
 		if (queueCombined != null) {
 			queueCombined.cancel(true);
-			if (queueCombined.channel.equalsIgnoreCase("vpn"))
-				disconnectVPN();
 		}
 		this.finish();
 	}
@@ -689,8 +726,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				Log.d("testID", "testID is " + testID);
 
-				sideChannel.declareID(appData.getReplayName(), testID,
-						Config.get("extraString"));
+				sideChannel
+						.declareID(appData.getReplayName(), testID,
+								Config.get("extraString"),
+								String.valueOf(historyCount));
 
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
@@ -1054,10 +1093,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
 				ex.printStackTrace();
+				ACRA.getErrorReporter().handleException(ex);
+				ReplayActivity.this.finish();
+			} catch (InterruptedException ex) {
+				Log.d("Replay", "Replay interrupted!");
 			} catch (Exception ex) {
 				success = false;
 				Log.d("Replay", "bad things happened, quiting process");
 				ex.printStackTrace();
+				// throw new RuntimeException();
+				ACRA.getErrorReporter().handleException(ex);
+				ReplayActivity.this.finish();
 			}
 			Log.d("Replay", "queueCombined finished execution!");
 			return null;
@@ -1160,6 +1206,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				vpnDisconnected.execute(this);
 				return;
 			}
+
+			// Call ask4analysis when finished one trace and update historyCount
+			historyCount += 1;
+			Editor editor = settings.edit();
+			editor.putInt("historyCount", historyCount);
+			editor.commit();
+			Log.d("Replay", "historyCount: " + String.valueOf(historyCount));
 
 			/**
 			 * Change status on screen. Here currentReplayCount stores number of
@@ -1293,6 +1346,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				vpnDisconnected.execute(this);
 				return;
 			}
+
+			// Call ask4analysis when finished one trace and update historyCount
+			historyCount += 1;
+			Editor editor = settings.edit();
+			editor.putInt("historyCount", historyCount);
+			editor.commit();
+			Log.d("Replay", "historyCount: " + String.valueOf(historyCount));
 
 			/**
 			 * Change status on screen. Here currentReplayCount stores number of
