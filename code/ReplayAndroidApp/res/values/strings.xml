@@ -48,7 +48,7 @@
     <string name="finish_vpn">Finished replay on vpn</string>
     <string name="finish_random">Finished random replay</string>
     
-    <string name="crash_toast_text">Sorry, an exception occurred. Sending crash report now.</string>
+    <string name="crash_toast_text">Please allow exception report to be sent back to us!</string>
     
     <string name="downloading">Downloading File</string>
     <string name="error">Whoops! Replay aborted.</string>

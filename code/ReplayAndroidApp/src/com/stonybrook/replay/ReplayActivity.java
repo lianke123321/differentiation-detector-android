@@ -66,6 +66,7 @@ import com.stonybrook.replay.combined.CombinedQueue;
 import com.stonybrook.replay.combined.CombinedReceiverThread;
 import com.stonybrook.replay.combined.CombinedSideChannel;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
+import com.stonybrook.replay.exception_handler.ReplayAbortedException;
 import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.Mobilyzer;
 import com.stonybrook.replay.util.ReplayCompleteListener;
@@ -1020,9 +1021,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						Boolean.valueOf(Config.get("timing")), server);
 
 				// if sender aborted, throw exception here
+				// queue.ABORT = true;
 				if (queue.ABORT == true) {
-					Log.d("Replay", "replay aborted! Throw exception!");
-					throw new Exception();
+					//Log.d("Replay", "replay aborted! Throw exception!");
+					throw new ReplayAbortedException();
 				}
 
 				// waiting for all threads to finish
@@ -1097,10 +1099,34 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				ReplayActivity.this.finish();
 			} catch (InterruptedException ex) {
 				Log.d("Replay", "Replay interrupted!");
+			} catch (ReplayAbortedException ex) {
+				success = false;
+				Log.d("Replay", "replay aborted!");
+				ex.printStackTrace();
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(
+								context,
+								"Sorry, we might have observed traffic modification "
+										+ "and replay is aborted due to this.",
+								Toast.LENGTH_LONG).show();
+					}
+				});
+				// throw new RuntimeException();
+				ACRA.getErrorReporter().handleException(ex);
+				ReplayActivity.this.finish();
 			} catch (Exception ex) {
 				success = false;
-				Log.d("Replay", "bad things happened, quiting process");
+				Log.d("Replay", "replay failed due to unknow reason!");
 				ex.printStackTrace();
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(
+								context,
+								"Sorry, replay failed due to unknown reason.",
+								Toast.LENGTH_LONG).show();
+					}
+				});
 				// throw new RuntimeException();
 				ACRA.getErrorReporter().handleException(ex);
 				ReplayActivity.this.finish();
