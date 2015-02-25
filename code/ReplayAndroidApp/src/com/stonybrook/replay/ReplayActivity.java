@@ -666,7 +666,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected String doInBackground(String... str) {
-
+			// testing manually free memory
+			System.gc();
+			
 			if (channel.equalsIgnoreCase("open") && currentIterationCount == 0) {
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {

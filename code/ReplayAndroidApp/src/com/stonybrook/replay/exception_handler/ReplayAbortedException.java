@@ -1,6 +1,6 @@
 package com.stonybrook.replay.exception_handler;
 
-public class ReplayAbortedException extends RuntimeException {
+public class ReplayAbortedException extends Exception {
 
     /**
      * Using this custom exception when replay is aborted 

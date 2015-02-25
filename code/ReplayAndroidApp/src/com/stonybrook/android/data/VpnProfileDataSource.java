@@ -177,6 +177,9 @@ public class VpnProfileDataSource
 	{
 		if (mDbHelper != null)
 		{
+			// added by adrian to solve sqlconnection leak problem
+			mDatabase.close();
+			
 			mDbHelper.close();
 			mDbHelper = null;
 		}
