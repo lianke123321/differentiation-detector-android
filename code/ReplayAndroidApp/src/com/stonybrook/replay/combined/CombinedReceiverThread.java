@@ -1,8 +1,6 @@
 package com.stonybrook.replay.combined;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -42,7 +40,7 @@ public final class CombinedReceiverThread implements Runnable {
 		try {
 			Selector selector = Selector.open();
 			ByteBuffer buf = ByteBuffer.allocate(bufSize);
-			byte[] buff = new byte[bufSize];
+			//byte[] buff = new byte[bufSize];
 
 			while (keepRunning) {
 
