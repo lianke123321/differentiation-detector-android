@@ -112,7 +112,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 	private CharonVpnService syncObject;
 
 	private ConnectivityManager connectivityManger;
-	private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
+	/*private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (syncObject == null || mService == null)
@@ -124,7 +124,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 
 			}
 		}
-	};
+	};*/
 
 	/**
 	 * as defined in charonservice.h
@@ -183,8 +183,8 @@ public class CharonVpnService extends VpnService implements Runnable {
 		bindService(new Intent(this, VpnStateService.class),
 				mServiceConnection, Service.BIND_AUTO_CREATE);
 		/* check if we need to start a connection after being offline */
-		registerReceiver(mConnReceiver, new IntentFilter(
-				ConnectivityManager.CONNECTIVITY_ACTION));
+		//registerReceiver(mConnReceiver, new IntentFilter(
+		//		ConnectivityManager.CONNECTIVITY_ACTION));
 		// initialize this object in order to obtain all the fields
 		thisStaticObject = this;
 	}
@@ -302,6 +302,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 	 * The timer to double check the current network connection
 	 */
 	private void runTimer() {
+		/*
 		timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 
@@ -359,7 +360,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 				}
 			}
 			// start at one minute delay and run 15 minutes apart
-		}, ONE_MINUTE, 15 * ONE_MINUTE);
+		}, ONE_MINUTE, 15 * ONE_MINUTE); */
 	}
 
 	/*
