@@ -13,6 +13,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 
@@ -1818,7 +1821,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		String publicIP = null;
 		while (publicIP == null) {
 			try {
-				HttpClient httpclient = new DefaultHttpClient();
+				HttpParams httpParameters = new BasicHttpParams();
+				// Set the timeout in milliseconds until a connection is established.
+				// The default value is zero, that means the timeout is not used. 
+				int timeoutConnection = 3000;
+				HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+				// Set the default socket timeout (SO_TIMEOUT) 
+				// in milliseconds which is the timeout for waiting for data.
+				int timeoutSocket = 5000;
+				HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+
+				HttpClient httpclient = new DefaultHttpClient(httpParameters);
 				HttpGet httpget = new HttpGet("http://myexternalip.com/raw");
 				HttpResponse response;
 				response = httpclient.execute(httpget);
