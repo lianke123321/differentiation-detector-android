@@ -69,19 +69,36 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ll1"
+        android:layout_above="@+id/prgBarLayout"
         android:divider="@drawable/listitem"
         android:dividerHeight="1.5dip" 
         android:groupIndicator="@drawable/expandable"
         >
     </ListView>
 
-    
-    
-    <LinearLayout
-        android:id="@+id/ll2"
+    <LinearLayout 
+        android:id="@+id/prgBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/appsListView"
+        android:layout_above="@+id/summaryLinearLayout"
+        android:orientation="horizontal" >
+        
+        <ProgressBar 
+            android:id="@+id/prgBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:padding="10dp"
+        	android:max="100"
+        	android:progress="0" />
+        
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/summaryLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:background="@color/blue1"
         android:orientation="horizontal" >
 
@@ -107,24 +124,6 @@
             android:textColor="@color/black"
             android:textSize="@dimen/main_title_text_size"
             android:textStyle="bold" />
-    </LinearLayout>
-    
-    <LinearLayout 
-        android:id="@+id/prgBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/ll2"
-        android:orientation="horizontal" >
-        
-        <ProgressBar 
-            android:id="@+id/prgBar"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-        	android:layout_height="wrap_content"
-        	android:padding="10dp"
-        	android:max="100"
-        	android:progress="0" />
-        
     </LinearLayout>
 
 </RelativeLayout>

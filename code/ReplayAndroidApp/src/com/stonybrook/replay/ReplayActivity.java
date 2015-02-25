@@ -71,7 +71,14 @@ import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.Mobilyzer;
 import com.stonybrook.replay.util.ReplayCompleteListener;
 import com.stonybrook.replay.util.UnpickleDataStream;
-
+/**
+ * This activity handles all replay-related stuff
+ * TODO: find a way to safely kill all threads when app 
+ * is crashed or interrupted by user
+ * 
+ * @author Rajesh, Adrian
+ *
+ */
 public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	// add SharedPreferences for consent form
@@ -282,7 +289,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			ReplayActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
 					Toast.makeText(ReplayActivity.this,
-							"You have pressed HOME button. Replay aborted.",
+							"Replay aborted by user.",
 							Toast.LENGTH_LONG).show();
 				}
 
