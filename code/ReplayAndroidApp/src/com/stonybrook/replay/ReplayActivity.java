@@ -288,12 +288,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 
 		// this is for testing log sending code
-		// throw new RuntimeException("Crash!");
+		//throw new RuntimeException("Crash!");
 	}
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
+		
 		super.onStop();
 		if (replayOngoing) {
 			ReplayActivity.this.runOnUiThread(new Runnable() {

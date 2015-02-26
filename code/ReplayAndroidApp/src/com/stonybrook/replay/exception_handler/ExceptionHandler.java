@@ -56,10 +56,15 @@ public class ExceptionHandler implements
 		errorReport.append(LINE_SEPARATOR);
 
 		Intent intent = new Intent(myContext, CrashActivity.class);
+		// set crash activity as the root activity and close all the others
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+				| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		
 		intent.putExtra("error", errorReport.toString());
 		myContext.startActivity(intent);
 		Log.e("ExceptionHandler", errorReport.toString());
-		Thread.getDefaultUncaughtExceptionHandler().uncaughtException(thread, exception);
+		Thread.getDefaultUncaughtExceptionHandler().uncaughtException(thread,
+				exception);
 
 		android.os.Process.killProcess(android.os.Process.myPid());
 		System.exit(10);
