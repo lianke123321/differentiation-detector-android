@@ -2,6 +2,7 @@ package com.stonybrook.replay;
 
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -1107,6 +1108,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
 				ex.printStackTrace();
+				
 				ACRA.getErrorReporter().handleException(ex);
 				ReplayActivity.this.finish();
 			} catch (InterruptedException ex) {
@@ -1115,19 +1117,21 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				success = false;
 				Log.d("Replay", "replay aborted!");
 				ex.printStackTrace();
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						Toast.makeText(
-								context,
-								"Sorry, we might have observed traffic modification "
-										+ "and replay is aborted due to this.",
-								Toast.LENGTH_LONG).show();
-					}
-				});
+//				ReplayActivity.this.runOnUiThread(new Runnable() {
+//					public void run() {
+//						Toast.makeText(
+//								context,
+//								"Sorry, we might have observed traffic modification "
+//										+ "and replay is aborted due to this.",
+//								Toast.LENGTH_LONG).show();
+//					}
+//				});
 				// throw new RuntimeException();
-				ACRA.getErrorReporter().handleException(ex);
+				//ACRA.getErrorReporter().handleException(ex);
 				ReplayActivity.this.finish();
-			} catch (Exception ex) {
+			} catch (SocketTimeoutException ex){ 
+				Log.d("Replay", "Replay failed due to socket timeout!");
+			}catch (Exception ex) {
 				success = false;
 				Log.d("Replay", "replay failed due to unknow reason!");
 				ex.printStackTrace();
@@ -1140,7 +1144,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				});
 				// throw new RuntimeException();
-				ACRA.getErrorReporter().handleException(ex);
+				//ACRA.getErrorReporter().handleException(ex);
 				ReplayActivity.this.finish();
 			}
 			Log.d("Replay", "queueCombined finished execution!");
@@ -1168,8 +1172,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				new AlertDialog.Builder(ReplayActivity.this)
 						.setTitle("Replay aborted!")
 						.setMessage(
-								"There is an error happened during replay and caused "
-										+ "replay to stop. All previous successful "
+								"There is an error that happened during replay and caused "
+										+ "the replay to stop. All previous successful "
 										+ "replays are still recorded in our server.\n"
 										+ "You could try it again.\n\n"
 										+ "Thank you for your support and contribution "
