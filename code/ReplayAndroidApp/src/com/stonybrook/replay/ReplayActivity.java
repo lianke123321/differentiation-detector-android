@@ -999,7 +999,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Thread UIUpdateThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
-
+						Thread.currentThread().setName("UIUpdateThread (Thread)");
 						while (updateUIBean.getProgress() < 100) {
 							ReplayActivity.this.runOnUiThread(new Runnable() {
 								@Override
