@@ -50,7 +50,7 @@ public class CombinedSideChannel {
 		socket.setKeepAlive(true);
 		// channel.socket().setKeepAlive(true);
 		// channel.configureBlocking(false);
-		socket.setSoTimeout(30000);
+		socket.setSoTimeout(60000);
 
 		socket.connect(endPoint);
 		// channel.connect(endPoint);

@@ -69,7 +69,7 @@ public class CombinedQueue {
 			int i = 1;
 			// for jitter
 			int m = 0;
-			int len = this.Q.size();
+			double len = this.Q.size();
 			// @@@ start all the treads here
 			for (RequestSet RS : this.Q) {
 
@@ -85,7 +85,7 @@ public class CombinedQueue {
 					m++;
 
 					// adrian: for updating progress bar
-					updateUIBean.setProgress((int) (i * 100 / len));
+					updateUIBean.setProgress((int) ((i * 100) / len));
 
 				} else {
 					Semaphore recvSema = getRecvSemaLock(CSPairMapping.get(RS
@@ -99,7 +99,7 @@ public class CombinedQueue {
 							/ 1000000);
 
 					// adrian: for updating progress bar
-					updateUIBean.setProgress((int) (i * 100 / len));
+					updateUIBean.setProgress((int) ((i * 100) / len));
 
 					// adrian: every time when calling next we create and start
 					// a new thread

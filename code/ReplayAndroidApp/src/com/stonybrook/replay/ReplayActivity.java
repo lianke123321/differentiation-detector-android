@@ -106,7 +106,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	int currentReplayCount = 0;
 	int currentIterationCount = 0;
-	ProgressBar progressBar = null;
 	ImageReplayListAdapter adapter = null;
 
 	String server = null;
@@ -1007,6 +1006,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Thread UIUpdateThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
+						prgBar.setProgress(0);
+						updateUIBean.setProgress(0);
 						Thread.currentThread().setName("UIUpdateThread (Thread)");
 						while (updateUIBean.getProgress() < 100) {
 							ReplayActivity.this.runOnUiThread(new Runnable() {
@@ -1065,19 +1066,22 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// if sender aborted, throw exception here
 				// queue.ABORT = true;
 				if (queue.ABORT == true) {
-					// Log.d("Replay", "replay aborted! Throw exception!");
-					throw new ReplayAbortedException();
+					Log.d("Replay", "replay aborted!");
+					//throw new ReplayAbortedException();
+					notifier.doneSending = true;
+					receiver.keepRunning = false;
+				} 
+				else {
+
+					// waiting for all threads to finish
+					Log.d("Replay", "waiting for all threads to die!");
+	
+					Thread.sleep(1000);
+					notifier.doneSending = true;
+					notfThread.join();
+					receiver.keepRunning = false;
+					rThread.join();
 				}
-
-				// waiting for all threads to finish
-				Log.d("Replay", "waiting for all threads to die!");
-
-				Thread.sleep(1000);
-				notifier.doneSending = true;
-				notfThread.join();
-				receiver.keepRunning = false;
-				rThread.join();
-
 				// Telling server done with replaying
 				double duration = ((double) (System.nanoTime() - this.timeStarted)) / 1000000000;
 
@@ -1096,8 +1100,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// Sending jitter
 
 				// adrian: update progress
-				applicationBean.status = getResources().getString(
-						R.string.send_jitter);
+				String message = "";
+				if(queue.ABORT==true){
+					message = "Error during replay";
+				} else {
+					message = getResources().getString(
+							R.string.send_jitter);
+				}
+				applicationBean.status = message;
+				
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
@@ -1116,8 +1127,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// set progress bar to invisible
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
-						prgBar.setVisibility(View.GONE);
 						prgBar.setProgress(0);
+						prgBar.setVisibility(View.GONE);
 					}
 				});
 

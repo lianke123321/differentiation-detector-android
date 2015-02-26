@@ -81,6 +81,7 @@ public class ImageReplayListAdapter extends BaseAdapter {
 
 		if (app.status.equalsIgnoreCase(mainAct.getResources().getString(R.string.finish_vpn))) {
 			progress.setVisibility(ProgressBar.GONE);
+			progress.setProgress(0);
 			button.setVisibility(Button.VISIBLE);
 
 			button.setOnClickListener(new OnClickListener() {
@@ -119,6 +120,7 @@ public class ImageReplayListAdapter extends BaseAdapter {
 			button.setVisibility(Button.GONE);
 		} else {
 			progress.setVisibility(ProgressBar.INVISIBLE);
+			progress.setProgress(0);
 			button.setVisibility(Button.GONE);
 		}
 
