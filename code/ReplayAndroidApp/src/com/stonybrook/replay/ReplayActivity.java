@@ -1156,7 +1156,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								Toast.LENGTH_LONG).show();
 					}
 				});
-				// ReplayActivity.this.finish();
+				ReplayActivity.this.finish();
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
 				ex.printStackTrace();
