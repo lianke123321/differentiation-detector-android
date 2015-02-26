@@ -23,6 +23,8 @@ import com.stonybrook.replay.bean.ApplicationBean;
  */
 public class ResultChannelThread implements Runnable {
 
+	public volatile boolean doneReplay = false;
+
 	private String path;
 	private int port;
 	private String analyzerServerUrl = null;
@@ -77,6 +79,12 @@ public class ResultChannelThread implements Runnable {
 						Thread.sleep(2000);
 					}
 				}
+
+				if (doneReplay) {
+					Log.d("Result Channel", "Done replay! Exiting thread.");
+					break;
+				}
+
 				Thread.sleep(2000);
 			}
 		} catch (InterruptedException ex) {

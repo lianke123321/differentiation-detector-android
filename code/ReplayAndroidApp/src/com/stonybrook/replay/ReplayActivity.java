@@ -125,6 +125,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	// This is result channel thread
 	ResultChannelThread resultChannelThread = null;
+	Thread resultThread = null;
 
 	// VPN Changes
 	private Bundle mProfileInfo;
@@ -394,11 +395,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			if (isAvailable) {
 				// Creating result channel thread here
-				resultChannelThread = new ResultChannelThread(server, 56565, randomID,
-						selectedApps, getResources().getString(
-								R.string.finish_vpn), getResources().getString(
-								R.string.finish_random), adapter);
-				Thread resultThread = new Thread(resultChannelThread);
+				resultChannelThread = new ResultChannelThread(
+						server, 56565, randomID, selectedApps, getResources()
+								.getString(R.string.finish_vpn), getResources()
+								.getString(R.string.finish_random), adapter);
+				resultThread = new Thread(resultChannelThread);
 				resultThread.start();
 
 				// If server is available. Change status from to processing
@@ -1342,6 +1343,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				currentReplayCount = 0;
 				Log.d("Replay", "finished all replays!");
 				replayOngoing = false;
+				
+				// notify result channel thread
+				resultChannelThread.doneReplay = true;
+				resultThread.join();
 
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1477,6 +1482,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				currentReplayCount = 0;
 				Log.d("Replay", "finished all replays!");
 				replayOngoing = false;
+				
+				// notify result channel thread
+				resultChannelThread.doneReplay = true;
+				resultThread.join();
 
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1576,6 +1585,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					currentReplayCount = 0;
 					Log.d("Replay", "finished all replays!");
 					replayOngoing = false;
+					
+					// notify result channel thread
+					resultChannelThread.doneReplay = true;
+					resultThread.join();
 
 					ReplayActivity.this.runOnUiThread(new Runnable() {
 						public void run() {
