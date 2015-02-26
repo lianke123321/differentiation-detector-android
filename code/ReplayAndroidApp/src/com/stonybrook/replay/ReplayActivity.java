@@ -979,6 +979,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					@Override
 					public void run() {
 
+						prgBar.setProgress(0);
 						while (updateUIBean.getProgress() < 100) {
 							ReplayActivity.this.runOnUiThread(new Runnable() {
 								@Override
