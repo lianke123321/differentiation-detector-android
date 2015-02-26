@@ -68,6 +68,7 @@ import com.stonybrook.replay.combined.CombinedNotifierThread;
 import com.stonybrook.replay.combined.CombinedQueue;
 import com.stonybrook.replay.combined.CombinedReceiverThread;
 import com.stonybrook.replay.combined.CombinedSideChannel;
+import com.stonybrook.replay.combined.ResultChannelThread;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.exception_handler.ReplayAbortedException;
 import com.stonybrook.replay.util.Config;
@@ -121,6 +122,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	String currentTask = "none";
 	String randomID = null;
 	int historyCount;
+
+	// This is result channel thread
+	ResultChannelThread resultChannelThread = null;
 
 	// VPN Changes
 	private Bundle mProfileInfo;
@@ -389,6 +393,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					"Server availability " + String.valueOf(isAvailable));
 
 			if (isAvailable) {
+				// Creating result channel thread here
+				resultChannelThread = new ResultChannelThread(server, 56565, randomID,
+						selectedApps, getResources().getString(
+								R.string.finish_vpn), getResources().getString(
+								R.string.finish_random), adapter);
+				Thread resultThread = new Thread(resultChannelThread);
+				resultThread.start();
+
 				// If server is available. Change status from to processing
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.processing);
@@ -765,7 +777,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							+ String.valueOf(currentIterationCount + 1);
 
 				Log.d("testID", "testID is " + testID);
-				
+
 				if (testID.equalsIgnoreCase("NOVPN_1")) {
 					// First update historyCount
 					historyCount += 1;

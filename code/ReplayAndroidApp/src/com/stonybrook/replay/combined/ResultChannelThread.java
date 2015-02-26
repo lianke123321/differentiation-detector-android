@@ -10,32 +10,39 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
+import com.stonybrook.replay.adapter.ImageReplayListAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
 
 /**
- * This class will be running through the whole replay, and periodically
- * check selected apps to see if there are finished traces. If it is,
- * tries to query analysis server for results.
+ * This class will be running through the whole replay, and periodically check
+ * selected apps to see if there are finished traces. If it is, tries to query
+ * analysis server for results.
  * 
  * @author Boyu, Adrian
- *
+ * 
  */
 public class ResultChannelThread implements Runnable {
 
 	private String path;
+	private int port;
+	private String analyzerServerUrl = null;
 	private String id;
 	private ArrayList<ApplicationBean> selectedApps = null;
 	private String finishVpn;
 	private String finishRandom;
+	private ImageReplayListAdapter adapter = null;
 
-	public ResultChannelThread(String path, String id,
+	public ResultChannelThread(String path, int port, String id,
 			ArrayList<ApplicationBean> selectedApps, String finishVpn,
-			String finishRandom) {
+			String finishRandom, ImageReplayListAdapter adapter) {
 		this.path = path;
+		this.port = port;
+		this.analyzerServerUrl = ("http://" + path + ":" + port + "/Results");
 		this.id = id;
 		this.selectedApps = selectedApps;
 		this.finishVpn = finishVpn;
 		this.finishRandom = finishRandom;
+		this.adapter = adapter;
 		Log.d("Result Channel", "path: " + this.path + " finishVpn: "
 				+ this.finishVpn + " finishRandom: " + this.finishRandom);
 	}
@@ -43,17 +50,37 @@ public class ResultChannelThread implements Runnable {
 	@Override
 	public void run() {
 		Thread.currentThread().setName("ResultChannelThread (Thread)");
-		while (true) {
-			for (int i = 0; i < selectedApps.size(); i++) {
-				if ((selectedApps.get(i).status == finishVpn)
-						|| (selectedApps.get(i).status == finishRandom)) {
-					if (selectedApps.get(i).historyCount < 0) {
-						Log.e("Result Channel", "historyCount value not correct!");
-						return;
+		try {
+			String wait = "Waiting for server result";
+
+			while (true) {
+				for (int i = 0; i < selectedApps.size(); i++) {
+					if ((selectedApps.get(i).status == finishVpn)
+							|| (selectedApps.get(i).status == finishRandom)) {
+						selectedApps.get(i).status = wait;
+						// adapter.notifyDataSetChanged();
+
+						// sanity check
+						if (selectedApps.get(i).historyCount < 0) {
+							Log.e("Result Channel",
+									"historyCount value not correct!");
+							return;
+						}
 					}
-					JSONObject result = getSingleResult(id);
+
+					if (selectedApps.get(i).status == wait) {
+						JSONObject result = getSingleResult(id);
+						Log.d("Result Channel",
+								"received result: " + result.toString());
+						selectedApps.get(i).status = "Result received";
+						// adapter.notifyDataSetChanged();
+						Thread.sleep(2000);
+					}
 				}
+				Thread.sleep(2000);
 			}
+		} catch (InterruptedException ex) {
+			Log.d("Result Channel", "interrupted!");
 		}
 	}
 
@@ -112,16 +139,17 @@ public class ResultChannelThread implements Runnable {
 	}
 
 	public JSONObject sendRequest(String method, ArrayList<String> data) {
-		System.out.println(data);
+		// Log.d("Result Channel", data.toString());
 		String dataURL = URLEncoder(data);
-		System.out.println(dataURL);
+		// Log.d("Result Channel", dataURL);
 		String url_string = "";
 		if (method.equalsIgnoreCase("GET")) {
-			url_string = this.path + "?" + dataURL;
+			url_string = this.analyzerServerUrl + "?" + dataURL;
 		} else if (method.equalsIgnoreCase("POST")) {
-			url_string = this.path + dataURL;
+			url_string = this.analyzerServerUrl + dataURL;
 		}
-		System.out.println(url_string);
+		// System.out.println(url_string);
+		Log.d("Result Channel", url_string);
 		JSONObject json = null;
 		try {
 			URL url = new URL(url_string);
