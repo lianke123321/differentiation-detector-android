@@ -8,7 +8,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.acra.ACRA;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -287,12 +286,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		}
 
 		// this is for testing log sending code
-		//throw new RuntimeException("Crash!");
+		// throw new RuntimeException("Crash!");
+		// ACRA.getErrorReporter().handleSilentException(
+		// new RuntimeException("test ACRA"));
 	}
 
 	@Override
 	protected void onStop() {
-		
+
 		super.onStop();
 		if (replayOngoing) {
 			ReplayActivity.this.runOnUiThread(new Runnable() {
@@ -318,8 +319,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		this.finish();
 	}
-	
-	
 
 	@Override
 	protected void onDestroy() {
@@ -1008,7 +1007,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					public void run() {
 						prgBar.setProgress(0);
 						updateUIBean.setProgress(0);
-						Thread.currentThread().setName("UIUpdateThread (Thread)");
+						Thread.currentThread().setName(
+								"UIUpdateThread (Thread)");
 						while (updateUIBean.getProgress() < 100) {
 							ReplayActivity.this.runOnUiThread(new Runnable() {
 								@Override
@@ -1067,15 +1067,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// queue.ABORT = true;
 				if (queue.ABORT == true) {
 					Log.d("Replay", "replay aborted!");
-					//throw new ReplayAbortedException();
+					// throw new ReplayAbortedException();
 					notifier.doneSending = true;
 					receiver.keepRunning = false;
-				} 
-				else {
+				} else {
 
 					// waiting for all threads to finish
 					Log.d("Replay", "waiting for all threads to die!");
-	
+
 					Thread.sleep(1000);
 					notifier.doneSending = true;
 					notfThread.join();
@@ -1101,14 +1100,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// adrian: update progress
 				String message = "";
-				if(queue.ABORT==true){
+				if (queue.ABORT == true) {
 					message = "Error during replay";
+					success = false;
 				} else {
-					message = getResources().getString(
-							R.string.send_jitter);
+					message = getResources().getString(R.string.send_jitter);
 				}
+
 				applicationBean.status = message;
-				
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						adapter.notifyDataSetChanged();
@@ -1150,7 +1149,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				Log.d("Replay", "Error parsing JSON");
 				ex.printStackTrace();
 				this.cancel(true);
-				ACRA.getErrorReporter().handleException(ex);
+				// ACRA.getErrorReporter().handleException(ex);
 				// ReplayActivity.this.finish();
 			} catch (InterruptedException ex) {
 				Log.d("Replay", "Replay interrupted!");
@@ -1170,7 +1169,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				});*/
 				// throw new RuntimeException();
 				this.cancel(true);
-				ACRA.getErrorReporter().handleException(ex);
+				// ACRA.getErrorReporter().handleSilentException(ex);
 				ReplayActivity.this.finish();
 			} catch (SocketTimeoutException ex) {
 				Log.d("Replay", "Replay failed due to socket timeout!");
@@ -1187,7 +1186,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				});
 				// throw new RuntimeException();
 				this.cancel(true);
-				ACRA.getErrorReporter().handleException(ex);
+				// ACRA.getErrorReporter().handleException(ex);
 				ReplayActivity.this.finish();
 			}
 			Log.d("Replay", "queueCombined finished execution!");
@@ -1202,7 +1201,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	public void vpnFinishCompleteCallback(Boolean success) {
 		try {
 			server = Config.get("server");
-			// If there was error. Display message and stop processing further.
+
+			// updating progress
+			selectedApps.get(currentReplayCount).status = getResources()
+					.getString(R.string.disconnect_vpn);
+			adapter.notifyDataSetChanged();
+
+			disconnectVPN();
+
 			if (!success) {
 				// Update status on screen and stop processing
 				selectedApps.get(currentReplayCount).resultImg = "p";
@@ -1210,7 +1216,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
 
-				replayOngoing = false;
+				/*replayOngoing = false;
 
 				new AlertDialog.Builder(ReplayActivity.this)
 						.setTitle("Replay aborted!")
@@ -1241,77 +1247,66 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									}
 								}).show();
 
-				return;
-			}/* else if (doRandom) {
-				// updating progress
-				selectedApps.get(currentReplayCount).status = getResources()
-						.getString(R.string.random);
-				adapter.notifyDataSetChanged();
+				return;*/
 
-				disconnectVPN();
-				}*/
+			} else {
 
-			// updating progress
-			selectedApps.get(currentReplayCount).status = getResources()
-					.getString(R.string.disconnect_vpn);
-			adapter.notifyDataSetChanged();
+				if (doRandom) {
+					// updating progress
+					selectedApps.get(currentReplayCount).status = getResources()
+							.getString(R.string.random);
+					adapter.notifyDataSetChanged();
 
-			disconnectVPN();
-
-			if (doRandom) {
-				// updating progress
-				selectedApps.get(currentReplayCount).status = getResources()
-						.getString(R.string.random);
-				adapter.notifyDataSetChanged();
-
-				randomReplay = new RandomReplay();
-				randomReplay.execute(ReplayActivity.this);
-				return;
-			}
-
-			currentIterationCount++;
-
-			if (currentIterationCount != iteration) {
-
-				// tell user current iteration
-				if (currentIterationCount == 1)
-					Toast.makeText(ReplayActivity.this,
-							"Second iteration of current replay!",
-							Toast.LENGTH_LONG).show();
-				else if (currentIterationCount == 2)
-					Toast.makeText(ReplayActivity.this,
-							"Third iteration of current replay!",
-							Toast.LENGTH_LONG).show();
-				else {
-					Log.w("Replay", "Iteration number exceeds!");
-					System.exit(0);
+					randomReplay = new RandomReplay();
+					randomReplay.execute(ReplayActivity.this);
+					return;
 				}
 
-				vpnDisconnected = new VPNDisconnected();
-				vpnDisconnected.execute(this);
-				return;
+				currentIterationCount++;
+
+				if (currentIterationCount != iteration) {
+
+					// tell user current iteration
+					if (currentIterationCount == 1)
+						Toast.makeText(ReplayActivity.this,
+								"Second iteration of current replay!",
+								Toast.LENGTH_LONG).show();
+					else if (currentIterationCount == 2)
+						Toast.makeText(ReplayActivity.this,
+								"Third iteration of current replay!",
+								Toast.LENGTH_LONG).show();
+					else {
+						Log.w("Replay", "Iteration number exceeds!");
+						System.exit(0);
+					}
+
+					vpnDisconnected = new VPNDisconnected();
+					vpnDisconnected.execute(this);
+					return;
+				}
+
+				// First write current historyCount to applicationBean
+				selectedApps.get(currentReplayCount).historyCount = historyCount;
+				// Then Call ask4analysis when finished one trace and update
+				// historyCount
+				historyCount += 1;
+				Editor editor = settings.edit();
+				editor.putInt("historyCount", historyCount);
+				editor.commit();
+				Log.d("Replay", "historyCount: " + String.valueOf(historyCount));
+
+				/**
+				 * Change status on screen. Here currentReplayCount stores
+				 * number of applications selected by user. ++ makes processing
+				 * of next application in list when processApplicationReplay()
+				 * is called.
+				 */
+
+				selectedApps.get(currentReplayCount).resultImg = "p";
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.finish_vpn);
+				adapter.notifyDataSetChanged();
 			}
-
-			// First write current historyCount to applicationBean
-			selectedApps.get(currentReplayCount).historyCount = historyCount;
-			// Then Call ask4analysis when finished one trace and update
-			// historyCount
-			historyCount += 1;
-			Editor editor = settings.edit();
-			editor.putInt("historyCount", historyCount);
-			editor.commit();
-			Log.d("Replay", "historyCount: " + String.valueOf(historyCount));
-
-			/**
-			 * Change status on screen. Here currentReplayCount stores number of
-			 * applications selected by user. ++ makes processing of next
-			 * application in list when processApplicationReplay() is called.
-			 */
-
-			selectedApps.get(currentReplayCount).resultImg = "p";
-			selectedApps.get(currentReplayCount).status = getResources()
-					.getString(R.string.finish_vpn);
-			adapter.notifyDataSetChanged();
 
 			// initialize this for the next application
 			currentIterationCount = 0;
@@ -1380,7 +1375,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				adapter.notifyDataSetChanged();
 				replayOngoing = false;
 
-				new AlertDialog.Builder(ReplayActivity.this)
+				/*new AlertDialog.Builder(ReplayActivity.this)
 						.setTitle("Replay aborted!")
 						.setMessage(
 								"There is an error happened during replay and caused "
@@ -1409,51 +1404,54 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									}
 								}).show();
 
-				return;
-			}
+				return;*/
+			} else {
 
-			currentIterationCount++;
+				currentIterationCount++;
 
-			if (currentIterationCount != iteration) {
+				if (currentIterationCount != iteration) {
 
-				// tell user current iteration
-				if (currentIterationCount == 1)
-					Toast.makeText(ReplayActivity.this,
-							"Second iteration of current replay!",
-							Toast.LENGTH_LONG).show();
-				else if (currentIterationCount == 2)
-					Toast.makeText(ReplayActivity.this,
-							"Third iteration of current replay!",
-							Toast.LENGTH_LONG).show();
-				else {
-					Log.w("Replay", "Iteration number exceeds!");
-					System.exit(0);
+					// tell user current iteration
+					if (currentIterationCount == 1)
+						Toast.makeText(ReplayActivity.this,
+								"Second iteration of current replay!",
+								Toast.LENGTH_LONG).show();
+					else if (currentIterationCount == 2)
+						Toast.makeText(ReplayActivity.this,
+								"Third iteration of current replay!",
+								Toast.LENGTH_LONG).show();
+					else {
+						Log.w("Replay", "Iteration number exceeds!");
+						System.exit(0);
+					}
+
+					vpnDisconnected = new VPNDisconnected();
+					vpnDisconnected.execute(this);
+					return;
 				}
 
-				vpnDisconnected = new VPNDisconnected();
-				vpnDisconnected.execute(this);
-				return;
+				// First write current historyCount to applicationBean
+				selectedApps.get(currentReplayCount).historyCount = historyCount;
+				// Call ask4analysis when finished one trace and update
+				// historyCount
+				historyCount += 1;
+				Editor editor = settings.edit();
+				editor.putInt("historyCount", historyCount);
+				editor.commit();
+				Log.d("Replay", "historyCount: " + String.valueOf(historyCount));
+
+				/**
+				 * Change status on screen. Here currentReplayCount stores
+				 * number of applications selected by user. ++ makes processing
+				 * of next application in list when processApplicationReplay()
+				 * is called.
+				 */
+
+				selectedApps.get(currentReplayCount).resultImg = "p";
+				selectedApps.get(currentReplayCount).status = getResources()
+						.getString(R.string.finish_random);
+				adapter.notifyDataSetChanged();
 			}
-
-			// First write current historyCount to applicationBean
-			selectedApps.get(currentReplayCount).historyCount = historyCount;
-			// Call ask4analysis when finished one trace and update historyCount
-			historyCount += 1;
-			Editor editor = settings.edit();
-			editor.putInt("historyCount", historyCount);
-			editor.commit();
-			Log.d("Replay", "historyCount: " + String.valueOf(historyCount));
-
-			/**
-			 * Change status on screen. Here currentReplayCount stores number of
-			 * applications selected by user. ++ makes processing of next
-			 * application in list when processApplicationReplay() is called.
-			 */
-
-			selectedApps.get(currentReplayCount).resultImg = "p";
-			selectedApps.get(currentReplayCount).status = getResources()
-					.getString(R.string.finish_random);
-			adapter.notifyDataSetChanged();
 
 			// initialize this for the next application
 			currentIterationCount = 0;
@@ -1516,7 +1514,95 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	public void openFinishCompleteCallback(Boolean success) {
 		try {
 			// If Replay on Open was successful then schedule on VPN
-			if (success) {
+			if (!success) {
+				// Update status on screen and stop processing
+				selectedApps.get(currentReplayCount).resultImg = "p";
+				selectedApps.get(currentReplayCount++).status = getResources()
+						.getString(R.string.error);
+				adapter.notifyDataSetChanged();
+				replayOngoing = false;
+
+				/*new AlertDialog.Builder(ReplayActivity.this)
+						.setTitle("Replay aborted!")
+						.setMessage(
+								"There is an error happened during replay and caused "
+										+ "replay to stop. All previous successful "
+										+ "replays are still recorded in our server.\n"
+										+ "You could try it again.\n\n"
+										+ "Thank you for your support and contribution "
+										+ "to this research!")
+						.setPositiveButton("Go back",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										if (queueCombined != null) {
+											vpnConnected.cancel(true);
+											vpnDisconnected.cancel(true);
+											randomReplay.cancel(true);
+											queueCombined.cancel(true);
+										}
+										disconnectVPN();
+										ReplayActivity.this.finish();
+										ReplayActivity.this
+												.overridePendingTransition(
+														android.R.anim.slide_in_left,
+														android.R.anim.slide_out_right);
+									}
+								}).show();
+				return;*/
+
+				// initialize this for the next application
+				currentIterationCount = 0;
+
+				// If there are more apps that require processing then start
+				// with those.
+				if (selectedApps.size() != (currentReplayCount + 1)) {
+					// (new StartNextApp()).execute(this);
+					// processCombinedApplication(selectedApps.get(++currentReplayCount),
+					// "vpn");
+					currentReplayCount++;
+					vpnDisconnected = new VPNDisconnected();
+					vpnDisconnected.execute(this);
+				} else {
+					// progressWait.setMessage("Finishing Analysis...");
+					// Thread.sleep(10000);
+					// progressWait.dismiss();
+					currentReplayCount = 0;
+					Log.d("Replay", "finished all replays!");
+					replayOngoing = false;
+
+					ReplayActivity.this.runOnUiThread(new Runnable() {
+						public void run() {
+							new AlertDialog.Builder(ReplayActivity.this)
+									.setTitle("Replay finished!")
+									.setMessage(
+											"Replay of all applications you have chosen is done!\n"
+													+ "We truly appreciate your support and contribution "
+													+ "to this research!\n\n"
+													+ "Thank you and have a nice day :-)")
+									.setPositiveButton(
+											"Go back",
+											new DialogInterface.OnClickListener() {
+
+												@Override
+												public void onClick(
+														DialogInterface dialog,
+														int which) {
+													ReplayActivity.this
+															.finish();
+													ReplayActivity.this
+															.overridePendingTransition(
+																	android.R.anim.slide_in_left,
+																	android.R.anim.slide_out_right);
+												}
+											}).show();
+						}
+
+					});
+				}
+
+			} else {
 				// Change screen status
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.finish_open);
@@ -1545,44 +1631,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				vpnConnected = new VPNConnected();
 				vpnConnected.execute(this);
-
-			} else {
-				// Update status on screen and stop processing
-				selectedApps.get(currentReplayCount).resultImg = "p";
-				selectedApps.get(currentReplayCount++).status = getResources()
-						.getString(R.string.error);
-				adapter.notifyDataSetChanged();
-				replayOngoing = false;
-
-				new AlertDialog.Builder(ReplayActivity.this)
-						.setTitle("Replay aborted!")
-						.setMessage(
-								"There is an error happened during replay and caused "
-										+ "replay to stop. All previous successful "
-										+ "replays are still recorded in our server.\n"
-										+ "You could try it again.\n\n"
-										+ "Thank you for your support and contribution "
-										+ "to this research!")
-						.setPositiveButton("Go back",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										if (queueCombined != null) {
-											vpnConnected.cancel(true);
-											vpnDisconnected.cancel(true);
-											randomReplay.cancel(true);
-											queueCombined.cancel(true);
-										}
-										disconnectVPN();
-										ReplayActivity.this.finish();
-										ReplayActivity.this
-												.overridePendingTransition(
-														android.R.anim.slide_in_left,
-														android.R.anim.slide_out_right);
-									}
-								}).show();
-				return;
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
