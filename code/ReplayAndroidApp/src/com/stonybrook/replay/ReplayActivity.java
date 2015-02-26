@@ -215,7 +215,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		// generate or retrieve an historyCount for this phone
 		boolean hasHistoryCount = settings.getBoolean("hasHistoryCount", false);
 		if (!hasHistoryCount) {
-			historyCount = 1;
+			historyCount = 0;
 			Editor editor = settings.edit();
 			editor.putBoolean("hasHistoryCount", true);
 			editor.putInt("historyCount", historyCount);
@@ -298,9 +298,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		if (replayOngoing) {
 			ReplayActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
-					Toast.makeText(ReplayActivity.this,
-							"Replay aborted", Toast.LENGTH_LONG)
-							.show();
+					Toast.makeText(ReplayActivity.this, "Replay aborted",
+							Toast.LENGTH_LONG).show();
 				}
 
 			});
@@ -766,6 +765,19 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							+ String.valueOf(currentIterationCount + 1);
 
 				Log.d("testID", "testID is " + testID);
+				
+				if (testID.equalsIgnoreCase("NOVPN_1")) {
+					// First update historyCount
+					historyCount += 1;
+					// Then write current historyCount to applicationBean
+					applicationBean.historyCount = historyCount;
+					Editor editor = settings.edit();
+					editor.putInt("historyCount", historyCount);
+					editor.commit();
+					Log.d("Replay",
+							"historyCount: " + String.valueOf(historyCount));
+
+				}
 
 				sideChannel
 						.declareID(appData.getReplayName(), testID,
@@ -1285,16 +1297,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					return;
 				}
 
-				// First write current historyCount to applicationBean
-				selectedApps.get(currentReplayCount).historyCount = historyCount;
-				// Then Call ask4analysis when finished one trace and update
-				// historyCount
-				historyCount += 1;
-				Editor editor = settings.edit();
-				editor.putInt("historyCount", historyCount);
-				editor.commit();
-				Log.d("Replay", "historyCount: " + String.valueOf(historyCount));
-
 				/**
 				 * Change status on screen. Here currentReplayCount stores
 				 * number of applications selected by user. ++ makes processing
@@ -1429,16 +1431,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					vpnDisconnected.execute(this);
 					return;
 				}
-
-				// First write current historyCount to applicationBean
-				selectedApps.get(currentReplayCount).historyCount = historyCount;
-				// Call ask4analysis when finished one trace and update
-				// historyCount
-				historyCount += 1;
-				Editor editor = settings.edit();
-				editor.putInt("historyCount", historyCount);
-				editor.commit();
-				Log.d("Replay", "historyCount: " + String.valueOf(historyCount));
 
 				/**
 				 * Change status on screen. Here currentReplayCount stores
