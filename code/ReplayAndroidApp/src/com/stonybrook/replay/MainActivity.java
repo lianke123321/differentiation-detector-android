@@ -98,7 +98,8 @@ public class MainActivity extends Activity {
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		// Register with Global Exception hanndler
-		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+		//Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+		Thread.currentThread().setUncaughtExceptionHandler(new ExceptionHandler(this));
 
 		setContentView(R.layout.activity_main_image);
 

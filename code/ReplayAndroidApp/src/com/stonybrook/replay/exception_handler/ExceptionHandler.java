@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 
 import com.stonybrook.replay.CrashActivity;
 
@@ -57,6 +58,8 @@ public class ExceptionHandler implements
 		Intent intent = new Intent(myContext, CrashActivity.class);
 		intent.putExtra("error", errorReport.toString());
 		myContext.startActivity(intent);
+		Log.e("ExceptionHandler", errorReport.toString());
+		Thread.getDefaultUncaughtExceptionHandler().uncaughtException(thread, exception);
 
 		android.os.Process.killProcess(android.os.Process.myPid());
 		System.exit(10);

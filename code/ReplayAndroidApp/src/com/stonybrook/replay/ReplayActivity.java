@@ -148,7 +148,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+		//Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+		Thread.currentThread().setUncaughtExceptionHandler(new ExceptionHandler(this));
 		setContentView(R.layout.replay_main_layout_images);
 		// keep the screen on
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -673,6 +674,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			// testing manually free memory
 			System.gc();
 			
+			// for testing crash handler
+			/*if (true) {
+				throw new RuntimeException();
+			}*/
+			
 			if (channel.equalsIgnoreCase("open") && currentIterationCount == 0) {
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1105,29 +1111,32 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								Toast.LENGTH_LONG).show();
 					}
 				});
+				//ReplayActivity.this.finish();
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
 				ex.printStackTrace();
-				
+				this.cancel(true);
 				ACRA.getErrorReporter().handleException(ex);
-				ReplayActivity.this.finish();
+				//ReplayActivity.this.finish();
 			} catch (InterruptedException ex) {
 				Log.d("Replay", "Replay interrupted!");
+				this.cancel(true);
 			} catch (ReplayAbortedException ex) {
 				success = false;
 				Log.d("Replay", "replay aborted!");
 				ex.printStackTrace();
-//				ReplayActivity.this.runOnUiThread(new Runnable() {
-//					public void run() {
-//						Toast.makeText(
-//								context,
-//								"Sorry, we might have observed traffic modification "
-//										+ "and replay is aborted due to this.",
-//								Toast.LENGTH_LONG).show();
-//					}
-//				});
+				/*ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						Toast.makeText(
+								context,
+								"Sorry, we might have observed traffic modification "
+										+ "and replay is aborted due to this.",
+								Toast.LENGTH_LONG).show();
+					}
+				});*/
 				// throw new RuntimeException();
-				//ACRA.getErrorReporter().handleException(ex);
+				this.cancel(true);
+				ACRA.getErrorReporter().handleException(ex);
 				ReplayActivity.this.finish();
 			} catch (SocketTimeoutException ex){ 
 				Log.d("Replay", "Replay failed due to socket timeout!");
@@ -1144,7 +1153,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				});
 				// throw new RuntimeException();
-				//ACRA.getErrorReporter().handleException(ex);
+				this.cancel(true);
+				ACRA.getErrorReporter().handleException(ex);
 				ReplayActivity.this.finish();
 			}
 			Log.d("Replay", "queueCombined finished execution!");
@@ -1249,7 +1259,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				return;
 			}
 
-			// Call ask4analysis when finished one trace and update historyCount
+			// First write current historyCount to applicationBean
+			selectedApps.get(currentReplayCount).historyCount = historyCount;
+			// Then Call ask4analysis when finished one trace and update
+			// historyCount
 			historyCount += 1;
 			Editor editor = settings.edit();
 			editor.putInt("historyCount", historyCount);
@@ -1388,7 +1401,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				vpnDisconnected.execute(this);
 				return;
 			}
-
+			
+			// First write current historyCount to applicationBean
+			selectedApps.get(currentReplayCount).historyCount = historyCount;
 			// Call ask4analysis when finished one trace and update historyCount
 			historyCount += 1;
 			Editor editor = settings.edit();

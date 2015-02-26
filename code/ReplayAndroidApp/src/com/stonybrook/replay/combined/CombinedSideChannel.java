@@ -256,6 +256,7 @@ public class CombinedSideChannel {
 
 			sendObject(sentJitter.getBytes(), objLen);
 			sendObject(rcvdJitter.getBytes(), objLen);
+			jitterBean = null;
 		}
 
 		// receive confirmation from server

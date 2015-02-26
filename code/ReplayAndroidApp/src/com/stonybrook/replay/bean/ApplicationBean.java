@@ -15,6 +15,7 @@ public class ApplicationBean implements Parcelable {
 	public String status = "Waiting to start";
 	public String resultImg = null;
 	public String time = null;
+	public int historyCount = -1;
 	
 	public String getTime() {
 		return time;
