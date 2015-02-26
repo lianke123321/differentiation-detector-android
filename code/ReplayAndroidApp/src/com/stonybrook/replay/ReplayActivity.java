@@ -299,7 +299,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			ReplayActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
 					Toast.makeText(ReplayActivity.this,
-							"Replay aborted by user.", Toast.LENGTH_LONG)
+							"Replay aborted", Toast.LENGTH_LONG)
 							.show();
 				}
 
