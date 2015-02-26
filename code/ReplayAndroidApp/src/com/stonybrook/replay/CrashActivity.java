@@ -17,13 +17,13 @@ public class CrashActivity extends Activity {
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_crash);
 		this.error = getIntent().getStringExtra("error");
-		this.ErrorMsgTextView = (TextView) findViewById(R.id.report);
+		/*this.ErrorMsgTextView = (TextView) findViewById(R.id.report);
 
 		//SpannableString spanString = new SpannableString(error);
 
 		this.ErrorMsgTextView.setText(error);
 		this.ErrorMsgTextView
-				.setTextColor(getResources().getColor(R.color.red));
+				.setTextColor(getResources().getColor(R.color.red));*/
 	}
 
 	@Override
