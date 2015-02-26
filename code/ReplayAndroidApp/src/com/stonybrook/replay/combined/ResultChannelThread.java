@@ -42,6 +42,7 @@ public class ResultChannelThread implements Runnable {
 
 	@Override
 	public void run() {
+		Thread.currentThread().setName("ResultChannelThread (Thread)");
 		while (true) {
 			for (int i = 0; i < selectedApps.size(); i++) {
 				if ((selectedApps.get(i).status == finishVpn)

@@ -53,7 +53,7 @@ public final class CombinedNotifierThread implements Runnable {
 
 	@Override
 	public void run() {
-
+		Thread.currentThread().setName("CombinedNotifierThread (Thread)");
 		try {
 			// Selector selector = Selector.open();
 			// channel.register(selector, SelectionKey.OP_READ);

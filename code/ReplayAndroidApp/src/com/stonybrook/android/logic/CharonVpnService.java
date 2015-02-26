@@ -18,17 +18,12 @@
 package com.stonybrook.android.logic;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import org.acra.ACRA;
 
@@ -36,11 +31,9 @@ import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.VpnService;
@@ -233,6 +226,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 
 	@Override
 	public void run() {
+		Thread.currentThread().setName("CharonVpnService (Thread)");
 		Log.d("VPN", "start command");
 		syncObject = this;
 

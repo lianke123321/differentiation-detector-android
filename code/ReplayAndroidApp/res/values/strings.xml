@@ -8,7 +8,7 @@
     <string name="back_button">Back</string>
     <string name="selected_apps">Selected Applications</string>
     <string name="replay">Start</string>
-    <string name="title_activity_replay">Loading...</string>
+    <string name="title_activity_replay">Loading…</string>
     <string name="title_activity_crash">CrashActivity</string>
     <string name="image_name">App image</string>
     

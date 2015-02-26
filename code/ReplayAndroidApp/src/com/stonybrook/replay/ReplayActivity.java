@@ -75,13 +75,13 @@ import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.Mobilyzer;
 import com.stonybrook.replay.util.ReplayCompleteListener;
 import com.stonybrook.replay.util.UnpickleDataStream;
+
 /**
- * This activity handles all replay-related stuff
- * TODO: find a way to safely kill all threads when app 
- * is crashed or interrupted by user
+ * This activity handles all replay-related stuff TODO: find a way to safely
+ * kill all threads when app is crashed or interrupted by user
  * 
  * @author Rajesh, Adrian
- *
+ * 
  */
 public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
@@ -144,12 +144,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	VPNDisconnected vpnDisconnected = null;
 	RandomReplay randomReplay = null;
 
+	// define all asynctasks here for future clean up
+	// CertificateLoadTask certificateLoadTask = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		//Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
-		Thread.currentThread().setUncaughtExceptionHandler(new ExceptionHandler(this));
+		// Thread.setDefaultUncaughtExceptionHandler(new
+		// ExceptionHandler(this));
+		Thread.currentThread().setUncaughtExceptionHandler(
+				new ExceptionHandler(this));
 		setContentView(R.layout.replay_main_layout_images);
 		// keep the screen on
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -294,16 +299,24 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			ReplayActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
 					Toast.makeText(ReplayActivity.this,
-							"Replay aborted by user.",
-							Toast.LENGTH_LONG).show();
+							"Replay aborted by user.", Toast.LENGTH_LONG)
+							.show();
 				}
 
 			});
 		}
 		disconnectVPN();
+
+		// here I clean up all dangling threads and AsyncTasks
 		if (queueCombined != null) {
 			queueCombined.cancel(true);
 		}
+		/*if (certificateLoadTask != null) {
+			certificateLoadTask.cancel(true);
+			Log.d("onStop", "certificateLoadTask is cancelled? "
+					+ certificateLoadTask.isCancelled());
+		}*/
+
 		this.finish();
 	}
 
@@ -541,6 +554,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected Boolean doInBackground(String... arg0) {
+			Thread.currentThread().setName("ServerReachable (AsyncTask)");
 			Boolean isReachable = true;
 			String serverIP = arg0[0];
 			try {
@@ -671,14 +685,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected String doInBackground(String... str) {
+			Thread.currentThread().setName("QueueCombinedAsync (AsyncTask)");
 			// testing manually free memory
 			System.gc();
-			
+
 			// for testing crash handler
 			/*if (true) {
 				throw new RuntimeException();
 			}*/
-			
+
 			if (channel.equalsIgnoreCase("open") && currentIterationCount == 0) {
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1042,7 +1057,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// if sender aborted, throw exception here
 				// queue.ABORT = true;
 				if (queue.ABORT == true) {
-					//Log.d("Replay", "replay aborted! Throw exception!");
+					// Log.d("Replay", "replay aborted! Throw exception!");
 					throw new ReplayAbortedException();
 				}
 
@@ -1111,13 +1126,13 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								Toast.LENGTH_LONG).show();
 					}
 				});
-				//ReplayActivity.this.finish();
+				// ReplayActivity.this.finish();
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
 				ex.printStackTrace();
 				this.cancel(true);
 				ACRA.getErrorReporter().handleException(ex);
-				//ReplayActivity.this.finish();
+				// ReplayActivity.this.finish();
 			} catch (InterruptedException ex) {
 				Log.d("Replay", "Replay interrupted!");
 				this.cancel(true);
@@ -1138,16 +1153,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				this.cancel(true);
 				ACRA.getErrorReporter().handleException(ex);
 				ReplayActivity.this.finish();
-			} catch (SocketTimeoutException ex){ 
+			} catch (SocketTimeoutException ex) {
 				Log.d("Replay", "Replay failed due to socket timeout!");
-			}catch (Exception ex) {
+			} catch (Exception ex) {
 				success = false;
 				Log.d("Replay", "replay failed due to unknow reason!");
 				ex.printStackTrace();
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
-						Toast.makeText(
-								context,
+						Toast.makeText(context,
 								"Sorry, replay failed due to unknown reason.",
 								Toast.LENGTH_LONG).show();
 					}
@@ -1401,7 +1415,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				vpnDisconnected.execute(this);
 				return;
 			}
-			
+
 			// First write current historyCount to applicationBean
 			selectedApps.get(currentReplayCount).historyCount = historyCount;
 			// Call ask4analysis when finished one trace and update historyCount
@@ -1691,6 +1705,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected TrustedCertificateManager doInBackground(Boolean... params) {
+			Thread.currentThread().setName("CertificateLoadTask (AsyncTask)");
 			if (params.length > 0 && params[0]) {
 				/* force a reload of the certificates */
 				return TrustedCertificateManager.getInstance().reload();
@@ -1841,14 +1856,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		while (publicIP == null) {
 			try {
 				HttpParams httpParameters = new BasicHttpParams();
-				// Set the timeout in milliseconds until a connection is established.
-				// The default value is zero, that means the timeout is not used. 
+				// Set the timeout in milliseconds until a connection is
+				// established.
+				// The default value is zero, that means the timeout is not
+				// used.
 				int timeoutConnection = 3000;
-				HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-				// Set the default socket timeout (SO_TIMEOUT) 
+				HttpConnectionParams.setConnectionTimeout(httpParameters,
+						timeoutConnection);
+				// Set the default socket timeout (SO_TIMEOUT)
 				// in milliseconds which is the timeout for waiting for data.
 				int timeoutSocket = 5000;
-				HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+				HttpConnectionParams
+						.setSoTimeout(httpParameters, timeoutSocket);
 
 				HttpClient httpclient = new DefaultHttpClient(httpParameters);
 				HttpGet httpget = new HttpGet("http://myexternalip.com/raw");
@@ -1870,6 +1889,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected Boolean doInBackground(String... params) {
+			Thread.currentThread().setName(
+					"GetReplayServerAndMeddleIP (AsyncTask)");
 			// adrian: get IP from hostname
 			try {
 				server = InetAddress.getByName(
@@ -1948,7 +1969,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected Boolean doInBackground(ReplayActivity... params) {
-
+			Thread.currentThread().setName("VPNConnected (AsyncTask)");
 			int i = 0;
 			while (i < 5) {
 				i++;
@@ -2016,7 +2037,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected Boolean doInBackground(ReplayActivity... params) {
-
+			Thread.currentThread().setName("TestVPN (AsyncTask)");
 			int i = 0;
 			while (i < 5) {
 				i++;
@@ -2101,6 +2122,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected Boolean doInBackground(ReplayActivity... params) {
+			Thread.currentThread().setName("VPNDisconnected (AsyncTask)");
 			String publicIP = Config.get("publicIP");
 			int i = 0;
 			try {
@@ -2188,6 +2210,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		protected Boolean doInBackground(ReplayActivity... params) {
+			Thread.currentThread().setName("RandomReplay (AsyncTask)");
 			String publicIP = Config.get("publicIP");
 			int i = 0;
 			try {
