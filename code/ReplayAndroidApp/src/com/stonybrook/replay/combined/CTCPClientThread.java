@@ -40,6 +40,7 @@ public class CTCPClientThread implements Runnable {
 	 */
 	@Override
 	public void run() {
+		Thread.currentThread().setName("CTCPClientThread (Thread)");
 		try {
 
 			if (client.socket == null)

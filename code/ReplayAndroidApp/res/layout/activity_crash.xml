@@ -4,7 +4,7 @@
     android:background="@color/white" >
 
     <LinearLayout
-        android:id="@+id/ll1"
+        android:id="@+id/errTitleLinearLayout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/blue14"
@@ -21,19 +21,34 @@
             android:textSize="@dimen/main_title_text_size"
             android:textStyle="bold" />
     </LinearLayout>
-
+    
     <TextView
         android:id="@+id/errorMsg"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="3"
-        android:padding="10dp"
-        android:text="@string/crash_toast_text"
+        android:layout_below="@+id/errTitleLinearLayout"
+        android:text="@string/crash_activity_title"
         android:textColor="@color/blue14"
         android:textSize="@dimen/main_title_text_size"
-        android:textStyle="bold" 
-        android:gravity="center"
-        android:layout_below="@id/ll1"
-        />
+        android:textStyle="bold"
+        android:padding="10dp"
+        android:gravity="center" />
+    
+    <ScrollView
+        android:id="@+id/reportScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/errorMsg"
+        android:padding="10dp" >
+        
+        <TextView
+            android:id="@+id/report"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/crash_toast_text"
+            android:textColor="@color/blue14"
+            android:textSize="@dimen/main_title_text_size"
+            android:gravity="center" />
+    </ScrollView>
 
 </RelativeLayout>

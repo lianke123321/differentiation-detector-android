@@ -34,7 +34,7 @@ public final class CombinedReceiverThread implements Runnable {
 
 	@Override
 	public void run() {
-
+		Thread.currentThread().setName("CombinedReceiverThread (Thread)");
 		this.jitterTimeOrigin = System.nanoTime();
 
 		try {

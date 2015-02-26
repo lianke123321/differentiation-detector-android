@@ -14,7 +14,7 @@ import com.stonybrook.replay.R;
 	    httpMethod = HttpSender.Method.POST,
 	    formUriBasicAuthLogin = "hentedereartakedstomenti",
 	    formUriBasicAuthPassword = "3VpKoQvvkV74GBDGD6uyuy34",
-	    formKey = "", // This is required for backward compatibility but not used
+	    //formKey = "", // This is required for backward compatibility but not used
 	    customReportContent = {
 	            ReportField.APP_VERSION_CODE,
 	            ReportField.APP_VERSION_NAME,
@@ -27,7 +27,7 @@ import com.stonybrook.replay.R;
 	    mode = ReportingInteractionMode.TOAST,
 	    resToastText = R.string.crash_toast_text)*/
 
-@ReportsCrashes(formKey = "", // will not be used
+@ReportsCrashes(//formKey = "", // will not be used
 				mailTo = "diffdetector.report@ankeli.me",
 				mode = ReportingInteractionMode.TOAST,
 				resToastText = R.string.crash_toast_text)

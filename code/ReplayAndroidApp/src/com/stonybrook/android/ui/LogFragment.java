@@ -30,8 +30,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.stonybrook.replay.R;
 import com.stonybrook.android.logic.CharonVpnService;
+import com.stonybrook.replay.R;
 
 public class LogFragment extends Fragment implements Runnable
 {
@@ -146,7 +146,8 @@ public class LogFragment extends Fragment implements Runnable
 
 	@Override
 	public void run()
-	{
+	{	
+		Thread.currentThread().setName("LogFragment (Thread)");
 		while (mRunning)
 		{
 			try
