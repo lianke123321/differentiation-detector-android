@@ -319,6 +319,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		this.finish();
 	}
+	
+	
+
+	@Override
+	protected void onDestroy() {
+		// TODO: figure out if I need to do anything here
+		super.onDestroy();
+	}
 
 	/**
 	 * This Method checks the network Availability. For this NetworkInfo class
