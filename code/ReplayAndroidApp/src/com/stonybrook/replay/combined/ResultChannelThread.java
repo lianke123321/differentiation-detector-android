@@ -6,9 +6,13 @@ import java.net.URI;
 import java.util.ArrayList;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,6 +74,22 @@ public class ResultChannelThread implements Runnable {
 				for (int i = 0; i < selectedApps.size(); i++) {
 					if ((selectedApps.get(i).status == finishVpn)
 							|| (selectedApps.get(i).status == finishRandom)) {
+						// asking server to analyze data
+						JSONObject result = ask4analysis(id,
+								selectedApps.get(i).historyCount);
+
+						if (result == null) {
+							Log.d("Result Channel",
+									"ask4analysis returned null!");
+							continue;
+						}
+
+						boolean success = result.getBoolean("success");
+						if (!success) {
+							Log.d("Result Channel", "ask4analysis failed!");
+							continue;
+						}
+
 						synchronized (selectedApps) {
 							selectedApps.get(i).status = wait;
 						}
@@ -82,9 +102,9 @@ public class ResultChannelThread implements Runnable {
 									"historyCount value not correct!");
 							return;
 						}
-					}
 
-					if (selectedApps.get(i).status == wait) {
+						Log.d("Result Channel", "ask4analysis succeeded!");
+					} else if (selectedApps.get(i).status == wait) {
 
 						JSONObject result = getSingleResult(id,
 								selectedApps.get(i).historyCount);
@@ -94,14 +114,14 @@ public class ResultChannelThread implements Runnable {
 						boolean success = result.getBoolean("success");
 						if (success) {
 							Log.d("Result Channel", "retrieve result succeed");
-							
+
 							// parse content of response
-							JSONArray raw_response = result.getJSONArray(
-									"response");
-							
+							JSONArray raw_response = result
+									.getJSONArray("response");
+
 							if (raw_response.length() == 0)
 								continue;
-							
+
 							counter -= 1;
 							JSONObject response = raw_response.getJSONObject(0);
 
@@ -183,12 +203,13 @@ public class ResultChannelThread implements Runnable {
 	}
 
 	public JSONObject ask4analysis(String id, int historyCount) {
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("userID=" + id);
-		data.add("command=" + "analyze");
-		data.add("historyCount=" + String.valueOf(historyCount));
+		ArrayList<NameValuePair> pairs = new ArrayList<NameValuePair>();
+		pairs.add(new BasicNameValuePair("command", "analyze"));
+		pairs.add(new BasicNameValuePair("userID", id));
+		pairs.add(new BasicNameValuePair("historyCount", String
+				.valueOf(historyCount)));
 
-		JSONObject res = sendRequest("POST", data);
+		JSONObject res = sendRequest("POST", null, pairs);
 		return res;
 	}
 
@@ -198,7 +219,7 @@ public class ResultChannelThread implements Runnable {
 		data.add("command=" + "singleResult");
 		data.add("historyCount=" + String.valueOf(historyCount));
 
-		JSONObject res = sendRequest("GET", data);
+		JSONObject res = sendRequest("GET", data, null);
 		return res;
 
 	}
@@ -210,7 +231,7 @@ public class ResultChannelThread implements Runnable {
 		data.add("userID=" + id);
 		data.add("command=" + "singleResult");
 
-		JSONObject res = sendRequest("GET", data);
+		JSONObject res = sendRequest("GET", data, null);
 		return res;
 	}
 
@@ -220,7 +241,7 @@ public class ResultChannelThread implements Runnable {
 		data.add("command=" + "multiResults");
 		data.add("maxHistoryCount=" + String.valueOf(maxHistoryCount));
 
-		JSONObject res = sendRequest("GET", data);
+		JSONObject res = sendRequest("GET", data, null);
 		return res;
 	}
 
@@ -232,45 +253,68 @@ public class ResultChannelThread implements Runnable {
 		data.add("command=" + "multiResults");
 		data.add("maxHistoryCount=" + String.valueOf(maxHistoryCount));
 
-		JSONObject res = sendRequest("GET", data);
+		JSONObject res = sendRequest("GET", data, null);
 		return res;
 	}
 
-	public JSONObject sendRequest(String method, ArrayList<String> data) {
-		// Log.d("Result Channel", data.toString());
-		String dataURL = URLEncoder(data);
-		// Log.d("Result Channel", dataURL);
-		String url_string = "";
-		if (method.equalsIgnoreCase("GET")) {
-			url_string = this.analyzerServerUrl + "?" + dataURL;
-		} else if (method.equalsIgnoreCase("POST")) {
-			url_string = this.analyzerServerUrl + dataURL;
-		}
-		// System.out.println(url_string);
-		Log.d("Result Channel", url_string);
+	public JSONObject sendRequest(String method, ArrayList<String> data, ArrayList<NameValuePair> pairs) {
+		
 		JSONObject json = null;
-		try {
-			HttpClient httpClient = new DefaultHttpClient();
-			HttpGet request = new HttpGet();
-			URI uri = new URI(url_string);
-			request.setURI(uri);
-			HttpResponse response = httpClient.execute(request);
-			BufferedReader rd = new BufferedReader(new InputStreamReader(
-					response.getEntity().getContent()));
-			StringBuilder res = new StringBuilder();
+		if (method.equalsIgnoreCase("GET")) {
+			String dataURL = URLEncoder(data);
+			String url_string = this.analyzerServerUrl + "?" + dataURL;
+			Log.d("Result Channel", url_string);
 
-			// parse BufferReader rd to StringBuilder res
-			String line;
-			while ((line = rd.readLine()) != null) {
-				res.append(line);
+			try {
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpGet request = new HttpGet();
+				URI uri = new URI(url_string);
+				request.setURI(uri);
+				HttpResponse response = httpClient.execute(request);
+				BufferedReader rd = new BufferedReader(new InputStreamReader(
+						response.getEntity().getContent()));
+				StringBuilder res = new StringBuilder();
+
+				// parse BufferReader rd to StringBuilder res
+				String line;
+				while ((line = rd.readLine()) != null) {
+					res.append(line);
+				}
+				rd.close();
+
+				// parse String to json file.
+				json = new JSONObject(res.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e("Result Channel", "sendRequest GET failed");
 			}
-			rd.close();
+		} else if (method.equalsIgnoreCase("POST")) {
+			String url_string = this.analyzerServerUrl;
+			Log.d("Result Channel", url_string);
 
-			// parse String to json file.
-			json = new JSONObject(res.toString());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.e("Result Channel", "sendRequest failed");
+			try {
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpPost post = new HttpPost(url_string);
+				//URI uri = new URI(url_string);
+				post.setEntity(new UrlEncodedFormEntity(pairs));
+				HttpResponse response = httpClient.execute(post);
+				BufferedReader rd = new BufferedReader(new InputStreamReader(
+						response.getEntity().getContent()));
+				StringBuilder res = new StringBuilder();
+
+				// parse BufferReader rd to StringBuilder res
+				String line;
+				while ((line = rd.readLine()) != null) {
+					res.append(line);
+				}
+				rd.close();
+
+				// parse String to json file.
+				json = new JSONObject(res.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e("Result Channel", "sendRequest POST failed");
+			}
 		}
 
 		return json;

@@ -5,6 +5,7 @@ import java.util.List;
 import uk.co.senab.photoview.PhotoViewAttacher;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,6 +78,7 @@ public class ImageReplayListAdapter extends BaseAdapter {
 
 		tv = (TextView) view.findViewById(R.id.appStatusTextView);
 		tv.setText(app.status);
+		tv.setTextColor(Color.parseColor("#DAA520"));
 
 		ProgressBar progress = (ProgressBar) view
 				.findViewById(R.id.appProgress);

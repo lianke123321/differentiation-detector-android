@@ -21,4 +21,6 @@
     <color name="black">#000000</color>
     
     <color name="red">#8B0000</color>
+    <color name="forestGreen">#228B22</color>
+    <color name="goldenRod">#DAA520</color>
 </resources>
