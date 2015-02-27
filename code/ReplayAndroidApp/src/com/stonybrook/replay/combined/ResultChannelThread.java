@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
@@ -23,209 +24,230 @@ import com.stonybrook.replay.bean.ApplicationBean;
  */
 public class ResultChannelThread implements Runnable {
 
-	public volatile boolean doneReplay = false;
+    public volatile boolean doneReplay = false;
 
-	private String path;
-	private int port;
-	private String analyzerServerUrl = null;
-	private String id;
-	private ArrayList<ApplicationBean> selectedApps = null;
-	private String finishVpn;
-	private String finishRandom;
-	private ImageReplayListAdapter adapter = null;
+    private String path;
+    private String analyzerServerUrl = null;
+    private String id;
+    private ArrayList<ApplicationBean> selectedApps = null;
+    private String finishVpn;
+    private String finishRandom;
+    private ImageReplayListAdapter adapter = null;
 
-	public ResultChannelThread(String path, int port, String id,
-			ArrayList<ApplicationBean> selectedApps, String finishVpn,
-			String finishRandom, ImageReplayListAdapter adapter) {
-		this.path = path;
-		this.port = port;
-		this.analyzerServerUrl = ("http://" + path + ":" + port + "/Results");
-		this.id = id;
-		this.selectedApps = selectedApps;
-		this.finishVpn = finishVpn;
-		this.finishRandom = finishRandom;
-		this.adapter = adapter;
-		Log.d("Result Channel", "path: " + this.path + " finishVpn: "
-				+ this.finishVpn + " finishRandom: " + this.finishRandom);
-	}
+    public ResultChannelThread(String path, int port, String id,
+            ArrayList<ApplicationBean> selectedApps, String finishVpn,
+            String finishRandom, ImageReplayListAdapter adapter) {
+        this.path = path;
+        this.analyzerServerUrl = ("http://" + path + ":" + port + "/Results");
+        this.id = id;
+        this.selectedApps = selectedApps;
+        this.finishVpn = finishVpn;
+        this.finishRandom = finishRandom;
+        this.adapter = adapter;
+        Log.d("Result Channel", "path: " + this.path + " finishVpn: "
+                + this.finishVpn + " finishRandom: " + this.finishRandom);
+    }
 
-	@Override
-	public void run() {
-		Thread.currentThread().setName("ResultChannelThread (Thread)");
-		try {
-			String wait = "Waiting for server result";
+    @Override
+    public void run() {
+        Thread.currentThread().setName("ResultChannelThread (Thread)");
+        try {
+            String wait = "Waiting for server result";
 
-			while (true) {
-				for (int i = 0; i < selectedApps.size(); i++) {
-					if ((selectedApps.get(i).status == finishVpn)
-							|| (selectedApps.get(i).status == finishRandom)) {
-						selectedApps.get(i).status = wait;
-						// adapter.notifyDataSetChanged();
+            while (true) {
+                for (int i = 0; i < selectedApps.size(); i++) {
+                    if ((selectedApps.get(i).status == finishVpn)
+                            || (selectedApps.get(i).status == finishRandom)) {
+                        synchronized (selectedApps) {
+                            selectedApps.get(i).status = wait;
+                        }
 
-						// sanity check
-						if (selectedApps.get(i).historyCount < 0) {
-							Log.e("Result Channel",
-									"historyCount value not correct!");
-							return;
-						}
-					}
+                        // adapter.notifyDataSetChanged();
 
-					if (selectedApps.get(i).status == wait) {
-						JSONObject result = getSingleResult(id);
-						Log.d("Result Channel",
-								"received result: " + result.toString());
-						selectedApps.get(i).status = "Result received";
-						// adapter.notifyDataSetChanged();
-						Thread.sleep(2000);
-					}
-				}
+                        // sanity check
+                        if (selectedApps.get(i).historyCount < 0) {
+                            Log.e("Result Channel",
+                                    "historyCount value not correct!");
+                            return;
+                        }
+                    }
 
-				if (doneReplay) {
-					Log.d("Result Channel", "Done replay! Exiting thread.");
-					break;
-				}
+                    if (selectedApps.get(i).status == wait) {
 
-				Thread.sleep(2000);
-			}
-		} catch (InterruptedException ex) {
-			Log.d("Result Channel", "interrupted!");
-		}
-	}
+                        JSONObject result = getSingleResult(id,
+                                selectedApps.get(i).historyCount);
+                        if (result == null)
+                            continue;
 
-	public JSONObject ask4analysis(String id, int historyCount) {
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("userID=" + id);
-		data.add("command=" + "analyze");
-		data.add("historyCount=" + String.valueOf(historyCount));
+                        boolean success = result.getBoolean("success");
+                        if (success) {
+                            Log.d("Result Channel", "retrieve result succeed");
 
-		JSONObject res = sendRequest("POST", data);
-		return res;
-	}
+                            // parse content of response
+                            JSONObject response = result.getJSONArray(
+                                    "response").getJSONObject(0);
 
-	public JSONObject getSingleResult(String id, int historyCount) {
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("userID=" + id);
-		data.add("command=" + "singleResult");
-		data.add("historyCount=" + String.valueOf(historyCount));
+                            String userID = response.getString("userID");
+                            double rate = response.getDouble("rate");
+                            int historyCount = response.getInt("historyCount");
+                            int diff = response.getInt("diff");
+                            String replayName = response
+                                    .getString("replayName");
+                            String date = response.getString("date");
 
-		JSONObject res = sendRequest("GET", data);
-		return res;
+                            // sanity check
+                            if ((!userID.trim().equalsIgnoreCase(id))
+                                    || (historyCount != selectedApps.get(i).historyCount)) {
+                                Log.e("Result Channel",
+                                        "Result didn't pass sanity check! correct id: "
+                                                + id
+                                                + " correct historyCount: "
+                                                + selectedApps.get(i).historyCount);
+                                Log.e("Result Channel", "Result content: "
+                                        + response.toString());
+                                selectedApps.get(i).status = "Result error";
+                            } else {
+                                synchronized (selectedApps) {
+                                    switch (diff) {
+                                        case -1:
+                                            selectedApps.get(i).status = "No differentiation";
+                                        case 0:
+                                            selectedApps.get(i).status = "There might be differentiation";
+                                        case 1:
+                                            selectedApps.get(i).status = "Differentiation detected!";
+                                        default:
+                                            selectedApps.get(i).status = "unknown result! "
+                                                    + String.valueOf(diff);
+                                    }
+                                }
+                            }
+                            // adapter.notifyDataSetChanged();
+                        }
+                        Thread.sleep(2000);
+                    }
+                }
 
-	}
+                if (doneReplay) {
+                    Log.d("Result Channel", "Done replay! Exiting thread.");
+                    break;
+                }
 
-	// overload getSingleResult method. historyCount are not given as a
-	// parameter
-	public JSONObject getSingleResult(String id) {
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("userID=" + id);
-		data.add("command=" + "singleResult");
+                Thread.sleep(2000);
+            }
+        } catch (InterruptedException ex) {
+            Log.d("Result Channel", "interrupted!");
+        } catch (JSONException e) {
+            Log.d("Result Channel", "parsing json error");
+            e.printStackTrace();
+        }
+    }
 
-		JSONObject res = sendRequest("GET", data);
-		return res;
-	}
+    public JSONObject ask4analysis(String id, int historyCount) {
+        ArrayList<String> data = new ArrayList<String>();
+        data.add("userID=" + id);
+        data.add("command=" + "analyze");
+        data.add("historyCount=" + String.valueOf(historyCount));
 
-	public JSONObject getMultipleResult(String id, int maxHistoryCount) {
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("userID=" + id);
-		data.add("command=" + "multiResults");
-		data.add("maxHistoryCount=" + String.valueOf(maxHistoryCount));
+        JSONObject res = sendRequest("POST", data);
+        return res;
+    }
 
-		JSONObject res = sendRequest("GET", data);
-		return res;
-	}
+    public JSONObject getSingleResult(String id, int historyCount) {
+        ArrayList<String> data = new ArrayList<String>();
+        data.add("userID=" + id);
+        data.add("command=" + "singleResult");
+        data.add("historyCount=" + String.valueOf(historyCount));
 
-	// overload getMultiple method. maxHistoryCount is not given as a parameter
-	public JSONObject getMultipleResult(String id) {
-		int maxHistoryCount = 10;
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("userID=" + id);
-		data.add("command=" + "multiResults");
-		data.add("maxHistoryCount=" + String.valueOf(maxHistoryCount));
+        JSONObject res = sendRequest("GET", data);
+        return res;
 
-		JSONObject res = sendRequest("GET", data);
-		return res;
-	}
+    }
 
-	public JSONObject sendRequest(String method, ArrayList<String> data) {
-		// Log.d("Result Channel", data.toString());
-		String dataURL = URLEncoder(data);
-		// Log.d("Result Channel", dataURL);
-		String url_string = "";
-		if (method.equalsIgnoreCase("GET")) {
-			url_string = this.analyzerServerUrl + "?" + dataURL;
-		} else if (method.equalsIgnoreCase("POST")) {
-			url_string = this.analyzerServerUrl + dataURL;
-		}
-		// System.out.println(url_string);
-		Log.d("Result Channel", url_string);
-		JSONObject json = null;
-		try {
-			URL url = new URL(url_string);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("GET");
-			BufferedReader rd = new BufferedReader(new InputStreamReader(
-					conn.getInputStream()));
+    // overload getSingleResult method. historyCount are not given as a
+    // parameter
+    public JSONObject getSingleResult(String id) {
+        ArrayList<String> data = new ArrayList<String>();
+        data.add("userID=" + id);
+        data.add("command=" + "singleResult");
 
-			StringBuilder res = new StringBuilder();
+        JSONObject res = sendRequest("GET", data);
+        return res;
+    }
 
-			// parse BufferReader rd to StringBuilder res
-			String line;
-			while ((line = rd.readLine()) != null) {
-				res.append(line);
-			}
-			rd.close();
+    public JSONObject getMultipleResult(String id, int maxHistoryCount) {
+        ArrayList<String> data = new ArrayList<String>();
+        data.add("userID=" + id);
+        data.add("command=" + "multiResults");
+        data.add("maxHistoryCount=" + String.valueOf(maxHistoryCount));
 
-			// parse String to json file.
-			json = new JSONObject(res.toString());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        JSONObject res = sendRequest("GET", data);
+        return res;
+    }
 
-		return json;
+    // overload getMultiple method. maxHistoryCount is not given as a parameter
+    public JSONObject getMultipleResult(String id) {
+        int maxHistoryCount = 10;
+        ArrayList<String> data = new ArrayList<String>();
+        data.add("userID=" + id);
+        data.add("command=" + "multiResults");
+        data.add("maxHistoryCount=" + String.valueOf(maxHistoryCount));
 
-	}
+        JSONObject res = sendRequest("GET", data);
+        return res;
+    }
 
-	// overload URLencoder to encode map to an url.
-	public String URLEncoder(ArrayList<String> map) {
-		StringBuilder data = new StringBuilder();
-		for (String s : map) {
-			if (data.length() > 0) {
-				data.append("&");
-			}
-			data.append(s);
-		}
+    public JSONObject sendRequest(String method, ArrayList<String> data) {
+        // Log.d("Result Channel", data.toString());
+        String dataURL = URLEncoder(data);
+        // Log.d("Result Channel", dataURL);
+        String url_string = "";
+        if (method.equalsIgnoreCase("GET")) {
+            url_string = this.analyzerServerUrl + "?" + dataURL;
+        } else if (method.equalsIgnoreCase("POST")) {
+            url_string = this.analyzerServerUrl + dataURL;
+        }
+        // System.out.println(url_string);
+        Log.d("Result Channel", url_string);
+        JSONObject json = null;
+        try {
+            URL url = new URL(url_string);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            BufferedReader rd = new BufferedReader(new InputStreamReader(
+                    conn.getInputStream()));
 
-		return data.toString();
+            StringBuilder res = new StringBuilder();
 
-	}
+            // parse BufferReader rd to StringBuilder res
+            String line;
+            while ((line = rd.readLine()) != null) {
+                res.append(line);
+            }
+            rd.close();
 
-	/*public static void main(String[] args)
-	{
-		String analyzerServerPort = "56565";
-		String analyzerServerIP   = "54.87.92.45";
-		String analyzerServerPath = ("http://" + analyzerServerIP 
-				+ ":" + analyzerServerPort + "/Results");
-		
-		ResultChannel sendT1 = new ResultChannel(analyzerServerPath);
-		
-		JSONObject json_single1,json_single2,json_multi1,json_multi2;
-		json_single1 = sendT1.getSingleResult("KSiZr4RAqA", 9);
-		json_single2 = sendT1.getSingleResult("KSiZr4RAqA");				
-		json_multi1 = sendT1.getMultipleResult("KSiZr4RAqA", 9);
-		json_multi2 = sendT1.getMultipleResult("KSiZr4RAqA");
-		
-		System.out.println("JSON for singleResult:");
-		System.out.println(json_single1);
-		System.out.println();
-		System.out.println("JSON for singleResult w.o historyCount:");
-		System.out.println(json_single2);
-		System.out.println();
-		System.out.println("JSON for multiResults");
-		System.out.println(json_multi1);
-		System.out.println();
-		System.out.println("JSON for multiResults w.o maxHistoryCount");
-		System.out.println(json_multi2);
-		System.out.println();
-			
-	}*/
+            // parse String to json file.
+            json = new JSONObject(res.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Result Channel", "sendRequest failed");
+        }
+
+        return json;
+
+    }
+
+    // overload URLencoder to encode map to an url.
+    public String URLEncoder(ArrayList<String> map) {
+        StringBuilder data = new StringBuilder();
+        for (String s : map) {
+            if (data.length() > 0) {
+                data.append("&");
+            }
+            data.append(s);
+        }
+
+        return data.toString();
+
+    }
+
 }

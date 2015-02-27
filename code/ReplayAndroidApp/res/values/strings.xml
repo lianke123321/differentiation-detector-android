@@ -99,7 +99,7 @@ This study has been reviewed and approved by the Northeastern University Institu
     <string name="user_agree">Accept</string>
     <string name="user_disagree">Decline</string>
     
-    <string name="no_diff">No differentiation.</string>
+    <string name="no_diff">No differentiation</string>
     <string name="has_diff">Differentiation detected!</string>
     
     <!-- This is for mobilyzer -->
