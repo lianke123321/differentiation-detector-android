@@ -2,20 +2,14 @@ package com.stonybrook.replay.adapter;
 
 import java.util.List;
 
-import uk.co.senab.photoview.PhotoViewAttacher;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.stonybrook.replay.R;
@@ -78,9 +72,27 @@ public class ImageReplayListAdapter extends BaseAdapter {
 
 		tv = (TextView) view.findViewById(R.id.appStatusTextView);
 		tv.setText(app.status);
-		tv.setTextColor(Color.parseColor("#DAA520"));
+		// here we set different color for different results
+		// TODO: Move these strings somewhere else
+		if (app.status.trim().equalsIgnoreCase("Inconclusive Result")) {
+			// yellow and normal
+			tv.setTypeface(null, Typeface.NORMAL);
+			tv.setTextColor(Color.parseColor("#DAA520"));
+		} else if (app.status.trim().equalsIgnoreCase("No Differentiation")) {
+			// green and normal
+			tv.setTypeface(null, Typeface.NORMAL);
+			tv.setTextColor(Color.parseColor("#228B22"));
+		} else if (app.status.trim().equalsIgnoreCase("Differentiation Detected")) {
+			// red and bold
+			tv.setTypeface(null, Typeface.BOLD);
+			tv.setTextColor(Color.parseColor("#B22222"));
+		} else {
+			tv.setTypeface(null, Typeface.NORMAL);
+			tv.setTextColor(Color.parseColor("#000000"));
+		}
+		
 
-		ProgressBar progress = (ProgressBar) view
+		/*ProgressBar progress = (ProgressBar) view
 				.findViewById(R.id.appProgress);
 		ImageButton button = (ImageButton) view.findViewById(R.id.appResultBtn);
 
@@ -102,11 +114,11 @@ public class ImageReplayListAdapter extends BaseAdapter {
 					ImageView image = (ImageView) view
 							.findViewById(R.id.resultDialogImg);
 
-					/**
+					*//**
 					 * Not sure about the license of PhotoViewAttacher TODO :
 					 * look into the license of this and decide whether to use
 					 * it or not.
-					 */
+					 *//*
 
 					image.setImageDrawable(mainAct.getResources().getDrawable(
 							mainAct.getResources().getIdentifier(app.resultImg,
@@ -140,7 +152,7 @@ public class ImageReplayListAdapter extends BaseAdapter {
 			progress.setVisibility(ProgressBar.INVISIBLE);
 			progress.setProgress(0);
 			button.setVisibility(Button.GONE);
-		}
+		}*/
 
 		ImageView img = (ImageView) view.findViewById(R.id.appImageView);
 

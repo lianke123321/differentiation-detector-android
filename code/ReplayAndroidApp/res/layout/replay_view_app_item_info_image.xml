@@ -85,8 +85,8 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:minHeight="25dp"
-        android:minWidth="100dp"
-        android:paddingLeft="15dp"
+        android:minWidth="200dp"
+        android:paddingLeft="25dp"
         android:visibility="gone" /> 
 
     <ImageButton
@@ -100,7 +100,7 @@
         android:minWidth="100dp"
         android:padding="4dp"
         android:layout_marginTop="10dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:paddingLeft="25dp"      
         android:src="@drawable/analysis"
         android:background="@null"

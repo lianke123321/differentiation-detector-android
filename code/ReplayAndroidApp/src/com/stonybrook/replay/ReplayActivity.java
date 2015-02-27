@@ -1246,7 +1246,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			if (!success) {
 				// Update status on screen and stop processing
-				selectedApps.get(currentReplayCount).resultImg = "p";
+				//selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
@@ -1327,7 +1327,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * is called.
 				 */
 
-				selectedApps.get(currentReplayCount).resultImg = "p";
+				//selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.finish_vpn);
 				adapter.notifyDataSetChanged();
@@ -1395,7 +1395,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		try {
 			if (!success) {
 				// Update status on screen and stop processing
-				selectedApps.get(currentReplayCount).resultImg = "p";
+				//selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
@@ -1463,7 +1463,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * is called.
 				 */
 
-				selectedApps.get(currentReplayCount).resultImg = "p";
+				//selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.finish_random);
 				adapter.notifyDataSetChanged();
@@ -1534,7 +1534,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			// If Replay on Open was successful then schedule on VPN
 			if (!success) {
 				// Update status on screen and stop processing
-				selectedApps.get(currentReplayCount).resultImg = "p";
+				//selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
@@ -1680,7 +1680,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				processCombinedApplication(
 						selectedApps.get(currentReplayCount), "open");
 			} else {
-				selectedApps.get(currentReplayCount).resultImg = "p";
+				//selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
