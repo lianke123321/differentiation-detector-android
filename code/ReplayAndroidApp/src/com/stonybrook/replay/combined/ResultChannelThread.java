@@ -9,6 +9,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,8 +48,10 @@ public class ResultChannelThread implements Runnable {
 		this.finishVpn = finishVpn;
 		this.finishRandom = finishRandom;
 		this.adapter = adapter;
-		Log.d("Result Channel", "path: " + this.path + " finishVpn: "
-				+ this.finishVpn + " finishRandom: " + this.finishRandom);
+		Log.d("Result Channel",
+				"path: " + this.path + " port: " + String.valueOf(port)
+						+ " finishVpn: " + this.finishVpn + " finishRandom: "
+						+ this.finishRandom);
 	}
 
 	@Override
@@ -56,7 +59,7 @@ public class ResultChannelThread implements Runnable {
 		Thread.currentThread().setName("ResultChannelThread (Thread)");
 		try {
 			String wait = "Waiting for server result";
-			//int counter = 0;
+			int counter = 0;
 
 			while (true) {
 				/*if (!doneReplay) {
@@ -70,7 +73,7 @@ public class ResultChannelThread implements Runnable {
 						synchronized (selectedApps) {
 							selectedApps.get(i).status = wait;
 						}
-						//counter += 1;
+						counter += 1;
 						// adapter.notifyDataSetChanged();
 
 						// sanity check
@@ -91,10 +94,16 @@ public class ResultChannelThread implements Runnable {
 						boolean success = result.getBoolean("success");
 						if (success) {
 							Log.d("Result Channel", "retrieve result succeed");
-							//counter -= 1;
+							
 							// parse content of response
-							JSONObject response = result.getJSONArray(
-									"response").getJSONObject(0);
+							JSONArray raw_response = result.getJSONArray(
+									"response");
+							
+							if (raw_response.length() == 0)
+								continue;
+							
+							counter -= 1;
+							JSONObject response = raw_response.getJSONObject(0);
 
 							String userID = response.getString("userID");
 							double rate = response.getDouble("rate");
@@ -139,13 +148,13 @@ public class ResultChannelThread implements Runnable {
 									                + String.valueOf(diff);
 									}*/
 									if (diff == -1)
-										selectedApps.get(i).status = "No differentiation";
+										selectedApps.get(i).status = "No Differentiation";
 									else if (diff == 0)
-										selectedApps.get(i).status = "There might be differentiation";
+										selectedApps.get(i).status = "Inconclusive Result";
 									else if (diff == 1)
-										selectedApps.get(i).status = "Differentiation detected!";
+										selectedApps.get(i).status = "Differentiation Detected!";
 									else
-										selectedApps.get(i).status = "unknown result! "
+										selectedApps.get(i).status = "Unknown Code: "
 												+ String.valueOf(diff);
 								}
 							}
@@ -155,9 +164,9 @@ public class ResultChannelThread implements Runnable {
 					}
 				}
 
-				if (doneReplay) {
-				    Log.d("Result Channel", "Done replay! Exiting thread.");
-				    break;
+				if (doneReplay && counter == 0) {
+					Log.d("Result Channel", "Done replay! Exiting thread.");
+					break;
 				}
 				/*if (counter == 0) {
 					break;

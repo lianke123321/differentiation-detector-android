@@ -395,8 +395,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			if (isAvailable) {
 				// Creating result channel thread here
-				resultChannelThread = new ResultChannelThread(server, 56565,
-						randomID, selectedApps, getResources().getString(
+				resultChannelThread = new ResultChannelThread(server,
+						Integer.valueOf(Config.get("result_port")), randomID,
+						selectedApps, getResources().getString(
 								R.string.finish_vpn), getResources().getString(
 								R.string.finish_random), adapter);
 				resultThread = new Thread(resultChannelThread);
@@ -1357,7 +1358,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												+ "We truly appreciate your support and contribution "
 												+ "to this research!\n\n"
 												+ "Thank you and have a nice day :-)")
-								.setPositiveButton("Retrieve result",
+								.setPositiveButton("OK",
 										new DialogInterface.OnClickListener() {
 
 											@Override
@@ -1493,7 +1494,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												+ "We truly appreciate your support and contribution "
 												+ "to this research!\n\n"
 												+ "Thank you and have a nice day :-)")
-								.setPositiveButton("Retrieve result",
+								.setPositiveButton("OK",
 										new DialogInterface.OnClickListener() {
 
 											@Override
@@ -1595,7 +1596,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 													+ "to this research!\n\n"
 													+ "Thank you and have a nice day :-)")
 									.setPositiveButton(
-											"Retrieve result",
+											"OK",
 											new DialogInterface.OnClickListener() {
 
 												@Override
