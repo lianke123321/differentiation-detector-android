@@ -529,7 +529,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 											queueCombined.cancel(true);
 										}
 										disconnectVPN();
-										resultChannelThread.forceQuit = true;
+										if (resultChannelThread != null)
+											resultChannelThread.forceQuit = true;
 										ReplayActivity.this.finish();
 										ReplayActivity.this
 												.overridePendingTransition(
@@ -832,7 +833,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 														queueCombined
 																.cancel(true);
 														disconnectVPN();
-														resultChannelThread.forceQuit = true;
+														if (resultChannelThread != null)
+															resultChannelThread.forceQuit = true;
 														ReplayActivity.this
 																.finish();
 													}
@@ -861,7 +863,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 														queueCombined
 																.cancel(true);
 														disconnectVPN();
-														resultChannelThread.forceQuit = true;
+														if (resultChannelThread != null)
+															resultChannelThread.forceQuit = true;
 														ReplayActivity.this
 																.finish();
 													}
@@ -889,7 +892,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 														queueCombined
 																.cancel(true);
 														disconnectVPN();
-														resultChannelThread.forceQuit = true;
+														if (resultChannelThread != null)
+															resultChannelThread.forceQuit = true;
 														ReplayActivity.this
 																.finish();
 													}
@@ -1177,7 +1181,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				});
 				this.cancel(true);
-				resultChannelThread.forceQuit = true;
+				if (resultChannelThread != null)
+					resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
@@ -1204,7 +1209,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// throw new RuntimeException();
 				this.cancel(true);
 				// ACRA.getErrorReporter().handleSilentException(ex);
-				resultChannelThread.forceQuit = true;
+				if (resultChannelThread != null)
+					resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			} catch (SocketTimeoutException ex) {
 				Log.d("Replay", "Replay failed due to socket timeout!");
@@ -1222,7 +1228,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// throw new RuntimeException();
 				this.cancel(true);
 				// ACRA.getErrorReporter().handleException(ex);
-				resultChannelThread.forceQuit = true;
+				if (resultChannelThread != null)
+					resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			}
 			Log.d("Replay", "queueCombined finished execution!");
