@@ -395,10 +395,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			if (isAvailable) {
 				// Creating result channel thread here
-				resultChannelThread = new ResultChannelThread(
-						server, 56565, randomID, selectedApps, getResources()
-								.getString(R.string.finish_vpn), getResources()
-								.getString(R.string.finish_random), adapter);
+				resultChannelThread = new ResultChannelThread(server,
+						Integer.valueOf(Config.get("result_port")), randomID,
+						selectedApps, getResources().getString(
+								R.string.finish_vpn), getResources().getString(
+								R.string.finish_random), adapter);
 				resultThread = new Thread(resultChannelThread);
 				resultThread.start();
 
@@ -1343,7 +1344,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				currentReplayCount = 0;
 				Log.d("Replay", "finished all replays!");
 				replayOngoing = false;
-				
+
 				// notify result channel thread
 				resultChannelThread.doneReplay = true;
 				resultThread.join();
@@ -1357,23 +1358,20 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												+ "We truly appreciate your support and contribution "
 												+ "to this research!\n\n"
 												+ "Thank you and have a nice day :-)")
-								.setPositiveButton("Go back",
+								.setPositiveButton("OK",
 										new DialogInterface.OnClickListener() {
 
 											@Override
 											public void onClick(
 													DialogInterface dialog,
 													int which) {
-												ReplayActivity.this.finish();
-												ReplayActivity.this
-														.overridePendingTransition(
-																android.R.anim.slide_in_left,
-																android.R.anim.slide_out_right);
+												// do nothing
 											}
 										}).show();
 					}
 
 				});
+
 			}
 
 		} catch (Exception ex) {
@@ -1482,7 +1480,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				currentReplayCount = 0;
 				Log.d("Replay", "finished all replays!");
 				replayOngoing = false;
-				
+
 				// notify result channel thread
 				resultChannelThread.doneReplay = true;
 				resultThread.join();
@@ -1496,23 +1494,21 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												+ "We truly appreciate your support and contribution "
 												+ "to this research!\n\n"
 												+ "Thank you and have a nice day :-)")
-								.setPositiveButton("Go back",
+								.setPositiveButton("OK",
 										new DialogInterface.OnClickListener() {
 
 											@Override
 											public void onClick(
 													DialogInterface dialog,
 													int which) {
-												ReplayActivity.this.finish();
-												ReplayActivity.this
-														.overridePendingTransition(
-																android.R.anim.slide_in_left,
-																android.R.anim.slide_out_right);
+												// do nothing
+
 											}
 										}).show();
 					}
 
 				});
+
 			}
 
 		} catch (Exception ex) {
@@ -1585,7 +1581,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					currentReplayCount = 0;
 					Log.d("Replay", "finished all replays!");
 					replayOngoing = false;
-					
+
 					// notify result channel thread
 					resultChannelThread.doneReplay = true;
 					resultThread.join();
@@ -1600,24 +1596,20 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 													+ "to this research!\n\n"
 													+ "Thank you and have a nice day :-)")
 									.setPositiveButton(
-											"Go back",
+											"OK",
 											new DialogInterface.OnClickListener() {
 
 												@Override
 												public void onClick(
 														DialogInterface dialog,
 														int which) {
-													ReplayActivity.this
-															.finish();
-													ReplayActivity.this
-															.overridePendingTransition(
-																	android.R.anim.slide_in_left,
-																	android.R.anim.slide_out_right);
+													// do nothing
 												}
 											}).show();
 						}
 
 					});
+
 				}
 
 			} else {
@@ -1769,12 +1761,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.log:
-			Intent logIntent = new Intent(this, LogActivity.class);
-			startActivity(logIntent);
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.log:
+				Intent logIntent = new Intent(this, LogActivity.class);
+				startActivity(logIntent);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -1864,35 +1856,37 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
-		case PREPARE_VPN_SERVICE:
-			if (resultCode == RESULT_OK && mProfileInfo != null) {
-				Context context = getApplicationContext();
-				Intent intent = new Intent(context, CharonVpnService.class);
-				intent.putExtras(mProfileInfo);
-				intent.putExtra("action", "start");
-				context.startService(intent);
-			} else {
-				// a alert dialog will pop up and the app will quite if user
-				// click "Cancel" for trust permission
-				AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-				alertDialog
-						.setMessage("Connecting VPN failed. Replay aborted.")
-						.setNeutralButton("OK",
-								new DialogInterface.OnClickListener() {
+			case PREPARE_VPN_SERVICE:
+				if (resultCode == RESULT_OK && mProfileInfo != null) {
+					Context context = getApplicationContext();
+					Intent intent = new Intent(context, CharonVpnService.class);
+					intent.putExtras(mProfileInfo);
+					intent.putExtra("action", "start");
+					context.startService(intent);
+				} else {
+					// a alert dialog will pop up and the app will quite if user
+					// click "Cancel" for trust permission
+					AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+							this);
+					alertDialog.setMessage(
+							"Connecting VPN failed. Replay aborted.")
+							.setNeutralButton("OK",
+									new DialogInterface.OnClickListener() {
 
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										// exit this application
-										ReplayActivity.this.finish();
-									}
-								});
-				// show this dialog on the screen
-				alertDialog.create().show();
-			}
-			break;
-		default:
-			super.onActivityResult(requestCode, resultCode, data);
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											// exit this application
+											ReplayActivity.this.finish();
+										}
+									});
+					// show this dialog on the screen
+					alertDialog.create().show();
+				}
+				break;
+			default:
+				super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
 
