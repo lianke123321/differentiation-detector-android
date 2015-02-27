@@ -377,6 +377,16 @@ public class CharonVpnService extends VpnService implements Runnable {
 	}
 
 	/**
+	 * @return true if currently is connected.
+	 */
+	public boolean isFullyConnected() {
+		// defensive programming since this method will be called from other
+		// activities
+		return mService != null
+				&& (mService.getState() == State.CONNECTED);
+	}
+	
+	/**
 	 * Stop any existing connection by deinitializing charon.
 	 */
 	private void stopCurrentConnection() {

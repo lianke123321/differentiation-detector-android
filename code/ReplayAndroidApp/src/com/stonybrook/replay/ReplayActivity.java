@@ -2056,12 +2056,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		protected Boolean doInBackground(ReplayActivity... params) {
 			Thread.currentThread().setName("VPNConnected (AsyncTask)");
 			int i = 0;
+			
 			while (i < 5) {
 				i++;
 				try {
+					
+					
 					Log.d("VPNConnected", "about to get public IP");
-					String str = getPublicIP();
-					if (str.equalsIgnoreCase(meddleIP)) {
+					//String str = getPublicIP();
+					//if (str.equalsIgnoreCase(meddleIP)) {
+					if (CharonVpnService.getInstance() != null && 
+							CharonVpnService.getInstance().isFullyConnected()){
 						Log.d("VPNConnected", "Got it!");
 						// Set flag indicating VPN connectivity status
 						isVPNConnected = true;
@@ -2084,7 +2089,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						return true;
 					}
 					Thread.sleep(3000);
-					Log.d("VPNConnected", "Not yet! PublicIP is: " + str);
+					Log.d("VPNConnected", "Not yet!");
 				} catch (Exception e) {
 					Log.d("VPNConnected", "failed to get VPN IP address");
 					e.printStackTrace();
@@ -2128,8 +2133,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				i++;
 				try {
 					Log.d("TestVPN", "about to get public IP");
-					String str = getPublicIP();
-					if (str.equalsIgnoreCase(meddleIP)) {
+					//String str = getPublicIP();
+					//if (str.equalsIgnoreCase(meddleIP)) {
+					if (CharonVpnService.getInstance() != null && 
+							CharonVpnService.getInstance().isFullyConnected()){
 						Log.d("TestVPN", "Got it!");
 						isVPNConnected = true;
 						// disconnect vpn and return
@@ -2148,7 +2155,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						return true;
 					}
 					Thread.sleep(3000);
-					Log.d("TestVPN", "Not yet! PublicIP is: " + str);
+					Log.d("TestVPN", "Not yet! ");
 				} catch (Exception e) {
 					Log.d("TestVPN", "failed to get VPN IP address");
 					e.printStackTrace();
@@ -2219,14 +2226,19 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			while (i < 5) {
 				try {
 					i++;
-					String str = getPublicIP();
-					if (str.equalsIgnoreCase(publicIP)) {
+					//String str = getPublicIP();
+					//if (str.equalsIgnoreCase(publicIP)) {
+					if (CharonVpnService.getInstance() != null && 
+							!CharonVpnService.getInstance().isFullyConnected()){
 						Log.d("DisconnectVPN", "Got it!");
 						// Set flag indicating VPN connectivity status
 						isVPNConnected = false;
 
 						// Start the replay for the next app
 						// adrian: start the combined thread
+						if (currentReplayCount < selectedApps.size()){
+							// do nothing
+						}
 						if (currentTask.equalsIgnoreCase("combined")) {
 							appData_combined = UnpickleDataStream
 									.unpickleCombinedJSON(
@@ -2249,7 +2261,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						return true;
 
 					}
-					Log.d("DisconnectVPN", "public IP: " + str);
+					Log.d("DisconnectVPN", "done");
 				} catch (Exception e) {
 					Log.d("DisconnectVPN", "failed to get VPN IP address");
 					e.printStackTrace();
