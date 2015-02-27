@@ -172,7 +172,7 @@ public class ResultChannelThread implements Runnable {
 									else if (diff == 0)
 										selectedApps.get(i).status = "Inconclusive Result";
 									else if (diff == 1)
-										selectedApps.get(i).status = "Differentiation Detected!";
+										selectedApps.get(i).status = "Differentiation Detected";
 									else
 										selectedApps.get(i).status = "Unknown Code: "
 												+ String.valueOf(diff);
