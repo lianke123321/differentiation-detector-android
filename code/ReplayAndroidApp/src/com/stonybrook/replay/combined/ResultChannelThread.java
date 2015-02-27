@@ -67,10 +67,6 @@ public class ResultChannelThread implements Runnable {
 			int counter = 0;
 
 			while (true) {
-				/*if (!doneReplay) {
-					Thread.sleep(5000);
-					continue;
-				}*/
 
 				for (int i = 0; i < selectedApps.size(); i++) {
 					if ((selectedApps.get(i).status == finishVpn)
@@ -88,6 +84,9 @@ public class ResultChannelThread implements Runnable {
 						boolean success = result.getBoolean("success");
 						if (!success) {
 							Log.d("Result Channel", "ask4analysis failed!");
+							synchronized (selectedApps) {
+								selectedApps.get(i).status = "Error getting result";
+							}
 							continue;
 						}
 
@@ -188,7 +187,7 @@ public class ResultChannelThread implements Runnable {
 							}
 							// adapter.notifyDataSetChanged();
 						}
-						Thread.sleep(2000);
+						Thread.sleep(3000);
 					}
 				}
 
@@ -204,7 +203,7 @@ public class ResultChannelThread implements Runnable {
 					break;
 				}*/
 
-				Thread.sleep(2000);
+				Thread.sleep(10000);
 			}
 		} catch (InterruptedException ex) {
 			Log.d("Result Channel", "interrupted!");

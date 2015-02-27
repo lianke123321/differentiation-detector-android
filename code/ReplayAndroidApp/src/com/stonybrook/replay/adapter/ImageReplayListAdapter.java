@@ -100,11 +100,10 @@ public class ImageReplayListAdapter extends BaseAdapter {
 		}
 				
 		double rate = app.rate;
-		if (rate > 0) {
-			tv2.setText(String.valueOf((int)(app.rate * 100)) + "%");
+		tv2.setText(String.valueOf((int)Math.abs(app.rate * 100)) + "%");
+		if (rate < 0) {
 			tv1.setText("faster");
 		} else {
-			tv2.setText(String.valueOf((int)Math.abs(app.rate * 100)) + "%");
 			tv1.setText("slower");
 		}
 		
