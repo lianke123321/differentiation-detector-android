@@ -157,7 +157,7 @@ public class ConsentFormActivity extends Activity {
 									"If you are using Android 5.0.x, please restart your phone after " +
 									"installing certificate to avoid a bug of Android.")
 					.setPositiveButton(
-							"Do not click me without reading the instruction!",
+							"Read instructions above carefully before clicking here!",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int which) {
