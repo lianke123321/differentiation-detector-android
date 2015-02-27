@@ -1364,7 +1364,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// notify result channel thread
 				resultChannelThread.doneReplay = true;
-				resultThread.join();
+				//resultThread.join();
 
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1500,7 +1500,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// notify result channel thread
 				resultChannelThread.doneReplay = true;
-				resultThread.join();
+				//resultThread.join();
 
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1601,7 +1601,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 					// notify result channel thread
 					resultChannelThread.doneReplay = true;
-					resultThread.join();
+					//resultThread.join();
 
 					ReplayActivity.this.runOnUiThread(new Runnable() {
 						public void run() {
@@ -1723,6 +1723,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					randomReplay.cancel(true);
 					queueCombined.cancel(true);
 				}
+				if (resultChannelThread != null)
+					resultChannelThread.forceQuit = true;
+				
 				ReplayActivity.this.finish();
 				ReplayActivity.this.overridePendingTransition(
 						android.R.anim.slide_in_left,

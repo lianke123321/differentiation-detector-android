@@ -81,6 +81,11 @@ public class ResultChannelThread implements Runnable {
 						if (result == null) {
 							Log.d("Result Channel",
 									"ask4analysis returned null!");
+							synchronized (selectedApps) {
+								selectedApps.get(i).status = "Analysis server unavailable";
+								updateUI();
+
+							}
 							continue;
 						}
 
@@ -201,6 +206,7 @@ public class ResultChannelThread implements Runnable {
 				}
 
 				if (forceQuit) {
+					Log.d("Result Channel", "Force quit!");
 					break;
 				}
 				/*if (counter == 0) {
@@ -327,7 +333,11 @@ public class ResultChannelThread implements Runnable {
 
 				// parse String to json file.
 				json = new JSONObject(res.toString());
-			} catch (Exception e) {
+			} catch (JSONException e) {
+				e.printStackTrace();
+				Log.e("Result Channel", "convert string to json failed");
+				json = null;
+			}catch (Exception e) {
 				e.printStackTrace();
 				Log.e("Result Channel", "sendRequest POST failed");
 			}

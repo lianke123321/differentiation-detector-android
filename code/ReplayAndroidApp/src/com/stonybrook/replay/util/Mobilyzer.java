@@ -177,7 +177,7 @@ public class Mobilyzer {
 			Location location = locationManager
 					.getLastKnownLocation(locationProviderName);
 			if (location == null) {
-				Log.e("Mobilyzer", "Cannot obtain location from provider "
+				Log.w("Mobilyzer", "Cannot obtain location from provider "
 						+ locationProviderName);
 				deviceInfoBean.location = new Location("unknown");
 			} else {

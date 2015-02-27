@@ -82,8 +82,8 @@ public class ImageReplayListAdapter extends BaseAdapter {
 			tv.setTypeface(null, Typeface.NORMAL);
 			tv.setTextColor(Color.parseColor("#DAA520"));
 			
-			tv1.setVisibility(View.VISIBLE);
-			tv2.setVisibility(View.VISIBLE);
+			tv1.setVisibility(View.GONE);
+			tv2.setVisibility(View.GONE);
 		} else if (app.status.trim().equalsIgnoreCase("No Differentiation")) {
 			// green and normal
 			tv.setTypeface(null, Typeface.NORMAL);
