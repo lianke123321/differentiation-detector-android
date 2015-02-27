@@ -397,11 +397,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			if (isAvailable) {
 				// Creating result channel thread here
-				resultChannelThread = new ResultChannelThread(server,
-						Integer.valueOf(Config.get("result_port")), randomID,
-						selectedApps, getResources().getString(
-								R.string.finish_vpn), getResources().getString(
-								R.string.finish_random), adapter);
+				resultChannelThread = new ResultChannelThread(
+						ReplayActivity.this, server, Integer.valueOf(Config
+								.get("result_port")), randomID, selectedApps,
+						getResources().getString(R.string.finish_vpn),
+						getResources().getString(R.string.finish_random),
+						adapter);
 				resultThread = new Thread(resultChannelThread);
 				resultThread.start();
 

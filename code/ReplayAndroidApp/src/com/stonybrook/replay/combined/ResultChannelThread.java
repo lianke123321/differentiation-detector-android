@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
+import com.stonybrook.replay.ReplayActivity;
 import com.stonybrook.replay.adapter.ImageReplayListAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
 
@@ -42,10 +43,12 @@ public class ResultChannelThread implements Runnable {
 	private String finishVpn;
 	private String finishRandom;
 	private ImageReplayListAdapter adapter = null;
+	private ReplayActivity replayAct;
 
-	public ResultChannelThread(String path, int port, String id,
-			ArrayList<ApplicationBean> selectedApps, String finishVpn,
-			String finishRandom, ImageReplayListAdapter adapter) {
+	public ResultChannelThread(ReplayActivity replayAct, String path, int port,
+			String id, ArrayList<ApplicationBean> selectedApps,
+			String finishVpn, String finishRandom, ImageReplayListAdapter adapter) {
+		this.replayAct = replayAct;
 		this.path = path;
 		this.analyzerServerUrl = ("http://" + path + ":" + port + "/Results");
 		this.id = id;
@@ -86,12 +89,15 @@ public class ResultChannelThread implements Runnable {
 							Log.d("Result Channel", "ask4analysis failed!");
 							synchronized (selectedApps) {
 								selectedApps.get(i).status = "Error getting result";
+								updateUI();
+
 							}
 							continue;
 						}
 
 						synchronized (selectedApps) {
 							selectedApps.get(i).status = wait;
+							updateUI();
 						}
 						counter += 1;
 						// adapter.notifyDataSetChanged();
@@ -170,20 +176,18 @@ public class ResultChannelThread implements Runnable {
 									if (diff == -1) {
 										selectedApps.get(i).status = "No Differentiation";
 										selectedApps.get(i).rate = rate;
-									}
-									else if (diff == 0) {
+									} else if (diff == 0) {
 										selectedApps.get(i).status = "Inconclusive Result";
 										selectedApps.get(i).rate = rate;
-									}
-									else if (diff == 1) {
+									} else if (diff == 1) {
 										selectedApps.get(i).status = "Differentiation Detected";
 										selectedApps.get(i).rate = rate;
-									}
-									else {
+									} else {
 										selectedApps.get(i).status = "Unknown Code: "
 												+ String.valueOf(diff);
 									}
 								}
+								updateUI();
 							}
 							// adapter.notifyDataSetChanged();
 						}
@@ -195,7 +199,7 @@ public class ResultChannelThread implements Runnable {
 					Log.d("Result Channel", "Done replay! Exiting thread.");
 					break;
 				}
-				
+
 				if (forceQuit) {
 					break;
 				}
@@ -268,8 +272,9 @@ public class ResultChannelThread implements Runnable {
 		return res;
 	}
 
-	public JSONObject sendRequest(String method, ArrayList<String> data, ArrayList<NameValuePair> pairs) {
-		
+	public JSONObject sendRequest(String method, ArrayList<String> data,
+			ArrayList<NameValuePair> pairs) {
+
 		JSONObject json = null;
 		if (method.equalsIgnoreCase("GET")) {
 			String dataURL = URLEncoder(data);
@@ -306,7 +311,7 @@ public class ResultChannelThread implements Runnable {
 			try {
 				HttpClient httpClient = new DefaultHttpClient();
 				HttpPost post = new HttpPost(url_string);
-				//URI uri = new URI(url_string);
+				// URI uri = new URI(url_string);
 				post.setEntity(new UrlEncodedFormEntity(pairs));
 				HttpResponse response = httpClient.execute(post);
 				BufferedReader rd = new BufferedReader(new InputStreamReader(
@@ -344,6 +349,18 @@ public class ResultChannelThread implements Runnable {
 
 		return data.toString();
 
+	}
+	
+	// TODO: temporary way to updateUI from this thread
+	// maybe find another way
+	private void updateUI() {
+		replayAct.runOnUiThread(new Runnable() {
+			public void run() {
+				adapter.notifyDataSetChanged();
+				Log.d("Result Channel", "updated UI");
+			}
+
+		});
 	}
 
 }
