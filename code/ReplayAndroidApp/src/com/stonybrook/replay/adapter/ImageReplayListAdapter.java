@@ -63,6 +63,8 @@ public class ImageReplayListAdapter extends BaseAdapter {
 					 * = (TextView) view.findViewById(R.id.appNameTextView);
 					 * tv.setText(app.getName());
 					 */
+		TextView tv1 = (TextView) view.findViewById(R.id.slowerTextView);
+		TextView tv2 = (TextView) view.findViewById(R.id.percentTextView);
 
 		tv = (TextView) view.findViewById(R.id.appSize);
 		tv.setText(String.valueOf(app.getSize()) + " MB");
@@ -72,12 +74,16 @@ public class ImageReplayListAdapter extends BaseAdapter {
 
 		tv = (TextView) view.findViewById(R.id.appStatusTextView);
 		tv.setText(app.status);
+		
 		// here we set different color for different results
-		// TODO: Move these strings somewhere else
+		// TODO: These strings are hard-coded. Change it
 		if (app.status.trim().equalsIgnoreCase("Inconclusive Result")) {
 			// yellow and normal
 			tv.setTypeface(null, Typeface.NORMAL);
 			tv.setTextColor(Color.parseColor("#DAA520"));
+			
+			tv1.setVisibility(View.VISIBLE);
+			tv2.setVisibility(View.VISIBLE);
 		} else if (app.status.trim().equalsIgnoreCase("No Differentiation")) {
 			// green and normal
 			tv.setTypeface(null, Typeface.NORMAL);
@@ -86,13 +92,21 @@ public class ImageReplayListAdapter extends BaseAdapter {
 			// red and bold
 			tv.setTypeface(null, Typeface.BOLD);
 			tv.setTextColor(Color.parseColor("#B22222"));
+			tv1.setVisibility(View.VISIBLE);
+			tv2.setVisibility(View.VISIBLE);
 		} else {
 			tv.setTypeface(null, Typeface.NORMAL);
-			tv.setTextColor(Color.parseColor("#000000"));
+			tv.setTextColor(Color.parseColor("#4682B4"));
 		}
-		
-		tv = (TextView) view.findViewById(R.id.percentTextView);
-		tv.setText(String.valueOf((int)(app.rate * 100)) + "%");
+				
+		double rate = app.rate;
+		if (rate > 0) {
+			tv2.setText(String.valueOf((int)(app.rate * 100)) + "%");
+			tv1.setText("faster");
+		} else {
+			tv2.setText(String.valueOf((int)Math.abs(app.rate * 100)) + "%");
+			tv1.setText("slower");
+		}
 		
 
 		/*ProgressBar progress = (ProgressBar) view

@@ -81,6 +81,7 @@
     </TableLayout>
 
     <TableLayout
+        android:id="@+id/resultTableLayout"
         android:layout_width="0px"
         android:layout_weight="1"
         android:layout_height="match_parent" >
@@ -101,7 +102,8 @@
                 android:layout_marginTop="10dp"
                 android:text="@string/zero_percent"
                 android:textSize="30dp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </TableRow>
 
@@ -120,7 +122,8 @@
                 android:layout_gravity="center"
                 android:padding="5dp"
                 android:text="@string/slower"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                android:visibility="gone" />
         </TableRow>
     </TableLayout>
 

@@ -48,7 +48,7 @@
     <string name="finish_vpn">Finished replay over VPN</string>
     <string name="finish_random">Finished random replay</string>
     
-    <string name="crash_toast_text">An error occurred. Sending report…</string>
+    <string name="crash_toast_text">Sending report for improvement</string>
     <string name="crash_activity_title">Press back button to exit!</string>
     
     <string name="downloading">Downloading File</string>
@@ -84,7 +84,7 @@
     <string name="appTimeLabel">Time:</string>
     
     <string name="install_cert_label">Click the button below if you want to reinstall the credential. Please leave the password field empty and click "OK"!</string>
-    <string name="install_cert_button">Install credential</string>
+    <string name="install_cert_button">Reinstall credential</string>
     
     <string name="consent_form_title">Consent Form</string>
     <string name="consent_form"><Data><![CDATA[ We would like to invite you to take part in a research project. The purpose of this research study is to understand how cellular Internet providers give different performance to different network traffic from your smartphone. For example, we would like to know if a provider is speeding up YouTube traffic and/or slowing down Netflix. We will use this information to understand how often this occurs, where this occurs and what are the implications. <br>

@@ -75,16 +75,6 @@
             android:padding="10dp"
             android:text="@string/select_random" />
         
-        <TextView 
-            android:id = "@+id/installCertTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="@string/install_cert_label"
-            android:textColor="@color/blue11"
-            android:textSize="@dimen/main_title_text_size"
-            android:textStyle="bold" />
-        
         <Button
             android:id="@+id/installCertButton"
             android:layout_width="wrap_content"

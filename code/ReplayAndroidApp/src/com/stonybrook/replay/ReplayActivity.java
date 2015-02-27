@@ -2185,12 +2185,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			ReplayActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
 					new AlertDialog.Builder(ReplayActivity.this)
-							.setTitle("Error")
+							.setTitle("VPN Connection Test")
 							.setMessage(
-									"Testing VPN connection failed! "
+									"We detected that your device is unable to connect to "
+											+ "the VPN we use for testing differentiation. "
 											+ "If you are using Android "
-											+ "5.0.x, please try rebooting your phone.\n\n"
-											+ "Click \"Ignore\" to continue or click \"Go back\".")
+											+ "5.0.x, and this is the first time you run "
+											+ "this app, please try rebooting your phone.\n\n"
+											+ "Click \"Ignore\" and try our alternative (less "
+											+ "reliable) detection approach or click \"Go back\".")
 							.setPositiveButton("Ignore",
 									new DialogInterface.OnClickListener() {
 										@Override
