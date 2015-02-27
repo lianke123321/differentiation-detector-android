@@ -15,7 +15,8 @@
         android:paddingBottom="6dp"
         android:paddingRight="16dp"
         android:paddingTop="6dp"
-        android:src="@drawable/dropbox" />
+        android:src="@drawable/dropbox"
+        android:contentDescription="logo" />
 
     <TableLayout
         android:layout_width="0px"

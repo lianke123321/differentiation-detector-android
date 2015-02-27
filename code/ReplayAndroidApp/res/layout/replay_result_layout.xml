@@ -16,6 +16,7 @@
       android:paddingTop="6dp"
       android:paddingBottom="6dp"
       android:id="@+id/resultDialogImg"
+      android:contentDescription="logo"
       />
     
 
