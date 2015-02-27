@@ -33,6 +33,7 @@ import com.stonybrook.replay.bean.ApplicationBean;
 public class ResultChannelThread implements Runnable {
 
 	public volatile boolean doneReplay = false;
+	public volatile boolean forceQuit = false;
 
 	private String path;
 	private String analyzerServerUrl = null;
@@ -186,6 +187,10 @@ public class ResultChannelThread implements Runnable {
 
 				if (doneReplay && counter == 0) {
 					Log.d("Result Channel", "Done replay! Exiting thread.");
+					break;
+				}
+				
+				if (forceQuit) {
 					break;
 				}
 				/*if (counter == 0) {

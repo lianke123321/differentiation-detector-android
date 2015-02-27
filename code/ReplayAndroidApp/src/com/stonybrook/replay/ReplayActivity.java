@@ -320,6 +320,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			Log.d("onStop", "certificateLoadTask is cancelled? "
 					+ certificateLoadTask.isCancelled());
 		}*/
+		resultChannelThread.forceQuit = true;
 
 		this.finish();
 	}
@@ -527,6 +528,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 											queueCombined.cancel(true);
 										}
 										disconnectVPN();
+										resultChannelThread.forceQuit = true;
 										ReplayActivity.this.finish();
 										ReplayActivity.this
 												.overridePendingTransition(
@@ -829,6 +831,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 														queueCombined
 																.cancel(true);
 														disconnectVPN();
+														resultChannelThread.forceQuit = true;
 														ReplayActivity.this
 																.finish();
 													}
@@ -857,6 +860,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 														queueCombined
 																.cancel(true);
 														disconnectVPN();
+														resultChannelThread.forceQuit = true;
 														ReplayActivity.this
 																.finish();
 													}
@@ -884,6 +888,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 														queueCombined
 																.cancel(true);
 														disconnectVPN();
+														resultChannelThread.forceQuit = true;
 														ReplayActivity.this
 																.finish();
 													}
@@ -1171,6 +1176,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				});
 				this.cancel(true);
+				resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			} catch (JSONException ex) {
 				Log.d("Replay", "Error parsing JSON");
@@ -1197,6 +1203,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// throw new RuntimeException();
 				this.cancel(true);
 				// ACRA.getErrorReporter().handleSilentException(ex);
+				resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			} catch (SocketTimeoutException ex) {
 				Log.d("Replay", "Replay failed due to socket timeout!");
@@ -1214,6 +1221,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// throw new RuntimeException();
 				this.cancel(true);
 				// ACRA.getErrorReporter().handleException(ex);
+				resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			}
 			Log.d("Replay", "queueCombined finished execution!");
@@ -1728,6 +1736,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 											queueCombined.cancel(true);
 										}
 										disconnectVPN();
+										resultChannelThread.forceQuit = true;
 										ReplayActivity.this.finish();
 										ReplayActivity.this
 												.overridePendingTransition(
@@ -1878,6 +1887,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												DialogInterface dialog,
 												int which) {
 											// exit this application
+											resultChannelThread.forceQuit = true;
 											ReplayActivity.this.finish();
 										}
 									});
@@ -1998,7 +2008,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 
 				});
-
+				resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			} catch (NullPointerException e) {
 				Log.w("GetReplayServerIP", "not ipv4 address!");
@@ -2019,6 +2029,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 													int which) {
 												try {
 													disconnectVPN();
+													resultChannelThread.forceQuit = true;
 													ReplayActivity.this
 															.finish();
 												} catch (Exception e) {
@@ -2284,6 +2295,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												int which) {
 											queueCombined.cancel(true);
 											disconnectVPN();
+											resultChannelThread.forceQuit = true;
 											ReplayActivity.this.finish();
 										}
 									}).show();
@@ -2370,6 +2382,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												int which) {
 											queueCombined.cancel(true);
 											disconnectVPN();
+											resultChannelThread.forceQuit = true;
 											ReplayActivity.this.finish();
 										}
 									}).show();
