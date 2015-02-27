@@ -60,6 +60,8 @@
     <string name="cancel">Cancel</string>
     <string name="setting">Settings</string>
     <string name="log">Log</string>
+    <string name="zero_percent">0%</string>
+    <string name="slower">slower</string>
     
     <string name="errMsgTitle">An error occurred</string>
     <string name="errMsg">Sorry, the app crashed. A crash log will be sent to our server. Sorry for the inconvenience!</string>

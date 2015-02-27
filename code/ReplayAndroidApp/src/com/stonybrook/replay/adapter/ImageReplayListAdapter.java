@@ -91,6 +91,9 @@ public class ImageReplayListAdapter extends BaseAdapter {
 			tv.setTextColor(Color.parseColor("#000000"));
 		}
 		
+		tv = (TextView) view.findViewById(R.id.percentTextView);
+		tv.setText(String.valueOf((int)(app.rate * 100)) + "%");
+		
 
 		/*ProgressBar progress = (ProgressBar) view
 				.findViewById(R.id.appProgress);

@@ -17,6 +17,8 @@ public class ApplicationBean implements Parcelable {
 	public String time = null;
 	public int historyCount = -1;
 	
+	public double rate = 0;
+	
 	public String getTime() {
 		return time;
 	}

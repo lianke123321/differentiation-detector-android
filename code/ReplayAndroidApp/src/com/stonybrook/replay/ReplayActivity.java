@@ -320,7 +320,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			Log.d("onStop", "certificateLoadTask is cancelled? "
 					+ certificateLoadTask.isCancelled());
 		}*/
-		resultChannelThread.forceQuit = true;
+		if (resultChannelThread != null)
+			resultChannelThread.forceQuit = true;
 
 		this.finish();
 	}
@@ -1246,7 +1247,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			if (!success) {
 				// Update status on screen and stop processing
-				//selectedApps.get(currentReplayCount).resultImg = "p";
+				// selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
@@ -1327,7 +1328,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * is called.
 				 */
 
-				//selectedApps.get(currentReplayCount).resultImg = "p";
+				// selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.finish_vpn);
 				adapter.notifyDataSetChanged();
@@ -1395,7 +1396,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		try {
 			if (!success) {
 				// Update status on screen and stop processing
-				//selectedApps.get(currentReplayCount).resultImg = "p";
+				// selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
@@ -1463,7 +1464,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				 * is called.
 				 */
 
-				//selectedApps.get(currentReplayCount).resultImg = "p";
+				// selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.finish_random);
 				adapter.notifyDataSetChanged();
@@ -1534,7 +1535,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			// If Replay on Open was successful then schedule on VPN
 			if (!success) {
 				// Update status on screen and stop processing
-				//selectedApps.get(currentReplayCount).resultImg = "p";
+				// selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
@@ -1680,7 +1681,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				processCombinedApplication(
 						selectedApps.get(currentReplayCount), "open");
 			} else {
-				//selectedApps.get(currentReplayCount).resultImg = "p";
+				// selectedApps.get(currentReplayCount).resultImg = "p";
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
@@ -1736,7 +1737,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 											queueCombined.cancel(true);
 										}
 										disconnectVPN();
-										resultChannelThread.forceQuit = true;
+										if (resultChannelThread != null)
+											resultChannelThread.forceQuit = true;
 										ReplayActivity.this.finish();
 										ReplayActivity.this
 												.overridePendingTransition(
@@ -1887,7 +1889,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												DialogInterface dialog,
 												int which) {
 											// exit this application
-											resultChannelThread.forceQuit = true;
+											if (resultChannelThread != null)
+												resultChannelThread.forceQuit = true;
 											ReplayActivity.this.finish();
 										}
 									});
@@ -2008,7 +2011,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 
 				});
-				resultChannelThread.forceQuit = true;
+				if (resultChannelThread != null)
+					resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			} catch (NullPointerException e) {
 				Log.w("GetReplayServerIP", "not ipv4 address!");
@@ -2029,7 +2033,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 													int which) {
 												try {
 													disconnectVPN();
-													resultChannelThread.forceQuit = true;
+													if (resultChannelThread != null)
+														resultChannelThread.forceQuit = true;
 													ReplayActivity.this
 															.finish();
 												} catch (Exception e) {
@@ -2061,17 +2066,17 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		protected Boolean doInBackground(ReplayActivity... params) {
 			Thread.currentThread().setName("VPNConnected (AsyncTask)");
 			int i = 0;
-			
+
 			while (i < 5) {
 				i++;
 				try {
-					
-					
+
 					Log.d("VPNConnected", "about to get public IP");
-					//String str = getPublicIP();
-					//if (str.equalsIgnoreCase(meddleIP)) {
-					if (CharonVpnService.getInstance() != null && 
-							CharonVpnService.getInstance().isFullyConnected()){
+					// String str = getPublicIP();
+					// if (str.equalsIgnoreCase(meddleIP)) {
+					if (CharonVpnService.getInstance() != null
+							&& CharonVpnService.getInstance()
+									.isFullyConnected()) {
 						Log.d("VPNConnected", "Got it!");
 						// Set flag indicating VPN connectivity status
 						isVPNConnected = true;
@@ -2138,10 +2143,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				i++;
 				try {
 					Log.d("TestVPN", "about to get public IP");
-					//String str = getPublicIP();
-					//if (str.equalsIgnoreCase(meddleIP)) {
-					if (CharonVpnService.getInstance() != null && 
-							CharonVpnService.getInstance().isFullyConnected()){
+					// String str = getPublicIP();
+					// if (str.equalsIgnoreCase(meddleIP)) {
+					if (CharonVpnService.getInstance() != null
+							&& CharonVpnService.getInstance()
+									.isFullyConnected()) {
 						Log.d("TestVPN", "Got it!");
 						isVPNConnected = true;
 						// disconnect vpn and return
@@ -2231,17 +2237,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			while (i < 5) {
 				try {
 					i++;
-					//String str = getPublicIP();
-					//if (str.equalsIgnoreCase(publicIP)) {
-					if (CharonVpnService.getInstance() != null && 
-							!CharonVpnService.getInstance().isFullyConnected()){
+					// String str = getPublicIP();
+					// if (str.equalsIgnoreCase(publicIP)) {
+					if (CharonVpnService.getInstance() != null
+							&& !CharonVpnService.getInstance()
+									.isFullyConnected()) {
 						Log.d("DisconnectVPN", "Got it!");
 						// Set flag indicating VPN connectivity status
 						isVPNConnected = false;
 
 						// Start the replay for the next app
 						// adrian: start the combined thread
-						if (currentReplayCount < selectedApps.size()){
+						if (currentReplayCount < selectedApps.size()) {
 							// do nothing
 						}
 						if (currentTask.equalsIgnoreCase("combined")) {
@@ -2295,7 +2302,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												int which) {
 											queueCombined.cancel(true);
 											disconnectVPN();
-											resultChannelThread.forceQuit = true;
+											if (resultChannelThread != null)
+												resultChannelThread.forceQuit = true;
 											ReplayActivity.this.finish();
 										}
 									}).show();
@@ -2382,7 +2390,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 												int which) {
 											queueCombined.cancel(true);
 											disconnectVPN();
-											resultChannelThread.forceQuit = true;
+											if (resultChannelThread != null)
+												resultChannelThread.forceQuit = true;
 											ReplayActivity.this.finish();
 										}
 									}).show();

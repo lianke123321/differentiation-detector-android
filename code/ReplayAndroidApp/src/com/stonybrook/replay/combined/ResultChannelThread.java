@@ -168,15 +168,22 @@ public class ResultChannelThread implements Runnable {
 									        selectedApps.get(i).status = "unknown result! "
 									                + String.valueOf(diff);
 									}*/
-									if (diff == -1)
+									if (diff == -1) {
 										selectedApps.get(i).status = "No Differentiation";
-									else if (diff == 0)
+										selectedApps.get(i).rate = rate;
+									}
+									else if (diff == 0) {
 										selectedApps.get(i).status = "Inconclusive Result";
-									else if (diff == 1)
+										selectedApps.get(i).rate = rate;
+									}
+									else if (diff == 1) {
 										selectedApps.get(i).status = "Differentiation Detected";
-									else
+										selectedApps.get(i).rate = rate;
+									}
+									else {
 										selectedApps.get(i).status = "Unknown Code: "
 												+ String.valueOf(diff);
+									}
 								}
 							}
 							// adapter.notifyDataSetChanged();
