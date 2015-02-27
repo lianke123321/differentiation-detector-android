@@ -48,7 +48,7 @@
     <string name="finish_vpn">Finished replay over VPN</string>
     <string name="finish_random">Finished random replay</string>
     
-    <string name="crash_toast_text">An error occurred. Please allow exception report to be sent back to us!</string>
+    <string name="crash_toast_text">An error occurred. Sending report…</string>
     <string name="crash_activity_title">Press back button to exit!</string>
     
     <string name="downloading">Downloading File</string>

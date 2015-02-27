@@ -27,7 +27,7 @@ import com.stonybrook.replay.R;
 	            ReportField.STACK_TRACE
 	    },
 	    mode = ReportingInteractionMode.TOAST,
-	    resToastText = R.string.errMsg)
+	    resToastText = R.string.crash_toast_text)
 
 /*@ReportsCrashes(//formKey = "", // will not be used
 				mailTo = "diffdetector.report@ankeli.me",

@@ -2190,8 +2190,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									"Testing VPN connection failed! "
 											+ "If you are using Android "
 											+ "5.0.x, please try rebooting your phone.\n\n"
-											+ "Click \"OK\" to continue or click \"Go back\".")
-							.setPositiveButton("OK",
+											+ "Click \"Ignore\" to continue or click \"Go back\".")
+							.setPositiveButton("Ignore",
 									new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(
