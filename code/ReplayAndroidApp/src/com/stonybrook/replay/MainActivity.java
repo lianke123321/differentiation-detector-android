@@ -46,6 +46,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -258,8 +259,11 @@ public class MainActivity extends Activity {
 			 * is used. TODO: Layout needs some tweaking such that it can be
 			 * made presentable to user
 			 */
-			View view = LayoutInflater.from(MainActivity.this).inflate(
-					R.layout.settings_layout, null);
+			View view = LayoutInflater
+					.from(MainActivity.this)
+					.inflate(
+							R.layout.settings_layout,
+							(RelativeLayout) findViewById(R.layout.activity_main_image));
 			builder.setView(view);
 
 			// Set elements of dialog
@@ -349,7 +353,7 @@ public class MainActivity extends Activity {
 										downloadAndInstallVpnCreds();
 									}
 								}).show();
-				
+
 				/*downloadAndInstallVpnCreds();
 
 				KeyChain.choosePrivateKeyAlias(MainActivity.this,
@@ -401,7 +405,8 @@ public class MainActivity extends Activity {
 			// Check to see if user has selected at least one app from the list.
 			if (selectedApps.size() == 0) {
 				Toast.makeText(MainActivity.this,
-						"Please select at least one application", 1).show();
+						"Please select at least one application",
+						Toast.LENGTH_LONG).show();
 				return;
 			}
 

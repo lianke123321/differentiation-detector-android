@@ -60,19 +60,10 @@
             android:screenOrientation="portrait" >
         </activity>
 
-        <receiver
-            android:name="org.strongswan.android.ui.logic.StartVPNServiceAtBootReceiver"
-            android:enabled="true"
-            android:exported="true"
-            android:label="StartVPNServiceAtBootReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
         <provider
             android:name="com.stonybrook.android.data.LogContentProvider"
-            android:authorities="org.strongswan.android.content.log" >
+            android:authorities="org.strongswan.android.content.log"
+            android:exported="false" >
 
             <!--
                  android:grantUriPermissions="true" combined with a custom permission does
