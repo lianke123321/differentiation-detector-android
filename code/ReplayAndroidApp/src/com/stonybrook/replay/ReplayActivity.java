@@ -1544,7 +1544,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			if (!success) {
 				// Update status on screen and stop processing
 				// selectedApps.get(currentReplayCount).resultImg = "p";
-				selectedApps.get(currentReplayCount++).status = getResources()
+				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
 				replayOngoing = false;

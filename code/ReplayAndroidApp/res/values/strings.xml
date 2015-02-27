@@ -52,7 +52,7 @@
     <string name="crash_activity_title">Press back button to exit!</string>
     
     <string name="downloading">Downloading File</string>
-    <string name="error">Whoops! Replay aborted.</string>
+    <string name="error">Replay aborted</string>
     <string name="vpn_connect">Trying to connect VPN</string>
     <string name="vpn_failed">Failed to connect VPN</string>
     <string name="appResultButton">Results</string>

@@ -102,7 +102,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:text="@string/zero_percent"
-                android:textSize="30sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
 
