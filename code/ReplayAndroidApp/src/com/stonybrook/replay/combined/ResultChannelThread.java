@@ -138,8 +138,10 @@ public class ResultChannelThread implements Runnable {
 							JSONArray raw_response = result
 									.getJSONArray("response");
 
-							if (raw_response.length() == 0)
+							if (raw_response.length() == 0) {
+								Log.w("Result Channel", "Server result not ready");
 								continue;
+							}
 
 							counter -= 1;
 							JSONObject response = raw_response.getJSONObject(0);
