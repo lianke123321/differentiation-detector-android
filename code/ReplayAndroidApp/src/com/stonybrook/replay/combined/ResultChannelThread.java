@@ -119,8 +119,16 @@ public class ResultChannelThread implements Runnable {
 
 						JSONObject result = getSingleResult(id,
 								selectedApps.get(i).historyCount);
-						if (result == null)
+						if (result == null) {
+							Log.d("Result Channel",
+									"getSingleResult returned null!");
+							synchronized (selectedApps) {
+								selectedApps.get(i).status = "Analysis server unavailable";
+								updateUI();
+
+							}
 							continue;
+						}
 
 						boolean success = result.getBoolean("success");
 						if (success) {
@@ -196,7 +204,7 @@ public class ResultChannelThread implements Runnable {
 							}
 							// adapter.notifyDataSetChanged();
 						}
-						Thread.sleep(3000);
+						Thread.sleep(1000);
 					}
 				}
 
@@ -209,9 +217,6 @@ public class ResultChannelThread implements Runnable {
 					Log.d("Result Channel", "Force quit!");
 					break;
 				}
-				/*if (counter == 0) {
-					break;
-				}*/
 
 				Thread.sleep(10000);
 			}

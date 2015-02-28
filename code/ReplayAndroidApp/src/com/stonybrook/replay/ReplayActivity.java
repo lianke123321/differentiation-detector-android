@@ -1259,6 +1259,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
+				
+				// set progress bar to invisible
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						prgBar.setProgress(0);
+						prgBar.setVisibility(View.GONE);
+					}
+				});
 
 				/*replayOngoing = false;
 
@@ -1409,6 +1417,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
 				replayOngoing = false;
+				
+				// set progress bar to invisible
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						prgBar.setProgress(0);
+						prgBar.setVisibility(View.GONE);
+					}
+				});
 
 				/*new AlertDialog.Builder(ReplayActivity.this)
 						.setTitle("Replay aborted!")
@@ -1548,6 +1564,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
 				replayOngoing = false;
+				
+				// set progress bar to invisible
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						prgBar.setProgress(0);
+						prgBar.setVisibility(View.GONE);
+					}
+				});
 
 				/*new AlertDialog.Builder(ReplayActivity.this)
 						.setTitle("Replay aborted!")
@@ -1693,6 +1717,14 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
+				
+				// set progress bar to invisible
+				ReplayActivity.this.runOnUiThread(new Runnable() {
+					public void run() {
+						prgBar.setProgress(0);
+						prgBar.setVisibility(View.GONE);
+					}
+				});
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
