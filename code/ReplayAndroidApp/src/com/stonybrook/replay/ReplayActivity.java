@@ -1259,7 +1259,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
-				
+
 				// set progress bar to invisible
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1372,16 +1372,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// notify result channel thread
 				resultChannelThread.doneReplay = true;
-				//resultThread.join();
+				// wait for all results to be received
 
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						new AlertDialog.Builder(ReplayActivity.this)
 								.setTitle("Replay finished!")
 								.setMessage(
-										"Replay of all applications you have chosen is done!\n"
-												+ "We truly appreciate your support and contribution "
-												+ "to this research!\n\n"
+										"Replay of all applications you have chosen is done! "
+												+ "You might need to wait a few more seconds "
+												+ "for all the results!\n\n"
 												+ "Thank you and have a nice day :-)")
 								.setPositiveButton("OK",
 										new DialogInterface.OnClickListener() {
@@ -1396,7 +1396,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 
 				});
-
 			}
 
 		} catch (Exception ex) {
@@ -1417,7 +1416,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
 				replayOngoing = false;
-				
+
 				// set progress bar to invisible
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1516,16 +1515,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				// notify result channel thread
 				resultChannelThread.doneReplay = true;
-				//resultThread.join();
+				// resultThread.join();
 
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						new AlertDialog.Builder(ReplayActivity.this)
 								.setTitle("Replay finished!")
 								.setMessage(
-										"Replay of all applications you have chosen is done!\n"
-												+ "We truly appreciate your support and contribution "
-												+ "to this research!\n\n"
+										"Replay of all applications you have chosen is done! "
+												+ "You might need to wait a few more seconds "
+												+ "for all the results!\n\n"
 												+ "Thank you and have a nice day :-)")
 								.setPositiveButton("OK",
 										new DialogInterface.OnClickListener() {
@@ -1535,7 +1534,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 													DialogInterface dialog,
 													int which) {
 												// do nothing
-
 											}
 										}).show();
 					}
@@ -1564,7 +1562,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
 				replayOngoing = false;
-				
+
 				// set progress bar to invisible
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1625,16 +1623,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 					// notify result channel thread
 					resultChannelThread.doneReplay = true;
-					//resultThread.join();
+					// resultThread.join();
 
 					ReplayActivity.this.runOnUiThread(new Runnable() {
 						public void run() {
 							new AlertDialog.Builder(ReplayActivity.this)
 									.setTitle("Replay finished!")
 									.setMessage(
-											"Replay of all applications you have chosen is done!\n"
-													+ "We truly appreciate your support and contribution "
-													+ "to this research!\n\n"
+											"Replay of all applications you have chosen is done! "
+													+ "You might need to wait a few more seconds "
+													+ "for all the results!\n\n"
 													+ "Thank you and have a nice day :-)")
 									.setPositiveButton(
 											"OK",
@@ -1717,7 +1715,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
 				adapter.notifyDataSetChanged();
-				
+
 				// set progress bar to invisible
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
@@ -1757,7 +1755,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				}
 				if (resultChannelThread != null)
 					resultChannelThread.forceQuit = true;
-				
+
 				ReplayActivity.this.finish();
 				ReplayActivity.this.overridePendingTransition(
 						android.R.anim.slide_in_left,

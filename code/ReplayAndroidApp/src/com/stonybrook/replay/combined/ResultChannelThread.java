@@ -35,6 +35,7 @@ public class ResultChannelThread implements Runnable {
 
 	public volatile boolean doneReplay = false;
 	public volatile boolean forceQuit = false;
+	public volatile int counter = 0;
 
 	private String path;
 	private String analyzerServerUrl = null;
@@ -47,7 +48,8 @@ public class ResultChannelThread implements Runnable {
 
 	public ResultChannelThread(ReplayActivity replayAct, String path, int port,
 			String id, ArrayList<ApplicationBean> selectedApps,
-			String finishVpn, String finishRandom, ImageReplayListAdapter adapter) {
+			String finishVpn, String finishRandom,
+			ImageReplayListAdapter adapter) {
 		this.replayAct = replayAct;
 		this.path = path;
 		this.analyzerServerUrl = ("http://" + path + ":" + port + "/Results");
@@ -67,7 +69,7 @@ public class ResultChannelThread implements Runnable {
 		Thread.currentThread().setName("ResultChannelThread (Thread)");
 		try {
 			String wait = "Waiting for server result";
-			int counter = 0;
+			int giveupCounter[] = new int[selectedApps.size()];
 
 			while (true) {
 
@@ -116,6 +118,8 @@ public class ResultChannelThread implements Runnable {
 
 						Log.d("Result Channel", "ask4analysis succeeded!");
 					} else if (selectedApps.get(i).status == wait) {
+						// initialize give up counter
+						giveupCounter[i] = 5;
 
 						JSONObject result = getSingleResult(id,
 								selectedApps.get(i).historyCount);
@@ -125,7 +129,6 @@ public class ResultChannelThread implements Runnable {
 							synchronized (selectedApps) {
 								selectedApps.get(i).status = "Analysis server unavailable";
 								updateUI();
-
 							}
 							continue;
 						}
@@ -139,7 +142,19 @@ public class ResultChannelThread implements Runnable {
 									.getJSONArray("response");
 
 							if (raw_response.length() == 0) {
-								Log.w("Result Channel", "Server result not ready");
+								// if client cannot get result after 5 attempts, give up
+								// and display another message
+								if (giveupCounter[i] > 0) {
+									giveupCounter[i] -= 1;
+									Log.w("Result Channel",
+											"Server result not ready");
+								} else {
+									synchronized (selectedApps) {
+										selectedApps.get(i).status = "Error processing result";
+										updateUI();
+										counter -= 1;
+									}
+								}
 								continue;
 							}
 
@@ -212,6 +227,7 @@ public class ResultChannelThread implements Runnable {
 
 				if (doneReplay && counter == 0) {
 					Log.d("Result Channel", "Done replay! Exiting thread.");
+					counter = -1;
 					break;
 				}
 
@@ -344,7 +360,7 @@ public class ResultChannelThread implements Runnable {
 				e.printStackTrace();
 				Log.e("Result Channel", "convert string to json failed");
 				json = null;
-			}catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				Log.e("Result Channel", "sendRequest POST failed");
 			}
@@ -367,7 +383,7 @@ public class ResultChannelThread implements Runnable {
 		return data.toString();
 
 	}
-	
+
 	// TODO: temporary way to updateUI from this thread
 	// maybe find another way
 	private void updateUI() {
