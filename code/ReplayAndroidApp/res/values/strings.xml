@@ -72,9 +72,8 @@
     
     <string name="server_label">Select Server</string>
     <string name="server_replay">replay-s.meddle.mobi</string>
+    <string name="server_hint">replay-s.meddle.mobi</string>
     <string name="server_adrian_local">10.0.1.16</string>
-    <string name="server_meddle2">54.163.170.96</string>
-    <string name="server_meddle1">54.160.198.73</string>
     <string name="select_iteration">Select Iteration Times</string>
     <string name="iteration_1">1</string>
     <string name="iteration_2">2</string>

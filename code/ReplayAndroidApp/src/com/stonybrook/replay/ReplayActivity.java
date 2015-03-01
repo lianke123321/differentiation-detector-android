@@ -427,6 +427,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				(new TestVPN()).execute(this);
 
 			} else {
+				replayOngoing = false;
 				Toast.makeText(ReplayActivity.this,
 						"Sorry, server is not available. Try after some time.",
 						Toast.LENGTH_LONG).show();
@@ -2042,7 +2043,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// throw new UnknownHostException();
 			} catch (UnknownHostException e) {
 				Log.w("GetReplayServerIP", "get IP of replay server failed!");
-
+				server = "172.0.0.1";
+				meddleIP = "172.0.0.1";
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						Toast.makeText(
@@ -2057,6 +2059,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				ReplayActivity.this.finish();
 			} catch (NullPointerException e) {
 				Log.w("GetReplayServerIP", "not ipv4 address!");
+				server = "172.0.0.1";
+				meddleIP = "172.0.0.1";
 
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {

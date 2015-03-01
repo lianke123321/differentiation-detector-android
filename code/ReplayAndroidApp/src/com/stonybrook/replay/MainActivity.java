@@ -45,6 +45,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -98,7 +99,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		// Register with Global Exception hanndler
+		// Register with Global Exception handler
 		// Thread.setDefaultUncaughtExceptionHandler(new
 		// ExceptionHandler(this));
 		Thread.currentThread().setUncaughtExceptionHandler(
@@ -269,7 +270,9 @@ public class MainActivity extends Activity {
 			// Set elements of dialog
 			final Spinner spinnerTiming = (Spinner) view
 					.findViewById(R.id.settings_timing);
-			final Spinner spinnerServer = (Spinner) view
+			/*final Spinner spinnerServer = (Spinner) view
+					.findViewById(R.id.settings_server);*/
+			final EditText textServer = (EditText) view
 					.findViewById(R.id.settings_server);
 			final Spinner spinnerIteration = (Spinner) view
 					.findViewById(R.id.settings_iteration);
@@ -297,7 +300,7 @@ public class MainActivity extends Activity {
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int id) {
-							server = (String) spinnerServer.getSelectedItem();
+							server = (String) textServer.getText().toString().trim();
 							enableTiming = (String) spinnerTiming
 									.getSelectedItem();
 							iteration = Integer

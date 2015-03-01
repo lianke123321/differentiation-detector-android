@@ -70,6 +70,10 @@ public class ResultChannelThread implements Runnable {
 		try {
 			String wait = "Waiting for server result";
 			int giveupCounter[] = new int[selectedApps.size()];
+			for (int i = 0; i < giveupCounter.length; i++) {
+				// initialize give up counter
+				giveupCounter[i] = 5;
+			}
 
 			while (true) {
 
@@ -118,8 +122,6 @@ public class ResultChannelThread implements Runnable {
 
 						Log.d("Result Channel", "ask4analysis succeeded!");
 					} else if (selectedApps.get(i).status == wait) {
-						// initialize give up counter
-						giveupCounter[i] = 5;
 
 						JSONObject result = getSingleResult(id,
 								selectedApps.get(i).historyCount);
@@ -150,7 +152,7 @@ public class ResultChannelThread implements Runnable {
 											"Server result not ready");
 								} else {
 									synchronized (selectedApps) {
-										selectedApps.get(i).status = "Error processing result";
+										selectedApps.get(i).status = "Analyzer server error";
 										updateUI();
 										counter -= 1;
 									}
@@ -220,6 +222,14 @@ public class ResultChannelThread implements Runnable {
 								updateUI();
 							}
 							// adapter.notifyDataSetChanged();
+						} else {
+							synchronized (selectedApps) {
+								String error = result.getString("error");
+								Log.w("Result Channel", "Error: " + error);
+								selectedApps.get(i).status = "Analyzer server error";
+								updateUI();
+								counter -= 1;
+							}
 						}
 						Thread.sleep(1000);
 					}
