@@ -89,7 +89,7 @@ public class MainActivity extends Activity {
 	int iteration = 2;
 	boolean doRandom = false;
 
-	String gateway = null;
+	// String gateway = null;
 	String randomID = null;
 
 	// Remove this
@@ -128,7 +128,7 @@ public class MainActivity extends Activity {
 			// TODO Auto-generated catch block
 			this.finish();
 		}
-		gateway = Config.get("vpn_server");
+		// gateway = Config.get("vpn_server");
 
 		try {
 			/*
@@ -300,7 +300,9 @@ public class MainActivity extends Activity {
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int id) {
-							server = (String) textServer.getText().toString().trim();
+							server = (String) textServer.getText().toString()
+									.trim();
+							Config.set("vpn_server", server);
 							enableTiming = (String) spinnerTiming
 									.getSelectedItem();
 							iteration = Integer
@@ -489,7 +491,10 @@ public class MainActivity extends Activity {
 		try {
 
 			// fetch credentials in an async thread
-			FetchCredentialTask task = new FetchCredentialTask(gateway);
+			Log.d("getAndUpdateProfileData",
+					"vpn_server: " + Config.get("vpn_server"));
+			FetchCredentialTask task = new FetchCredentialTask(
+					Config.get("vpn_server"));
 			task.execute("");
 			JSONObject json = (JSONObject) task.get();
 

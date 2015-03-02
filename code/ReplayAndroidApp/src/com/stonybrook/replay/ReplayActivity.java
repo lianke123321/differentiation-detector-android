@@ -114,7 +114,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	boolean doRandom = false;
 	boolean onlyRandom = false;
 
-	String GATE_WAY = Config.get("vpn_server");
+	//String GATE_WAY = Config.get("vpn_server");
 	String meddleIP = null;
 
 	// This is AsyncTasks for replay. Run in background.
@@ -2032,7 +2032,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						.getHostAddress();
 				String[] tmpServer = server.split("\\.");
 
-				meddleIP = InetAddress.getByName(GATE_WAY).getHostAddress();
+				meddleIP = server;
 				Log.d("GetReplayServerIP", "Server IP: " + server + " VPN IP: "
 						+ meddleIP + " # fields: " + tmpServer.length);
 

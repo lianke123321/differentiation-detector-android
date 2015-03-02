@@ -78,7 +78,6 @@ public class ConsentFormActivity extends Activity {
 			// TODO Auto-generated catch block
 			this.finish();
 		}
-		this.gateway = Config.get("vpn_server");
 		
 		// Get "userAgreed" value. If the value doesn't exist yet false is
 		// returned
@@ -90,7 +89,9 @@ public class ConsentFormActivity extends Activity {
 			startActivity(intent);
 			ConsentFormActivity.this.finish();
 		}
-
+		
+		this.gateway = Config.get("vpn_server");
+		
 		setContentView(R.layout.consent_form_layout);
 
 		// Settings of click listeners of buttons on Main Screen
