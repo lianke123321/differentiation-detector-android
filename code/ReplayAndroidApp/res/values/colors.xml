@@ -17,6 +17,12 @@
     
     <color name="lightblue">#1DEBE1</color>
     
+    <color name="steelBlue">#4682B4</color>
+    
     <color name="white">#FFFFFF </color>
     <color name="black">#000000</color>
+    
+    <color name="red">#B22222</color>
+    <color name="forestGreen">#228B22</color>
+    <color name="goldenRod">#DAA520</color>
 </resources>

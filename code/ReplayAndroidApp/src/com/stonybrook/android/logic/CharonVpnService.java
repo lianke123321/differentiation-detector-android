@@ -18,27 +18,22 @@
 package com.stonybrook.android.logic;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
+
+import org.acra.ACRA;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.VpnService;
@@ -110,7 +105,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 	private CharonVpnService syncObject;
 
 	private ConnectivityManager connectivityManger;
-	private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
+	/*private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (syncObject == null || mService == null)
@@ -122,7 +117,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 
 			}
 		}
-	};
+	};*/
 
 	/**
 	 * as defined in charonservice.h
@@ -161,8 +156,9 @@ public class CharonVpnService extends VpnService implements Runnable {
 				}
 
 			}
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			Log.e("VPN", "failed to connect VPN!");
+			ACRA.getErrorReporter().handleException(e);
 		}
 		return START_NOT_STICKY;
 	}
@@ -180,8 +176,8 @@ public class CharonVpnService extends VpnService implements Runnable {
 		bindService(new Intent(this, VpnStateService.class),
 				mServiceConnection, Service.BIND_AUTO_CREATE);
 		/* check if we need to start a connection after being offline */
-		registerReceiver(mConnReceiver, new IntentFilter(
-				ConnectivityManager.CONNECTIVITY_ACTION));
+		//registerReceiver(mConnReceiver, new IntentFilter(
+		//		ConnectivityManager.CONNECTIVITY_ACTION));
 		// initialize this object in order to obtain all the fields
 		thisStaticObject = this;
 	}
@@ -230,6 +226,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 
 	@Override
 	public void run() {
+		Thread.currentThread().setName("CharonVpnService (Thread)");
 		Log.d("VPN", "start command");
 		syncObject = this;
 
@@ -299,6 +296,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 	 * The timer to double check the current network connection
 	 */
 	private void runTimer() {
+		/*
 		timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 
@@ -356,7 +354,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 				}
 			}
 			// start at one minute delay and run 15 minutes apart
-		}, ONE_MINUTE, 15 * ONE_MINUTE);
+		}, ONE_MINUTE, 15 * ONE_MINUTE); */
 	}
 
 	/*
@@ -378,6 +376,16 @@ public class CharonVpnService extends VpnService implements Runnable {
 						.getState() == State.CONNECTING);
 	}
 
+	/**
+	 * @return true if currently is connected.
+	 */
+	public boolean isFullyConnected() {
+		// defensive programming since this method will be called from other
+		// activities
+		return mService != null
+				&& (mService.getState() == State.CONNECTED);
+	}
+	
 	/**
 	 * Stop any existing connection by deinitializing charon.
 	 */

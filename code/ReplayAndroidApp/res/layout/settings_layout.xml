@@ -38,15 +38,15 @@
             android:textColor="@color/blue11"
             android:textSize="@dimen/main_title_text_size"
             android:textStyle="bold" />
-
-        <Spinner
+        
+        <EditText 
             android:id="@+id/settings_server"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:entries="@array/server"
             android:padding="10dp"
-            android:prompt="@string/server_label" />
+            android:text="@string/server_replay"
+            android:hint="@string/server_hint" />"
         
         <TextView
             android:id="@+id/selectIterationTextView"
@@ -74,16 +74,6 @@
             android:layout_gravity="center"
             android:padding="10dp"
             android:text="@string/select_random" />
-        
-        <TextView 
-            android:id = "@+id/installCertTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="@string/install_cert_label"
-            android:textColor="@color/blue11"
-            android:textSize="@dimen/main_title_text_size"
-            android:textStyle="bold" />
         
         <Button
             android:id="@+id/installCertButton"

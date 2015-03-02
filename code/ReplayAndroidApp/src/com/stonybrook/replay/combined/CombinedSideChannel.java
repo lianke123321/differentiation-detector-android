@@ -50,6 +50,7 @@ public class CombinedSideChannel {
 		socket.setKeepAlive(true);
 		// channel.socket().setKeepAlive(true);
 		// channel.configureBlocking(false);
+		socket.setSoTimeout(60000);
 
 		socket.connect(endPoint);
 		// channel.connect(endPoint);
@@ -58,14 +59,12 @@ public class CombinedSideChannel {
 
 	}
 
-	public void declareID(String replayName, String testID, String extraString)
-			throws Exception {
+	public void declareID(String replayName, String testID, String extraString,
+			String historyCount) throws Exception {
 		/*String round = testID.replace('_', '-');
 		String extra = extraString.replace('_', '-');*/
-		sendObject(
-				(id + ";" + testID + ";" + replayName + ";" + extraString)
-						.getBytes(),
-				objLen);
+		sendObject((id + ";" + testID + ";" + replayName + ";" + extraString
+				+ ";" + historyCount).getBytes(), objLen);
 		Log.d("declareID", id);
 
 	}
@@ -257,6 +256,7 @@ public class CombinedSideChannel {
 
 			sendObject(sentJitter.getBytes(), objLen);
 			sendObject(rcvdJitter.getBytes(), objLen);
+			jitterBean = null;
 		}
 
 		// receive confirmation from server

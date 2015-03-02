@@ -62,6 +62,11 @@ public class ConsentFormActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
+		if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
+			finish();
+			return;
+		}
+		
 		//This is not working
 		//System.setProperty("java.net.preferIPv4Stack", "true");
 		
@@ -73,7 +78,6 @@ public class ConsentFormActivity extends Activity {
 			// TODO Auto-generated catch block
 			this.finish();
 		}
-		this.gateway = Config.get("vpn_server");
 		
 		// Get "userAgreed" value. If the value doesn't exist yet false is
 		// returned
@@ -85,7 +89,9 @@ public class ConsentFormActivity extends Activity {
 			startActivity(intent);
 			ConsentFormActivity.this.finish();
 		}
-
+		
+		this.gateway = Config.get("vpn_server");
+		
 		setContentView(R.layout.consent_form_layout);
 
 		// Settings of click listeners of buttons on Main Screen
@@ -152,7 +158,7 @@ public class ConsentFormActivity extends Activity {
 									"If you are using Android 5.0.x, please restart your phone after " +
 									"installing certificate to avoid a bug of Android.")
 					.setPositiveButton(
-							"Do not click me without reading the instruction!",
+							"Read instructions above carefully before clicking here!",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int which) {

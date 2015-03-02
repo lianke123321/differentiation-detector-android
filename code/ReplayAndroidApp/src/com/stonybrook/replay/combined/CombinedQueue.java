@@ -12,17 +12,11 @@ import com.stonybrook.replay.bean.RequestSet;
 import com.stonybrook.replay.bean.ServerInstance;
 import com.stonybrook.replay.bean.UDPReplayInfoBean;
 import com.stonybrook.replay.bean.UpdateUIBean;
-//import java.util.concurrent.locks.Lock;
-//import java.util.concurrent.locks.ReentrantLock;
-//import android.graphics.Paint.Join;
 
 /**
  * This loads and de-serializes all necessary objects. Complicated. I'll have to
- * think what I did here. May be comments in python client can be helpful. TODO:
- * Find a way to get exceptions from child threads. Difficult than it looks.
- * Tried using Callable Thread but it did not work out. Callbacks can be used.
- * When child thread gets Exception, it can callback to parent which can stop
- * executing other threads and return Error to AsyncTask.
+ * think what I did here. May be comments in python client can be helpful.
+ * 
  */
 public class CombinedQueue {
 
@@ -75,7 +69,7 @@ public class CombinedQueue {
 			int i = 1;
 			// for jitter
 			int m = 0;
-			int len = this.Q.size();
+			double len = this.Q.size();
 			// @@@ start all the treads here
 			for (RequestSet RS : this.Q) {
 
@@ -91,7 +85,7 @@ public class CombinedQueue {
 					m++;
 
 					// adrian: for updating progress bar
-					updateUIBean.setProgress((int) (i * 100 / len));
+					updateUIBean.setProgress((int) ((i * 100) / len));
 
 				} else {
 					Semaphore recvSema = getRecvSemaLock(CSPairMapping.get(RS
@@ -105,7 +99,7 @@ public class CombinedQueue {
 							/ 1000000);
 
 					// adrian: for updating progress bar
-					updateUIBean.setProgress((int) (i * 100 / len));
+					updateUIBean.setProgress((int) ((i * 100) / len));
 
 					// adrian: every time when calling next we create and start
 					// a new thread

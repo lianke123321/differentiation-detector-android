@@ -45,7 +45,9 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -76,7 +78,7 @@ public class MainActivity extends Activity {
 	/**
 	 * We can provide email account here on which VPN logs can be received
 	 */
-	public static final String CONTACT_EMAIL = "lianke123321@gmail.com";
+	public static final String CONTACT_EMAIL = "contact@ankeli.me";
 	private static final String DEFAULT_ALIAS = "replay5";
 
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
@@ -87,7 +89,7 @@ public class MainActivity extends Activity {
 	int iteration = 2;
 	boolean doRandom = false;
 
-	String gateway = null;
+	// String gateway = null;
 	String randomID = null;
 
 	// Remove this
@@ -97,8 +99,11 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		// Register with Global Exception hanndler
-		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+		// Register with Global Exception handler
+		// Thread.setDefaultUncaughtExceptionHandler(new
+		// ExceptionHandler(this));
+		Thread.currentThread().setUncaughtExceptionHandler(
+				new ExceptionHandler(this));
 
 		setContentView(R.layout.activity_main_image);
 
@@ -123,7 +128,7 @@ public class MainActivity extends Activity {
 			// TODO Auto-generated catch block
 			this.finish();
 		}
-		gateway = Config.get("vpn_server");
+		// gateway = Config.get("vpn_server");
 
 		try {
 			/*
@@ -166,9 +171,9 @@ public class MainActivity extends Activity {
 			settingsButton = (Button) findViewById(R.id.settingsButton);
 			settingsButton.setOnClickListener(settingsButtonclick);
 
-			// to get certificate status
+			// to get randomID
 			settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
-			
+
 			// generate or retrieve an id for this phone
 			boolean hasID = settings.getBoolean("hasID", false);
 			if (!hasID) {
@@ -182,7 +187,7 @@ public class MainActivity extends Activity {
 				randomID = settings.getString("ID", null);
 				Log.d("MainActivity", "retrieve existing ID: " + randomID);
 			}
-				
+
 		} catch (Exception ex) {
 			Log.d(ReplayConstants.LOG_APPNAME,
 					"Exception while parsing JSON file "
@@ -255,14 +260,19 @@ public class MainActivity extends Activity {
 			 * is used. TODO: Layout needs some tweaking such that it can be
 			 * made presentable to user
 			 */
-			View view = LayoutInflater.from(MainActivity.this).inflate(
-					R.layout.settings_layout, null);
+			View view = LayoutInflater
+					.from(MainActivity.this)
+					.inflate(
+							R.layout.settings_layout,
+							(RelativeLayout) findViewById(R.layout.activity_main_image));
 			builder.setView(view);
 
 			// Set elements of dialog
 			final Spinner spinnerTiming = (Spinner) view
 					.findViewById(R.id.settings_timing);
-			final Spinner spinnerServer = (Spinner) view
+			/*final Spinner spinnerServer = (Spinner) view
+					.findViewById(R.id.settings_server);*/
+			final EditText textServer = (EditText) view
 					.findViewById(R.id.settings_server);
 			final Spinner spinnerIteration = (Spinner) view
 					.findViewById(R.id.settings_iteration);
@@ -290,7 +300,9 @@ public class MainActivity extends Activity {
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int id) {
-							server = (String) spinnerServer.getSelectedItem();
+							server = (String) textServer.getText().toString()
+									.trim();
+							Config.set("vpn_server", server);
 							enableTiming = (String) spinnerTiming
 									.getSelectedItem();
 							iteration = Integer
@@ -327,7 +339,27 @@ public class MainActivity extends Activity {
 		public void onClick(View v) {
 			boolean userAllowed = settings.getBoolean("userAllowed", false);
 			if (!userAllowed) {
-				downloadAndInstallVpnCreds();
+				new AlertDialog.Builder(MainActivity.this)
+						.setTitle("PLEASE READ ME!!!")
+						.setMessage(
+								"We are going to install a certificate that allows our tests to run."
+										+ "When asked for a password,\n\nLEAVE THE PASSWORD FIELD EMPTY\n\n"
+										+ "and click \"OK\".\n\n"
+										+ "If you are using Android 5.0.x, please restart your phone after "
+										+ "installing certificate to avoid a bug of Android.")
+						.setPositiveButton(
+								"Read instructions above carefully before clicking here!",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										Log.d("MainActivity",
+												"proceed to install credential");
+										// download credentials
+										downloadAndInstallVpnCreds();
+									}
+								}).show();
+
+				/*downloadAndInstallVpnCreds();
 
 				KeyChain.choosePrivateKeyAlias(MainActivity.this,
 						new SelectUserCertOnClickListener(), // Callback
@@ -335,7 +367,7 @@ public class MainActivity extends Activity {
 						null, // Any issuers.
 						"localhost", // Any host
 						-1, // Any port
-						null);
+						null);*/
 			} else {
 				Toast.makeText(context,
 						"Certificate has already been installed!",
@@ -356,8 +388,7 @@ public class MainActivity extends Activity {
 		public void onClick(View v) {
 
 			// check if user allowed to use certificate
-			
-			
+
 			boolean userAllowed = settings.getBoolean("userAllowed", false);
 			if (!userAllowed) {
 				KeyChain.choosePrivateKeyAlias(MainActivity.this,
@@ -379,7 +410,8 @@ public class MainActivity extends Activity {
 			// Check to see if user has selected at least one app from the list.
 			if (selectedApps.size() == 0) {
 				Toast.makeText(MainActivity.this,
-						"Please select at least one application", 1).show();
+						"Please select at least one application",
+						Toast.LENGTH_LONG).show();
 				return;
 			}
 
@@ -459,7 +491,10 @@ public class MainActivity extends Activity {
 		try {
 
 			// fetch credentials in an async thread
-			FetchCredentialTask task = new FetchCredentialTask(gateway);
+			Log.d("getAndUpdateProfileData",
+					"vpn_server: " + Config.get("vpn_server"));
+			FetchCredentialTask task = new FetchCredentialTask(
+					Config.get("vpn_server"));
 			task.execute("");
 			JSONObject json = (JSONObject) task.get();
 

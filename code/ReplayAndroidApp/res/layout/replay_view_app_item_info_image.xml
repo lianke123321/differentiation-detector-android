@@ -2,22 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:divider="#00000000"
     android:orientation="horizontal"
-    android:paddingLeft="5dp" >
+    android:paddingLeft="5dp"
+    android:background="@color/white" >
 
     <ImageView
         android:id="@+id/appImageView"
-        android:layout_width="100dp"
+        android:layout_width="0px"
+        android:layout_weight="1"
         android:layout_height="100dp"
         android:paddingBottom="6dp"
         android:paddingRight="16dp"
         android:paddingTop="6dp"
-        android:src="@drawable/dropbox" />
+        android:src="@drawable/dropbox"
+        android:contentDescription="logo" />
 
     <TableLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0px"
+        android:layout_weight="3"
         android:layout_height="match_parent" >
 
         <TableRow
@@ -78,32 +81,49 @@
         </TableRow>
     </TableLayout>
 
-     <ProgressBar
-        android:id="@+id/appProgress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:minHeight="25dp"
-        android:minWidth="200dp"
-        android:paddingLeft="25dp"
-        android:visibility="gone" /> 
+    <TableLayout
+        android:id="@+id/resultTableLayout"
+        android:layout_width="0px"
+        android:layout_weight="1"
+        android:layout_height="match_parent" >
 
-    <ImageButton
-        android:id="@+id/appResultBtn"
-         android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:paddingBottom="6dp"
-        android:paddingRight="16dp"
-        android:paddingTop="6dp"
-        android:minHeight="25dp"
-        android:minWidth="100dp"
-        android:padding="4dp"
-        android:layout_marginTop="10dp"
-        android:visibility="visible"
-        android:paddingLeft="25dp"      
-        android:src="@drawable/analysis"
-        android:background="@null"
-         />
+        <TableRow
+            android:id="@+id/resultRow1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip" >
+
+            <TextView
+                android:id="@+id/percentTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="4"
+                android:layout_weight="2"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:text="@string/zero_percent"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/resultRow2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/slowerTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="4"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:text="@string/slower"
+                android:textColor="@color/black"
+                android:visibility="gone" />
+        </TableRow>
+    </TableLayout>
 
 </LinearLayout>

@@ -41,6 +41,7 @@ public class CTCPClient /* implements Runnable */{
 			socket.setTcpNoDelay(true);
 			socket.setReuseAddress(true);
 			socket.setKeepAlive(true);
+			socket.setSoTimeout(60000);
 			socket.connect(endPoint);
 
 			// this.identify();
