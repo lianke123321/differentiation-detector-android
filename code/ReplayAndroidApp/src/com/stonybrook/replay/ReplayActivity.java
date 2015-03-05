@@ -114,7 +114,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	boolean doRandom = false;
 	boolean onlyRandom = false;
 
-	//String GATE_WAY = Config.get("vpn_server");
+	// String GATE_WAY = Config.get("vpn_server");
 	String meddleIP = null;
 
 	// This is AsyncTasks for replay. Run in background.
@@ -164,7 +164,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		// First check to see of Internet access is available
 		if (!isNetworkAvailable()) {
-			new AlertDialog.Builder(this)
+			new AlertDialog.Builder(this,
+					AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 					.setTitle("Network Error")
 					.setMessage(
 							"No Internet connection available. Try After connecting to Intenet.")
@@ -272,7 +273,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					"Please click \"Start\" to start the replay!",
 					Toast.LENGTH_LONG).show();
 
-			new AlertDialog.Builder(ReplayActivity.this)
+			new AlertDialog.Builder(ReplayActivity.this,
+					AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 					.setTitle("One more thing...")
 					.setMessage(
 							"Please leave the app running in the foreground "
@@ -516,7 +518,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						android.R.anim.slide_in_left,
 						android.R.anim.slide_out_right);
 			} else
-				new AlertDialog.Builder(ReplayActivity.this)
+				new AlertDialog.Builder(ReplayActivity.this,
+						AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 						.setTitle("Replay is ongoing!")
 						.setMessage("Do you want to stop the process?")
 						.setPositiveButton("Yes",
@@ -820,7 +823,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					if (permission[1].trim().equalsIgnoreCase("1")) {
 						ReplayActivity.this.runOnUiThread(new Runnable() {
 							public void run() {
-								new AlertDialog.Builder(ReplayActivity.this)
+								new AlertDialog.Builder(ReplayActivity.this,
+										AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 										.setTitle("Error")
 										.setMessage(
 												"No such replay on server!\n"
@@ -849,7 +853,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					} else if (permission[1].trim().equalsIgnoreCase("2")) {
 						ReplayActivity.this.runOnUiThread(new Runnable() {
 							public void run() {
-								new AlertDialog.Builder(ReplayActivity.this)
+								new AlertDialog.Builder(ReplayActivity.this,
+										AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 										.setTitle("Error")
 										.setMessage(
 												"No permission: another client with same IP address is running. "
@@ -879,7 +884,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					} else {
 						ReplayActivity.this.runOnUiThread(new Runnable() {
 							public void run() {
-								new AlertDialog.Builder(ReplayActivity.this)
+								new AlertDialog.Builder(ReplayActivity.this,
+										AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 										.setTitle("Error")
 										.setMessage(
 												"Unknown error!\n"
@@ -1377,7 +1383,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
-						new AlertDialog.Builder(ReplayActivity.this)
+						new AlertDialog.Builder(ReplayActivity.this,
+								AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 								.setTitle("Replay finished!")
 								.setMessage(
 										"Replay of all applications you have chosen is done! "
@@ -1520,7 +1527,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
-						new AlertDialog.Builder(ReplayActivity.this)
+						new AlertDialog.Builder(ReplayActivity.this,
+								AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 								.setTitle("Replay finished!")
 								.setMessage(
 										"Replay of all applications you have chosen is done! "
@@ -1628,7 +1636,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 					ReplayActivity.this.runOnUiThread(new Runnable() {
 						public void run() {
-							new AlertDialog.Builder(ReplayActivity.this)
+							new AlertDialog.Builder(ReplayActivity.this,
+									AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 									.setTitle("Replay finished!")
 									.setMessage(
 											"Replay of all applications you have chosen is done! "
@@ -1764,7 +1773,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				return super.onKeyDown(keyCode, event);
 			} else {
-				new AlertDialog.Builder(ReplayActivity.this)
+				new AlertDialog.Builder(ReplayActivity.this,
+						AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 						.setTitle("Replay is ongoing!")
 						.setMessage("Do you want to stop the process?")
 						.setPositiveButton("Yes",
@@ -1920,7 +1930,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					// a alert dialog will pop up and the app will quite if user
 					// click "Cancel" for trust permission
 					AlertDialog.Builder alertDialog = new AlertDialog.Builder(
-							this);
+							this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
 					alertDialog.setMessage(
 							"Connecting VPN failed. Replay aborted.")
 							.setNeutralButton("OK",
@@ -1952,7 +1962,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	public static class VpnNotSupportedError extends DialogFragment {
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			return new AlertDialog.Builder(getActivity())
+			return new AlertDialog.Builder(getActivity(),
+					AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 					.setTitle("VPN Not supported")
 					.setMessage(
 							"Your device does not support VPN.\n"
@@ -2064,7 +2075,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
-						new AlertDialog.Builder(ReplayActivity.this)
+						new AlertDialog.Builder(ReplayActivity.this,
+								AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 								.setTitle("Error")
 								.setMessage(
 										"Sorry, your phone is using IPv6 address."
@@ -2222,7 +2234,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 			ReplayActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
-					new AlertDialog.Builder(ReplayActivity.this)
+					new AlertDialog.Builder(ReplayActivity.this,
+							AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 							.setTitle("VPN Connection Test")
 							.setMessage(
 									"We detected that your device is unable to connect to "
@@ -2337,7 +2350,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			// show a dialogue to inform user
 			ReplayActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
-					new AlertDialog.Builder(ReplayActivity.this)
+					new AlertDialog.Builder(ReplayActivity.this,
+							AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 							.setTitle("Error")
 							.setMessage(
 									"Failed to disconnect VPN!\n"
@@ -2425,7 +2439,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			// show a dialogue to inform user
 			ReplayActivity.this.runOnUiThread(new Runnable() {
 				public void run() {
-					new AlertDialog.Builder(ReplayActivity.this)
+					new AlertDialog.Builder(ReplayActivity.this,
+							AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 							.setTitle("Error")
 							.setMessage(
 									"Failed to disconnect VPN!\n"

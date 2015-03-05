@@ -61,15 +61,15 @@ public class ConsentFormActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
+
 		if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
 			finish();
 			return;
 		}
-		
-		//This is not working
-		//System.setProperty("java.net.preferIPv4Stack", "true");
-		
+
+		// This is not working
+		// System.setProperty("java.net.preferIPv4Stack", "true");
+
 		// get vpn server hostname
 		try {
 			Config.readConfigFile(ReplayConstants.CONFIG_FILE,
@@ -78,7 +78,7 @@ public class ConsentFormActivity extends Activity {
 			// TODO Auto-generated catch block
 			this.finish();
 		}
-		
+
 		// Get "userAgreed" value. If the value doesn't exist yet false is
 		// returned
 		settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
@@ -89,9 +89,9 @@ public class ConsentFormActivity extends Activity {
 			startActivity(intent);
 			ConsentFormActivity.this.finish();
 		}
-		
+
 		this.gateway = Config.get("vpn_server");
-		
+
 		setContentView(R.layout.consent_form_layout);
 
 		// Settings of click listeners of buttons on Main Screen
@@ -149,14 +149,15 @@ public class ConsentFormActivity extends Activity {
 			 * startActivity(intent); ConsentFormActivity.this.finish();
 			 */
 
-			new AlertDialog.Builder(ConsentFormActivity.this)
+			new AlertDialog.Builder(ConsentFormActivity.this,
+					AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 					.setTitle("PLEASE READ ME!!!")
 					.setMessage(
 							"We are going to install a certificate that allows our tests to run."
 									+ "When asked for a password,\n\nLEAVE THE PASSWORD FIELD EMPTY\n\n"
-									+ "and click \"OK\".\n\n" +
-									"If you are using Android 5.0.x, please restart your phone after " +
-									"installing certificate to avoid a bug of Android.")
+									+ "and click \"OK\".\n\n"
+									+ "If you are using Android 5.0.x, please restart your phone after "
+									+ "installing certificate to avoid a bug of Android.")
 					.setPositiveButton(
 							"Read instructions above carefully before clicking here!",
 							new DialogInterface.OnClickListener() {
@@ -303,7 +304,8 @@ public class ConsentFormActivity extends Activity {
 			Editor editor = settings.edit();
 			editor.putBoolean("userAgreed", false);
 			editor.commit();
-			new AlertDialog.Builder(ConsentFormActivity.this)
+			new AlertDialog.Builder(ConsentFormActivity.this,
+					AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 					.setTitle("Thank you!")
 					.setMessage("Thank you for your support!")
 					.setNegativeButton("Exit",

@@ -136,7 +136,8 @@ public class MainActivity extends Activity {
 			 * TODO : Identify if connection is WiFi or Cellular
 			 */
 			if (!isNetworkAvailable()) {
-				new AlertDialog.Builder(this)
+				new AlertDialog.Builder(this,
+						AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 						.setTitle("Network Error")
 						.setMessage(
 								"No Internet connection available. Try After connecting to Intenet.")
@@ -252,7 +253,7 @@ public class MainActivity extends Activity {
 		public void onClick(View v) {
 			// Creating dialog to display to use
 			AlertDialog.Builder builder = new AlertDialog.Builder(
-					MainActivity.this);
+					MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
 			// builder.setTitle("Settings");
 
 			/**
@@ -339,7 +340,8 @@ public class MainActivity extends Activity {
 		public void onClick(View v) {
 			boolean userAllowed = settings.getBoolean("userAllowed", false);
 			if (!userAllowed) {
-				new AlertDialog.Builder(MainActivity.this)
+				new AlertDialog.Builder(MainActivity.this,
+						AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 						.setTitle("PLEASE READ ME!!!")
 						.setMessage(
 								"We are going to install a certificate that allows our tests to run."
