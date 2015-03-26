@@ -11,23 +11,28 @@ public class CTCPClient /* implements Runnable */{
 	private String destIP = null;
 	private int destPort;
 	public Socket socket = null;
+	public String publicIP = null;
+	public boolean addHeader = false;
 	/*
 	 * private int port; private int NATPort;
 	 */
 	private String id = null;
-	private String replayName = null;
+	public String replayName = null;
 	public SocketChannel sc = null;
 	// TODO: Check proper usage later
 	public AtomicBoolean flag = new AtomicBoolean();
 
 	public CTCPClient(String cSPair, String destIP, int destPort,
-			String randomID, String replayName) {
+			String randomID, String replayName, String publicIP,
+			boolean addHeader) {
 		super();
 		CSPair = cSPair;
 		this.destIP = destIP;
 		this.destPort = destPort;
 		this.id = randomID;
 		this.replayName = replayName;
+		this.publicIP = publicIP;
+		this.addHeader = addHeader;
 	}
 
 	/**
@@ -49,16 +54,6 @@ public class CTCPClient /* implements Runnable */{
 			ex.printStackTrace();
 		}
 	}
-
-	// Not Used
-	/*public void identify_channel() throws IOException {
-		// Log.d("Identify", id + ";" + this.CSPair + ";" + replayName);
-		byte[] message = (id + ";" + this.CSPair + ";" + replayName).getBytes();
-		ByteBuffer buf = ByteBuffer.wrap(message);
-		// this.sc.write(ByteBuffer.wrap(String.format("%010d",
-		// message.length).getBytes()));
-		this.sc.write(buf);
-	}*/
 
 	/**
 	 * Before anything, client needs to identify itself to the server and tell

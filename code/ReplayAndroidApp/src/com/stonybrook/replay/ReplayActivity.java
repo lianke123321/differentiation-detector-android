@@ -977,7 +977,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					// compared with python client
 					CTCPClient c = new CTCPClient(csp, instance.server,
 							Integer.valueOf(instance.port), randomID,
-							appData.getReplayName());
+							appData.getReplayName(), Config.get("publicIP"),
+							Boolean.valueOf(Config.get("addHeader")));
 					CSPairMapping.put(csp, c);
 				}
 				Log.d("Replay", "created clients from CSPairs");
