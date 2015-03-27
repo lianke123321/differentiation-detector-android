@@ -84,8 +84,8 @@ public class MainActivity extends Activity {
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
 	public ArrayList<ApplicationBean> selectedAppsRandom = new ArrayList<ApplicationBean>();
 
-	String server = null;
-	String enableTiming = null;
+	String server = "replay-s.meddle.mobi";
+	String enableTiming = "true";
 	int iteration = 2;
 	boolean doRandom = false;
 
@@ -271,16 +271,30 @@ public class MainActivity extends Activity {
 			// Set elements of dialog
 			final Spinner spinnerTiming = (Spinner) view
 					.findViewById(R.id.settings_timing);
+			// set value of timing
+			if (enableTiming.equalsIgnoreCase("true"))
+				spinnerTiming.setSelection(0);
+			else
+				spinnerTiming.setSelection(1);
+			
 			/*final Spinner spinnerServer = (Spinner) view
 					.findViewById(R.id.settings_server);*/
 			final EditText textServer = (EditText) view
 					.findViewById(R.id.settings_server);
+			textServer.setText(server);
 			final Spinner spinnerIteration = (Spinner) view
 					.findViewById(R.id.settings_iteration);
-			// set default to 2 iterations
-			spinnerIteration.setSelection(1);
+			// set value of iteration
+			if (iteration == 1)
+				spinnerIteration.setSelection(0);
+			else if (iteration == 2)
+				spinnerIteration.setSelection(1);
+			else
+				spinnerIteration.setSelection(2);
+			
 			final CheckBox checkBoxRandom = (CheckBox) view
 					.findViewById(R.id.selectRandomCheckBox);
+			checkBoxRandom.setChecked(doRandom);
 
 			// set installCert button
 			final Button installCertButton = (Button) view

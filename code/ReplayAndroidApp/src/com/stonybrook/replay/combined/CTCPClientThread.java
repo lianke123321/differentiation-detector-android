@@ -60,14 +60,15 @@ public class CTCPClientThread implements Runnable {
 
 			// handle GET payload
 			String tmp = new String(RS.getPayload(), "UTF-8");
-			if (tmp.substring(0, 3).equalsIgnoreCase("GET") && client.addHeader) {
+			if (tmp.substring(0, 3).trim().equalsIgnoreCase("GET")
+					&& client.addHeader) {
 				// add modified fields
 				String[] parts = tmp.split("\r\n", 2);
 				tmp = parts[0]
 						+ String.format("\r\nX-rr: %s;%s;%s\r\n",
 								client.publicIP, client.replayName,
 								client.CSPair) + parts[1];
-				Log.d("Sending", "sending modified GET!");
+				Log.d("Sending", "Special GET!");
 				dataOutputStream.write(tmp.getBytes());
 			} else {
 				// send payload directly

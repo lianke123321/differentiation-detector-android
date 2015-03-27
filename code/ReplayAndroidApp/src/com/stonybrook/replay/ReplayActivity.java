@@ -271,7 +271,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		if (server.split("\\.").length == 4) {
 			Toast.makeText(context,
 					"Please click \"Start\" to start the replay!",
-					Toast.LENGTH_LONG).show();
+					Toast.LENGTH_SHORT).show();
 
 			new AlertDialog.Builder(ReplayActivity.this,
 					AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
