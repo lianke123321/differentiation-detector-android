@@ -2,12 +2,12 @@ package com.stonybrook.replay.combined;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
 import android.util.Log;
 
 import com.stonybrook.replay.bean.RequestSet;
+import com.stonybrook.replay.exception_handler.IpFlippingException;
 
 // @@@ Adrian add this
 
@@ -52,8 +52,6 @@ public class CTCPClientThread implements Runnable {
 			// Get Input/Output stream for socket
 			DataOutputStream dataOutputStream = new DataOutputStream(
 					client.socket.getOutputStream());
-			DataInputStream dataInputStream = new DataInputStream(
-					client.socket.getInputStream());
 
 			/*Log.d("Sending", "payload " + RS.getPayload().length +
 					" bytes, expecting " + RS.getResponse_len() + " bytes ");*/
@@ -82,6 +80,8 @@ public class CTCPClientThread implements Runnable {
 
 			// Notify waiting Queue thread to start processing next packet
 			if (RS.getResponse_len() > 0) {
+				DataInputStream dataInputStream = new DataInputStream(
+						client.socket.getInputStream());
 
 				int totalRead = 0;
 
@@ -94,16 +94,30 @@ public class CTCPClientThread implements Runnable {
 					// @@@ offset is wrong?
 					int bytesRead = dataInputStream.read(buffer, totalRead,
 							Math.min(buffer.length - totalRead, bufSize));
+					/*Log.i("Receiving", "Read " + bytesRead + " bytes out of "
+							+ buffer.length);*/
+
 					// Log.d("Payload " + RS.getResponse_len(),
 					// String.valueOf(buffer));
 					// int bytesRead = dataInputStream.read(buffer);
 					// Log.d("Received " + RS.getResponse_len(),
 					// String.valueOf(bytesRead));
 					if (bytesRead < 0) {
-						throw new IOException("Data stream ended prematurely");
+						// throw new
+						// IOException("Data stream ended prematurely");
+						Log.e("Receiving", "Not enough bytes!");
+						break;
 					}
 					totalRead += bytesRead;
 				}
+				
+				String data = new String(buffer, "UTF-8");
+				if (data.substring(0, 12).trim().equalsIgnoreCase("WhoTheFAreU?")) {
+					throw new IpFlippingException();
+				}
+				/*else
+					Log.d("Receiving", "content for " + buffer.length + "\n" + data);*/
+
 				// adrian: increase current pointer
 				/*synchronized (recvQueueBean) {
 					recvQueueBean.current ++;
@@ -120,13 +134,20 @@ public class CTCPClientThread implements Runnable {
 				Log.d("Receiving", "skipped");
 			}
 
-		} catch (Exception e) {
-			Log.d("TCPClientThread", "something bad happened!");
-			e.printStackTrace();
-			// abort replay if bad things happened!
+		} catch (IpFlippingException e) {
+			Log.e("TCPClientThread", "IP flipping detected!");
 			synchronized (queue) {
 				queue.ABORT = true;
+				queue.abort_reason = "IP flipping detected";
 			}
+		} catch (Exception e) {
+			Log.e("TCPClientThread", "something bad happened!");
+			// abort replay if bad things happened!
+						synchronized (queue) {
+							queue.ABORT = true;
+							queue.abort_reason = "Replay aborted due to unknown reason";
+						}
+			e.printStackTrace();
 		} finally {
 			recvSema.release();
 			synchronized (queue) {

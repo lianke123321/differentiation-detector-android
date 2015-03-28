@@ -36,6 +36,7 @@ public class CombinedQueue {
 
 	// for indicating abortion!
 	public volatile boolean ABORT = false;
+	public volatile String abort_reason = null;
 
 	public CombinedQueue(ArrayList<RequestSet> q, JitterBean jitterBean) {
 		super();

@@ -325,14 +325,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		if (resultChannelThread != null)
 			resultChannelThread.forceQuit = true;
 
-		this.finish();
+		//this.finish();
 	}
 
-	@Override
+	/*@Override
 	protected void onDestroy() {
 		// TODO: figure out if I need to do anything here
+		this.onStop();
 		super.onDestroy();
-	}
+	}*/
 
 	/**
 	 * This Method checks the network Availability. For this NetworkInfo class
@@ -1146,7 +1147,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				String message = "";
 				if (queue.ABORT == true) {
-					message = "Error during replay";
+					message = queue.abort_reason;
 					success = false;
 				} else {
 					message = getResources().getString(R.string.send_jitter);
@@ -1264,9 +1265,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			if (!success) {
 				// Update status on screen and stop processing
 				// selectedApps.get(currentReplayCount).resultImg = "p";
-				selectedApps.get(currentReplayCount++).status = getResources()
+				/*selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
-				adapter.notifyDataSetChanged();
+				adapter.notifyDataSetChanged();*/
+				replayOngoing = false;
 
 				// set progress bar to invisible
 				ReplayActivity.this.runOnUiThread(new Runnable() {
@@ -1421,9 +1423,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			if (!success) {
 				// Update status on screen and stop processing
 				// selectedApps.get(currentReplayCount).resultImg = "p";
-				selectedApps.get(currentReplayCount++).status = getResources()
+				/*selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
-				adapter.notifyDataSetChanged();
+				adapter.notifyDataSetChanged();*/
 				replayOngoing = false;
 
 				// set progress bar to invisible
@@ -1568,9 +1570,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			if (!success) {
 				// Update status on screen and stop processing
 				// selectedApps.get(currentReplayCount).resultImg = "p";
-				selectedApps.get(currentReplayCount).status = getResources()
+				/*selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.error);
-				adapter.notifyDataSetChanged();
+				adapter.notifyDataSetChanged();*/
 				replayOngoing = false;
 
 				// set progress bar to invisible
@@ -1723,9 +1725,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						selectedApps.get(currentReplayCount), "open");
 			} else {
 				// selectedApps.get(currentReplayCount).resultImg = "p";
-				selectedApps.get(currentReplayCount++).status = getResources()
+				/*selectedApps.get(currentReplayCount++).status = getResources()
 						.getString(R.string.error);
-				adapter.notifyDataSetChanged();
+				adapter.notifyDataSetChanged();*/
+				replayOngoing = false;
 
 				// set progress bar to invisible
 				ReplayActivity.this.runOnUiThread(new Runnable() {
