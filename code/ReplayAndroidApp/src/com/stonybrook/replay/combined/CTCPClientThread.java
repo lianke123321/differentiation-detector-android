@@ -110,9 +110,11 @@ public class CTCPClientThread implements Runnable {
 					}
 					totalRead += bytesRead;
 				}
-				
+
 				String data = new String(buffer, "UTF-8");
-				if (data.substring(0, 12).trim().equalsIgnoreCase("WhoTheFAreU?")) {
+				if (data.length() >= 12
+						&& data.substring(0, 12).trim()
+								.equalsIgnoreCase("WhoTheFAreU?")) {
 					throw new IpFlippingException();
 				}
 				/*else
@@ -143,10 +145,10 @@ public class CTCPClientThread implements Runnable {
 		} catch (Exception e) {
 			Log.e("TCPClientThread", "something bad happened!");
 			// abort replay if bad things happened!
-						synchronized (queue) {
-							queue.ABORT = true;
-							queue.abort_reason = "Replay aborted due to unknown reason";
-						}
+			synchronized (queue) {
+				queue.ABORT = true;
+				queue.abort_reason = "Replay aborted due to unknown reason";
+			}
 			e.printStackTrace();
 		} finally {
 			recvSema.release();
