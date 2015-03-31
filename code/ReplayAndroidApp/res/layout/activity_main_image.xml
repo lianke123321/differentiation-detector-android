@@ -5,31 +5,24 @@
     <LinearLayout
         android:id="@+id/ll1"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="47sp"
         android:background="@color/blue14"
         android:orientation="horizontal"
         android:gravity="center" >
 
-        <Button
-            android:id="@+id/settingsButton"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
+        <com.gc.materialdesign.views.ButtonRectangle
+            android:radius="70sp"
+	        android:id="@+id/settingsButton"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
             android:layout_marginRight="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/buttonshape"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
+	        android:text = "@string/setting"
+	        android:textSize="15sp"
+            android:textStyle="bold"
             android:padding="5dp"
-            android:shadowColor="#000"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="10"
-            android:text="@string/setting"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:background="@color/blue6">
+    	</com.gc.materialdesign.views.ButtonRectangle>
 
         <TextView
             android:id="@+id/mainPageTitleTextView"
@@ -37,30 +30,24 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:padding="10dp"
+            android:gravity="center_horizontal"
             android:text="@string/main_page_title"
             android:textColor="@color/white"
             android:textSize="@dimen/main_title_text_size"
             android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/nextButton"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        
+        <com.gc.materialdesign.views.ButtonRectangle
+	        android:id="@+id/nextButton"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
             android:layout_marginRight="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/buttonshape_next"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
+	        android:text = "@string/next_button"
+	        android:textSize="15sp"
+            android:textStyle="bold"
             android:padding="5dp"
-            android:shadowColor="#000"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="10"
-            android:text="@string/next_button"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:background="@color/blue6">
+    	</com.gc.materialdesign.views.ButtonRectangle>
     </LinearLayout>
 
    

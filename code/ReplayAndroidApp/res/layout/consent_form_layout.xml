@@ -6,18 +6,17 @@
     <LinearLayout
         android:id="@+id/ll1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50sp"
         android:background="@color/blue14"
         android:orientation="horizontal" >
 
-        <Button
+        <com.gc.materialdesign.views.ButtonRectangle
             android:id="@+id/disagreeBtn"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
+            android:radius="20sp"
             android:layout_weight="1"
-            android:background="@drawable/buttonshape_prev"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:padding="5dp"
@@ -28,6 +27,7 @@
             android:text="@string/user_disagree"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
+            android:background="@color/blue6"
             android:textStyle="bold" />
 
         <TextView
@@ -35,20 +35,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="3"
+            android:gravity="center_horizontal"
             android:padding="10dp"
             android:text="@string/consent_form_title"
             android:textColor="@color/white"
             android:textSize="@dimen/main_title_text_size"
             android:textStyle="bold" />
 
-        <Button
+        <com.gc.materialdesign.views.ButtonRectangle
             android:id="@+id/agreeBtn"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:layout_weight="1"
-            android:background="@drawable/buttonshape_next"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:padding="5dp"
@@ -59,6 +58,7 @@
             android:text="@string/user_agree"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
+            android:background="@color/blue6"
             android:textStyle="bold" />
     </LinearLayout>
 

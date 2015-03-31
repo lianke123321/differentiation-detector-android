@@ -51,7 +51,7 @@ public class ConsentFormActivity extends Activity {
 
 	// @@@ this is consent form
 	public static final String STATUS = "ConsentFormPrefsFile";
-	Button agreeButton, disagreeButton;
+	com.gc.materialdesign.views.ButtonRectangle agreeButton, disagreeButton; 
 
 	SharedPreferences settings;
 
@@ -95,10 +95,10 @@ public class ConsentFormActivity extends Activity {
 		setContentView(R.layout.consent_form_layout);
 
 		// Settings of click listeners of buttons on Main Screen
-		agreeButton = (Button) findViewById(R.id.agreeBtn);
+		agreeButton = (com.gc.materialdesign.views.ButtonRectangle) findViewById(R.id.agreeBtn);
 		agreeButton.setOnClickListener(agreeButtonClick);
 
-		disagreeButton = (Button) findViewById(R.id.disagreeBtn);
+		disagreeButton = (com.gc.materialdesign.views.ButtonRectangle) findViewById(R.id.disagreeBtn);
 		disagreeButton.setOnClickListener(disagreeButtonClick);
 
 		// Set consent form content as HTML

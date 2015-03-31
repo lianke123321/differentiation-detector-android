@@ -49,6 +49,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gc.materialdesign.views.ButtonRectangle;
+import com.gc.materialdesign.views.ProgressBarDeterminate;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
 import com.stonybrook.android.logic.CharonVpnService;
@@ -89,7 +91,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	public static final String STATUS = "ReplayActPrefsFile";
 	SharedPreferences settings;
 
-	Button backButton, replayButton;
+	com.gc.materialdesign.views.ButtonRectangle backButton, replayButton;
 	ArrayList<ApplicationBean> selectedApps = null;
 	ArrayList<ApplicationBean> selectedAppsRandom = null;
 	ListView appsListView = null;
@@ -101,7 +103,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	boolean replayOngoing = false;
 
 	// adrian: for progress bar
-	ProgressBar prgBar;
+	ProgressBarDeterminate prgBar;
+//	ProgressBar prgBar;
 	UpdateUIBean updateUIBean;
 
 	int currentReplayCount = 0;
@@ -206,10 +209,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		appsListView.setAdapter(adapter);
 
 		// Register button listeners
-		backButton = (Button) findViewById(R.id.backButton);
+		backButton = (com.gc.materialdesign.views.ButtonRectangle) findViewById(R.id.backButton);
 		backButton.setOnClickListener(backButtonListner);
 
-		replayButton = (Button) findViewById(R.id.replayButton);
+		replayButton = (com.gc.materialdesign.views.ButtonRectangle) findViewById(R.id.replayButton);
 		replayButton.setOnClickListener(replayButtonListener);
 		currentReplayCount = 0;
 
@@ -236,7 +239,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			throw new RuntimeException();
 
 		// adrian: for progress bar
-		prgBar = (ProgressBar) findViewById(R.id.prgBar);
+		prgBar = (ProgressBarDeterminate) findViewById(R.id.prgBar);
+//		prgBar = (ProgressBar) findViewById(R.id.prgBar);
 		prgBar.setVisibility(View.GONE);
 		updateUIBean = new UpdateUIBean();
 

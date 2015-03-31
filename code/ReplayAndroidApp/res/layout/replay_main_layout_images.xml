@@ -7,29 +7,24 @@
     <LinearLayout
         android:id="@+id/ll1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50sp"
         android:background="@color/blue14"
         android:orientation="horizontal" >
 
-        <Button
+        <com.gc.materialdesign.views.ButtonRectangle
             android:id="@+id/backButton"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_weight="1"
-            android:background="@drawable/buttonshape_prev"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:padding="5dp"
-            android:shadowColor="#000"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="10"
             android:text="@string/back_button"
+            android:background="@color/blue6"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textStyle="bold" /> 
 
         <TextView
             android:id="@+id/mainPageTitleTextView"
@@ -37,19 +32,18 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:padding="10dp"
+            android:gravity="center_horizontal"
             android:text="@string/selected_apps"
             android:textColor="@color/white"
             android:textSize="@dimen/main_title_text_size"
             android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/replayButton"
-            style="?android:attr/buttonStyleSmall"
+        
+		<com.gc.materialdesign.views.ButtonRectangle
+			android:id="@+id/replayButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:layout_weight="1"
-            android:background="@drawable/buttonshape"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:padding="5dp"
@@ -58,6 +52,7 @@
             android:shadowDy="0"
             android:shadowRadius="10"
             android:text="@string/replay"
+            android:background="@color/blue6"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -82,14 +77,23 @@
         android:layout_above="@+id/summaryLinearLayout"
         android:orientation="horizontal" >
         
-        <ProgressBar 
+        <com.gc.materialdesign.views.ProgressBarDeterminate
+            android:id="@+id/prgBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+        	android:padding="0dp"
+        	android:layout_width="match_parent"
+        	android:layout_height="5sp"
+        	android:max="100"
+        	android:progress="0"  />
+        
+        <!-- <ProgressBar 
             android:id="@+id/prgBar"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"
         	android:layout_height="wrap_content"
         	android:padding="10dp"
         	android:max="100"
-        	android:progress="0" />
+        	android:progress="0" /> -->
         
     </LinearLayout>
     

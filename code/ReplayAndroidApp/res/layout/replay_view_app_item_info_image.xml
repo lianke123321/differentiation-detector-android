@@ -7,6 +7,12 @@
     android:paddingLeft="5dp"
     android:background="@color/white" >
 
+    <!-- <com.gc.materialdesign.views.Card
+         android:id="@+id/card1"
+         android:layout_width="match_parent"
+         android:layout_height="20sp"
+          > -->
+    
     <ImageView
         android:id="@+id/appImageView"
         android:layout_width="0px"
@@ -125,5 +131,6 @@
                 android:visibility="gone" />
         </TableRow>
     </TableLayout>
+    <!-- </com.gc.materialdesign.views.Card> -->
 
 </LinearLayout>

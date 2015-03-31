@@ -51,6 +51,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.gc.materialdesign.views.ButtonRectangle;
 import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
@@ -70,7 +71,8 @@ public class MainActivity extends Activity {
 
 	// GridView on Main Screen
 	GridView appList;
-	Button nextButton, settingsButton;
+	com.gc.materialdesign.views.Button nextButton, settingsButton;
+	
 	public HashMap<String, ApplicationBean> appsHashMap = null;
 	public HashMap<String, ApplicationBean> randomHashMap = null;
 	Context context;
@@ -166,10 +168,10 @@ public class MainActivity extends Activity {
 			appList.setAdapter(adapter);
 
 			// Settings of click listeners of buttons on Main Screen
-			nextButton = (Button) findViewById(R.id.nextButton);
+			nextButton = (com.gc.materialdesign.views.Button) findViewById(R.id.nextButton);
 			nextButton.setOnClickListener(nextButtonClick);
 
-			settingsButton = (Button) findViewById(R.id.settingsButton);
+			settingsButton = (com.gc.materialdesign.views.Button) findViewById(R.id.settingsButton);
 			settingsButton.setOnClickListener(settingsButtonclick);
 
 			// to get randomID
@@ -292,13 +294,19 @@ public class MainActivity extends Activity {
 			else
 				spinnerIteration.setSelection(2);
 			
+//			final com.gc.materialdesign.views.CheckBox checkBoxRandom = (com.gc.materialdesign.views.CheckBox) view
+//			.findViewById(R.id.selectRandomCheckBox);
 			final CheckBox checkBoxRandom = (CheckBox) view
 					.findViewById(R.id.selectRandomCheckBox);
 			checkBoxRandom.setChecked(doRandom);
 
 			// set installCert button
-			final Button installCertButton = (Button) view
-					.findViewById(R.id.installCertButton);
+			 
+			final com.gc.materialdesign.views.ButtonRectangle installCertButton = 
+					(com.gc.materialdesign.views.ButtonRectangle) view
+				.findViewById(R.id.installCertButton);
+//			final Button installCertButton = (Button) view
+//					.findViewById(R.id.installCertButton);
 			installCertButton.setOnClickListener(installOnClick);
 
 			// (EditText)view.findViewById(R.id.settings_server_txt);
@@ -323,6 +331,7 @@ public class MainActivity extends Activity {
 							iteration = Integer
 									.parseInt((String) spinnerIteration
 											.getSelectedItem());
+//							doRandom = checkBoxRandom.isCheck();
 							doRandom = checkBoxRandom.isChecked();
 							/*Log.d("MainActivity",
 									"Iteration time: "
