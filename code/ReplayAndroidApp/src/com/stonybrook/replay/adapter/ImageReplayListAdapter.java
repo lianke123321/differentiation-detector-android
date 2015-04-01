@@ -94,6 +94,9 @@ public class ImageReplayListAdapter extends BaseAdapter {
 			tv.setTextColor(Color.parseColor("#B22222"));
 			tv1.setVisibility(View.VISIBLE);
 			tv2.setVisibility(View.VISIBLE);
+		} else if (app.status.trim().equalsIgnoreCase("IP Flipping Detected")) {
+			tv.setTypeface(null, Typeface.BOLD);
+			tv.setTextColor(Color.parseColor("#B22222"));
 		} else {
 			tv.setTypeface(null, Typeface.NORMAL);
 			tv.setTextColor(Color.parseColor("#4682B4"));
