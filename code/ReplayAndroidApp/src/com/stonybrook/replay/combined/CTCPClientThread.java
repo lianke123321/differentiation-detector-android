@@ -113,8 +113,8 @@ public class CTCPClientThread implements Runnable {
 						// IOException("Data stream ended prematurely");
 						Log.w("Receiving", "Not enough bytes! totalRead: "
 								+ totalRead + " expected: " + buffer.length);
-						String data = new String(buffer, "UTF-8");
-						Log.w("Receiving", data);
+						//String data = new String(buffer, "UTF-8");
+						//Log.w("Receiving", data);
 						break;
 					}
 					totalRead += bytesRead;
