@@ -101,7 +101,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	// adrian: for progress bar
 	ProgressBarDeterminate prgBar;
-//	ProgressBar prgBar;
+	// ProgressBar prgBar;
 	UpdateUIBean updateUIBean;
 
 	int currentReplayCount = 0;
@@ -237,7 +237,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		// adrian: for progress bar
 		prgBar = (ProgressBarDeterminate) findViewById(R.id.prgBar);
-//		prgBar = (ProgressBar) findViewById(R.id.prgBar);
+		// prgBar = (ProgressBar) findViewById(R.id.prgBar);
 		prgBar.setVisibility(View.GONE);
 		updateUIBean = new UpdateUIBean();
 
@@ -326,7 +326,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		if (resultChannelThread != null)
 			resultChannelThread.forceQuit = true;
 
-		//this.finish();
+		// this.finish();
 	}
 
 	/*@Override
@@ -708,8 +708,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			}
 		}
 
-		protected void onProgressUpdate(String... a) {
-			Log.d("Replay", "You are in progress update ... " + a[0]);
+		protected void onProgressUpdate(String... values) {
+			if (values[0].equalsIgnoreCase("updateStatus"))
+				adapter.notifyDataSetChanged();
+			else if (values[0].equalsIgnoreCase("updateUI")) {
+				if (prgBar.getVisibility() == View.GONE)
+					prgBar.setVisibility(View.VISIBLE);
+				prgBar.setProgress(updateUIBean.getProgress());
+			} else
+				Log.w("onProgressUpdate", "unknown instruction!");
+				
 		}
 
 		@Override
@@ -750,11 +758,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
 						R.string.create_side_channel);
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						adapter.notifyDataSetChanged();
-					}
-				});
+				publishProgress("updateStatus");
 
 				int sideChannelPort = Integer.valueOf(Config
 						.get("combined_sidechannel_port"));
@@ -811,11 +815,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
 						R.string.ask4permission);
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						adapter.notifyDataSetChanged();
-					}
-				});
+				publishProgress("updateStatus");
 
 				String[] permission = sideChannel.ask4Permission();
 				Log.d("Replay", "permission[0]: " + permission[0]
@@ -932,11 +932,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
 						R.string.receive_server_port_mapping);
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						adapter.notifyDataSetChanged();
-					}
-				});
+				publishProgress("updateStatus");
 
 				try {
 					// randomID = new RandomString(10).nextString();
@@ -959,11 +955,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
 						R.string.create_tcp_client);
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						adapter.notifyDataSetChanged();
-					}
-				});
+				publishProgress("updateStatus");
 
 				for (String csp : appData.getTcpCSPs()) {
 					String destIP = csp.substring(csp.lastIndexOf('-') + 1,
@@ -991,11 +983,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
 						R.string.create_udp_client);
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						adapter.notifyDataSetChanged();
-					}
-				});
+				publishProgress("updateStatus");
 
 				for (String originalClientPort : appData.getUdpClientPorts()) {
 					CUDPClient c = new CUDPClient(Config.get("publicIP"));
@@ -1018,11 +1006,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
 						R.string.run_notf);
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						adapter.notifyDataSetChanged();
-					}
-				});
+				publishProgress("updateStatus");
 
 				CombinedNotifierThread notifier = sideChannel
 						.notifierCreater(udpReplayInfoBean);
@@ -1035,11 +1019,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
 						R.string.run_receiver);
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						adapter.notifyDataSetChanged();
-					}
-				});
+				publishProgress("updateStatus");
 
 				CombinedReceiverThread receiver = new CombinedReceiverThread(
 						udpReplayInfoBean, jitterBean);
@@ -1056,20 +1036,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						Thread.currentThread().setName(
 								"UIUpdateThread (Thread)");
 						while (updateUIBean.getProgress() < 100) {
-							ReplayActivity.this.runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									// set progress bar to visible
-									if (prgBar.getVisibility() == View.GONE)
-										prgBar.setVisibility(View.VISIBLE);
-									prgBar.setProgress(updateUIBean
-											.getProgress());
-								}
-							});
+							publishProgress("updateUI");
 							try {
 								Thread.sleep(500);
 							} catch (InterruptedException e) {
-								Log.d("UpdateUI", "try to sleep failed!");
+								Log.d("UpdateUI", "sleeping interrupted!");
 							}
 						}
 
@@ -1096,11 +1067,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
 						R.string.run_sender);
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						adapter.notifyDataSetChanged();
-					}
-				});
+				publishProgress("updateStatus");
 
 				CombinedQueue queue = new CombinedQueue(appData.getQ(),
 						jitterBean);
@@ -1133,11 +1100,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				applicationBean.status = getResources().getString(
 						R.string.send_done);
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						adapter.notifyDataSetChanged();
-					}
-				});
+				publishProgress("updateStatus");
 
 				sideChannel.sendDone(duration);
 				Log.d("Replay", "replay finished using time " + duration + " s");
@@ -1154,11 +1117,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				}
 
 				applicationBean.status = message;
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						adapter.notifyDataSetChanged();
-					}
-				});
+				publishProgress("updateStatus");
 
 				sideChannel.sendJitter(randomID, Config.get("jitter"),
 						jitterBean);
@@ -1753,9 +1712,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							&& queueCombined != null
 							&& queueCombined.getStatus() == AsyncTask.Status.RUNNING)
 						queueCombined.cancel(true);
-					else {
-						Log.d("fileExistsListener", "unknown replay type!");
-					}
 				} catch (Exception e) {
 					Log.d("ReplayActivity", "exception while press back key!");
 					e.printStackTrace();
@@ -2132,7 +2088,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				i++;
 				try {
 
-					//Log.d("VPNConnected", "about to get public IP");
+					// Log.d("VPNConnected", "about to get public IP");
 					// String str = getPublicIP();
 					// if (str.equalsIgnoreCase(meddleIP)) {
 					if (CharonVpnService.getInstance() != null
@@ -2291,7 +2247,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		protected Boolean doInBackground(ReplayActivity... params) {
 			Thread.currentThread().setName("VPNDisconnected (AsyncTask)");
-			//String publicIP = Config.get("publicIP");
+			// String publicIP = Config.get("publicIP");
 			int i = 0;
 			try {
 				Thread.sleep(5000);

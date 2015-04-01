@@ -43,7 +43,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -51,7 +50,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.gc.materialdesign.views.ButtonRectangle;
 import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
@@ -81,7 +79,7 @@ public class MainActivity extends Activity {
 	 * We can provide email account here on which VPN logs can be received
 	 */
 	public static final String CONTACT_EMAIL = "contact@ankeli.me";
-	private static final String DEFAULT_ALIAS = "replay5";
+	//private static final String DEFAULT_ALIAS = "replay5";
 
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
 	public ArrayList<ApplicationBean> selectedAppsRandom = new ArrayList<ApplicationBean>();
