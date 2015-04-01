@@ -58,8 +58,8 @@ public class CTCPClientThread implements Runnable {
 
 			// handle GET payload
 			String tmp = new String(RS.getPayload(), "UTF-8");
-			if (tmp.substring(0, 3).trim().equalsIgnoreCase("GET")
-					&& client.addHeader) {
+			if (client.addHeader && tmp.length() >= 3
+					&& tmp.substring(0, 3).trim().equalsIgnoreCase("GET")) {
 				// add modified fields
 				String[] parts = tmp.split("\r\n", 2);
 				tmp = parts[0]
@@ -140,7 +140,7 @@ public class CTCPClientThread implements Runnable {
 			Log.e("TCPClientThread", "IP flipping detected!");
 			synchronized (queue) {
 				queue.ABORT = true;
-				queue.abort_reason = "IP flipping detected";
+				queue.abort_reason = "IP Flipping Detected";
 			}
 		} catch (Exception e) {
 			Log.e("TCPClientThread", "something bad happened!");
