@@ -43,13 +43,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gc.materialdesign.views.ButtonRectangle;
 import com.gc.materialdesign.views.ProgressBarDeterminate;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
@@ -918,7 +915,10 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				} else {
 					Log.d("Replay", "Permission granted.");
-					Config.set("vpnPublicIP", permission[1].trim());
+					if (channel.equalsIgnoreCase("open"))
+						Config.set("publicIP", permission[1].trim());
+					else
+						Config.set("vpnPublicIP", permission[1].trim());
 				}
 
 				// always send noIperf here

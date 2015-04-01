@@ -58,6 +58,12 @@ public class CTCPClientThread implements Runnable {
 
 			// handle GET payload
 			String tmp = new String(RS.getPayload(), "UTF-8");
+			/*Log.d("Sending", "length of string: " + tmp.length()
+					+ " length of payload: " + RS.getPayload().length);*/
+			/*if (tmp.length() >= 20)
+				Log.d("Sending", "First 20 bytes: " + tmp.substring(0, 20));
+			else
+				Log.d("Sending", "Short content: " + tmp);*/
 			if (client.addHeader && tmp.length() >= 3
 					&& tmp.substring(0, 3).trim().equalsIgnoreCase("GET")) {
 				// add modified fields
@@ -105,7 +111,10 @@ public class CTCPClientThread implements Runnable {
 					if (bytesRead < 0) {
 						// throw new
 						// IOException("Data stream ended prematurely");
-						Log.e("Receiving", "Not enough bytes!");
+						Log.w("Receiving", "Not enough bytes! totalRead: "
+								+ totalRead + " expected: " + buffer.length);
+						String data = new String(buffer, "UTF-8");
+						Log.w("Receiving", data);
 						break;
 					}
 					totalRead += bytesRead;
