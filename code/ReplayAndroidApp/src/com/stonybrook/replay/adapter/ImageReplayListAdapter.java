@@ -74,42 +74,43 @@ public class ImageReplayListAdapter extends BaseAdapter {
 
 		tv = (TextView) view.findViewById(R.id.appStatusTextView);
 		tv.setText(app.status);
-		
+
 		// here we set different color for different results
 		// TODO: These strings are hard-coded. Change it
 		if (app.status.trim().equalsIgnoreCase("Inconclusive Result")) {
 			// yellow and normal
 			tv.setTypeface(null, Typeface.NORMAL);
 			tv.setTextColor(Color.parseColor("#DAA520"));
-			
+
 			tv1.setVisibility(View.GONE);
 			tv2.setVisibility(View.GONE);
 		} else if (app.status.trim().equalsIgnoreCase("No Differentiation")) {
 			// green and normal
 			tv.setTypeface(null, Typeface.NORMAL);
 			tv.setTextColor(Color.parseColor("#228B22"));
-		} else if (app.status.trim().equalsIgnoreCase("Differentiation Detected")) {
+		} else if (app.status.trim().equalsIgnoreCase(
+				"Differentiation Detected")) {
 			// red and bold
 			tv.setTypeface(null, Typeface.BOLD);
 			tv.setTextColor(Color.parseColor("#B22222"));
 			tv1.setVisibility(View.VISIBLE);
 			tv2.setVisibility(View.VISIBLE);
-		} else if (app.status.trim().equalsIgnoreCase("IP Flipping Detected")) {
+		} else if (app.status.trim().equalsIgnoreCase(
+				"Traffic Manipulation Detected (Type 1)")) {
 			tv.setTypeface(null, Typeface.BOLD);
 			tv.setTextColor(Color.parseColor("#B22222"));
 		} else {
 			tv.setTypeface(null, Typeface.NORMAL);
 			tv.setTextColor(Color.parseColor("#4682B4"));
 		}
-				
+
 		double rate = app.rate;
-		tv2.setText(String.valueOf((int)Math.abs(app.rate * 100)) + "%");
+		tv2.setText(String.valueOf((int) Math.abs(app.rate * 100)) + "%");
 		if (rate < 0) {
 			tv1.setText("faster");
 		} else {
 			tv1.setText("slower");
 		}
-		
 
 		/*ProgressBar progress = (ProgressBar) view
 				.findViewById(R.id.appProgress);
@@ -134,43 +135,43 @@ public class ImageReplayListAdapter extends BaseAdapter {
 							.findViewById(R.id.resultDialogImg);
 
 					*//**
-					 * Not sure about the license of PhotoViewAttacher TODO :
-					 * look into the license of this and decide whether to use
-					 * it or not.
-					 *//*
+		 * Not sure about the license of PhotoViewAttacher TODO : look into
+		 * the license of this and decide whether to use it or not.
+		 */
+		/*
 
-					image.setImageDrawable(mainAct.getResources().getDrawable(
-							mainAct.getResources().getIdentifier(app.resultImg,
-									"drawable", mainAct.getPackageName())));
-					PhotoViewAttacher mAttacher = new PhotoViewAttacher(image);
-					mAttacher.update();
-					// builder.setIcon(mainAct.getResources().getDrawable(mainAct.getResources().getIdentifier(app.getImage(),
-					// "drawable", mainAct.getPackageName())));
-					builder.setView(view);
-					builder.setPositiveButton(R.string.ok,
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int id) {
-									// User clicked OK. Start a new game.
-									dialog.dismiss();
-								}
-							});
-
-					builder.create().show();
-
+		image.setImageDrawable(mainAct.getResources().getDrawable(
+			mainAct.getResources().getIdentifier(app.resultImg,
+					"drawable", mainAct.getPackageName())));
+		PhotoViewAttacher mAttacher = new PhotoViewAttacher(image);
+		mAttacher.update();
+		// builder.setIcon(mainAct.getResources().getDrawable(mainAct.getResources().getIdentifier(app.getImage(),
+		// "drawable", mainAct.getPackageName())));
+		builder.setView(view);
+		builder.setPositiveButton(R.string.ok,
+			new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog,
+						int id) {
+					// User clicked OK. Start a new game.
+					dialog.dismiss();
 				}
 			});
+
+		builder.create().show();
+
+		}
+		});
 		} else if (app.status.equalsIgnoreCase(mainAct.getResources()
-				.getString(R.string.processing))
-				|| app.status.equalsIgnoreCase(mainAct.getResources()
-						.getString(R.string.vpn))) {
-			progress.setVisibility(ProgressBar.VISIBLE);
-			button.setVisibility(Button.GONE);
+		.getString(R.string.processing))
+		|| app.status.equalsIgnoreCase(mainAct.getResources()
+		.getString(R.string.vpn))) {
+		progress.setVisibility(ProgressBar.VISIBLE);
+		button.setVisibility(Button.GONE);
 		} else {
-			progress.setVisibility(ProgressBar.INVISIBLE);
-			progress.setProgress(0);
-			button.setVisibility(Button.GONE);
+		progress.setVisibility(ProgressBar.INVISIBLE);
+		progress.setProgress(0);
+		button.setVisibility(Button.GONE);
 		}*/
 
 		ImageView img = (ImageView) view.findViewById(R.id.appImageView);

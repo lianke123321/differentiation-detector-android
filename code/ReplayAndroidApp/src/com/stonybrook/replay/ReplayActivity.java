@@ -375,7 +375,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			Config.set("server", server);
 
 			// adrian: added cause arash's code
-			// Config.set("extraString", "MoblieApp");
 			Config.set("jitter", "true");
 			// Config.set("sendMobileStats", "true");
 			// adrian: set result
@@ -915,10 +914,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					}
 				} else {
 					Log.d("Replay", "Permission granted.");
-					if (channel.equalsIgnoreCase("open"))
-						Config.set("publicIP", permission[1].trim());
-					else
-						Config.set("vpnPublicIP", permission[1].trim());
+					Config.set("publicIP", permission[1].trim());
 				}
 
 				// always send noIperf here
@@ -1002,7 +998,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				});
 
 				for (String originalClientPort : appData.getUdpClientPorts()) {
-					CUDPClient c = new CUDPClient(Config.get("vpnPublicIP"));
+					CUDPClient c = new CUDPClient(Config.get("publicIP"));
 					udpPortMapping.put(originalClientPort, c);
 				}
 				Log.d("Replay", "created clients from udpClientPorts");
@@ -2136,7 +2132,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				i++;
 				try {
 
-					Log.d("VPNConnected", "about to get public IP");
+					//Log.d("VPNConnected", "about to get public IP");
 					// String str = getPublicIP();
 					// if (str.equalsIgnoreCase(meddleIP)) {
 					if (CharonVpnService.getInstance() != null
@@ -2295,7 +2291,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		protected Boolean doInBackground(ReplayActivity... params) {
 			Thread.currentThread().setName("VPNDisconnected (AsyncTask)");
-			String publicIP = Config.get("publicIP");
+			//String publicIP = Config.get("publicIP");
 			int i = 0;
 			try {
 				Thread.sleep(5000);
@@ -2351,7 +2347,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {
-					Log.d("DisconnectVPN", "sleep failed!");
+					Log.d("DisconnectVPN", "sleep interrupted!");
 				}
 			}
 
@@ -2392,7 +2388,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		protected Boolean doInBackground(ReplayActivity... params) {
 			Thread.currentThread().setName("RandomReplay (AsyncTask)");
-			String publicIP = Config.get("publicIP");
+			String server = Config.get("server");
 			int i = 0;
 			try {
 				Thread.sleep(5000);
@@ -2404,7 +2400,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				try {
 					i++;
 					String str = getPublicIP();
-					if (str.equalsIgnoreCase(publicIP)) {
+					if (!str.equalsIgnoreCase(server)) {
 						Log.d("randomReplay", "Got it!");
 						// Set flag indicating VPN connectivity status
 						isVPNConnected = false;

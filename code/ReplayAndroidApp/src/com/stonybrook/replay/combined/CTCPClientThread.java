@@ -146,17 +146,17 @@ public class CTCPClientThread implements Runnable {
 			}
 
 		} catch (IpFlippingException e) {
-			Log.e("TCPClientThread", "IP flipping detected!");
+			Log.e("TCPClientThread", "IP Flipping Detected");
 			synchronized (queue) {
 				queue.ABORT = true;
-				queue.abort_reason = "IP Flipping Detected";
+				queue.abort_reason = "Traffic Manipulation Detected (Type 1)";
 			}
 		} catch (Exception e) {
 			Log.e("TCPClientThread", "something bad happened!");
 			// abort replay if bad things happened!
 			synchronized (queue) {
 				queue.ABORT = true;
-				queue.abort_reason = "Replay aborted due to unknown reason";
+				queue.abort_reason = "Replay Aborted";
 			}
 			e.printStackTrace();
 		} finally {
