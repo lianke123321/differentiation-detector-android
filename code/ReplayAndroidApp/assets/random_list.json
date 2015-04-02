@@ -2,10 +2,10 @@
   "apps": [
     {
         "name" : "Youtube_random",
-        "configfile" : "dropbox_d.config",
+        "configfile" : "",
         "datafile" : "youtube_360p_random.pcap_client_all.json",
-        "size" : 0.5,
-        "time" : "2 m",
+        "size" : 19.5,
+        "time" : "30 s",
         "image" : "youtube",
         "type" : "combined"
     },
@@ -13,7 +13,7 @@
         "name" : "Hangouts_random",
         "configfile" : "",
         "datafile" : "hangout_video_10secs_random.pcap_client_all.json",
-        "size" : 0.5,
+        "size" : 3.29,
         "time" : "10 s",
         "image" : "hangouts",
         "type" : "combined"
@@ -22,7 +22,7 @@
         "name" : "Skype_random",
         "configfile" : "",
         "datafile" : "skype_video_10secs_random.pcap_client_all.json",
-        "size" : 8,
+        "size" : 1,
         "time" : "10 s",
         "image" : "skype",
         "type" : "combined"
@@ -31,7 +31,7 @@
         "name" : "Spotify_random",
         "configfile" : "",
         "datafile" : "spotify_normal_15secs_random.pcap_client_all.json",
-        "size" : 8,
+        "size" : 3.31,
         "time" : "15 s",
         "image" : "spotify",
         "type" : "combined"
@@ -40,7 +40,7 @@
         "name" : "Netflix_random",
         "configfile" : "",
         "datafile" : "netflix_auto_5secs_random.pcap_client_all.json",
-        "size" : 8,
+        "size" : 30.4,
         "time" : "5 s",
         "image" : "netflix",
         "type" : "combined"
@@ -49,7 +49,7 @@
         "name" : "Viber_random",
         "configfile" : "",
         "datafile" : "viber_video_10secs_random.pcap_client_all.json",
-        "size" : 8,
+        "size" : 1.76,
         "time" : "10 s",
         "image" : "viber",
         "type" : "combined"
