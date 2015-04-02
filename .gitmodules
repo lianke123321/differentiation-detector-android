@@ -1,3 +1,5 @@
 [submodule "code/MaterialDesignLibrary"]
 	path = code/MaterialDesignLibrary
 	url = https://github.com/navasmdc/MaterialDesignLibrary.git
+
+ignore = dirty
