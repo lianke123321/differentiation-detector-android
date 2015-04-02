@@ -2,6 +2,7 @@ package com.stonybrook.replay.combined;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.SocketException;
 import java.util.concurrent.Semaphore;
 
 import android.util.Log;
@@ -113,8 +114,8 @@ public class CTCPClientThread implements Runnable {
 						// IOException("Data stream ended prematurely");
 						Log.w("Receiving", "Not enough bytes! totalRead: "
 								+ totalRead + " expected: " + buffer.length);
-						//String data = new String(buffer, "UTF-8");
-						//Log.w("Receiving", data);
+						// String data = new String(buffer, "UTF-8");
+						// Log.w("Receiving", data);
 						break;
 					}
 					totalRead += bytesRead;
@@ -151,6 +152,10 @@ public class CTCPClientThread implements Runnable {
 				queue.ABORT = true;
 				queue.abort_reason = "Traffic Manipulation Detected (Type 1)";
 			}
+		} catch (SocketException e) {
+			Log.e("TCPClientThread",
+					"SocketException happened. Temporarily ignore it.");
+			e.printStackTrace();
 		} catch (Exception e) {
 			Log.e("TCPClientThread", "something bad happened!");
 			// abort replay if bad things happened!
