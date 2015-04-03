@@ -110,7 +110,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 	String server = null;
 	String enableTiming = null;
-	int iteration = 1;
+	int iteration = 2;
 	boolean doRandom = false;
 	boolean onlyRandom = false;
 
@@ -200,7 +200,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		// Create layout for this page
 		adapter = new ImageReplayListAdapter(selectedApps, getLayoutInflater(),
-				this);
+				this, iteration, doRandom);
 
 		appsListView = (ListView) findViewById(R.id.appsListView);
 		appsListView.setAdapter(adapter);
@@ -490,8 +490,12 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				+ " applications selected.");
 		double totalSize = 0.0;
 
-		for (int i = 0; i < list.size(); i++)
-			totalSize += list.get(i).getSize();
+		for (int i = 0; i < list.size(); i++) {
+			if (doRandom)
+				totalSize += list.get(i).getSize() * 3 * iteration;
+			else
+				totalSize += list.get(i).getSize() * 2 * iteration;
+		}
 
 		DecimalFormat df = new DecimalFormat("#.##");
 		selectedAppsSizeTextView.setText(df.format(totalSize).toString()

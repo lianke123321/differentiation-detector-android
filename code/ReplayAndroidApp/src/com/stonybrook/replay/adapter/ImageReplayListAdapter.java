@@ -17,20 +17,28 @@ import com.stonybrook.replay.ReplayActivity;
 import com.stonybrook.replay.bean.ApplicationBean;
 
 public class ImageReplayListAdapter extends BaseAdapter {
-	/** The inflator used to inflate the XML layout */
+	/** The inflater used to inflate the XML layout */
 	private LayoutInflater inflator;
 
 	/** A list containing some sample data to show. */
 	private List<ApplicationBean> dataList;
 
+	private int replay_iteration;
+
 	ReplayActivity mainAct;
 
 	public ImageReplayListAdapter(List<ApplicationBean> list,
-			LayoutInflater inflator, ReplayActivity mainAct) {
+			LayoutInflater inflator, ReplayActivity mainAct, int iteration,
+			boolean doRandom) {
 		super();
 		this.inflator = inflator;
 		this.mainAct = mainAct;
-		dataList = list;
+		this.dataList = list;
+		// for each iteration there are two or three replays
+		if (doRandom)
+			this.replay_iteration = iteration * 3;
+		else
+			this.replay_iteration = iteration * 2;
 	}
 
 	@Override
@@ -67,10 +75,11 @@ public class ImageReplayListAdapter extends BaseAdapter {
 		TextView tv2 = (TextView) view.findViewById(R.id.percentTextView);
 
 		tv = (TextView) view.findViewById(R.id.appSize);
-		tv.setText(String.valueOf(app.getSize()) + " MB");
+		tv.setText(String.valueOf(app.getSize()) + " MB (x" + replay_iteration
+				+ ")");
 
 		tv = (TextView) view.findViewById(R.id.appTime);
-		tv.setText(String.valueOf(app.getTime()));
+		tv.setText(app.getTime() + " (x" + replay_iteration + ")");
 
 		tv = (TextView) view.findViewById(R.id.appStatusTextView);
 		tv.setText(app.status);
