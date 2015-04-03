@@ -4,8 +4,8 @@
         "name" : "Youtube",
         "configfile" : "",
         "datafile" : "youtube_360p.pcap_client_all.json",
-        "size" : 19.5,
-        "time" : "30 s",
+        "size" : 10.4,
+        "time" : "10 s",
         "image" : "youtube",
         "type" : "combined"
     },
@@ -13,7 +13,7 @@
         "name" : "Hangouts",
         "configfile" : "",
         "datafile" : "hangout_video_10secs.pcap_client_all.json",
-        "size" : 3.29,
+        "size" : 1.65,
         "time" : "10 s",
         "image" : "hangouts",
         "type" : "combined"
@@ -22,7 +22,7 @@
         "name" : "Skype",
         "configfile" : "",
         "datafile" : "skype_video_10secs.pcap_client_all.json",
-        "size" : 1,
+        "size" : 0.5,
         "time" : "10 s",
         "image" : "skype",
         "type" : "combined"
@@ -31,7 +31,7 @@
         "name" : "Spotify",
         "configfile" : "",
         "datafile" : "spotify_normal_15secs.pcap_client_all.json",
-        "size" : 3.31,
+        "size" : 1.93,
         "time" : "15 s",
         "image" : "spotify",
         "type" : "combined"
@@ -40,7 +40,7 @@
         "name" : "Netflix",
         "configfile" : "",
         "datafile" : "netflix_auto_5secs.pcap_client_all.json",
-        "size" : 30.4,
+        "size" : 16.4,
         "time" : "5 s",
         "image" : "netflix",
         "type" : "combined"
@@ -49,7 +49,7 @@
         "name" : "Viber",
         "configfile" : "",
         "datafile" : "viber_video_10secs.pcap_client_all.json",
-        "size" : 1.76,
+        "size" : 0.9,
         "time" : "10 s",
         "image" : "viber",
         "type" : "combined"

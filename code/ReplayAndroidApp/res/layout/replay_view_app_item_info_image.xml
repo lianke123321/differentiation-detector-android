@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:divider="#00000000"
     android:orientation="horizontal"
-    android:paddingLeft="5dp"
+    android:paddingLeft="5dip"
     android:background="@color/white" >
 
     <!-- <com.gc.materialdesign.views.Card
@@ -17,10 +17,10 @@
         android:id="@+id/appImageView"
         android:layout_width="0px"
         android:layout_weight="1"
-        android:layout_height="100dp"
-        android:paddingBottom="6dp"
-        android:paddingRight="16dp"
-        android:paddingTop="6dp"
+        android:layout_height="100dip"
+        android:paddingBottom="6dip"
+        android:paddingRight="16dip"
+        android:paddingTop="6dip"
         android:src="@drawable/dropbox"
         android:contentDescription="logo" />
 
@@ -39,7 +39,7 @@
                 android:id="@+id/appSizeLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="20dip"
                 android:text="@string/appSizeLabel"
                 android:textStyle="bold" />
 
@@ -47,15 +47,16 @@
                 android:id="@+id/appSize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="20dp"
+                android:paddingLeft="5dip"
+                android:layout_marginRight="10dip"
+                android:layout_marginTop="20dip"
                 android:text="10 M" />
 
             <TextView
                 android:id="@+id/appTimeLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="20dip"
                 android:text="@string/appTimeLabel"
                 android:textStyle="bold" />
 
@@ -63,9 +64,8 @@
                 android:id="@+id/appTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:paddingLeft="5dp"
-                android:text="20 s" />
+                android:layout_marginTop="20dip"
+                android:paddingLeft="5dip" />
         </TableRow>
 
         <TableRow
@@ -81,7 +81,7 @@
                 android:layout_span="4"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:padding="5dp"
+                android:padding="5dip"
                 android:text="@string/pending"
                 android:textColor="@color/black" />
         </TableRow>
@@ -106,9 +106,9 @@
                 android:layout_span="4"
                 android:layout_weight="2"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="10dip"
                 android:text="@string/zero_percent"
-                android:textSize="20dp"
+                android:textSize="25sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
 
@@ -127,6 +127,7 @@
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:text="@string/slower"
+                android:textSize="12sp"
                 android:textColor="@color/black"
                 android:visibility="gone" />
         </TableRow>
