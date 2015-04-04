@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Differentiation Detector</string>
     <string name="action_settings">Settings</string>
     <string name="main_page_title">Select Applications</string>
@@ -11,7 +12,6 @@
     <string name="title_activity_replay">Loading…</string>
     <string name="title_activity_crash">CrashActivity</string>
     <string name="image_name">App image</string>
-    
     <string name="Viber">Viber</string>
     <string name="Viber_random">Viber (random)</string>
     <string name="Netflix">Netflix</string>
@@ -24,7 +24,6 @@
     <string name="Youtube_random">Youtube (random)</string>
     <string name="Hangouts">Hangouts</string>
     <string name="Hangouts_random">Hangouts (random)</string>
-    
     <string name="pending">Waiting to start</string>
     <string name="start_replay">Starting the replay</string>
     <string name="processing">Processing trace</string>
@@ -47,10 +46,8 @@
     <string name="finish_open">Finished replay in the clear</string>
     <string name="finish_vpn">Finished replay over VPN</string>
     <string name="finish_random">Finished random replay</string>
-    
     <string name="crash_toast_text">Sending report for improvement</string>
     <string name="crash_activity_title">Press back button to exit!</string>
-    
     <string name="downloading">Downloading File</string>
     <string name="error">Replay aborted</string>
     <string name="vpn_connect">Trying to connect VPN</string>
@@ -62,14 +59,11 @@
     <string name="log">Log</string>
     <string name="zero_percent">0%</string>
     <string name="slower">slower</string>
-    
     <string name="errMsgTitle">An error occurred</string>
     <string name="errMsg">Sorry, the app crashed. A crash log will be sent to our server. Sorry for the inconvenience!</string>
-
     <string name="timing_label">Enable Inter-packet Timing?</string>
     <string name="timing_Yes">true</string>
     <string name="timing_No">false</string>
-    
     <string name="server_label">Select Server</string>
     <string name="server_replay">replay-s.meddle.mobi</string>
     <string name="server_hint">replay-s.meddle.mobi</string>
@@ -81,12 +75,11 @@
     <string name="select_random">Check me if you also want to run random replay for each application.</string>
     <string name="appSizeLabel">Size:</string>
     <string name="appTimeLabel">Time:</string>
-    
     <string name="install_cert_label">Click the button below if you want to reinstall the credential. Please leave the password field empty and click "OK"!</string>
     <string name="install_cert_button">Reinstall credential</string>
-    
     <string name="consent_form_title">Consent Form</string>
-    <string name="consent_form"><Data><![CDATA[ We would like to invite you to take part in a research project. The purpose of this research study is to understand how cellular Internet providers give different performance to different network traffic from your smartphone. For example, we would like to know if a provider is speeding up YouTube traffic and/or slowing down Netflix. We will use this information to understand how often this occurs, where this occurs and what are the implications. <br>
+    <string name="consent_form"><Data>
+<![CDATA[ We would like to invite you to take part in a research project. The purpose of this research study is to understand how cellular Internet providers give different performance to different network traffic from your smartphone. For example, we would like to know if a provider is speeding up YouTube traffic and/or slowing down Netflix. We will use this information to understand how often this occurs, where this occurs and what are the implications. <br>
 We are asking you to participate in this study because you are a smartphone user who has installed our app for detecting traffic differentiation. The decision to participate in this research project is voluntary. You do not have to participate and you can uninstall the app at any time. Even if you begin using the app, you can stop at any time. You must be at least 18 years of age to participate. <br>
 You can run tests from the app as many or as few times as you like. We would like you to run tests on different networks that you mobile device connects to, and at different times of day. <br>
 The possible risks or discomforts of the study are minimal. When you use the app, we will record the traffic it generates and use this data to determine whether your Internet service provider (ISP) is interfering with your network traffic in any way. If you choose to record your own app traffic for replaying, we will store this traffic as well. This data will be shared only with co-investigators, and it will not be annotated with any personally identifiable information. If available, we will collect information about your network, signal strength, operating system, and coarse-grained location (no more precise than a 1km radius of your location). <br>
@@ -95,16 +88,18 @@ Your part in this study is anonymous to the researcher(s). However, because of t
 If you have any questions about this study, please feel free to email <strong>David Choffnes</strong> at <a href="mailto:meddle-support@lists.ccs.neu.edu ">meddle-support@lists.ccs.neu.edu </a>, the person mainly responsible for the research.
 If you have any questions about your rights in this research, you may contact <strong>Nan C. Regina</strong>, Director, Human Subject Research Protection, 960 Renaissance Park, Northeastern University, Boston, MA 02115. Email: <strong>n.regina@neu.edu.</strong> You may contact anonymously if you wish. <br>
 If you have any questions regarding electronic privacy, please feel free to contact <strong>Mark Nardone</strong>, NU’s Director of Information Security via email at <strong>privacy@neu.edu</strong>. <br>
-This study has been reviewed and approved by the Northeastern University Institutional Review Board (#14-08-16). ]]> </Data> </string>
-    <string name="consent_form_condition"><Data><![CDATA[ <br> By clicking the \"Accept\" button above (top right) you are indicating that you consent to participate in this study. Please print out a copy of this consent form for your records. ]]> </Data> </string>
+This study has been reviewed and approved by the Northeastern University Institutional Review Board (#14-08-16). ]]>
+</Data></string>
+    <string name="consent_form_condition"><Data><![CDATA[ <br> By clicking the \"Accept\" button above (top right) you are indicating that you consent to participate in this study. Please print out a copy of this consent form for your records. ]]></Data></string>
     <string name="user_agree">Accept</string>
     <string name="user_disagree">Decline</string>
-    
     <string name="no_diff">No differentiation</string>
     <string name="has_diff">Differentiation detected!</string>
-    
+
     <!-- This is for mobilyzer -->
     <string name="scheduler_version_name">1.0</string>
     <string name="scheduler_priority">2</string>
-        
+    <string name="title_activity_entrance">EntranceActivity</string>
+    <string name="hello_world">Hello world!</string>
+
 </resources>

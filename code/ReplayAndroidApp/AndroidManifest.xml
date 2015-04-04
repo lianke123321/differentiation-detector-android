@@ -55,6 +55,11 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name="com.stonybrook.replay.EntranceActivity"
+            android:label="@string/title_activity_entrance"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name="com.stonybrook.android.ui.LogActivity"
             android:label="@string/log"
             android:screenOrientation="portrait" >
