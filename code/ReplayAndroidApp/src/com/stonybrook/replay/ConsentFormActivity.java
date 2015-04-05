@@ -84,7 +84,7 @@ public class ConsentFormActivity extends Activity {
 		boolean userAgreed = settings.getBoolean("userAgreed", false);
 		if (userAgreed) {
 			Intent intent = new Intent();
-			intent.setClass(ConsentFormActivity.this, MainActivity.class);
+			intent.setClass(ConsentFormActivity.this, EntranceActivity.class);
 			startActivity(intent);
 			ConsentFormActivity.this.finish();
 		}

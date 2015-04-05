@@ -2,15 +2,71 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.stonybrook.replay.EntranceActivity" >
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+        
+        <ImageView
+	        android:layout_width="150dp"
+	        android:layout_weight="3"
+	        android:layout_height="150dp"
+	        android:layout_gravity="center"
+	        android:paddingBottom="6dip"
+	        android:paddingRight="16dip"
+	        android:paddingTop="6dip"
+	        android:src="@drawable/app_icon"
+	        android:contentDescription="applogo" />
+        
+        <ImageView 
+            android:layout_width="fill_parent"
+	        android:layout_weight="1"
+	        android:layout_height="5dp"
+	        android:paddingStart="30dp"
+	        android:paddingEnd="30dp"
+	        android:layout_gravity="center"
+	        android:src="@drawable/neu_logo"
+	        android:contentDescription="neulogo" />
+        
+        <ImageView 
+            android:layout_width="fill_parent"
+	        android:layout_weight="1"
+	        android:layout_height="30dp"
+	        android:layout_gravity="center"
+	        android:src="@drawable/sbu_logo"
+	        android:contentDescription="sbulogo" />
+        
+        <LinearLayout
+            android:layout_width="fill_parent"
+        	android:layout_height="30dp"
+        	android:layout_weight="1"
+        	android:padding="15dp"
+        	android:orientation="horizontal" >
+        	<com.gc.materialdesign.views.ButtonRectangle
+		        android:id="@+id/historyButton"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+	            android:layout_marginRight="8dp"
+		        android:text = "History"
+		        android:textSize="15sp"
+	            android:textStyle="bold"
+	            android:background="@color/blue6" />
+	    	
+	    	<com.gc.materialdesign.views.ButtonRectangle
+		        android:id="@+id/intoButton"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+	            android:layout_marginRight="8dp"
+		        android:text = "New"
+		        android:textSize="15sp"
+	            android:textStyle="bold"
+	            android:background="@color/blue6" />
+	    	
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>
