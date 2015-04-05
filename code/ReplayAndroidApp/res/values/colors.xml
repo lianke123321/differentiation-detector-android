@@ -15,6 +15,10 @@
     <color name="blue2">#C5EAF8</color>
     <color name="blue1">#E2F4FB</color>
     
+    <color name="lightorange">#FFBB33</color>
+    <color name="darkorange">#FF8800</color>
+    <color name="darkerorange">#FF6F00</color>
+    
     <color name="lightblue">#1DEBE1</color>
     
     <color name="steelBlue">#4682B4</color>

@@ -15,6 +15,7 @@
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         -->
+     	<item name="colorPrimaryDark">@color/darkerorange</item>
     </style>
 
 </resources>
