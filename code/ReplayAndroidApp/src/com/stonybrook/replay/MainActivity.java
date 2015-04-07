@@ -50,6 +50,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.gc.materialdesign.views.Button;
 import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
@@ -69,7 +70,7 @@ public class MainActivity extends Activity {
 
 	// GridView on Main Screen
 	GridView appList;
-	com.gc.materialdesign.views.Button nextButton, settingsButton;
+	Button nextButton, settingsButton;
 	
 	public HashMap<String, ApplicationBean> appsHashMap = null;
 	public HashMap<String, ApplicationBean> randomHashMap = null;
@@ -166,7 +167,7 @@ public class MainActivity extends Activity {
 			appList.setAdapter(adapter);
 
 			// Settings of click listeners of buttons on Main Screen
-			nextButton = (com.gc.materialdesign.views.Button) findViewById(R.id.nextButton);
+			nextButton = (Button) findViewById(R.id.nextButton);
 			nextButton.setOnClickListener(nextButtonClick);
 
 			settingsButton = (com.gc.materialdesign.views.Button) findViewById(R.id.settingsButton);

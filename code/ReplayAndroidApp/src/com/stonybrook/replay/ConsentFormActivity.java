@@ -39,6 +39,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.TextView;
 
+import com.gc.materialdesign.views.Button;
 import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
@@ -50,7 +51,7 @@ public class ConsentFormActivity extends Activity {
 
 	// @@@ this is consent form
 	public static final String STATUS = "ConsentFormPrefsFile";
-	com.gc.materialdesign.views.ButtonRectangle agreeButton, disagreeButton; 
+	Button agreeButton, disagreeButton;
 
 	SharedPreferences settings;
 
@@ -75,6 +76,7 @@ public class ConsentFormActivity extends Activity {
 					getApplicationContext());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			Log.e("ConsentForm", "read config filename failed");
 			this.finish();
 		}
 
@@ -86,6 +88,8 @@ public class ConsentFormActivity extends Activity {
 			Intent intent = new Intent();
 			intent.setClass(ConsentFormActivity.this, EntranceActivity.class);
 			startActivity(intent);
+			ConsentFormActivity.this.overridePendingTransition(
+					R.anim.slide_in_right, R.anim.slide_out_left);
 			ConsentFormActivity.this.finish();
 		}
 
@@ -94,10 +98,10 @@ public class ConsentFormActivity extends Activity {
 		setContentView(R.layout.consent_form_layout);
 
 		// Settings of click listeners of buttons on Main Screen
-		agreeButton = (com.gc.materialdesign.views.ButtonRectangle) findViewById(R.id.agreeBtn);
+		agreeButton = (Button) findViewById(R.id.agreeBtn);
 		agreeButton.setOnClickListener(agreeButtonClick);
 
-		disagreeButton = (com.gc.materialdesign.views.ButtonRectangle) findViewById(R.id.disagreeBtn);
+		disagreeButton = (Button) findViewById(R.id.disagreeBtn);
 		disagreeButton.setOnClickListener(disagreeButtonClick);
 
 		// Set consent form content as HTML
@@ -248,8 +252,10 @@ public class ConsentFormActivity extends Activity {
 		mDataSource.insertProfile(mProfile);
 
 		Intent intent = new Intent();
-		intent.setClass(ConsentFormActivity.this, MainActivity.class);
+		intent.setClass(ConsentFormActivity.this, EntranceActivity.class);
 		startActivity(intent);
+		ConsentFormActivity.this.overridePendingTransition(
+				R.anim.slide_in_right, R.anim.slide_out_left);
 		ConsentFormActivity.this.finish();
 
 	}
