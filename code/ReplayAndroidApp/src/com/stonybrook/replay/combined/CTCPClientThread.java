@@ -125,6 +125,7 @@ public class CTCPClientThread implements Runnable {
 				if (data.length() >= 12
 						&& data.substring(0, 12).trim()
 								.equalsIgnoreCase("WhoTheFAreU?")) {
+					Log.e("TCPClientThread", data);
 					throw new IpFlippingException();
 				}
 				/*else
