@@ -96,7 +96,7 @@ This study has been reviewed and approved by the Northeastern University Institu
     <string name="user_disagree">Decline</string>
     <string name="no_diff">No differentiation</string>
     <string name="has_diff">Differentiation detected!</string>
-    <string name="history_button">See History Result</string>
+    <string name="history_button">History Result</string>
     <string name="start_button">Start</string>
 
     <!-- This is for mobilyzer -->
