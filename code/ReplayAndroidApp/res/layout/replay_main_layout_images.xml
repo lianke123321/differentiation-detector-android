@@ -7,8 +7,8 @@
     <LinearLayout
         android:id="@+id/ll1"
         android:layout_width="match_parent"
-        android:layout_height="50sp"
-        android:background="@color/blue14"
+        android:layout_height="47dp"
+        android:background="@color/darkorange"
         android:orientation="horizontal" >
 
         <com.gc.materialdesign.views.ButtonRectangle
@@ -21,7 +21,7 @@
             android:minWidth="0dp"
             android:padding="5dp"
             android:text="@string/back_button"
-            android:background="@color/blue6"
+            android:background="@color/darkerorange"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
             android:textStyle="bold" /> 
@@ -52,7 +52,7 @@
             android:shadowDy="0"
             android:shadowRadius="10"
             android:text="@string/replay"
-            android:background="@color/blue6"
+            android:background="@color/darkerorange"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -75,6 +75,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/summaryLinearLayout"
+        android:background="@color/lightorange"
         android:orientation="horizontal" >
         
         <com.gc.materialdesign.views.ProgressBarDeterminate
@@ -84,7 +85,7 @@
         	android:layout_width="match_parent"
         	android:layout_height="5sp"
         	android:max="100"
-        	android:progress="0"  />
+        	android:progress="0"/>
         
         <!-- <ProgressBar 
             android:id="@+id/prgBar"
@@ -102,7 +103,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/blue1"
+        android:background="@color/darkorange"
         android:orientation="horizontal" >
 
         <TextView
@@ -111,7 +112,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="10dp"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="@dimen/main_title_text_size"
             android:textStyle="bold"
              android:gravity="right"
@@ -124,7 +125,7 @@
             android:layout_weight="1"
             android:gravity="right"
             android:padding="10dp"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="@dimen/main_title_text_size"
             android:textStyle="bold" />
     </LinearLayout>

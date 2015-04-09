@@ -5,8 +5,8 @@
     <LinearLayout
         android:id="@+id/ll1"
         android:layout_width="fill_parent"
-        android:layout_height="47sp"
-        android:background="@color/blue14"
+        android:layout_height="47dp"
+        android:background="@color/darkorange"
         android:orientation="horizontal"
         android:gravity="center" >
 
@@ -21,7 +21,7 @@
 	        android:textSize="15sp"
             android:textStyle="bold"
             android:padding="5dp"
-            android:background="@color/blue6">
+            android:background="@color/darkerorange">
     	</com.gc.materialdesign.views.ButtonRectangle>
 
         <TextView
@@ -46,7 +46,7 @@
 	        android:textSize="15sp"
             android:textStyle="bold"
             android:padding="5dp"
-            android:background="@color/blue6">
+            android:background="@color/darkerorange">
     	</com.gc.materialdesign.views.ButtonRectangle>
     </LinearLayout>
 

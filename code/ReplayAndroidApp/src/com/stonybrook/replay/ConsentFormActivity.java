@@ -19,7 +19,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,14 +28,14 @@ import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.security.KeyChain;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.TextView;
 
 import com.gc.materialdesign.views.Button;
@@ -47,11 +46,12 @@ import com.stonybrook.android.data.VpnType;
 import com.stonybrook.replay.constant.ReplayConstants;
 import com.stonybrook.replay.util.Config;
 
-public class ConsentFormActivity extends Activity {
+public class ConsentFormActivity extends ActionBarActivity {
 
 	// @@@ this is consent form
 	public static final String STATUS = "ConsentFormPrefsFile";
 	Button agreeButton, disagreeButton;
+	Toolbar consentFormToolbar;
 
 	SharedPreferences settings;
 
@@ -60,7 +60,7 @@ public class ConsentFormActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
 			finish();
@@ -96,6 +96,11 @@ public class ConsentFormActivity extends Activity {
 		this.gateway = Config.get("vpn_server");
 
 		setContentView(R.layout.consent_form_layout);
+		consentFormToolbar = (Toolbar) findViewById(R.id.consentform_bar);
+		setSupportActionBar(consentFormToolbar);
+		getSupportActionBar().setTitle(getString(R.string.consent_form_title));
+		consentFormToolbar.setTitleTextColor(getResources().getColor(R.color.white));
+
 
 		// Settings of click listeners of buttons on Main Screen
 		agreeButton = (Button) findViewById(R.id.agreeBtn);
@@ -127,13 +132,6 @@ public class ConsentFormActivity extends Activity {
 			finish();
 		}
 		return super.onKeyDown(keyCode, event);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
 	}
 
 	OnClickListener agreeButtonClick = new OnClickListener() {
