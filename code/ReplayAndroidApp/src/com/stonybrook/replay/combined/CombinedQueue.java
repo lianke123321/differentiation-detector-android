@@ -112,7 +112,7 @@ public class CombinedQueue {
 					sendSema.acquire();
 
 				}
-				
+
 				if (ABORT == true) {
 					Log.d("Queue", "replay aborted!");
 					break;
@@ -238,6 +238,7 @@ public class CombinedQueue {
 			Log.d("sendUDP", "something bad happened!");
 			e.printStackTrace();
 			ABORT = true;
+			abort_reason = "Replay Aborted: " + e.getMessage();
 		}
 
 	}

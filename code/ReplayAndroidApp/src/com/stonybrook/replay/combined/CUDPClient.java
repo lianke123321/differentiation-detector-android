@@ -50,7 +50,7 @@ public class CUDPClient /* implements Runnable */{
 				.parseInt(instance.port)));*/
 		this.channel.send(ByteBuffer.wrap(payload), new InetSocketAddress(
 				instance.server, Integer.parseInt(instance.port)));
-
+		//throw new SocketException();
 	}
 
 }

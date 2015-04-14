@@ -712,6 +712,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			}
 		}
 
+		// this method handles all UI updates, running on main thread
 		protected void onProgressUpdate(String... values) {
 			if (values[0].equalsIgnoreCase("updateStatus"))
 				adapter.notifyDataSetChanged();
@@ -719,9 +720,32 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				if (prgBar.getVisibility() == View.GONE)
 					prgBar.setVisibility(View.VISIBLE);
 				prgBar.setProgress(updateUIBean.getProgress());
+			} else if (values[0].equalsIgnoreCase("finishProgress")) {
+				prgBar.setProgress(0);
+				prgBar.setVisibility(View.GONE);
+			} else if (values[0].equalsIgnoreCase("makeToast")) {
+				Toast.makeText(ReplayActivity.this, values[1],
+						Toast.LENGTH_LONG).show();
+			} else if (values[0].equalsIgnoreCase("makeDialog")) {
+				new AlertDialog.Builder(ReplayActivity.this,
+						AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+						.setTitle("Error")
+						.setMessage(values[1])
+						.setPositiveButton("OK",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										queueCombined.cancel(true);
+										disconnectVPN();
+										if (resultChannelThread != null)
+											resultChannelThread.forceQuit = true;
+										ReplayActivity.this.finish();
+									}
+								}).show();
 			} else
-				Log.w("onProgressUpdate", "unknown instruction!");
-				
+				Log.e("onProgressUpdate", "unknown instruction!");
+
 		}
 
 		@Override
@@ -736,13 +760,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 			}*/
 
 			if (channel.equalsIgnoreCase("open") && currentIterationCount == 0) {
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						Toast.makeText(ReplayActivity.this,
-								"First iteration of current replay!",
-								Toast.LENGTH_LONG).show();
-					}
-				});
+				publishProgress("makeToast",
+						"First iteration of current replay!");
 			}
 
 			this.appData = appData_combined;
@@ -826,99 +845,51 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						+ " permission[1]: " + permission[1]);
 				if (permission[0].trim().equalsIgnoreCase("0")) {
 					if (permission[1].trim().equalsIgnoreCase("1")) {
-						ReplayActivity.this.runOnUiThread(new Runnable() {
-							public void run() {
-								new AlertDialog.Builder(ReplayActivity.this,
-										AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-										.setTitle("Error")
-										.setMessage(
-												"No such replay on server!\n"
-														+ "Click \"OK\" to go back.")
-										.setPositiveButton(
-												"OK",
-												new DialogInterface.OnClickListener() {
-													@Override
-													public void onClick(
-															DialogInterface dialog,
-															int which) {
-														queueCombined
-																.cancel(true);
-														disconnectVPN();
-														if (resultChannelThread != null)
-															resultChannelThread.forceQuit = true;
-														ReplayActivity.this
-																.finish();
-													}
-												}).show();
-							}
-
-						});
+						publishProgress("makeDialog",
+								"No such replay on server!\n"
+										+ "Click \"OK\" to go back.");
 						Thread.sleep(30000);
 						throw new Exception();
 					} else if (permission[1].trim().equalsIgnoreCase("2")) {
-						ReplayActivity.this.runOnUiThread(new Runnable() {
-							public void run() {
-								new AlertDialog.Builder(ReplayActivity.this,
-										AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-										.setTitle("Error")
-										.setMessage(
-												"No permission: another client with same IP address is running. "
-														+ "Wait for it to finish!\n"
-														+ "Click \"OK\" to go back.")
-										.setPositiveButton(
-												"OK",
-												new DialogInterface.OnClickListener() {
-													@Override
-													public void onClick(
-															DialogInterface dialog,
-															int which) {
-														queueCombined
-																.cancel(true);
-														disconnectVPN();
-														if (resultChannelThread != null)
-															resultChannelThread.forceQuit = true;
-														ReplayActivity.this
-																.finish();
-													}
-												}).show();
-							}
-
-						});
+						publishProgress("makeDialog",
+								"No permission: another client with same IP address is running. "
+										+ "Wait for it to finish!\n"
+										+ "Click \"OK\" to go back.");
 						Thread.sleep(30000);
 						throw new Exception();
 					} else {
-						ReplayActivity.this.runOnUiThread(new Runnable() {
-							public void run() {
-								new AlertDialog.Builder(ReplayActivity.this,
-										AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-										.setTitle("Error")
-										.setMessage(
-												"Unknown error!\n"
-														+ "Click \"OK\" to go back.")
-										.setPositiveButton(
-												"OK",
-												new DialogInterface.OnClickListener() {
-													@Override
-													public void onClick(
-															DialogInterface dialog,
-															int which) {
-														queueCombined
-																.cancel(true);
-														disconnectVPN();
-														if (resultChannelThread != null)
-															resultChannelThread.forceQuit = true;
-														ReplayActivity.this
-																.finish();
-													}
-												}).show();
-							}
-						});
+						publishProgress("makeDialog", "Unknown error!\n"
+								+ "Click \"OK\" to go back.");
 						Thread.sleep(30000);
 						throw new Exception();
 					}
 				} else {
-					Log.d("Replay", "Permission granted.");
-					Config.set("publicIP", permission[1].trim());
+					if (!Config.get("publicIP").trim()
+							.equalsIgnoreCase(permission[1].trim())) {
+						/**
+						 * only enable addHeader if replay is not over vpn,
+						 * cause when replay over vpn, two public IP must be
+						 * different (one of them is local ip)
+						 */
+						if (!this.channel.equalsIgnoreCase("vpn")
+								&& !getPublicIP().trim().equalsIgnoreCase(
+										permission[1].trim())) {
+							Log.w("Replay",
+									"IP flipping detected! enable addHeader. "
+											+ "Old ip: "
+											+ Config.get("publicIP")
+											+ " new ip: "
+											+ permission[1].trim());
+							Config.set("addHeader", "true");
+						}
+						// always set to ip from server if there is difference
+						Config.set("publicIP", permission[1].trim());
+					} else {
+						// if IP is consistent, disable addHeader
+						Log.d("Replay",
+								"public IP consistent. disable addHeader");
+						Config.set("addHeader", "false");
+					}
 				}
 
 				// always send noIperf here
@@ -1049,15 +1020,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						}
 
 						// make progress bar to be 100%
-						ReplayActivity.this.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								// set progress bar to visible
-								if (prgBar.getVisibility() == View.GONE)
-									prgBar.setVisibility(View.VISIBLE);
-								prgBar.setProgress(100);
-							}
-						});
+						publishProgress("updateUI");
 
 						Log.d("UpdateUI", "completed!");
 					}
@@ -1080,24 +1043,15 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 						udpReplayInfoBean, serverPortsMap.get("udp"),
 						Boolean.valueOf(Config.get("timing")), server);
 
-				// if sender aborted, throw exception here
-				// queue.ABORT = true;
-				if (queue.ABORT == true) {
-					Log.d("Replay", "replay aborted!");
-					// throw new ReplayAbortedException();
-					notifier.doneSending = true;
-					receiver.keepRunning = false;
-				} else {
+				// waiting for all threads to finish
+				Log.d("Replay", "waiting for all threads to die!");
 
-					// waiting for all threads to finish
-					Log.d("Replay", "waiting for all threads to die!");
+				Thread.sleep(1000);
+				notifier.doneSending = true;
+				notfThread.join();
+				receiver.keepRunning = false;
+				rThread.join();
 
-					Thread.sleep(1000);
-					notifier.doneSending = true;
-					notfThread.join();
-					receiver.keepRunning = false;
-					rThread.join();
-				}
 				// Telling server done with replaying
 				double duration = ((double) (System.nanoTime() - this.timeStarted)) / 1000000000;
 
@@ -1114,6 +1068,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				// adrian: update progress
 				String message = "";
 				if (queue.ABORT == true) {
+					Log.w("Replay", "replay aborted!");
 					message = queue.abort_reason;
 					success = false;
 				} else {
@@ -1133,26 +1088,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				sideChannel.closeSideChannelSocket();
 
 				// set progress bar to invisible
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						prgBar.setProgress(0);
-						prgBar.setVisibility(View.GONE);
-					}
-				});
+				publishProgress("finishProgress");
 
 			} catch (ConnectException ce) {
 				Log.d("Replay", "Server unavailable!");
 				ce.printStackTrace();
 				success = false;
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						Toast.makeText(
-								context,
-								"Sorry, our server is currently not running. "
-										+ "Please try another time.",
-								Toast.LENGTH_LONG).show();
-					}
-				});
+
+				publishProgress("makeToast",
+						"Sorry, our server is currently not running. "
+								+ "Please try another time.");
 				this.cancel(true);
 				if (resultChannelThread != null)
 					resultChannelThread.forceQuit = true;
@@ -1191,13 +1136,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				success = false;
 				Log.d("Replay", "replay failed due to unknow reason!");
 				ex.printStackTrace();
-				ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						Toast.makeText(context,
-								"Sorry, replay failed due to unknown reason.",
-								Toast.LENGTH_LONG).show();
-					}
-				});
+
+				publishProgress("makeToast",
+						"Sorry, replay failed due to unknown reason.");
 				// throw new RuntimeException();
 				this.cancel(true);
 				// ACRA.getErrorReporter().handleException(ex);

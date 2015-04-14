@@ -162,7 +162,7 @@ public class CTCPClientThread implements Runnable {
 			// abort replay if bad things happened!
 			synchronized (queue) {
 				queue.ABORT = true;
-				queue.abort_reason = "Replay Aborted";
+				queue.abort_reason = "Replay Aborted: " + e.getMessage();
 			}
 			e.printStackTrace();
 		} finally {
