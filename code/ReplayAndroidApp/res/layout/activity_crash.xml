@@ -5,8 +5,8 @@
     <LinearLayout
         android:id="@+id/errTitleLinearLayout"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/blue14"
+        android:layout_height="47dp"
+        android:background="@color/darkorange"
         android:orientation="horizontal" >
 
         <TextView

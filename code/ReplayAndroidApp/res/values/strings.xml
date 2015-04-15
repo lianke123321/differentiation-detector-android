@@ -91,7 +91,7 @@ If you have any questions about your rights in this research, you may contact <s
 If you have any questions regarding electronic privacy, please feel free to contact <strong>Mark Nardone</strong>, NU’s Director of Information Security via email at <strong>privacy@neu.edu</strong>. <br>
 This study has been reviewed and approved by the Northeastern University Institutional Review Board (#14-08-16). ]]>
 </Data></string>
-    <string name="consent_form_condition"><Data><![CDATA[ <br> By clicking the \"Accept\" button above (top right) you are indicating that you consent to participate in this study. Please print out a copy of this consent form for your records. ]]></Data></string>
+    <string name="consent_form_condition"><Data><![CDATA[ <br> By clicking the \"Accept\" button below you are indicating that you consent to participate in this study. Please print out a copy of this consent form for your records. ]]></Data></string>
     <string name="user_agree">Accept</string>
     <string name="user_disagree">Decline</string>
     <string name="no_diff">No differentiation</string>
