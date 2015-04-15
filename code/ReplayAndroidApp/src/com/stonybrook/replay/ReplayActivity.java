@@ -896,11 +896,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								&& !getPublicIP().trim().equalsIgnoreCase(
 										permission[1].trim())) {
 							Log.w("Replay",
-									"IP flipping detected! enable addHeader. "
-											+ "Old ip: "
-											+ Config.get("publicIP")
-											+ " new ip: "
-											+ permission[1].trim());
+									"IP flipping detected! enable addHeader.");
 							Config.set("addHeader", "true");
 						}
 						// always set to ip from server if there is difference
