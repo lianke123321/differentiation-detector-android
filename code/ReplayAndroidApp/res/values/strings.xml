@@ -98,6 +98,7 @@ This study has been reviewed and approved by the Northeastern University Institu
     <string name="has_diff">Differentiation detected!</string>
     <string name="history_button">History Result</string>
     <string name="start_button">Start</string>
+    <string name="default_result">No previous result available</string>
 
     <!-- This is for mobilyzer -->
     <string name="scheduler_version_name">1.0</string>

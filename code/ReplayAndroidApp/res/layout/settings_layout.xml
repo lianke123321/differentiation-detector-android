@@ -64,6 +64,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:background="@color/orange1"
             android:entries="@array/iteration"
             android:padding="10dp"
             android:prompt="@string/iteration_2" />

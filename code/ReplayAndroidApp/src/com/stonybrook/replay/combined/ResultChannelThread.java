@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -17,6 +19,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.stonybrook.replay.ReplayActivity;
@@ -37,6 +41,10 @@ public class ResultChannelThread implements Runnable {
 	public volatile boolean forceQuit = false;
 	public volatile int counter = 0;
 
+	// for storing results
+	private SharedPreferences settings;
+	Set<String> results;
+
 	private String path;
 	private String analyzerServerUrl = null;
 	private String id;
@@ -49,7 +57,7 @@ public class ResultChannelThread implements Runnable {
 	public ResultChannelThread(ReplayActivity replayAct, String path, int port,
 			String id, ArrayList<ApplicationBean> selectedApps,
 			String finishVpn, String finishRandom,
-			ImageReplayListAdapter adapter) {
+			ImageReplayListAdapter adapter, SharedPreferences settings) {
 		this.replayAct = replayAct;
 		this.path = path;
 		this.analyzerServerUrl = ("http://" + path + ":" + port + "/Results");
@@ -58,6 +66,8 @@ public class ResultChannelThread implements Runnable {
 		this.finishVpn = finishVpn;
 		this.finishRandom = finishRandom;
 		this.adapter = adapter;
+		this.settings = settings;
+		this.results = new HashSet<String>();
 		Log.d("Result Channel",
 				"path: " + this.path + " port: " + String.valueOf(port)
 						+ " finishVpn: " + this.finishVpn + " finishRandom: "
@@ -144,7 +154,8 @@ public class ResultChannelThread implements Runnable {
 									.getJSONArray("response");
 
 							if (raw_response.length() == 0) {
-								// if client cannot get result after 5 attempts, give up
+								// if client cannot get result after 5 attempts,
+								// give up
 								// and display another message
 								if (giveupCounter[i] > 0) {
 									giveupCounter[i] -= 1;
@@ -162,6 +173,8 @@ public class ResultChannelThread implements Runnable {
 
 							counter -= 1;
 							JSONObject response = raw_response.getJSONObject(0);
+							Log.d("Result Channel",
+									"response: " + response.toString());
 
 							String userID = response.getString("userID");
 							double rate = response.getDouble("rate");
@@ -193,18 +206,10 @@ public class ResultChannelThread implements Runnable {
 											+ response.toString());
 									selectedApps.get(i).status = "Result error";
 								} else {
+									// put new result into array list
+									Log.d("Result Channel", "put result to set");
+									results.add(response.toString());
 
-									/*switch (diff) {
-									    case -1:
-									        selectedApps.get(i).status = "No differentiation";
-									    case 0:
-									        selectedApps.get(i).status = "There might be differentiation";
-									    case 1:
-									        selectedApps.get(i).status = "Differentiation detected!";
-									    default:
-									        selectedApps.get(i).status = "unknown result! "
-									                + String.valueOf(diff);
-									}*/
 									if (diff == -1) {
 										selectedApps.get(i).status = "No Differentiation";
 										selectedApps.get(i).rate = rate;
@@ -236,13 +241,22 @@ public class ResultChannelThread implements Runnable {
 				}
 
 				if (doneReplay && counter == 0) {
-					Log.d("Result Channel", "Done replay! Exiting thread.");
+					Log.d("Result Channel", "Done replay");
+					// put results into shared preference
+					if (!results.isEmpty()) {
+						Log.d("Result Channel", "Storing results");
+						Editor editor = settings.edit();
+						editor.putStringSet("lastResult", results);
+						editor.commit();
+					}
+
 					counter = -1;
+					Log.d("Result Channel", "Exiting normally");
 					break;
 				}
 
 				if (forceQuit) {
-					Log.d("Result Channel", "Force quit!");
+					Log.w("Result Channel", "Force quit!");
 					break;
 				}
 

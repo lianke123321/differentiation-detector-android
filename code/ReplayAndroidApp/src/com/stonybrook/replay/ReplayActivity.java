@@ -87,6 +87,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	// add SharedPreferences for consent form
 	public static final String STATUS = "ReplayActPrefsFile";
 	SharedPreferences settings;
+	boolean networkAvailable = true;
 
 	com.gc.materialdesign.views.ButtonRectangle backButton, replayButton;
 	ArrayList<ApplicationBean> selectedApps = null;
@@ -163,6 +164,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		// First check to see of Internet access is available
+
 		if (!isNetworkAvailable()) {
 			new AlertDialog.Builder(this,
 					AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
@@ -176,6 +178,9 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 									ReplayActivity.this.finish();
 								}
 							}).show();
+			networkAvailable = false;
+		} else {
+			(new GetReplayServerAndMeddleIP()).execute("");
 		}
 
 		// Extract data that was sent by previous activity. In our case, list of
@@ -188,8 +193,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		for (int i = 0; i < selectedApps.size(); i++)
 			Log.d("Replay", "selected JSON name: " + selectedApps.get(i).name
 					+ " " + selectedAppsRandom.get(i).name);
-
-		(new GetReplayServerAndMeddleIP()).execute("");
 
 		enableTiming = (String) getIntent().getStringExtra("timing");
 		iteration = (int) getIntent().getIntExtra("iteration", 1);
@@ -260,16 +263,16 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		vpnDisconnected = new VPNDisconnected();
 		randomReplay = new RandomReplay();
 
-		while (server == null) {
+		/*while (server == null) {
 			try {
+				Log.w("Replay", "Main thread sleeping!");
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.w("Replay", "sleeping interrupted");
 			}
-		}
+		}*/
 
-		if (server.split("\\.").length == 4) {
+		if (networkAvailable) {
 			Toast.makeText(context,
 					"Please click \"Start\" to start the replay!",
 					Toast.LENGTH_SHORT).show();
@@ -297,6 +300,20 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		// throw new RuntimeException("Crash!");
 		// ACRA.getErrorReporter().handleSilentException(
 		// new RuntimeException("test ACRA"));
+		
+		// test result sharing
+		/*Set<String> results = new HashSet<String>();
+		results.add("{\"replayName\":\"youtube-360p\",\"diff\":0,\"rate\":0}");
+		results.add("{\"replayName\":\"viber-video-10secs\",\"diff\":1,\"rate\":0.3}");
+		results.add("{\"replayName\":\"skype-video-10secs\",\"diff\":1,\"rate\":-0.24}");
+		results.add("{\"replayName\":\"hangout-video-10secs\",\"diff\":-1,\"rate\":0}");
+		results.add("{\"replayName\":\"netflix-auto-5secs\",\"diff\":0,\"rate\":0}");
+		results.add("{\"replayName\":\"spotify-normal-15secs\",\"diff\":1,\"rate\":0.735}");
+		Log.d("Replay", "fake results: " + results.toString());
+		Editor editor = settings.edit();
+		editor.putStringSet("lastResult", results);
+		editor.commit();*/
+		
 	}
 
 	@Override
@@ -353,7 +370,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	/**
 	 * This method is entry point for any application replay Here, first server
 	 * reachability is checked and according to type of app (TCP or UDP) request
-	 * is forwarded to methos
+	 * is forwarded to methods
 	 */
 	void processApplicationReplay() {
 
@@ -405,7 +422,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 								.get("result_port")), randomID, selectedApps,
 						getResources().getString(R.string.finish_vpn),
 						getResources().getString(R.string.finish_random),
-						adapter);
+						adapter, settings);
 				resultThread = new Thread(resultChannelThread);
 				resultThread.start();
 
@@ -565,7 +582,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 
 		@Override
 		public void onClick(View v) {
-			if (!replayOngoing) {
+			if (!networkAvailable) {
+				Toast.makeText(context,
+						"Network not available, please re-open this app after connecting to network.",
+						Toast.LENGTH_LONG).show();
+			} else if (!replayOngoing) {
 				currentReplayCount = 0;
 				processApplicationReplay();
 

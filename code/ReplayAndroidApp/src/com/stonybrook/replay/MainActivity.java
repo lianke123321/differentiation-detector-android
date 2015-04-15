@@ -37,7 +37,6 @@ import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
 import android.util.Base64;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -71,7 +70,7 @@ public class MainActivity extends Activity {
 	// GridView on Main Screen
 	GridView appList;
 	Button nextButton, settingsButton;
-	
+
 	public HashMap<String, ApplicationBean> appsHashMap = null;
 	public HashMap<String, ApplicationBean> randomHashMap = null;
 	Context context;
@@ -80,7 +79,7 @@ public class MainActivity extends Activity {
 	 * We can provide email account here on which VPN logs can be received
 	 */
 	public static final String CONTACT_EMAIL = "contact@ankeli.me";
-	//private static final String DEFAULT_ALIAS = "replay5";
+	// private static final String DEFAULT_ALIAS = "replay5";
 
 	public ArrayList<ApplicationBean> selectedApps = new ArrayList<ApplicationBean>();
 	public ArrayList<ApplicationBean> selectedAppsRandom = new ArrayList<ApplicationBean>();
@@ -136,7 +135,7 @@ public class MainActivity extends Activity {
 			 * First check to see of Internet access is available
 			 * TODO : Identify if connection is WiFi or Cellular
 			 */
-			if (!isNetworkAvailable()) {
+			/*if (!isNetworkAvailable()) {
 				new AlertDialog.Builder(this,
 						AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
 						.setTitle("Network Error")
@@ -149,7 +148,7 @@ public class MainActivity extends Activity {
 										MainActivity.this.finish();
 									}
 								}).show();
-			}
+			}*/
 			context = MainActivity.this.getApplicationContext();
 
 			// This method parses JSON file which contains details for different
@@ -233,16 +232,16 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	@Override
+	/*@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
 			super.onDestroy();
 			finish();
-			/*System.runFinalization();
-			System.exit(0);*/
+			System.runFinalization();
+			System.exit(0);
 		}
 		return super.onKeyDown(keyCode, event);
-	}
+	}*/
 
 	/**
 	 * This method is executed when user clicks on settings button on main
@@ -277,7 +276,7 @@ public class MainActivity extends Activity {
 				spinnerTiming.setSelection(0);
 			else
 				spinnerTiming.setSelection(1);
-			
+
 			/*final Spinner spinnerServer = (Spinner) view
 					.findViewById(R.id.settings_server);*/
 			final EditText textServer = (EditText) view
@@ -292,32 +291,24 @@ public class MainActivity extends Activity {
 				spinnerIteration.setSelection(1);
 			else
 				spinnerIteration.setSelection(2);
-			
-//			final com.gc.materialdesign.views.CheckBox checkBoxRandom = (com.gc.materialdesign.views.CheckBox) view
-//			.findViewById(R.id.selectRandomCheckBox);
+
+			// final com.gc.materialdesign.views.CheckBox checkBoxRandom =
+			// (com.gc.materialdesign.views.CheckBox) view
+			// .findViewById(R.id.selectRandomCheckBox);
 			final CheckBox checkBoxRandom = (CheckBox) view
 					.findViewById(R.id.selectRandomCheckBox);
 			checkBoxRandom.setChecked(doRandom);
 
 			// set installCert button
-			 
-			final com.gc.materialdesign.views.ButtonRectangle installCertButton = 
-					(com.gc.materialdesign.views.ButtonRectangle) view
-				.findViewById(R.id.installCertButton);
-//			final Button installCertButton = (Button) view
-//					.findViewById(R.id.installCertButton);
+
+			final com.gc.materialdesign.views.ButtonRectangle installCertButton = (com.gc.materialdesign.views.ButtonRectangle) view
+					.findViewById(R.id.installCertButton);
+			// final Button installCertButton = (Button) view
+			// .findViewById(R.id.installCertButton);
 			installCertButton.setOnClickListener(installOnClick);
 
 			// (EditText)view.findViewById(R.id.settings_server_txt);
 
-			/**
-			 * This will be called when user presses OK button on the dialog.
-			 * This will save user preferences. TODO: Here, user preference
-			 * saving scope is only session based i.e. If user closes the
-			 * application then all the saved preferences lost. Store this
-			 * preferences globally. For this Shared preferences can be used
-			 * which should be easy to do.
-			 */
 			builder.setPositiveButton(R.string.ok,
 					new DialogInterface.OnClickListener() {
 						@Override
@@ -330,7 +321,7 @@ public class MainActivity extends Activity {
 							iteration = Integer
 									.parseInt((String) spinnerIteration
 											.getSelectedItem());
-//							doRandom = checkBoxRandom.isCheck();
+							// doRandom = checkBoxRandom.isCheck();
 							doRandom = checkBoxRandom.isChecked();
 							/*Log.d("MainActivity",
 									"Iteration time: "
