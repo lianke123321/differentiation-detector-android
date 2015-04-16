@@ -18,7 +18,7 @@ public final class CombinedReceiverThread implements Runnable {
 	private int bufSize = 4096;
 	private long jitterTimeOrigin = 0;
 	// changes of Arash
-	public volatile boolean keepRunning;
+	public volatile boolean keepRunning = true;
 	private int TIME_OUT = 1000;
 
 	// adrian: for jitter
@@ -29,7 +29,6 @@ public final class CombinedReceiverThread implements Runnable {
 		super();
 		this.udpReplayInfoBean = udpReplayInfoBean;
 		this.jitterBean = jitterBean;
-		this.keepRunning = true;
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.stonybrook.replay;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
@@ -69,7 +70,6 @@ import com.stonybrook.replay.combined.CombinedReceiverThread;
 import com.stonybrook.replay.combined.CombinedSideChannel;
 import com.stonybrook.replay.combined.ResultChannelThread;
 import com.stonybrook.replay.exception_handler.ExceptionHandler;
-import com.stonybrook.replay.exception_handler.ReplayAbortedException;
 import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.Mobilyzer;
 import com.stonybrook.replay.util.ReplayCompleteListener;
@@ -1119,7 +1119,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				publishProgress("finishProgress");
 
 			} catch (ConnectException ce) {
-				Log.d("Replay", "Server unavailable!");
+				Log.w("Replay", "Server unavailable!");
 				ce.printStackTrace();
 				success = false;
 
@@ -1131,38 +1131,36 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			} catch (JSONException ex) {
-				Log.d("Replay", "Error parsing JSON");
+				Log.e("Replay", "Error parsing JSON");
 				ex.printStackTrace();
+				success = false;
 				this.cancel(true);
+				if (resultChannelThread != null)
+					resultChannelThread.forceQuit = true;
 				// ACRA.getErrorReporter().handleException(ex);
 				// ReplayActivity.this.finish();
 			} catch (InterruptedException ex) {
-				Log.d("Replay", "Replay interrupted!");
-				this.cancel(true);
-			} catch (ReplayAbortedException ex) {
+				Log.w("Replay", "Replay interrupted!");
 				success = false;
-				Log.d("Replay", "replay aborted!");
-				ex.printStackTrace();
-				/*ReplayActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						Toast.makeText(
-								context,
-								"Sorry, we might have observed traffic modification "
-										+ "and replay is aborted due to this.",
-								Toast.LENGTH_LONG).show();
-					}
-				});*/
-				// throw new RuntimeException();
 				this.cancel(true);
-				// ACRA.getErrorReporter().handleSilentException(ex);
 				if (resultChannelThread != null)
 					resultChannelThread.forceQuit = true;
-				ReplayActivity.this.finish();
 			} catch (SocketTimeoutException ex) {
-				Log.d("Replay", "Replay failed due to socket timeout!");
+				Log.e("Replay", "Replay failed due to socket timeout!");
+				success = false;
+				this.cancel(true);
+				if (resultChannelThread != null)
+					resultChannelThread.forceQuit = true;
+			} catch (IOException ex) {
+				Log.e("Replay", "Replay failed due to IOException!");
+				ex.printStackTrace();
+				success = false;
+				this.cancel(true);
+				if (resultChannelThread != null)
+					resultChannelThread.forceQuit = true;
 			} catch (Exception ex) {
 				success = false;
-				Log.d("Replay", "replay failed due to unknow reason!");
+				Log.e("Replay", "replay failed due to unknow reason!");
 				ex.printStackTrace();
 
 				publishProgress("makeToast",
@@ -1174,6 +1172,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 					resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			}
+			
 			Log.d("Replay", "queueCombined finished execution!");
 			return null;
 		}

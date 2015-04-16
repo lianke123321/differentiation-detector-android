@@ -126,7 +126,7 @@
             android:padding="10dp"
             android:textColor="@color/white"
             android:textSize="@dimen/main_title_text_size"
-            android:textStyle="italic" />
+            android:textStyle="bold" />
     </LinearLayout>
 
 </RelativeLayout>
