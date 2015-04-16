@@ -91,6 +91,14 @@
             android:layout_gravity="center"
             android:padding="10dp"
             android:text="@string/select_random" />
+        
+        <CheckBox
+            android:id="@+id/selectTestCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="10dp"
+            android:text="@string/select_test" />
 
         <com.gc.materialdesign.views.ButtonRectangle
             android:id="@+id/installCertButton"

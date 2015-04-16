@@ -113,6 +113,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	String enableTiming = null;
 	int iteration = 2;
 	boolean doRandom = false;
+	boolean doTest = false;
 	boolean onlyRandom = false;
 
 	// String GATE_WAY = Config.get("vpn_server");
@@ -197,9 +198,11 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		enableTiming = (String) getIntent().getStringExtra("timing");
 		iteration = (int) getIntent().getIntExtra("iteration", 1);
 		doRandom = getIntent().getBooleanExtra("doRandom", false);
+		doTest = getIntent().getBooleanExtra("doTest", false);
 		randomID = getIntent().getStringExtra("randomID");
 		Log.d("ReplayActivity", "iteration: " + String.valueOf(iteration)
-				+ " doRandom: " + doRandom + " randomID: " + randomID);
+				+ " doRandom: " + doRandom + " doTest: " + doTest
+				+ " randomID: " + randomID);
 
 		// Create layout for this page
 		adapter = new ImageReplayListAdapter(selectedApps, getLayoutInflater(),
@@ -300,7 +303,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		// throw new RuntimeException("Crash!");
 		// ACRA.getErrorReporter().handleSilentException(
 		// new RuntimeException("test ACRA"));
-		
+
 		// test result sharing
 		/*Set<String> results = new HashSet<String>();
 		results.add("{\"replayName\":\"youtube-360p\",\"diff\":0,\"rate\":0}");
@@ -313,7 +316,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		Editor editor = settings.edit();
 		editor.putStringSet("lastResult", results);
 		editor.commit();*/
-		
+
 	}
 
 	@Override
@@ -583,7 +586,8 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		@Override
 		public void onClick(View v) {
 			if (!networkAvailable) {
-				Toast.makeText(context,
+				Toast.makeText(
+						context,
 						"Network not available, please re-open this app after connecting to network.",
 						Toast.LENGTH_LONG).show();
 			} else if (!replayOngoing) {
@@ -850,11 +854,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 							"historyCount: " + String.valueOf(historyCount));
 
 				}
-
-				sideChannel
-						.declareID(appData.getReplayName(), testID,
-								Config.get("extraString"),
-								String.valueOf(historyCount));
+				
+				// if for testing purpose, add a string to extraString
+				if (doTest) {
+					Log.w("Replay", "include -Test string");
+					sideChannel.declareID(appData.getReplayName(), testID,
+							Config.get("extraString") + "-Test",
+							String.valueOf(historyCount));
+				}
+				else
+					sideChannel.declareID(appData.getReplayName(), testID,
+							Config.get("extraString"),
+							String.valueOf(historyCount));
 
 				// adrian: update progress
 				applicationBean.status = getResources().getString(

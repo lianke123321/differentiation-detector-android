@@ -88,6 +88,7 @@ public class MainActivity extends Activity {
 	String enableTiming = "true";
 	int iteration = 2;
 	boolean doRandom = false;
+	boolean doTest = false;
 
 	// String gateway = null;
 	String randomID = null;
@@ -258,8 +259,7 @@ public class MainActivity extends Activity {
 
 			/**
 			 * Select which layout to use. For this dialog, settings_layout.xml
-			 * is used. TODO: Layout needs some tweaking such that it can be
-			 * made presentable to user
+			 * is used.
 			 */
 			View view = LayoutInflater
 					.from(MainActivity.this)
@@ -292,12 +292,13 @@ public class MainActivity extends Activity {
 			else
 				spinnerIteration.setSelection(2);
 
-			// final com.gc.materialdesign.views.CheckBox checkBoxRandom =
-			// (com.gc.materialdesign.views.CheckBox) view
-			// .findViewById(R.id.selectRandomCheckBox);
 			final CheckBox checkBoxRandom = (CheckBox) view
 					.findViewById(R.id.selectRandomCheckBox);
 			checkBoxRandom.setChecked(doRandom);
+
+			final CheckBox checkBoxTest = (CheckBox) view
+					.findViewById(R.id.selectTestCheckBox);
+			checkBoxTest.setChecked(doTest);
 
 			// set installCert button
 
@@ -323,6 +324,7 @@ public class MainActivity extends Activity {
 											.getSelectedItem());
 							// doRandom = checkBoxRandom.isCheck();
 							doRandom = checkBoxRandom.isChecked();
+							doTest = checkBoxTest.isChecked();
 							/*Log.d("MainActivity",
 									"Iteration time: "
 											+ String.valueOf(iteration));*/
@@ -450,6 +452,7 @@ public class MainActivity extends Activity {
 			intent.putExtra("timing", enableTiming);
 			intent.putExtra("iteration", iteration);
 			intent.putExtra("doRandom", doRandom);
+			intent.putExtra("doTest", doTest);
 			intent.putExtra("randomID", randomID);
 
 			// Start ReplayActivity with slideIn animation.
