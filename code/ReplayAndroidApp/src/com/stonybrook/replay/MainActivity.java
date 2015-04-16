@@ -47,6 +47,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gc.materialdesign.views.Button;
@@ -70,6 +71,7 @@ public class MainActivity extends Activity {
 	// GridView on Main Screen
 	GridView appList;
 	Button nextButton, settingsButton;
+	TextView useridTextView;
 
 	public HashMap<String, ApplicationBean> appsHashMap = null;
 	public HashMap<String, ApplicationBean> randomHashMap = null;
@@ -172,7 +174,7 @@ public class MainActivity extends Activity {
 
 			settingsButton = (com.gc.materialdesign.views.Button) findViewById(R.id.settingsButton);
 			settingsButton.setOnClickListener(settingsButtonclick);
-
+			
 			// to get randomID
 			settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
 
@@ -189,6 +191,9 @@ public class MainActivity extends Activity {
 				randomID = settings.getString("ID", null);
 				Log.d("MainActivity", "retrieve existing ID: " + randomID);
 			}
+			
+			useridTextView = (TextView) findViewById(R.id.useridTextView);
+			useridTextView.setText("User ID: " + randomID);
 
 		} catch (Exception ex) {
 			Log.d(ReplayConstants.LOG_APPNAME,
