@@ -51,7 +51,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gc.materialdesign.views.Button;
 import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
@@ -71,7 +70,6 @@ public class MainActivity extends ActionBarActivity {
 
 	// GridView on Main Screen
 	GridView appList;
-	Button nextButton, settingsButton;
 	TextView useridTextView;
 
 	public HashMap<String, ApplicationBean> appsHashMap = null;
@@ -171,13 +169,6 @@ public class MainActivity extends ActionBarActivity {
 
 			appList = (GridView) findViewById(R.id.appsListView);
 			appList.setAdapter(adapter);
-
-			// Settings of click listeners of buttons on Main Screen
-			nextButton = (Button) findViewById(R.id.nextButton);
-			nextButton.setOnClickListener(nextButtonClick);
-
-			settingsButton = (com.gc.materialdesign.views.Button) findViewById(R.id.settingsButton);
-			settingsButton.setOnClickListener(settingsButtonclick);
 			
 			// to get randomID
 			settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
@@ -253,14 +244,132 @@ public class MainActivity extends ActionBarActivity {
 		return super.onKeyDown(keyCode, event);
 	}*/
 
-	/**
-	 * This method is executed when user clicks on settings button on main
-	 * screen. Comments are added inline.
-	 */
-	OnClickListener settingsButtonclick = new OnClickListener() {
+	OnClickListener installOnClick = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
+			boolean userAllowed = settings.getBoolean("userAllowed", false);
+			if (!userAllowed) {
+				new AlertDialog.Builder(MainActivity.this,
+						AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+						.setTitle("PLEASE READ ME!!!")
+						.setMessage(
+								"We are going to install a certificate that allows our tests to run."
+										+ "When asked for a password,\n\nLEAVE THE PASSWORD FIELD EMPTY\n\n"
+										+ "and click \"OK\".\n\n"
+										+ "If you are using Android 5.0.x, please restart your phone after "
+										+ "installing certificate to avoid a bug of Android.")
+						.setPositiveButton(
+								"Read instructions above carefully before clicking here!",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										Log.d("MainActivity",
+												"proceed to install credential");
+										// download credentials
+										downloadAndInstallVpnCreds();
+									}
+								}).show();
+
+				/*downloadAndInstallVpnCreds();
+
+				KeyChain.choosePrivateKeyAlias(MainActivity.this,
+						new SelectUserCertOnClickListener(), // Callback
+						new String[] {}, // Any key types.
+						null, // Any issuers.
+						"localhost", // Any host
+						-1, // Any port
+						null);*/
+			} else {
+				Toast.makeText(context,
+						"Certificate has already been installed!",
+						Toast.LENGTH_LONG).show();
+			}
+		}
+
+	};
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.main_navigate)
+		{
+			/**
+			 * This method will be called when user clicks on the next button on main
+			 * screen. This method redirects user to ReplayActivity page which display
+			 * users apps selected on main page.
+			 */
+			// check if user allowed to use certificate
+
+			boolean userAllowed = settings.getBoolean("userAllowed", false);
+			if (!userAllowed) {
+				KeyChain.choosePrivateKeyAlias(MainActivity.this,
+						new SelectUserCertOnClickListener(), // Callback
+						new String[] {}, // Any key types.
+						null, // Any issuers.
+						"localhost", // Any host
+						-1, // Any port
+						null);
+
+				Toast.makeText(
+						context,
+						"Please click \"Allow\" to allow using certificate. "
+								+ "No need to worry about \"Network may be monitored\" "
+								+ "message :)", Toast.LENGTH_LONG).show();
+				return true;
+			}
+
+			// Check to see if user has selected at least one app from the list.
+			if (selectedApps.size() == 0) {
+				Toast.makeText(MainActivity.this,
+						"Please select at least one application",
+						Toast.LENGTH_LONG).show();
+				return true;
+			}
+
+			// Create Intent for ReplayActivity and make data of selected apps
+			// by user available to ReplayActivity
+			Intent intent = new Intent(MainActivity.this, ReplayActivity.class);
+			intent.putParcelableArrayListExtra("selectedApps", selectedApps);
+			intent.putParcelableArrayListExtra("selectedAppsRandom",
+					selectedAppsRandom);
+
+			// If user did not select anything from settings dialog then use
+			// default preferences and
+			// make this available to next activity i.e. ReplayActivity
+			if (server == null)
+				server = getResources().getStringArray(R.array.server)[0];
+
+			if (enableTiming == null)
+				enableTiming = getResources().getStringArray(R.array.timing)[0];
+
+			intent.putExtra("server", server);
+			intent.putExtra("timing", enableTiming);
+			intent.putExtra("iteration", iteration);
+			intent.putExtra("doRandom", doRandom);
+			intent.putExtra("randomID", randomID);
+
+			// Start ReplayActivity with slideIn animation.
+			startActivity(intent);
+			MainActivity.this.overridePendingTransition(R.anim.slide_in_right,
+					R.anim.slide_out_left); 
+		}
+		else if (id == R.id.action_settings)
+		{
+			/**
+			 * This method is executed when user clicks on settings button on main
+			 * screen. Comments are added inline.
+			 */
+			
 			// Creating dialog to display to use
 			AlertDialog.Builder builder = new AlertDialog.Builder(
 					MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
@@ -355,190 +464,9 @@ public class MainActivity extends ActionBarActivity {
 
 			// Create Dialog from DialogBuilder and display it to user
 			builder.create().show();
-		}
-	};
-
-	OnClickListener installOnClick = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			boolean userAllowed = settings.getBoolean("userAllowed", false);
-			if (!userAllowed) {
-				new AlertDialog.Builder(MainActivity.this,
-						AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-						.setTitle("PLEASE READ ME!!!")
-						.setMessage(
-								"We are going to install a certificate that allows our tests to run."
-										+ "When asked for a password,\n\nLEAVE THE PASSWORD FIELD EMPTY\n\n"
-										+ "and click \"OK\".\n\n"
-										+ "If you are using Android 5.0.x, please restart your phone after "
-										+ "installing certificate to avoid a bug of Android.")
-						.setPositiveButton(
-								"Read instructions above carefully before clicking here!",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										Log.d("MainActivity",
-												"proceed to install credential");
-										// download credentials
-										downloadAndInstallVpnCreds();
-									}
-								}).show();
-
-				/*downloadAndInstallVpnCreds();
-
-				KeyChain.choosePrivateKeyAlias(MainActivity.this,
-						new SelectUserCertOnClickListener(), // Callback
-						new String[] {}, // Any key types.
-						null, // Any issuers.
-						"localhost", // Any host
-						-1, // Any port
-						null);*/
-			} else {
-				Toast.makeText(context,
-						"Certificate has already been installed!",
-						Toast.LENGTH_LONG).show();
-			}
-		}
-
-	};
-
-	/**
-	 * This method will be called when user clicks on the next button on main
-	 * screen. This method redirects user to ReplayActivity page which display
-	 * users apps selected on main page.
-	 */
-	OnClickListener nextButtonClick = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-
-			// check if user allowed to use certificate
-
-			boolean userAllowed = settings.getBoolean("userAllowed", false);
-			if (!userAllowed) {
-				KeyChain.choosePrivateKeyAlias(MainActivity.this,
-						new SelectUserCertOnClickListener(), // Callback
-						new String[] {}, // Any key types.
-						null, // Any issuers.
-						"localhost", // Any host
-						-1, // Any port
-						null);
-
-				Toast.makeText(
-						context,
-						"Please click \"Allow\" to allow using certificate. "
-								+ "No need to worry about \"Network may be monitored\" "
-								+ "message :)", Toast.LENGTH_LONG).show();
-				return;
-			}
-
-			// Check to see if user has selected at least one app from the list.
-			if (selectedApps.size() == 0) {
-				Toast.makeText(MainActivity.this,
-						"Please select at least one application",
-						Toast.LENGTH_LONG).show();
-				return;
-			}
-
-			// Create Intent for ReplayActivity and make data of selected apps
-			// by user available to ReplayActivity
-			Intent intent = new Intent(MainActivity.this, ReplayActivity.class);
-			intent.putParcelableArrayListExtra("selectedApps", selectedApps);
-			intent.putParcelableArrayListExtra("selectedAppsRandom",
-					selectedAppsRandom);
-
-			// If user did not select anything from settings dialog then use
-			// default preferences and
-			// make this available to next activity i.e. ReplayActivity
-			if (server == null)
-				server = getResources().getStringArray(R.array.server)[0];
-
-			if (enableTiming == null)
-				enableTiming = getResources().getStringArray(R.array.timing)[0];
-
-			intent.putExtra("server", server);
-			intent.putExtra("timing", enableTiming);
-			intent.putExtra("iteration", iteration);
-			intent.putExtra("doRandom", doRandom);
-			intent.putExtra("doTest", doTest);
-			intent.putExtra("randomID", randomID);
-
-			// Start ReplayActivity with slideIn animation.
-			startActivity(intent);
-			MainActivity.this.overridePendingTransition(R.anim.slide_in_right,
-					R.anim.slide_out_left);
-		}
-	};
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-	
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.main_navigate)
-		{
-			// check if user allowed to use certificate
-
-			boolean userAllowed = settings.getBoolean("userAllowed", false);
-			if (!userAllowed) {
-				KeyChain.choosePrivateKeyAlias(MainActivity.this,
-						new SelectUserCertOnClickListener(), // Callback
-						new String[] {}, // Any key types.
-						null, // Any issuers.
-						"localhost", // Any host
-						-1, // Any port
-						null);
-
-				Toast.makeText(
-						context,
-						"Please click \"Allow\" to allow using certificate. "
-								+ "No need to worry about \"Network may be monitored\" "
-								+ "message :)", Toast.LENGTH_LONG).show();
-				return true;
-			}
-
-			// Check to see if user has selected at least one app from the list.
-			if (selectedApps.size() == 0) {
-				Toast.makeText(MainActivity.this,
-						"Please select at least one application",
-						Toast.LENGTH_LONG).show();
-				return true;
-			}
-
-			// Create Intent for ReplayActivity and make data of selected apps
-			// by user available to ReplayActivity
-			Intent intent = new Intent(MainActivity.this, ReplayActivity.class);
-			intent.putParcelableArrayListExtra("selectedApps", selectedApps);
-			intent.putParcelableArrayListExtra("selectedAppsRandom",
-					selectedAppsRandom);
-
-			// If user did not select anything from settings dialog then use
-			// default preferences and
-			// make this available to next activity i.e. ReplayActivity
-			if (server == null)
-				server = getResources().getStringArray(R.array.server)[0];
-
-			if (enableTiming == null)
-				enableTiming = getResources().getStringArray(R.array.timing)[0];
-
-			intent.putExtra("server", server);
-			intent.putExtra("timing", enableTiming);
-			intent.putExtra("iteration", iteration);
-			intent.putExtra("doRandom", doRandom);
-			intent.putExtra("randomID", randomID);
-
-			// Start ReplayActivity with slideIn animation.
-			startActivity(intent);
-			MainActivity.this.overridePendingTransition(R.anim.slide_in_right,
-					R.anim.slide_out_left); 
+			
+//			Toast.makeText(this, "Hey you just hit "+item.getTitle(), Toast.LENGTH_SHORT).show();
+//			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

@@ -5,61 +5,12 @@
     <include
         android:id="@+id/mainimage_bar"
         layout="@layout/app_bar"/>
-    
-    <LinearLayout
-        android:id="@+id/ll1"
-        android:layout_below="@+id/mainimage_bar"
-        android:layout_width="fill_parent"
-        android:layout_height="47dp"
-        android:background="@color/darkorange"
-        android:gravity="center"
-        android:orientation="horizontal" >
-
-        <com.gc.materialdesign.views.ButtonRectangle
-            android:id="@+id/settingsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
-            android:layout_weight="1"
-            android:background="@color/darkerorange"
-            android:padding="5dp"
-            android:radius="70sp"
-            android:text="@string/setting"
-            android:textSize="15sp"
-            android:textStyle="bold" >
-        </com.gc.materialdesign.views.ButtonRectangle>
-
-        <TextView
-            android:id="@+id/mainPageTitleTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:gravity="center_horizontal"
-            android:padding="10dp"
-            android:text="@string/main_page_title"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_title_text_size"
-            android:textStyle="bold" />
-
-        <com.gc.materialdesign.views.ButtonRectangle
-            android:id="@+id/nextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
-            android:layout_weight="1"
-            android:background="@color/darkerorange"
-            android:padding="5dp"
-            android:text="@string/next_button"
-            android:textSize="15sp"
-            android:textStyle="bold" >
-        </com.gc.materialdesign.views.ButtonRectangle>
-    </LinearLayout>
 
     <GridView
         android:id="@+id/appsListView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/ll1"
+        android:layout_below="@+id/mainimage_bar"
         android:layout_above="@+id/userInfoLinearLayout"
         android:columnWidth="100dip"
         android:gravity="center"
