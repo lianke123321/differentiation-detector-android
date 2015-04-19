@@ -20,7 +20,6 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -36,13 +35,13 @@ import android.net.NetworkInfo;
 import android.net.VpnService;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -53,7 +52,6 @@ import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
 import com.stonybrook.android.logic.CharonVpnService;
 import com.stonybrook.android.logic.TrustedCertificateManager;
-import com.stonybrook.android.ui.LogActivity;
 import com.stonybrook.replay.adapter.ImageReplayListAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
 import com.stonybrook.replay.bean.JitterBean;
@@ -82,14 +80,13 @@ import com.stonybrook.replay.util.UnpickleDataStream;
  * @author Rajesh, Adrian
  * 
  */
-public class ReplayActivity extends Activity implements ReplayCompleteListener {
+public class ReplayActivity extends ActionBarActivity implements ReplayCompleteListener {
 
 	// add SharedPreferences for consent form
 	public static final String STATUS = "ReplayActPrefsFile";
 	SharedPreferences settings;
 	boolean networkAvailable = true;
 
-	com.gc.materialdesign.views.ButtonRectangle backButton, replayButton;
 	ArrayList<ApplicationBean> selectedApps = null;
 	ArrayList<ApplicationBean> selectedAppsRandom = null;
 	ListView appsListView = null;
@@ -148,6 +145,7 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	VPNConnected vpnConnected = null;
 	VPNDisconnected vpnDisconnected = null;
 	RandomReplay randomReplay = null;
+	Toolbar toolbar;
 
 	// define all asynctasks here for future clean up
 	// CertificateLoadTask certificateLoadTask = null;
@@ -155,12 +153,18 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		// Thread.setDefaultUncaughtExceptionHandler(new
 		// ExceptionHandler(this));
 		Thread.currentThread().setUncaughtExceptionHandler(
 				new ExceptionHandler(this));
 		setContentView(R.layout.replay_main_layout_images);
+		toolbar = (Toolbar) findViewById(R.id.relay_main_bar);
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setTitle(getResources().getString(R.string.selected_apps));
+		
+		getSupportActionBar().setHomeButtonEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		// keep the screen on
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -212,11 +216,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 		appsListView.setAdapter(adapter);
 
 		// Register button listeners
-		backButton = (com.gc.materialdesign.views.ButtonRectangle) findViewById(R.id.backButton);
-		backButton.setOnClickListener(backButtonListner);
-
-		replayButton = (com.gc.materialdesign.views.ButtonRectangle) findViewById(R.id.replayButton);
-		replayButton.setOnClickListener(replayButtonListener);
 		currentReplayCount = 0;
 
 		updateSelectedTextViews(selectedApps);
@@ -522,84 +521,6 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 				+ " MB");
 
 	}
-
-	/**
-	 * This is method is called when user presses the back button. This will
-	 * take then back to main screen.
-	 */
-	OnClickListener backButtonListner = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			if (!replayOngoing) {
-				if (queueCombined != null) {
-					vpnConnected.cancel(true);
-					vpnDisconnected.cancel(true);
-					randomReplay.cancel(true);
-					queueCombined.cancel(true);
-				}
-				ReplayActivity.this.finish();
-				ReplayActivity.this.overridePendingTransition(
-						android.R.anim.slide_in_left,
-						android.R.anim.slide_out_right);
-			} else
-				new AlertDialog.Builder(ReplayActivity.this,
-						AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
-						.setTitle("Replay is ongoing!")
-						.setMessage("Do you want to stop the process?")
-						.setPositiveButton("Yes",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										if (queueCombined != null) {
-											vpnConnected.cancel(true);
-											vpnDisconnected.cancel(true);
-											randomReplay.cancel(true);
-											queueCombined.cancel(true);
-										}
-										disconnectVPN();
-										if (resultChannelThread != null)
-											resultChannelThread.forceQuit = true;
-										ReplayActivity.this.finish();
-										ReplayActivity.this
-												.overridePendingTransition(
-														android.R.anim.slide_in_left,
-														android.R.anim.slide_out_right);
-									}
-								})
-						.setNegativeButton("No",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										// do nothing
-									}
-								}).show();
-		}
-	};
-
-	/**
-	 * This method is called when user clicks on Replay Button.
-	 */
-	OnClickListener replayButtonListener = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			if (!networkAvailable) {
-				Toast.makeText(
-						context,
-						"Network not available, please re-open this app after connecting to network.",
-						Toast.LENGTH_LONG).show();
-			} else if (!replayOngoing) {
-				currentReplayCount = 0;
-				processApplicationReplay();
-
-			} else
-				Toast.makeText(context,
-						"Replay is ongoing! Please do not start again.",
-						Toast.LENGTH_LONG).show();
-		}
-	};
 
 	/**
 	 * Simple check to see if server is reachable. No port listen checks are
@@ -1756,13 +1677,76 @@ public class ReplayActivity extends Activity implements ReplayCompleteListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.log:
-				Intent logIntent = new Intent(this, LogActivity.class);
-				startActivity(logIntent);
-				return true;
+//			case R.id.log:
+//				Intent logIntent = new Intent(this, LogActivity.class);
+//				startActivity(logIntent);
+//				return true;
+			case android.R.id.home:
+				if (!replayOngoing) {
+					if (queueCombined != null) {
+						vpnConnected.cancel(true);
+						vpnDisconnected.cancel(true);
+						randomReplay.cancel(true);
+						queueCombined.cancel(true);
+					}
+					ReplayActivity.this.finish();
+					ReplayActivity.this.overridePendingTransition(
+							android.R.anim.slide_in_left,
+							android.R.anim.slide_out_right);
+				} else
+					new AlertDialog.Builder(ReplayActivity.this,
+							AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+							.setTitle("Replay is ongoing!")
+							.setMessage("Do you want to stop the process?")
+							.setPositiveButton("Yes",
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog,
+												int which) {
+											if (queueCombined != null) {
+												vpnConnected.cancel(true);
+												vpnDisconnected.cancel(true);
+												randomReplay.cancel(true);
+												queueCombined.cancel(true);
+											}
+											disconnectVPN();
+											if (resultChannelThread != null)
+												resultChannelThread.forceQuit = true;
+											ReplayActivity.this.finish();
+											ReplayActivity.this
+													.overridePendingTransition(
+															android.R.anim.slide_in_left,
+															android.R.anim.slide_out_right);
+										}
+									})
+							.setNegativeButton("No",
+									new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog,
+												int which) {
+											// do nothing
+										}
+									}).show();
+				return super.onOptionsItemSelected(item);
+			case R.id.start_replay:
+				if (!networkAvailable) {
+					Toast.makeText(
+							context,
+							"Network not available, please re-open this app after connecting to network.",
+							Toast.LENGTH_LONG).show();
+				} else if (!replayOngoing) {
+					currentReplayCount = 0;
+					processApplicationReplay();
+
+				} else
+					Toast.makeText(context,
+							"Replay is ongoing! Please do not start again.",
+							Toast.LENGTH_LONG).show();
+				return super.onOptionsItemSelected(item);
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+		
+		
 	}
 
 	/**

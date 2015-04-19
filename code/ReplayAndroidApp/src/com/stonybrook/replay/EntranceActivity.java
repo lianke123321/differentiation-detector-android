@@ -34,12 +34,10 @@ public class EntranceActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_entrance);
 
 		toolbar = (Toolbar) findViewById(R.id.entrance_bar);
 		setSupportActionBar(toolbar);
-		toolbar.setTitleTextColor(0xFFFFFFFF);
 
 		historyButton = (Button) findViewById(R.id.historyButton);
 		historyButton.setOnClickListener(historyButtOnClick);

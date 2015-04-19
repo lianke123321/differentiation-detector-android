@@ -25,6 +25,12 @@
         -->
     </style>
     
+    <style name = "MyCustomToolBarTheme1" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+     	<!-- <item name="android:textColorPrimary">#F00</item>
+       	<item name="android:textColorHighlight">#00F</item>
+       	<item name="colorPrimaryDark">#F00</item> -->
+    </style>
+    
     <style name="LightThemeSelector" parent="android:Theme.Holo.Light">
 	</style>
 

@@ -21,7 +21,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -35,13 +34,15 @@ import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -62,7 +63,7 @@ import com.stonybrook.replay.parser.JSONParser;
 import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.RandomString;
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity {
 
 	// add SharedPreferences for consent form
 	public static final String STATUS = "MainActPrefsFile";
@@ -94,13 +95,13 @@ public class MainActivity extends Activity {
 
 	// String gateway = null;
 	String randomID = null;
+	Toolbar toolbar;
 
 	// Remove this
 	// @SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		// Register with Global Exception handler
 		// Thread.setDefaultUncaughtExceptionHandler(new
@@ -109,6 +110,9 @@ public class MainActivity extends Activity {
 				new ExceptionHandler(this));
 
 		setContentView(R.layout.activity_main_image);
+		toolbar = (Toolbar) findViewById(R.id.mainimage_bar);
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setTitle(getResources().getString(R.string.main_page_title));		
 
 		// In Android, Network cannot be done on Main thread. But Initially for
 		// testing
@@ -472,6 +476,71 @@ public class MainActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.main_navigate)
+		{
+			// check if user allowed to use certificate
+
+			boolean userAllowed = settings.getBoolean("userAllowed", false);
+			if (!userAllowed) {
+				KeyChain.choosePrivateKeyAlias(MainActivity.this,
+						new SelectUserCertOnClickListener(), // Callback
+						new String[] {}, // Any key types.
+						null, // Any issuers.
+						"localhost", // Any host
+						-1, // Any port
+						null);
+
+				Toast.makeText(
+						context,
+						"Please click \"Allow\" to allow using certificate. "
+								+ "No need to worry about \"Network may be monitored\" "
+								+ "message :)", Toast.LENGTH_LONG).show();
+				return true;
+			}
+
+			// Check to see if user has selected at least one app from the list.
+			if (selectedApps.size() == 0) {
+				Toast.makeText(MainActivity.this,
+						"Please select at least one application",
+						Toast.LENGTH_LONG).show();
+				return true;
+			}
+
+			// Create Intent for ReplayActivity and make data of selected apps
+			// by user available to ReplayActivity
+			Intent intent = new Intent(MainActivity.this, ReplayActivity.class);
+			intent.putParcelableArrayListExtra("selectedApps", selectedApps);
+			intent.putParcelableArrayListExtra("selectedAppsRandom",
+					selectedAppsRandom);
+
+			// If user did not select anything from settings dialog then use
+			// default preferences and
+			// make this available to next activity i.e. ReplayActivity
+			if (server == null)
+				server = getResources().getStringArray(R.array.server)[0];
+
+			if (enableTiming == null)
+				enableTiming = getResources().getStringArray(R.array.timing)[0];
+
+			intent.putExtra("server", server);
+			intent.putExtra("timing", enableTiming);
+			intent.putExtra("iteration", iteration);
+			intent.putExtra("doRandom", doRandom);
+			intent.putExtra("randomID", randomID);
+
+			// Start ReplayActivity with slideIn animation.
+			startActivity(intent);
+			MainActivity.this.overridePendingTransition(R.anim.slide_in_right,
+					R.anim.slide_out_left); 
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	/**
