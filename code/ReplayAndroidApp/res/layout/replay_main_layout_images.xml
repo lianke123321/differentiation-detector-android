@@ -7,7 +7,17 @@
         android:id="@+id/relay_main_bar"
         layout="@layout/app_bar"/>
 
-    <ListView
+    <android.support.v7.widget.RecyclerView  
+	    android:id="@+id/appsRecyclerView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/prgBarLayout"
+        android:layout_below="@+id/relay_main_bar"
+        android:divider="@drawable/listitem"
+        android:dividerHeight="1.5dip"
+        android:groupIndicator="@drawable/expandable" />  
+    
+    <!-- <ListView
         android:id="@+id/appsListView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -16,7 +26,7 @@
         android:divider="@drawable/listitem"
         android:dividerHeight="1.5dip"
         android:groupIndicator="@drawable/expandable" >
-    </ListView>
+    </ListView> -->
 
     <LinearLayout
         android:id="@+id/prgBarLayout"

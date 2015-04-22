@@ -17,6 +17,7 @@ public class CrashActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_crash);
 		toolbar = (Toolbar) findViewById(R.id.crash_bar);
 		setSupportActionBar(toolbar);
+		getSupportActionBar().setTitle(getResources().getString(R.string.errMsgTitle));
 		
 		this.error = getIntent().getStringExtra("error");
 		/*this.ErrorMsgTextView = (TextView) findViewById(R.id.report);

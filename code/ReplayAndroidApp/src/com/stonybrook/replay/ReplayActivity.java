@@ -36,6 +36,8 @@ import android.net.VpnService;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -43,7 +45,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +53,7 @@ import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
 import com.stonybrook.android.logic.CharonVpnService;
 import com.stonybrook.android.logic.TrustedCertificateManager;
-import com.stonybrook.replay.adapter.ImageReplayListAdapter;
+import com.stonybrook.replay.adapter.ImageReplayRecyclerViewAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
 import com.stonybrook.replay.bean.JitterBean;
 import com.stonybrook.replay.bean.ServerInstance;
@@ -89,7 +90,10 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 
 	ArrayList<ApplicationBean> selectedApps = null;
 	ArrayList<ApplicationBean> selectedAppsRandom = null;
-	ListView appsListView = null;
+	
+	RecyclerView appsRecyclerView = null;
+	RecyclerView.LayoutManager appsListViewLayoutManager;
+//	ListView appsListView = null;
 	TextView selectedAppsMsgTextView = null;
 	TextView selectedAppsSizeTextView = null;
 	Context context = null;
@@ -104,7 +108,8 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 
 	int currentReplayCount = 0;
 	int currentIterationCount = 0;
-	ImageReplayListAdapter adapter = null;
+//	ImageReplayListAdapter adapter = null;
+	ImageReplayRecyclerViewAdapter adapter = null;
 
 	String server = null;
 	String enableTiming = null;
@@ -209,11 +214,18 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 				+ " randomID: " + randomID);
 
 		// Create layout for this page
-		adapter = new ImageReplayListAdapter(selectedApps, getLayoutInflater(),
+//		adapter = new ImageReplayListAdapter(selectedApps, getLayoutInflater(),
+//				this, iteration, doRandom);
+		adapter = new ImageReplayRecyclerViewAdapter(selectedApps,
 				this, iteration, doRandom);
 
-		appsListView = (ListView) findViewById(R.id.appsListView);
-		appsListView.setAdapter(adapter);
+		appsRecyclerView = (RecyclerView) findViewById(R.id.appsRecyclerView);
+		appsListViewLayoutManager = new LinearLayoutManager(this);
+		appsRecyclerView.setLayoutManager(appsListViewLayoutManager);
+		appsRecyclerView.setAdapter(adapter);
+		
+//		appsListView = (ListView) findViewById(R.id.appsListView);
+//		appsListView.setAdapter(adapter);
 
 		// Register button listeners
 		currentReplayCount = 0;
@@ -1726,7 +1738,7 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 											// do nothing
 										}
 									}).show();
-				return super.onOptionsItemSelected(item);
+				break;
 			case R.id.start_replay:
 				if (!networkAvailable) {
 					Toast.makeText(
@@ -1741,11 +1753,12 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 					Toast.makeText(context,
 							"Replay is ongoing! Please do not start again.",
 							Toast.LENGTH_LONG).show();
-				return super.onOptionsItemSelected(item);
+				break;
 			default:
-				return super.onOptionsItemSelected(item);
+				break;
 		}
 		
+		return super.onOptionsItemSelected(item);
 		
 	}
 

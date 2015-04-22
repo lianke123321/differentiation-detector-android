@@ -24,7 +24,7 @@ import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.stonybrook.replay.ReplayActivity;
-import com.stonybrook.replay.adapter.ImageReplayListAdapter;
+import com.stonybrook.replay.adapter.ImageReplayRecyclerViewAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
 
 /**
@@ -51,13 +51,14 @@ public class ResultChannelThread implements Runnable {
 	private ArrayList<ApplicationBean> selectedApps = null;
 	private String finishVpn;
 	private String finishRandom;
-	private ImageReplayListAdapter adapter = null;
+//	private ImageReplayListAdapter adapter = null;
+	private ImageReplayRecyclerViewAdapter adapter = null;
 	private ReplayActivity replayAct;
 
 	public ResultChannelThread(ReplayActivity replayAct, String path, int port,
 			String id, ArrayList<ApplicationBean> selectedApps,
 			String finishVpn, String finishRandom,
-			ImageReplayListAdapter adapter, SharedPreferences settings) {
+			/*ImageReplayListAdapter*/ ImageReplayRecyclerViewAdapter adapter, SharedPreferences settings) {
 		this.replayAct = replayAct;
 		this.path = path;
 		this.analyzerServerUrl = ("http://" + path + ":" + port + "/Results");

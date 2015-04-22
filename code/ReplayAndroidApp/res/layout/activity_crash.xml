@@ -6,7 +6,7 @@
         android:id="@+id/crash_bar"
         layout="@layout/app_bar"/>
     
-    <LinearLayout
+    <!-- <LinearLayout
         android:id="@+id/errTitleLinearLayout"
         android:layout_below="@+id/crash_bar"
         android:layout_width="fill_parent"
@@ -24,13 +24,13 @@
             android:textColor="@color/white"
             android:textSize="@dimen/main_title_text_size"
             android:textStyle="bold" />
-    </LinearLayout>
+    </LinearLayout> -->
     
     <TextView
         android:id="@+id/errorMsg"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/errTitleLinearLayout"
+        android:layout_below="@+id/crash_bar"
         android:text="@string/crash_activity_title"
         android:textColor="@color/blue14"
         android:textSize="@dimen/main_title_text_size"
