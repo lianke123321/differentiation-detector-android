@@ -32,14 +32,14 @@ public class ImageReplayRecyclerViewAdapter extends
 		public TextView tvAppSize;
 		public TextView tvAppTime;
 		public TextView tvAppStatus;
-		public TextView tv1;
-		public TextView tv2;
+		public TextView tvSlower;
+		public TextView tvPercent;
 		public ImageView img;
 
 		public ViewHolder(View view) {
 			super(view);
-			tv1 = (TextView) view.findViewById(R.id.slowerTextView);
-			tv2 = (TextView) view.findViewById(R.id.percentTextView);
+			tvSlower = (TextView) view.findViewById(R.id.slowerTextView);
+			tvPercent = (TextView) view.findViewById(R.id.percentTextView);
 			tvAppSize = (TextView) view.findViewById(R.id.appSize);
 			tvAppTime = (TextView) view.findViewById(R.id.appTime);
 			tvAppStatus = (TextView) view.findViewById(R.id.appStatusTextView);
@@ -81,8 +81,8 @@ public class ImageReplayRecyclerViewAdapter extends
 			holder.tvAppStatus.setTypeface(null, Typeface.NORMAL);
 			holder.tvAppStatus.setTextColor(Color.parseColor("#DAA520"));
 
-			holder.tv1.setVisibility(View.GONE);
-			holder.tv2.setVisibility(View.GONE);
+			holder.tvSlower.setVisibility(View.GONE);
+			holder.tvPercent.setVisibility(View.GONE);
 		} else if (app.status.trim().equalsIgnoreCase("No Differentiation")) {
 			// green and normal
 			holder.tvAppStatus.setTypeface(null, Typeface.NORMAL);
@@ -92,8 +92,8 @@ public class ImageReplayRecyclerViewAdapter extends
 			// red and bold
 			holder.tvAppStatus.setTypeface(null, Typeface.BOLD);
 			holder.tvAppStatus.setTextColor(Color.parseColor("#B22222"));
-			holder.tv1.setVisibility(View.VISIBLE);
-			holder.tv2.setVisibility(View.VISIBLE);
+			holder.tvSlower.setVisibility(View.VISIBLE);
+			holder.tvPercent.setVisibility(View.VISIBLE);
 		} else if (app.status.trim().equalsIgnoreCase(
 				"Traffic Manipulation Detected (Type 1)")) {
 			holder.tvAppStatus.setTypeface(null, Typeface.BOLD);
@@ -104,12 +104,12 @@ public class ImageReplayRecyclerViewAdapter extends
 		}
 
 		double rate = app.rate;
-		holder.tv2
+		holder.tvPercent
 				.setText(String.valueOf((int) Math.abs(app.rate * 100)) + "%");
 		if (rate < 0) {
-			holder.tv1.setText("faster");
+			holder.tvSlower.setText("faster");
 		} else {
-			holder.tv1.setText("slower");
+			holder.tvSlower.setText("slower");
 		}
 
 		Log.d("img", app.getImage());
@@ -126,6 +126,7 @@ public class ImageReplayRecyclerViewAdapter extends
 		// null);
 		View view = LayoutInflater.from(parent.getContext()).inflate(
 				R.layout.replay_view_app_item_info_image, parent, false);
+		//view.setBackgroundResource(R.drawable.listitem);
 		ViewHolder vh = new ViewHolder(view);
 		//Log.d("Adapter", "created holder");
 		return vh;

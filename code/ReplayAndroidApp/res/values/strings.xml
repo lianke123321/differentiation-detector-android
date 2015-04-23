@@ -4,6 +4,7 @@
     <string name="author"> Developed by Researchers from:</string>
     <string name="app_name">Differentiation Detector</string>
     <string name="action_settings">Settings</string>
+    <string name="action_history">History Result</string>
     <string name="main_page_title">Select Applications</string>
     <string name="next_button">Next</string>
     <string name="selected">Selected</string>

@@ -11,6 +11,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.http.HttpResponse;
@@ -66,7 +68,8 @@ public class MainActivity extends ActionBarActivity {
 
 	// add SharedPreferences for consent form
 	public static final String STATUS = "MainActPrefsFile";
-	SharedPreferences settings;
+	private SharedPreferences settings;
+	private SharedPreferences history;
 
 	// GridView on Main Screen
 	GridView appList;
@@ -110,7 +113,8 @@ public class MainActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_main_image);
 		toolbar = (Toolbar) findViewById(R.id.mainimage_bar);
 		setSupportActionBar(toolbar);
-		getSupportActionBar().setTitle(getResources().getString(R.string.main_page_title));		
+		getSupportActionBar().setTitle(
+				getResources().getString(R.string.main_page_title));
 
 		// In Android, Network cannot be done on Main thread. But Initially for
 		// testing
@@ -131,6 +135,8 @@ public class MainActivity extends ActionBarActivity {
 					getApplicationContext());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			Log.e("MainActivity", "read config file failed!");
+			e.printStackTrace();
 			this.finish();
 		}
 		// gateway = Config.get("vpn_server");
@@ -169,9 +175,11 @@ public class MainActivity extends ActionBarActivity {
 
 			appList = (GridView) findViewById(R.id.appsListView);
 			appList.setAdapter(adapter);
-			
+
 			// to get randomID
 			settings = getSharedPreferences(STATUS, Context.MODE_PRIVATE);
+			history = getSharedPreferences(ReplayActivity.STATUS,
+					Context.MODE_PRIVATE);
 
 			// generate or retrieve an id for this phone
 			boolean hasID = settings.getBoolean("hasID", false);
@@ -186,9 +194,14 @@ public class MainActivity extends ActionBarActivity {
 				randomID = settings.getString("ID", null);
 				Log.d("MainActivity", "retrieve existing ID: " + randomID);
 			}
-			
+
 			useridTextView = (TextView) findViewById(R.id.useridTextView);
 			useridTextView.setText("User ID: " + randomID);
+
+			Toast.makeText(
+					context,
+					"Please click the tick button on top right when finishing choosing applications",
+					Toast.LENGTH_LONG).show();
 
 		} catch (Exception ex) {
 			Log.d(ReplayConstants.LOG_APPNAME,
@@ -295,18 +308,17 @@ public class MainActivity extends ActionBarActivity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
+
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.main_navigate)
-		{
+		if (id == R.id.main_navigate) {
 			/**
-			 * This method will be called when user clicks on the next button on main
-			 * screen. This method redirects user to ReplayActivity page which display
-			 * users apps selected on main page.
+			 * This will be called when user clicks on the tick button on main
+			 * screen. This method redirects user to ReplayActivity page which
+			 * display users apps selected on main page.
 			 */
 			// check if user allowed to use certificate
 
@@ -361,15 +373,13 @@ public class MainActivity extends ActionBarActivity {
 			// Start ReplayActivity with slideIn animation.
 			startActivity(intent);
 			MainActivity.this.overridePendingTransition(R.anim.slide_in_right,
-					R.anim.slide_out_left); 
-		}
-		else if (id == R.id.action_settings)
-		{
+					R.anim.slide_out_left);
+		} else if (id == R.id.action_settings) {
 			/**
-			 * This method is executed when user clicks on settings button on main
-			 * screen. Comments are added inline.
+			 * This method is executed when user clicks on settings button on
+			 * main screen. Comments are added inline.
 			 */
-			
+
 			// Creating dialog to display to use
 			AlertDialog.Builder builder = new AlertDialog.Builder(
 					MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
@@ -464,9 +474,74 @@ public class MainActivity extends ActionBarActivity {
 
 			// Create Dialog from DialogBuilder and display it to user
 			builder.create().show();
-			
-//			Toast.makeText(this, "Hey you just hit "+item.getTitle(), Toast.LENGTH_SHORT).show();
-//			return true;
+
+			// Toast.makeText(this, "Hey you just hit "+item.getTitle(),
+			// Toast.LENGTH_SHORT).show();
+			// return true;
+		} else if (id == R.id.action_history) {
+			// Creating dialog to display to use
+			AlertDialog.Builder builder = new AlertDialog.Builder(
+					MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+			builder.setTitle("Previous Results");
+
+			View view = LayoutInflater
+					.from(MainActivity.this)
+					.inflate(
+							R.layout.history_layout,
+							(RelativeLayout) findViewById(R.layout.activity_main_image));
+			builder.setView(view);
+			TextView tv = (TextView) view.findViewById(R.id.historyTextview);
+
+			// get results
+			Set<String> results = history.getStringSet("lastResult", null);
+			String finalResult = "";
+			if (results != null && !results.isEmpty()) {
+				Log.d("MainActivity", "Retrieve results succeeded! results: "
+						+ results.toString());
+				Iterator<String> it = results.iterator();
+				while (it.hasNext()) {
+					try {
+						JSONObject response = new JSONObject(it.next());
+						String replayName = response.getString("replayName");
+						int diff = response.getInt("diff");
+						double rate = response.getDouble("rate");
+
+						if (diff == -1) {
+							finalResult += (replayName + ":\n    no differentiation\n\n");
+						} else if (diff == 0) {
+							finalResult += (replayName + ":\n    inconclusive result\n\n");
+						} else if (diff == 1) {
+							String speed = rate < 0 ? "faster" : "slower";
+							String processedRate = String.valueOf((int) Math
+									.abs(rate * 100)) + "% ";
+							finalResult += (replayName
+									+ ":\n    differentiation detected, "
+									+ processedRate + speed + "\n\n");
+						} else {
+
+						}
+					} catch (JSONException e) {
+						Log.e("MainActivity", "parsing json error");
+						e.printStackTrace();
+					}
+				}
+
+				// Set elements of dialog
+				tv.setText(finalResult);
+			} else {
+				Log.d("MainActivity", "No result available");
+			}
+
+			builder.setPositiveButton(R.string.ok,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					});
+
+			// Create Dialog from DialogBuilder and display it to user
+			builder.create().show();
 		}
 		return super.onOptionsItemSelected(item);
 	}

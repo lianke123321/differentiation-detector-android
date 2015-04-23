@@ -3,7 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:theme="@style/MyCustomToolBarTheme1"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
     android:background="@color/darkorange"
+    android:elevation="4dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 </android.support.v7.widget.Toolbar>

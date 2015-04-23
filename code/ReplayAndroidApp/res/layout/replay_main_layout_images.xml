@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/prgBarLayout"
         android:layout_below="@+id/relay_main_bar"
-        android:divider="@drawable/listitem"
         android:dividerHeight="1.5dip"
         android:groupIndicator="@drawable/expandable" />  
     

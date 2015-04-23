@@ -72,6 +72,7 @@ import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.Mobilyzer;
 import com.stonybrook.replay.util.ReplayCompleteListener;
+import com.stonybrook.replay.util.SimpleDividerItemDecoration;
 import com.stonybrook.replay.util.UnpickleDataStream;
 
 /**
@@ -81,7 +82,8 @@ import com.stonybrook.replay.util.UnpickleDataStream;
  * @author Rajesh, Adrian
  * 
  */
-public class ReplayActivity extends ActionBarActivity implements ReplayCompleteListener {
+public class ReplayActivity extends ActionBarActivity implements
+		ReplayCompleteListener {
 
 	// add SharedPreferences for consent form
 	public static final String STATUS = "ReplayActPrefsFile";
@@ -90,10 +92,10 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 
 	ArrayList<ApplicationBean> selectedApps = null;
 	ArrayList<ApplicationBean> selectedAppsRandom = null;
-	
+
 	RecyclerView appsRecyclerView = null;
-	RecyclerView.LayoutManager appsListViewLayoutManager;
-//	ListView appsListView = null;
+	RecyclerView.LayoutManager appsRecyclerViewLayoutManager;
+	// ListView appsListView = null;
 	TextView selectedAppsMsgTextView = null;
 	TextView selectedAppsSizeTextView = null;
 	Context context = null;
@@ -108,7 +110,7 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 
 	int currentReplayCount = 0;
 	int currentIterationCount = 0;
-//	ImageReplayListAdapter adapter = null;
+	// ImageReplayListAdapter adapter = null;
 	ImageReplayRecyclerViewAdapter adapter = null;
 
 	String server = null;
@@ -165,11 +167,12 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 		setContentView(R.layout.replay_main_layout_images);
 		toolbar = (Toolbar) findViewById(R.id.relay_main_bar);
 		setSupportActionBar(toolbar);
-		getSupportActionBar().setTitle(getResources().getString(R.string.selected_apps));
-		
+		getSupportActionBar().setTitle(
+				getResources().getString(R.string.selected_apps));
+
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
+
 		// keep the screen on
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -214,18 +217,21 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 				+ " randomID: " + randomID);
 
 		// Create layout for this page
-//		adapter = new ImageReplayListAdapter(selectedApps, getLayoutInflater(),
-//				this, iteration, doRandom);
-		adapter = new ImageReplayRecyclerViewAdapter(selectedApps,
-				this, iteration, doRandom);
+		// adapter = new ImageReplayListAdapter(selectedApps,
+		// getLayoutInflater(),
+		// this, iteration, doRandom);
+		adapter = new ImageReplayRecyclerViewAdapter(selectedApps, this,
+				iteration, doRandom);
 
 		appsRecyclerView = (RecyclerView) findViewById(R.id.appsRecyclerView);
-		appsListViewLayoutManager = new LinearLayoutManager(this);
-		appsRecyclerView.setLayoutManager(appsListViewLayoutManager);
+		appsRecyclerViewLayoutManager = new LinearLayoutManager(this);
+		appsRecyclerView.setLayoutManager(appsRecyclerViewLayoutManager);
+		appsRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
+				getApplicationContext()));
 		appsRecyclerView.setAdapter(adapter);
-		
-//		appsListView = (ListView) findViewById(R.id.appsListView);
-//		appsListView.setAdapter(adapter);
+
+		// appsListView = (ListView) findViewById(R.id.appsListView);
+		// appsListView.setAdapter(adapter);
 
 		// Register button listeners
 		currentReplayCount = 0;
@@ -287,9 +293,10 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 		}*/
 
 		if (networkAvailable) {
-			Toast.makeText(context,
-					"Please click \"Start\" to start the replay!",
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(
+					context,
+					"Please click the tick button on top right to start the replay!",
+					Toast.LENGTH_LONG).show();
 
 			new AlertDialog.Builder(ReplayActivity.this,
 					AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
@@ -518,7 +525,8 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 		selectedAppsSizeTextView = (TextView) findViewById(R.id.selectedAppsSizeTextView);
 
 		selectedAppsMsgTextView.setText(String.valueOf(list.size())
-				+ " applications selected.");
+				+ (list.size() > 1 ? " applications selected"
+						: " application selected"));
 		double totalSize = 0.0;
 
 		for (int i = 0; i < list.size(); i++) {
@@ -787,15 +795,14 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 							"historyCount: " + String.valueOf(historyCount));
 
 				}
-				
+
 				// if for testing purpose, add a string to extraString
 				if (doTest) {
 					Log.w("Replay", "include -Test string");
 					sideChannel.declareID(appData.getReplayName(), testID,
 							Config.get("extraString") + "-Test",
 							String.valueOf(historyCount));
-				}
-				else
+				} else
 					sideChannel.declareID(appData.getReplayName(), testID,
 							Config.get("extraString"),
 							String.valueOf(historyCount));
@@ -1105,7 +1112,7 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 					resultChannelThread.forceQuit = true;
 				ReplayActivity.this.finish();
 			}
-			
+
 			Log.d("Replay", "queueCombined finished execution!");
 			return null;
 		}
@@ -1689,10 +1696,10 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-//			case R.id.log:
-//				Intent logIntent = new Intent(this, LogActivity.class);
-//				startActivity(logIntent);
-//				return true;
+		// case R.id.log:
+		// Intent logIntent = new Intent(this, LogActivity.class);
+		// startActivity(logIntent);
+		// return true;
 			case android.R.id.home:
 				if (!replayOngoing) {
 					if (queueCombined != null) {
@@ -1713,7 +1720,8 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 							.setPositiveButton("Yes",
 									new DialogInterface.OnClickListener() {
 										@Override
-										public void onClick(DialogInterface dialog,
+										public void onClick(
+												DialogInterface dialog,
 												int which) {
 											if (queueCombined != null) {
 												vpnConnected.cancel(true);
@@ -1733,7 +1741,8 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 									})
 							.setNegativeButton("No",
 									new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog,
+										public void onClick(
+												DialogInterface dialog,
 												int which) {
 											// do nothing
 										}
@@ -1757,9 +1766,9 @@ public class ReplayActivity extends ActionBarActivity implements ReplayCompleteL
 			default:
 				break;
 		}
-		
+
 		return super.onOptionsItemSelected(item);
-		
+
 	}
 
 	/**
