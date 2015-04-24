@@ -104,7 +104,7 @@ This study has been reviewed and approved by the Northeastern University Institu
     <string name="default_result">No previous result available</string>
     
     <string name="help_info"><Data><![CDATA[ About traffic manipulation:<br><br>
-        <strong>Type 1</strong> means that we detected IP flipping in your network and our current approach could not handle it.<br>
+        <strong>Type 1</strong> means that we detected IP flipping in your network and our current approach failed to handle it.<br>
         <strong>Type 2</strong> means that we detected other forms of traffic manipulation which we could not handle currently. It could also be caused by network fluctuation. ]]></Data></string>
 
     <!-- This is for mobilyzer -->
