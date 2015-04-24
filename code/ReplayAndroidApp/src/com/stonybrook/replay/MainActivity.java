@@ -29,8 +29,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.security.KeyChain;
@@ -38,6 +36,7 @@ import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,6 +52,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gc.materialdesign.views.Button;
 import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
@@ -74,6 +74,8 @@ public class MainActivity extends ActionBarActivity {
 	// GridView on Main Screen
 	GridView appList;
 	TextView useridTextView;
+
+	Button nextButton;
 
 	public HashMap<String, ApplicationBean> appsHashMap = null;
 	public HashMap<String, ApplicationBean> randomHashMap = null;
@@ -115,6 +117,9 @@ public class MainActivity extends ActionBarActivity {
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setTitle(
 				getResources().getString(R.string.main_page_title));
+
+		nextButton = (Button) findViewById(R.id.nextButton);
+		nextButton.setOnClickListener(nextButtonOnClick);
 
 		// In Android, Network cannot be done on Main thread. But Initially for
 		// testing
@@ -198,10 +203,10 @@ public class MainActivity extends ActionBarActivity {
 			useridTextView = (TextView) findViewById(R.id.useridTextView);
 			useridTextView.setText("User ID: " + randomID);
 
-			Toast.makeText(
+			/*Toast.makeText(
 					context,
 					"Please click the tick button on top right when finishing choosing applications",
-					Toast.LENGTH_LONG).show();
+					Toast.LENGTH_LONG).show();*/
 
 		} catch (Exception ex) {
 			Log.d(ReplayConstants.LOG_APPNAME,
@@ -298,6 +303,66 @@ public class MainActivity extends ActionBarActivity {
 						"Certificate has already been installed!",
 						Toast.LENGTH_LONG).show();
 			}
+		}
+
+	};
+
+	OnClickListener nextButtonOnClick = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			boolean userAllowed = settings.getBoolean("userAllowed", false);
+			if (!userAllowed) {
+				KeyChain.choosePrivateKeyAlias(MainActivity.this,
+						new SelectUserCertOnClickListener(), // Callback
+						new String[] {}, // Any key types.
+						null, // Any issuers.
+						"localhost", // Any host
+						-1, // Any port
+						null);
+
+				Toast.makeText(
+						context,
+						"Please click \"Allow\" to allow using certificate. "
+								+ "No need to worry about \"Network may be monitored\" "
+								+ "message :)", Toast.LENGTH_LONG).show();
+				return;
+			}
+
+			// Check to see if user has selected at least one app from the list.
+			if (selectedApps.size() == 0) {
+				Toast.makeText(MainActivity.this,
+						"Please select at least one application",
+						Toast.LENGTH_LONG).show();
+				return;
+			}
+
+			// Create Intent for ReplayActivity and make data of selected apps
+			// by user available to ReplayActivity
+			Intent intent = new Intent(MainActivity.this, ReplayActivity.class);
+			intent.putParcelableArrayListExtra("selectedApps", selectedApps);
+			intent.putParcelableArrayListExtra("selectedAppsRandom",
+					selectedAppsRandom);
+
+			// If user did not select anything from settings dialog then use
+			// default preferences and
+			// make this available to next activity i.e. ReplayActivity
+			if (server == null)
+				server = getResources().getStringArray(R.array.server)[0];
+
+			if (enableTiming == null)
+				enableTiming = getResources().getStringArray(R.array.timing)[0];
+
+			intent.putExtra("server", server);
+			intent.putExtra("timing", enableTiming);
+			intent.putExtra("iteration", iteration);
+			intent.putExtra("doRandom", doRandom);
+			intent.putExtra("randomID", randomID);
+
+			// Start ReplayActivity with slideIn animation.
+			startActivity(intent);
+			MainActivity.this.overridePendingTransition(R.anim.slide_in_right,
+					R.anim.slide_out_left);
 		}
 
 	};
@@ -413,12 +478,10 @@ public class MainActivity extends ActionBarActivity {
 			final Spinner spinnerIteration = (Spinner) view
 					.findViewById(R.id.settings_iteration);
 			// set value of iteration
-			if (iteration == 1)
+			if (iteration == 2)
 				spinnerIteration.setSelection(0);
-			else if (iteration == 2)
+			else if (iteration == 3)
 				spinnerIteration.setSelection(1);
-			else
-				spinnerIteration.setSelection(2);
 
 			final CheckBox checkBoxRandom = (CheckBox) view
 					.findViewById(R.id.selectRandomCheckBox);
@@ -430,7 +493,7 @@ public class MainActivity extends ActionBarActivity {
 
 			// set installCert button
 
-			final com.gc.materialdesign.views.ButtonRectangle installCertButton = (com.gc.materialdesign.views.ButtonRectangle) view
+			final Button installCertButton = (Button) view
 					.findViewById(R.id.installCertButton);
 			// final Button installCertButton = (Button) view
 			// .findViewById(R.id.installCertButton);
@@ -542,22 +605,35 @@ public class MainActivity extends ActionBarActivity {
 
 			// Create Dialog from DialogBuilder and display it to user
 			builder.create().show();
-		}
-		return super.onOptionsItemSelected(item);
-	}
+		} else if (id == R.id.action_help) {
+			// Creating dialog to display to use
+			AlertDialog.Builder builder = new AlertDialog.Builder(
+					MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+			builder.setTitle("Help");
 
-	/**
-	 * This Method checks the network Availability. For this NetworkInfo class
-	 * is used and this should also provide type of connectivity i.e. Wi-Fi,
-	 * Cellular ..
-	 * 
-	 * @return
-	 */
-	private boolean isNetworkAvailable() {
-		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo activeNetworkInfo = connectivityManager
-				.getActiveNetworkInfo();
-		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+			View view = LayoutInflater
+					.from(MainActivity.this)
+					.inflate(
+							R.layout.help_layout,
+							(RelativeLayout) findViewById(R.layout.activity_main_image));
+			builder.setView(view);
+			TextView helpTextView = (TextView) view.findViewById(R.id.helpTextView);
+			helpTextView.setText(Html.fromHtml(getResources().getString(
+					R.string.help_info)));
+			
+			builder.setPositiveButton(R.string.ok,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					});
+
+			// Create Dialog from DialogBuilder and display it to user
+			builder.create().show();
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	/**

@@ -1,17 +1,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
-    
+    android:layout_height="fill_parent"
+    android:background="@color/white" >
+
     <include
         android:id="@+id/mainimage_bar"
-        layout="@layout/app_bar"/>
+        layout="@layout/app_bar" />
 
     <GridView
         android:id="@+id/appsListView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_above="@+id/nextButtonLayout"
         android:layout_below="@+id/mainimage_bar"
-        android:layout_above="@+id/userInfoLinearLayout"
         android:columnWidth="100dip"
         android:gravity="center"
         android:horizontalSpacing="4dip"
@@ -19,6 +20,22 @@
         android:padding="5dp"
         android:stretchMode="columnWidth"
         android:verticalSpacing="4dip" />
+
+    <RelativeLayout
+        android:id="@+id/nextButtonLayout"
+        android:layout_above="@+id/userInfoLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp" >
+
+        <com.gc.materialdesign.views.ButtonFlat
+            android:id="@+id/nextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/replay"
+            android:textStyle="bold"
+            android:background="@color/darkorange" />
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/userInfoLinearLayout"

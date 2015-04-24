@@ -26,7 +26,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:background="@color/orange1"
+            android:background="@color/lightorange"
             android:entries="@array/timing"
             android:padding="10dp"
             android:prompt="@string/timing_label" />
@@ -65,7 +65,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:background="@color/orange1"
+            android:background="@color/lightorange"
             android:entries="@array/iteration"
             android:padding="10dp"
             android:prompt="@string/iteration_2" />
@@ -101,13 +101,13 @@
             android:padding="10dp"
             android:text="@string/select_test" />
 
-        <com.gc.materialdesign.views.ButtonRectangle
+        <com.gc.materialdesign.views.ButtonFlat
             android:id="@+id/installCertButton"
             android:layout_width="wrap_content"
             android:layout_height="50sp"
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"
-            android:background="@color/darkerorange"
+            android:background="@color/darkorange"
             android:text="@string/install_cert_button"
             android:textSize="15sp" />
 

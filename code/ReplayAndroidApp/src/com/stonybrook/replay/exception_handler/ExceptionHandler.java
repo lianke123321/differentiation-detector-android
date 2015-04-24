@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 
 import com.stonybrook.replay.CrashActivity;
 
@@ -62,7 +61,7 @@ public class ExceptionHandler implements
 		
 		intent.putExtra("error", errorReport.toString());
 		myContext.startActivity(intent);
-		Log.e("ExceptionHandler", errorReport.toString());
+		//Log.e("ExceptionHandler", errorReport.toString());
 		Thread.getDefaultUncaughtExceptionHandler().uncaughtException(thread,
 				exception);
 

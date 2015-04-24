@@ -87,20 +87,30 @@ public class ImageReplayRecyclerViewAdapter extends
 			// green and normal
 			holder.tvAppStatus.setTypeface(null, Typeface.NORMAL);
 			holder.tvAppStatus.setTextColor(Color.parseColor("#228B22"));
+			
+			holder.tvSlower.setVisibility(View.GONE);
+			holder.tvPercent.setVisibility(View.GONE);
 		} else if (app.status.trim().equalsIgnoreCase(
 				"Differentiation Detected")) {
 			// red and bold
 			holder.tvAppStatus.setTypeface(null, Typeface.BOLD);
 			holder.tvAppStatus.setTextColor(Color.parseColor("#B22222"));
+			
 			holder.tvSlower.setVisibility(View.VISIBLE);
 			holder.tvPercent.setVisibility(View.VISIBLE);
 		} else if (app.status.trim().equalsIgnoreCase(
 				"Traffic Manipulation Detected (Type 1)")) {
 			holder.tvAppStatus.setTypeface(null, Typeface.BOLD);
 			holder.tvAppStatus.setTextColor(Color.parseColor("#B22222"));
+			
+			holder.tvSlower.setVisibility(View.GONE);
+			holder.tvPercent.setVisibility(View.GONE);
 		} else {
 			holder.tvAppStatus.setTypeface(null, Typeface.NORMAL);
 			holder.tvAppStatus.setTextColor(Color.parseColor("#4682B4"));
+			
+			holder.tvSlower.setVisibility(View.GONE);
+			holder.tvPercent.setVisibility(View.GONE);
 		}
 
 		double rate = app.rate;

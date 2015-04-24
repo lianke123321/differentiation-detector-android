@@ -12,10 +12,15 @@
         android:showAsAction="never"
         android:title="@string/action_history"/>
     <item
+        android:id="@+id/action_help"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_help"/>
+    <item
         android:id="@+id/main_navigate"
         android:icon="@drawable/ic_action_accept"
         android:orderInCategory="200"
         android:title="@string/replay"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 
 </menu>

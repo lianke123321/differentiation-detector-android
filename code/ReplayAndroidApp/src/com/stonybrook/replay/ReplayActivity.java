@@ -44,11 +44,13 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gc.materialdesign.views.ProgressBarDeterminate;
+import com.gc.materialdesign.views.ButtonFloat;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
 import com.stonybrook.android.logic.CharonVpnService;
@@ -72,7 +74,6 @@ import com.stonybrook.replay.exception_handler.ExceptionHandler;
 import com.stonybrook.replay.util.Config;
 import com.stonybrook.replay.util.Mobilyzer;
 import com.stonybrook.replay.util.ReplayCompleteListener;
-import com.stonybrook.replay.util.SimpleDividerItemDecoration;
 import com.stonybrook.replay.util.UnpickleDataStream;
 
 /**
@@ -104,7 +105,9 @@ public class ReplayActivity extends ActionBarActivity implements
 	boolean replayOngoing = false;
 
 	// adrian: for progress bar
-	ProgressBarDeterminate prgBar;
+	// ProgressBarDeterminate prgBar;
+	ProgressBar prgBar;
+	ButtonFloat replayButton;
 	// ProgressBar prgBar;
 	UpdateUIBean updateUIBean;
 
@@ -164,7 +167,7 @@ public class ReplayActivity extends ActionBarActivity implements
 		// ExceptionHandler(this));
 		Thread.currentThread().setUncaughtExceptionHandler(
 				new ExceptionHandler(this));
-		setContentView(R.layout.replay_main_layout_images);
+		setContentView(R.layout.activity_replay_image);
 		toolbar = (Toolbar) findViewById(R.id.relay_main_bar);
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setTitle(
@@ -172,6 +175,9 @@ public class ReplayActivity extends ActionBarActivity implements
 
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		replayButton = (ButtonFloat) findViewById(R.id.replayButtonFloat);
+		replayButton.setOnClickListener(replayButtonOnClick);
 
 		// keep the screen on
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -226,8 +232,6 @@ public class ReplayActivity extends ActionBarActivity implements
 		appsRecyclerView = (RecyclerView) findViewById(R.id.appsRecyclerView);
 		appsRecyclerViewLayoutManager = new LinearLayoutManager(this);
 		appsRecyclerView.setLayoutManager(appsRecyclerViewLayoutManager);
-		appsRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(
-				getApplicationContext()));
 		appsRecyclerView.setAdapter(adapter);
 
 		// appsListView = (ListView) findViewById(R.id.appsListView);
@@ -259,7 +263,7 @@ public class ReplayActivity extends ActionBarActivity implements
 			throw new RuntimeException();
 
 		// adrian: for progress bar
-		prgBar = (ProgressBarDeterminate) findViewById(R.id.prgBar);
+		prgBar = (ProgressBar) findViewById(R.id.prgBar);
 		// prgBar = (ProgressBar) findViewById(R.id.prgBar);
 		prgBar.setVisibility(View.GONE);
 		updateUIBean = new UpdateUIBean();
@@ -293,10 +297,10 @@ public class ReplayActivity extends ActionBarActivity implements
 		}*/
 
 		if (networkAvailable) {
-			Toast.makeText(
+			/*Toast.makeText(
 					context,
 					"Please click the tick button on top right to start the replay!",
-					Toast.LENGTH_LONG).show();
+					Toast.LENGTH_LONG).show();*/
 
 			new AlertDialog.Builder(ReplayActivity.this,
 					AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
@@ -305,8 +309,8 @@ public class ReplayActivity extends ActionBarActivity implements
 							"Please leave the app running in the foreground "
 									+ "until replay is over in order to avoid "
 									+ "interruptions from other apps in your "
-									+ "phone. The screen will stay on during "
-									+ "the replay. Thank you for your cooperation!")
+									+ "phone.\n\nThe screen will stay on during "
+									+ "the replay.\n\nThank you for your cooperation!")
 					.setPositiveButton("OK",
 							new DialogInterface.OnClickListener() {
 								@Override
@@ -373,6 +377,27 @@ public class ReplayActivity extends ActionBarActivity implements
 		this.onStop();
 		super.onDestroy();
 	}*/
+
+	OnClickListener replayButtonOnClick = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if (!networkAvailable) {
+				Toast.makeText(
+						context,
+						"Network not available, please re-open this app after connecting to network.",
+						Toast.LENGTH_LONG).show();
+			} else if (!replayOngoing) {
+				currentReplayCount = 0;
+				processApplicationReplay();
+
+			} else
+				Toast.makeText(context,
+						"Replay is ongoing! Please do not start again.",
+						Toast.LENGTH_LONG).show();
+		}
+
+	};
 
 	/**
 	 * This Method checks the network Availability. For this NetworkInfo class
