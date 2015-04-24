@@ -152,6 +152,7 @@ public class ReplayActivity extends ActionBarActivity implements
 	public Mobilyzer mobilyzer = null;
 
 	// for all asynctask, create here
+	TestVPN testVpn = null;
 	VPNConnected vpnConnected = null;
 	VPNDisconnected vpnDisconnected = null;
 	RandomReplay randomReplay = null;
@@ -281,11 +282,6 @@ public class ReplayActivity extends ActionBarActivity implements
 
 		// initialize mobilyzer
 		mobilyzer = new Mobilyzer(this.context);
-
-		// create all asynctask
-		vpnConnected = new VPNConnected();
-		vpnDisconnected = new VPNDisconnected();
-		randomReplay = new RandomReplay();
 
 		/*while (server == null) {
 			try {
@@ -489,8 +485,9 @@ public class ReplayActivity extends ActionBarActivity implements
 				// start new task to test vpn
 				onVpnProfileSelected(null);
 				Log.d("Replay", "VPN started");
-
-				(new TestVPN()).execute(this);
+				
+				testVpn = new TestVPN();
+				testVpn.execute(this);
 
 			} else {
 				replayOngoing = false;
@@ -1214,9 +1211,9 @@ public class ReplayActivity extends ActionBarActivity implements
 					selectedApps.get(currentReplayCount).status = getResources()
 							.getString(R.string.random);
 					adapter.notifyDataSetChanged();
-
+					
 					randomReplay = new RandomReplay();
-					randomReplay.execute(ReplayActivity.this);
+					randomReplay.execute(this);
 					return;
 				}
 
@@ -1237,7 +1234,7 @@ public class ReplayActivity extends ActionBarActivity implements
 						Log.w("Replay", "Iteration number exceeds!");
 						System.exit(0);
 					}
-
+					
 					vpnDisconnected = new VPNDisconnected();
 					vpnDisconnected.execute(this);
 					return;
@@ -1381,7 +1378,7 @@ public class ReplayActivity extends ActionBarActivity implements
 						Log.w("Replay", "Iteration number exceeds!");
 						System.exit(0);
 					}
-
+					
 					vpnDisconnected = new VPNDisconnected();
 					vpnDisconnected.execute(this);
 					return;
@@ -1410,6 +1407,7 @@ public class ReplayActivity extends ActionBarActivity implements
 				// processCombinedApplication(selectedApps.get(++currentReplayCount),
 				// "vpn");
 				currentReplayCount++;
+				
 				vpnDisconnected = new VPNDisconnected();
 				vpnDisconnected.execute(this);
 			} else {
@@ -1519,6 +1517,7 @@ public class ReplayActivity extends ActionBarActivity implements
 					// processCombinedApplication(selectedApps.get(++currentReplayCount),
 					// "vpn");
 					currentReplayCount++;
+					
 					vpnDisconnected = new VPNDisconnected();
 					vpnDisconnected.execute(this);
 				} else {
@@ -1572,7 +1571,7 @@ public class ReplayActivity extends ActionBarActivity implements
 					selectedApps.get(currentReplayCount).status = getResources()
 							.getString(R.string.random);
 					adapter.notifyDataSetChanged();
-
+					
 					randomReplay = new RandomReplay();
 					randomReplay.execute(this);
 					return;
@@ -1586,7 +1585,7 @@ public class ReplayActivity extends ActionBarActivity implements
 				selectedApps.get(currentReplayCount).status = getResources()
 						.getString(R.string.vpn);
 				adapter.notifyDataSetChanged();
-
+				
 				vpnConnected = new VPNConnected();
 				vpnConnected.execute(this);
 			}
@@ -1653,7 +1652,9 @@ public class ReplayActivity extends ActionBarActivity implements
 					Log.d("ReplayActivity", "exception while press back key!");
 					e.printStackTrace();
 				}
-
+				
+				testVpn.cancel(true);
+				
 				if (queueCombined != null) {
 					vpnConnected.cancel(true);
 					vpnDisconnected.cancel(true);
@@ -1679,6 +1680,8 @@ public class ReplayActivity extends ActionBarActivity implements
 									@Override
 									public void onClick(DialogInterface dialog,
 											int which) {
+										testVpn.cancel(true);
+										
 										if (queueCombined != null) {
 											vpnConnected.cancel(true);
 											vpnDisconnected.cancel(true);
@@ -1727,6 +1730,8 @@ public class ReplayActivity extends ActionBarActivity implements
 		// return true;
 			case android.R.id.home:
 				if (!replayOngoing) {
+					testVpn.cancel(true);
+					
 					if (queueCombined != null) {
 						vpnConnected.cancel(true);
 						vpnDisconnected.cancel(true);
@@ -1748,6 +1753,8 @@ public class ReplayActivity extends ActionBarActivity implements
 										public void onClick(
 												DialogInterface dialog,
 												int which) {
+											testVpn.cancel(true);
+											
 											if (queueCombined != null) {
 												vpnConnected.cancel(true);
 												vpnDisconnected.cancel(true);
@@ -2136,7 +2143,7 @@ public class ReplayActivity extends ActionBarActivity implements
 							.show();
 				}
 			});
-
+			
 			randomReplay = new RandomReplay();
 			randomReplay.execute(ReplayActivity.this);
 			onlyRandom = true;

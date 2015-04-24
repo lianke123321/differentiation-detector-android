@@ -3,12 +3,12 @@ package com.stonybrook.replay.combined;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.Semaphore;
 
 import android.util.Log;
 
 import com.stonybrook.replay.bean.RequestSet;
-import com.stonybrook.replay.exception_handler.IpFlippingException;
 
 // @@@ Adrian add this
 
@@ -110,12 +110,20 @@ public class CTCPClientThread implements Runnable {
 					// Log.d("Received " + RS.getResponse_len(),
 					// String.valueOf(bytesRead));
 					if (bytesRead < 0) {
-						// throw new
-						// IOException("Data stream ended prematurely");
-						Log.w("Receiving", "Not enough bytes! totalRead: "
+						Log.e("Receiving", "Not enough bytes! totalRead: "
 								+ totalRead + " expected: " + buffer.length);
-						throw new SocketException(
-								"Traffic Manipulation Detected (Type 2)");
+
+						String data = new String(buffer, "UTF-8");
+
+						if (data.length() >= 12
+								&& data.substring(0, 12).trim()
+										.equalsIgnoreCase("WhoTheFAreU?")) {
+							Log.e("TCPClientThread", "IP flipping detected");
+							throw new SocketException(
+									"Traffic Manipulation Detected (Type 1)");
+						} else
+							throw new SocketException(
+									"Traffic Manipulation Detected (Type 2)");
 						// String data = new String(buffer, "UTF-8");
 						// Log.w("Receiving", data);
 					}
@@ -127,7 +135,8 @@ public class CTCPClientThread implements Runnable {
 						&& data.substring(0, 12).trim()
 								.equalsIgnoreCase("WhoTheFAreU?")) {
 					Log.e("TCPClientThread", data);
-					throw new IpFlippingException();
+					throw new SocketException(
+							"Traffic Manipulation Detected (Type 1)");
 				}
 				/*else
 					Log.d("Receiving", "content for " + buffer.length + "\n" + data);*/
@@ -148,11 +157,14 @@ public class CTCPClientThread implements Runnable {
 				Log.d("Receiving", "skipped");
 			}
 
-		} catch (IpFlippingException e) {
-			Log.e("TCPClientThread", "IP Flipping Detected");
+		} catch (SocketTimeoutException e) {
+			Log.w("TCPClientThread", "Socket time out!");
+
 			synchronized (queue) {
 				queue.ABORT = true;
-				queue.abort_reason = "Traffic Manipulation Detected (Type 1)";
+				// make sure that this is not caused by other issues
+				if (queue.abort_reason == null)
+					queue.abort_reason = "Replay Aborted: socket timeout";
 			}
 		} catch (Exception e) {
 			Log.e("TCPClientThread", "something bad happened!");
