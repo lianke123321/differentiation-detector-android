@@ -21,6 +21,7 @@ public class CTCPClient /* implements Runnable */{
 	public SocketChannel sc = null;
 	// TODO: Check proper usage later
 	public AtomicBoolean flag = new AtomicBoolean();
+	// use this to signal client thread to add header for the first packet
 
 	public CTCPClient(String cSPair, String destIP, int destPort,
 			String randomID, String replayName, String publicIP,
@@ -46,9 +47,9 @@ public class CTCPClient /* implements Runnable */{
 			socket.setTcpNoDelay(true);
 			socket.setReuseAddress(true);
 			socket.setKeepAlive(true);
-			socket.setSoTimeout(10000);
+			socket.setSoTimeout(20000);
 			socket.connect(endPoint);
-
+			
 			// this.identify();
 		} catch (Exception ex) {
 			ex.printStackTrace();

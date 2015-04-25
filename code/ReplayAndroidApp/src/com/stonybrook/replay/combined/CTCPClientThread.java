@@ -9,6 +9,7 @@ import java.util.concurrent.Semaphore;
 import android.util.Log;
 
 import com.stonybrook.replay.bean.RequestSet;
+import com.stonybrook.replay.util.Config;
 
 // @@@ Adrian add this
 
@@ -20,6 +21,7 @@ public class CTCPClientThread implements Runnable {
 	private Semaphore sendSema = null;
 	private Semaphore recvSema = null;
 	long timeOrigin = 0;
+	private boolean addInfo = false;
 
 	int bufSize = 4096;
 
@@ -44,8 +46,10 @@ public class CTCPClientThread implements Runnable {
 		Thread.currentThread().setName("CTCPClientThread (Thread)");
 		try {
 
-			if (client.socket == null)
+			if (client.socket == null) {
 				client.createSocket();
+				addInfo = true;
+			}
 
 			/*if (!client.socket.isConnected())
 				Log.w("TCPClientThread", "socket not connected!");*/
@@ -65,16 +69,48 @@ public class CTCPClientThread implements Runnable {
 				Log.d("Sending", "First 20 bytes: " + tmp.substring(0, 20));
 			else
 				Log.d("Sending", "Short content: " + tmp);*/
-			if (client.addHeader && tmp.length() >= 3
-					&& tmp.substring(0, 3).trim().equalsIgnoreCase("GET")) {
-				// add modified fields
-				String[] parts = tmp.split("\r\n", 2);
-				tmp = parts[0]
-						+ String.format("\r\nX-rr: %s;%s;%s\r\n",
-								client.publicIP, client.replayName,
-								client.CSPair) + parts[1];
-				Log.d("Sending", "Special GET!");
-				dataOutputStream.write(tmp.getBytes());
+			if (client.addHeader) {
+				if (client.replayName.endsWith("-random")) {
+					// cook the custom info
+					String customInfo = String.format("X-rr;%s;%s;%s;X-rr",
+							client.publicIP, Config.get(client.replayName),
+							client.CSPair);
+					Log.d("Sending", "adding header for random replay: "
+							+ customInfo);
+					
+					// check the length of the payload
+					if (tmp.length() > customInfo.length())
+						tmp = customInfo
+								+ tmp.substring(customInfo.length(),
+										tmp.length());
+					else
+						tmp = customInfo;
+					
+					dataOutputStream.write(tmp.getBytes());
+
+					// no header added for future packet
+					addInfo = false;
+				} else if (tmp.length() >= 3
+						&& tmp.substring(0, 3).trim().equalsIgnoreCase("GET")) {
+					// add modified fields
+					String customInfo = String.format("\r\nX-rr: %s;%s;%s\r\n",
+							client.publicIP, Config.get(client.replayName),
+							client.CSPair);
+
+					String[] parts = tmp.split("\r\n", 2);
+					tmp = parts[0] + customInfo + parts[1];
+
+					Log.d("Sending", "adding header for normal replay: "
+							+ customInfo);
+					dataOutputStream.write(tmp.getBytes());
+
+					// no header added for future GET
+					addInfo = false;
+				} else {
+					//Log.e("Sending", "first packet not touched!");
+					dataOutputStream.write(RS.getPayload());
+				}
+
 			} else {
 				// send payload directly
 				dataOutputStream.write(RS.getPayload());

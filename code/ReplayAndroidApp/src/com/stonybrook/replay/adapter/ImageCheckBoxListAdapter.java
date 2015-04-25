@@ -86,7 +86,9 @@ public class ImageCheckBoxListAdapter extends BaseAdapter implements
 		Log.d("Item", "app name: " + app[0].name + ", random app name: "
 				+ app[1].name);
 		// Set the example text and the state of the checkbox
-//		com.gc.materialdesign.views.CheckBox cb = (com.gc.materialdesign.views.CheckBox) view.findViewById(R.id.isSelectedCheckBox); 
+		// com.gc.materialdesign.views.CheckBox cb =
+		// (com.gc.materialdesign.views.CheckBox)
+		// view.findViewById(R.id.isSelectedCheckBox);
 		CheckBox cb = (CheckBox) view.findViewById(R.id.isSelectedCheckBox);
 		cb.setChecked(app[0].isSelected());
 		if (app[0].isSelected() && !mainAct.selectedApps.contains(app[0])) {
@@ -116,9 +118,11 @@ public class ImageCheckBoxListAdapter extends BaseAdapter implements
 		ApplicationBean data = bundle[0];
 		ApplicationBean dataRandom = bundle[1];
 		// data.setSelected(((CheckBox) view).isChecked());
-//		com.gc.materialdesign.views.CheckBox c = (com.gc.materialdesign.views.CheckBox) view.findViewById(R.id.isSelectedCheckBox);
+		// com.gc.materialdesign.views.CheckBox c =
+		// (com.gc.materialdesign.views.CheckBox)
+		// view.findViewById(R.id.isSelectedCheckBox);
 		CheckBox c = (CheckBox) view.findViewById(R.id.isSelectedCheckBox);
-		if (mainAct.selectedApps.contains(data)) {			
+		if (mainAct.selectedApps.contains(data)) {
 			c.setChecked(false);
 			mainAct.selectedApps.remove(data);
 			mainAct.selectedAppsRandom.remove(dataRandom);

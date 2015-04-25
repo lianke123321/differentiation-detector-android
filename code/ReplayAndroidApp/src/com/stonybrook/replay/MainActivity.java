@@ -357,6 +357,7 @@ public class MainActivity extends ActionBarActivity {
 			intent.putExtra("timing", enableTiming);
 			intent.putExtra("iteration", iteration);
 			intent.putExtra("doRandom", doRandom);
+			intent.putExtra("doTest", doTest);
 			intent.putExtra("randomID", randomID);
 
 			// Start ReplayActivity with slideIn animation.
@@ -433,6 +434,7 @@ public class MainActivity extends ActionBarActivity {
 			intent.putExtra("timing", enableTiming);
 			intent.putExtra("iteration", iteration);
 			intent.putExtra("doRandom", doRandom);
+			intent.putExtra("doTest", doTest);
 			intent.putExtra("randomID", randomID);
 
 			// Start ReplayActivity with slideIn animation.
