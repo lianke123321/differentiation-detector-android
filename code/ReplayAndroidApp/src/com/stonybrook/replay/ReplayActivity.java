@@ -858,28 +858,21 @@ public class ReplayActivity extends ActionBarActivity implements
 						throw new Exception();
 					}
 				} else {
-					if (!Config.get("publicIP").trim()
-							.equalsIgnoreCase(permission[1].trim())) {
-						/**
-						 * only enable addHeader if replay is not over vpn,
-						 * cause when replay over vpn, two public IP must be
-						 * different (one of them is local ip)
-						 */
-						if (!this.channel.equalsIgnoreCase("vpn")
-								&& !getPublicIP().trim().equalsIgnoreCase(
-										permission[1].trim())) {
+					if (!getPublicIP().trim().equalsIgnoreCase(
+							permission[1].trim())) {
+						if (!this.channel.equalsIgnoreCase("vpn")) {
 							Log.w("Replay",
 									"IP flipping detected! enable addHeader.");
 							Config.set("addHeader", "true");
 						}
-						// always set to ip from server if there is difference
-						Config.set("publicIP", permission[1].trim());
 					} else {
 						// if IP is consistent, disable addHeader
 						Log.d("Replay",
 								"public IP consistent. disable addHeader");
 						Config.set("addHeader", "false");
 					}
+
+					Config.set("publicIP", permission[1].trim());
 				}
 
 				// always send noIperf here

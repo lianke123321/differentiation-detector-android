@@ -69,7 +69,7 @@ public class CTCPClientThread implements Runnable {
 				Log.d("Sending", "First 20 bytes: " + tmp.substring(0, 20));
 			else
 				Log.d("Sending", "Short content: " + tmp);*/
-			if (client.addHeader) {
+			if (client.addHeader && addInfo) {
 				if (client.replayName.endsWith("-random")) {
 					// cook the custom info
 					String customInfo = String.format("X-rr;%s;%s;%s;X-rr",
@@ -77,7 +77,7 @@ public class CTCPClientThread implements Runnable {
 							client.CSPair);
 					Log.d("Sending", "adding header for random replay: "
 							+ customInfo);
-					
+
 					// check the length of the payload
 					if (tmp.length() > customInfo.length())
 						tmp = customInfo
@@ -85,11 +85,9 @@ public class CTCPClientThread implements Runnable {
 										tmp.length());
 					else
 						tmp = customInfo;
-					
+
 					dataOutputStream.write(tmp.getBytes());
 
-					// no header added for future packet
-					addInfo = false;
 				} else if (tmp.length() >= 3
 						&& tmp.substring(0, 3).trim().equalsIgnoreCase("GET")) {
 					// add modified fields
@@ -104,10 +102,9 @@ public class CTCPClientThread implements Runnable {
 							+ customInfo);
 					dataOutputStream.write(tmp.getBytes());
 
-					// no header added for future GET
-					addInfo = false;
 				} else {
-					//Log.e("Sending", "first packet not touched!");
+					Log.e("Sending", "first packet not touched! content: "
+							+ tmp + "\ndest port: " + client.socket.getPort());
 					dataOutputStream.write(RS.getPayload());
 				}
 
