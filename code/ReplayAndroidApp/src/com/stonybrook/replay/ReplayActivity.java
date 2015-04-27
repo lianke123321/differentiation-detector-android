@@ -121,6 +121,7 @@ public class ReplayActivity extends ActionBarActivity implements
 	int iteration = 2;
 	boolean doRandom = false;
 	boolean doTest = false;
+	boolean forceAddHeader = false;
 	boolean onlyRandom = false;
 
 	// String GATE_WAY = Config.get("vpn_server");
@@ -218,10 +219,12 @@ public class ReplayActivity extends ActionBarActivity implements
 		iteration = (int) getIntent().getIntExtra("iteration", 1);
 		doRandom = getIntent().getBooleanExtra("doRandom", false);
 		doTest = getIntent().getBooleanExtra("doTest", false);
+		forceAddHeader = getIntent().getBooleanExtra("forceAddHeader", false);
 		randomID = getIntent().getStringExtra("randomID");
 		Log.d("ReplayActivity", "iteration: " + String.valueOf(iteration)
 				+ " doRandom: " + doRandom + " doTest: " + doTest
-				+ " randomID: " + randomID);
+				+ " forceAddHeader: " + forceAddHeader + " randomID: "
+				+ randomID);
 
 		// Create layout for this page
 		// adapter = new ImageReplayListAdapter(selectedApps,
@@ -702,9 +705,10 @@ public class ReplayActivity extends ActionBarActivity implements
 
 		// this method handles all UI updates, running on main thread
 		protected void onProgressUpdate(String... values) {
-			if (values[0].equalsIgnoreCase("updateStatus"))
+			if (values[0].equalsIgnoreCase("updateStatus")) {
+				applicationBean.status = values[1];
 				adapter.notifyDataSetChanged();
-			else if (values[0].equalsIgnoreCase("updateUI")) {
+			} else if (values[0].equalsIgnoreCase("updateUI")) {
 				if (prgBar.getVisibility() == View.GONE)
 					prgBar.setVisibility(View.VISIBLE);
 				prgBar.setProgress(updateUIBean.getProgress());
@@ -742,6 +746,39 @@ public class ReplayActivity extends ActionBarActivity implements
 			// testing manually free memory
 			System.gc();
 
+			int replayIndex = 0;
+			String replayTimeStatus = null;
+
+			if (onlyRandom) {
+				if (channel.equalsIgnoreCase("open"))
+					replayIndex = currentIterationCount * 2 + 1;
+				else if (channel.equalsIgnoreCase("random"))
+					replayIndex = currentIterationCount * 2 + 2;
+				else
+					Log.w("replayIndex", "replay name error: " + channel);
+			} else if (doRandom) {
+				if (channel.equalsIgnoreCase("open"))
+					replayIndex = currentIterationCount * 3 + 1;
+				else if (channel.equalsIgnoreCase("vpn"))
+					replayIndex = currentIterationCount * 3 + 2;
+				else if (channel.equalsIgnoreCase("random"))
+					replayIndex = currentIterationCount * 3 + 3;
+				else
+					Log.w("replayIndex", "replay name error: " + channel);
+			} else {
+				if (channel.equalsIgnoreCase("open"))
+					replayIndex = currentIterationCount * 2 + 1;
+				else if (channel.equalsIgnoreCase("vpn"))
+					replayIndex = currentIterationCount * 2 + 2;
+				else
+					Log.w("replayIndex", "replay name error: " + channel);
+			}
+
+			replayTimeStatus = String.valueOf(replayIndex)
+					+ "/"
+					+ (doRandom ? String.valueOf(iteration * 3) : String
+							.valueOf(iteration * 2)) + " ";
+
 			// for testing crash handler
 			/*if (true) {
 				throw new RuntimeException();
@@ -767,9 +804,11 @@ public class ReplayActivity extends ActionBarActivity implements
 				 * 
 				 */
 				// adrian: update progress
-				applicationBean.status = getResources().getString(
-						R.string.create_side_channel);
-				publishProgress("updateStatus");
+				/*applicationBean.status = getResources().getString(
+						R.string.create_side_channel);*/
+				publishProgress("updateStatus", replayTimeStatus
+						+ getResources()
+								.getString(R.string.create_side_channel));
 
 				int sideChannelPort = Integer.valueOf(Config
 						.get("combined_sidechannel_port"));
@@ -830,9 +869,10 @@ public class ReplayActivity extends ActionBarActivity implements
 							String.valueOf(historyCount));
 
 				// adrian: update progress
-				applicationBean.status = getResources().getString(
-						R.string.ask4permission);
-				publishProgress("updateStatus");
+				/*applicationBean.status = getResources().getString(
+						R.string.ask4permission);*/
+				publishProgress("updateStatus", replayTimeStatus
+						+ getResources().getString(R.string.ask4permission));
 
 				String[] permission = sideChannel.ask4Permission();
 				Log.d("Replay", "permission[0]: " + permission[0]
@@ -842,23 +882,26 @@ public class ReplayActivity extends ActionBarActivity implements
 						publishProgress("makeDialog",
 								"No such replay on server!\n"
 										+ "Click \"OK\" to go back.");
-						//Thread.sleep(30000);
+						// Thread.sleep(30000);
 						throw new Exception();
 					} else if (permission[1].trim().equalsIgnoreCase("2")) {
 						publishProgress("makeDialog",
 								"No permission: another client with same IP address is running. "
 										+ "Wait for it to finish!\n"
 										+ "Click \"OK\" to go back.");
-						//Thread.sleep(30000);
+						// Thread.sleep(30000);
 						throw new Exception();
 					} else {
 						publishProgress("makeDialog", "Unknown error!\n"
 								+ "Click \"OK\" to go back.");
-						//Thread.sleep(30000);
+						// Thread.sleep(30000);
 						throw new Exception();
 					}
 				} else {
-					if (!getPublicIP().trim().equalsIgnoreCase(
+					if (forceAddHeader) {
+						Log.w("Replay", "Enable addHeader by user instruction");
+						Config.set("addHeader", "true");
+					} else if (!getPublicIP().trim().equalsIgnoreCase(
 							permission[1].trim())) {
 						if (!this.channel.equalsIgnoreCase("vpn")) {
 							Log.w("Replay",
@@ -888,9 +931,13 @@ public class ReplayActivity extends ActionBarActivity implements
 				 * this until port mapping is parsed successfully.
 				 */
 				// adrian: update progress
-				applicationBean.status = getResources().getString(
-						R.string.receive_server_port_mapping);
-				publishProgress("updateStatus");
+				/*applicationBean.status = getResources().getString(
+						R.string.receive_server_port_mapping);*/
+				publishProgress(
+						"updateStatus",
+						replayTimeStatus
+								+ getResources().getString(
+										R.string.receive_server_port_mapping));
 
 				try {
 					// randomID = new RandomString(10).nextString();
@@ -911,9 +958,10 @@ public class ReplayActivity extends ActionBarActivity implements
 				 */
 
 				// adrian: update progress
-				applicationBean.status = getResources().getString(
-						R.string.create_tcp_client);
-				publishProgress("updateStatus");
+				/*applicationBean.status = getResources().getString(
+						R.string.create_tcp_client);*/
+				publishProgress("updateStatus", replayTimeStatus
+						+ getResources().getString(R.string.create_tcp_client));
 
 				for (String csp : appData.getTcpCSPs()) {
 					String destIP = csp.substring(csp.lastIndexOf('-') + 1,
@@ -939,9 +987,10 @@ public class ReplayActivity extends ActionBarActivity implements
 				 */
 
 				// adrian: update progress
-				applicationBean.status = getResources().getString(
-						R.string.create_udp_client);
-				publishProgress("updateStatus");
+				/*applicationBean.status = getResources().getString(
+						R.string.create_udp_client);*/
+				publishProgress("updateStatus", replayTimeStatus
+						+ getResources().getString(R.string.create_udp_client));
 
 				for (String originalClientPort : appData.getUdpClientPorts()) {
 					CUDPClient c = new CUDPClient(Config.get("publicIP"));
@@ -962,9 +1011,10 @@ public class ReplayActivity extends ActionBarActivity implements
 				// adrian: starting notifier thread
 
 				// adrian: update progress
-				applicationBean.status = getResources().getString(
-						R.string.run_notf);
-				publishProgress("updateStatus");
+				/*applicationBean.status = getResources().getString(
+						R.string.run_notf);*/
+				publishProgress("updateStatus", replayTimeStatus
+						+ getResources().getString(R.string.run_notf));
 
 				CombinedNotifierThread notifier = sideChannel
 						.notifierCreater(udpReplayInfoBean);
@@ -975,9 +1025,10 @@ public class ReplayActivity extends ActionBarActivity implements
 				// adrian: starting receiver thread
 
 				// adrian: update progress
-				applicationBean.status = getResources().getString(
-						R.string.run_receiver);
-				publishProgress("updateStatus");
+				/*applicationBean.status = getResources().getString(
+						R.string.run_receiver);*/
+				publishProgress("updateStatus", replayTimeStatus
+						+ getResources().getString(R.string.run_receiver));
 
 				CombinedReceiverThread receiver = new CombinedReceiverThread(
 						udpReplayInfoBean, jitterBean);
@@ -1015,9 +1066,10 @@ public class ReplayActivity extends ActionBarActivity implements
 				// Running the Queue (Sender)
 
 				// adrian: update progress
-				applicationBean.status = getResources().getString(
-						R.string.run_sender);
-				publishProgress("updateStatus");
+				/*applicationBean.status = getResources().getString(
+						R.string.run_sender);*/
+				publishProgress("updateStatus", replayTimeStatus
+						+ getResources().getString(R.string.run_sender));
 
 				CombinedQueue queue = new CombinedQueue(appData.getQ(),
 						jitterBean);
@@ -1039,9 +1091,10 @@ public class ReplayActivity extends ActionBarActivity implements
 				double duration = ((double) (System.nanoTime() - this.timeStarted)) / 1000000000;
 
 				// adrian: update progress
-				applicationBean.status = getResources().getString(
-						R.string.send_done);
-				publishProgress("updateStatus");
+				/*applicationBean.status = getResources().getString(
+						R.string.send_done);*/
+				publishProgress("updateStatus", replayTimeStatus
+						+ getResources().getString(R.string.send_done));
 
 				sideChannel.sendDone(duration);
 				Log.d("Replay", "replay finished using time " + duration + " s");
@@ -1058,8 +1111,8 @@ public class ReplayActivity extends ActionBarActivity implements
 					message = getResources().getString(R.string.send_jitter);
 				}
 
-				applicationBean.status = message;
-				publishProgress("updateStatus");
+				// applicationBean.status = message;
+				publishProgress("updateStatus", replayTimeStatus + message);
 
 				sideChannel.sendJitter(randomID, Config.get("jitter"),
 						jitterBean);
@@ -1279,7 +1332,7 @@ public class ReplayActivity extends ActionBarActivity implements
 										"Replay of all applications you have chosen is done! "
 												+ "You might need to wait a few more seconds "
 												+ "for all the results!\n\n"
-												+ "Thank you and have a nice day :-)")
+												+ "Thank you and have a great day :-)")
 								.setPositiveButton("OK",
 										new DialogInterface.OnClickListener() {
 
@@ -1424,7 +1477,7 @@ public class ReplayActivity extends ActionBarActivity implements
 										"Replay of all applications you have chosen is done! "
 												+ "You might need to wait a few more seconds "
 												+ "for all the results!\n\n"
-												+ "Thank you and have a nice day :-)")
+												+ "Thank you and have a great day :-)")
 								.setPositiveButton("OK",
 										new DialogInterface.OnClickListener() {
 
@@ -1534,7 +1587,7 @@ public class ReplayActivity extends ActionBarActivity implements
 											"Replay of all applications you have chosen is done! "
 													+ "You might need to wait a few more seconds "
 													+ "for all the results!\n\n"
-													+ "Thank you and have a nice day :-)")
+													+ "Thank you and have a great day :-)")
 									.setPositiveButton(
 											"OK",
 											new DialogInterface.OnClickListener() {

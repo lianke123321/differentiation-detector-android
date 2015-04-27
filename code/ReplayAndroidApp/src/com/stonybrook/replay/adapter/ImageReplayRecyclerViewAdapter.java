@@ -53,10 +53,7 @@ public class ImageReplayRecyclerViewAdapter extends
 		this.mainAct = mainAct;
 		this.dataList = list;
 		// for each iteration there are two or three replays
-		if (doRandom)
-			this.replay_iteration = iteration * 3;
-		else
-			this.replay_iteration = iteration * 2;
+		this.replay_iteration = doRandom? iteration * 3 : iteration * 2;
 	}
 
 	@Override

@@ -61,8 +61,9 @@ public class CTCPClientThread implements Runnable {
 			/*Log.d("Sending", "payload " + RS.getPayload().length +
 					" bytes, expecting " + RS.getResponse_len() + " bytes ");*/
 
-			// handle GET payload
+			// convert payload to string format
 			String tmp = new String(RS.getPayload(), "UTF-8");
+
 			/*Log.d("Sending", "length of string: " + tmp.length()
 					+ " length of payload: " + RS.getPayload().length);*/
 			/*if (tmp.length() >= 20)
@@ -75,22 +76,26 @@ public class CTCPClientThread implements Runnable {
 					String customInfo = String.format("X-rr;%s;%s;%s;X-rr",
 							client.publicIP, Config.get(client.replayName),
 							client.CSPair);
-					Log.d("Sending", "adding header for random replay: "
-							+ customInfo);
+					Log.d("Sending", "adding header for random replay");
 
 					// check the length of the payload
 					if (tmp.length() > customInfo.length())
 						tmp = customInfo
 								+ tmp.substring(customInfo.length(),
 										tmp.length());
-					else
+					else {
+						Log.w("Sending",
+								"payload length shorter than header. payload length: "
+										+ tmp.length() + " header length: "
+										+ customInfo.length());
 						tmp = customInfo;
+					}
 
 					dataOutputStream.write(tmp.getBytes());
 
 				} else if (tmp.length() >= 3
 						&& tmp.substring(0, 3).trim().equalsIgnoreCase("GET")) {
-					// add modified fields
+					// cook the custom info
 					String customInfo = String.format("\r\nX-rr: %s;%s;%s\r\n",
 							client.publicIP, Config.get(client.replayName),
 							client.CSPair);
@@ -98,13 +103,12 @@ public class CTCPClientThread implements Runnable {
 					String[] parts = tmp.split("\r\n", 2);
 					tmp = parts[0] + customInfo + parts[1];
 
-					Log.d("Sending", "adding header for normal replay: "
-							+ customInfo);
+					Log.d("Sending", "adding header for normal replay");
 					dataOutputStream.write(tmp.getBytes());
 
 				} else {
-					Log.e("Sending", "first packet not touched! content: "
-							+ tmp + "\ndest port: " + client.socket.getPort());
+					Log.w("Sending", "first packet not touched! content:\n"
+							+ tmp + "\ndst port: " + client.socket.getPort());
 					dataOutputStream.write(RS.getPayload());
 				}
 

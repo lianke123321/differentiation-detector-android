@@ -95,6 +95,7 @@ public class MainActivity extends ActionBarActivity {
 	int iteration = 2;
 	boolean doRandom = false;
 	boolean doTest = false;
+	boolean forceAddHeader = false;
 
 	// String gateway = null;
 	String randomID = null;
@@ -358,6 +359,7 @@ public class MainActivity extends ActionBarActivity {
 			intent.putExtra("iteration", iteration);
 			intent.putExtra("doRandom", doRandom);
 			intent.putExtra("doTest", doTest);
+			intent.putExtra("forceAddHeader", forceAddHeader);
 			intent.putExtra("randomID", randomID);
 
 			// Start ReplayActivity with slideIn animation.
@@ -435,6 +437,7 @@ public class MainActivity extends ActionBarActivity {
 			intent.putExtra("iteration", iteration);
 			intent.putExtra("doRandom", doRandom);
 			intent.putExtra("doTest", doTest);
+			intent.putExtra("forceAddHeader", forceAddHeader);
 			intent.putExtra("randomID", randomID);
 
 			// Start ReplayActivity with slideIn animation.
@@ -493,6 +496,10 @@ public class MainActivity extends ActionBarActivity {
 					.findViewById(R.id.selectTestCheckBox);
 			checkBoxTest.setChecked(doTest);
 
+			final CheckBox checkBoxAddHeader = (CheckBox) view
+					.findViewById(R.id.forceAddHeaderCheckBox);
+			checkBoxAddHeader.setChecked(forceAddHeader);
+
 			// set installCert button
 
 			final Button installCertButton = (Button) view
@@ -518,6 +525,7 @@ public class MainActivity extends ActionBarActivity {
 							// doRandom = checkBoxRandom.isCheck();
 							doRandom = checkBoxRandom.isChecked();
 							doTest = checkBoxTest.isChecked();
+							forceAddHeader = checkBoxAddHeader.isChecked();
 							/*Log.d("MainActivity",
 									"Iteration time: "
 											+ String.valueOf(iteration));*/
@@ -619,10 +627,11 @@ public class MainActivity extends ActionBarActivity {
 							R.layout.help_layout,
 							(RelativeLayout) findViewById(R.layout.activity_main_image));
 			builder.setView(view);
-			TextView helpTextView = (TextView) view.findViewById(R.id.helpTextView);
+			TextView helpTextView = (TextView) view
+					.findViewById(R.id.helpTextView);
 			helpTextView.setText(Html.fromHtml(getResources().getString(
 					R.string.help_info)));
-			
+
 			builder.setPositiveButton(R.string.ok,
 					new DialogInterface.OnClickListener() {
 						@Override
