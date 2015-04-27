@@ -842,19 +842,19 @@ public class ReplayActivity extends ActionBarActivity implements
 						publishProgress("makeDialog",
 								"No such replay on server!\n"
 										+ "Click \"OK\" to go back.");
-						Thread.sleep(30000);
+						//Thread.sleep(30000);
 						throw new Exception();
 					} else if (permission[1].trim().equalsIgnoreCase("2")) {
 						publishProgress("makeDialog",
 								"No permission: another client with same IP address is running. "
 										+ "Wait for it to finish!\n"
 										+ "Click \"OK\" to go back.");
-						Thread.sleep(30000);
+						//Thread.sleep(30000);
 						throw new Exception();
 					} else {
 						publishProgress("makeDialog", "Unknown error!\n"
 								+ "Click \"OK\" to go back.");
-						Thread.sleep(30000);
+						//Thread.sleep(30000);
 						throw new Exception();
 					}
 				} else {
@@ -1118,8 +1118,8 @@ public class ReplayActivity extends ActionBarActivity implements
 				Log.e("Replay", "replay failed due to unknow reason!");
 				ex.printStackTrace();
 
-				publishProgress("makeToast",
-						"Sorry, replay failed due to unknown reason.");
+				/*publishProgress("makeToast",
+						"Sorry, replay failed due to unknown reason.");*/
 				// throw new RuntimeException();
 				this.cancel(true);
 				// ACRA.getErrorReporter().handleException(ex);
