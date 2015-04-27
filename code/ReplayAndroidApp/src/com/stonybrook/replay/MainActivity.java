@@ -492,13 +492,13 @@ public class MainActivity extends ActionBarActivity {
 					.findViewById(R.id.selectRandomCheckBox);
 			checkBoxRandom.setChecked(doRandom);
 
-			final CheckBox checkBoxTest = (CheckBox) view
-					.findViewById(R.id.selectTestCheckBox);
-			checkBoxTest.setChecked(doTest);
-
 			final CheckBox checkBoxAddHeader = (CheckBox) view
 					.findViewById(R.id.forceAddHeaderCheckBox);
 			checkBoxAddHeader.setChecked(forceAddHeader);
+
+			final CheckBox checkBoxTest = (CheckBox) view
+					.findViewById(R.id.selectTestCheckBox);
+			checkBoxTest.setChecked(doTest);
 
 			// set installCert button
 
@@ -524,9 +524,12 @@ public class MainActivity extends ActionBarActivity {
 											.getSelectedItem());
 							// doRandom = checkBoxRandom.isCheck();
 							doRandom = checkBoxRandom.isChecked();
-							doTest = checkBoxTest.isChecked();
 							forceAddHeader = checkBoxAddHeader.isChecked();
-							/*Log.d("MainActivity",
+							doTest = checkBoxTest.isChecked();
+							/*Log.d("settings", "doRandom: " + doRandom
+									+ " forceAddHeader: " + forceAddHeader
+									+ " doTest: " + doTest);
+							Log.d("MainActivity",
 									"Iteration time: "
 											+ String.valueOf(iteration));*/
 

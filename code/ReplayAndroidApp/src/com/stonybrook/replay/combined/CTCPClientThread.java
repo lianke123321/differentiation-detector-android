@@ -76,22 +76,27 @@ public class CTCPClientThread implements Runnable {
 					String customInfo = String.format("X-rr;%s;%s;%s;X-rr",
 							client.publicIP, Config.get(client.replayName),
 							client.CSPair);
-					Log.d("Sending", "adding header for random replay");
+
+					byte[] customInfoByte = customInfo.getBytes();
+					byte[] newPayload = null;
 
 					// check the length of the payload
-					if (tmp.length() > customInfo.length())
-						tmp = customInfo
-								+ tmp.substring(customInfo.length(),
-										tmp.length());
-					else {
+					if (RS.getPayload().length > customInfoByte.length) {
+						newPayload = new byte[RS.getPayload().length];
+						Log.d("Sending", "adding header for random replay");
+						System.arraycopy(customInfoByte, 0, newPayload, 0,
+								customInfoByte.length);
+						System.arraycopy(RS.getPayload(),
+								customInfoByte.length, newPayload,
+								customInfoByte.length, RS.getPayload().length
+										- customInfoByte.length);
+					} else {
 						Log.w("Sending",
-								"payload length shorter than header. payload length: "
-										+ tmp.length() + " header length: "
-										+ customInfo.length());
-						tmp = customInfo;
+								"payload length shorter than header, replace payload");
+						newPayload = customInfoByte;
 					}
 
-					dataOutputStream.write(tmp.getBytes());
+					dataOutputStream.write(newPayload);
 
 				} else if (tmp.length() >= 3
 						&& tmp.substring(0, 3).trim().equalsIgnoreCase("GET")) {
@@ -100,10 +105,17 @@ public class CTCPClientThread implements Runnable {
 							client.publicIP, Config.get(client.replayName),
 							client.CSPair);
 
+					if (tmp.getBytes().length != RS.getPayload().length)
+						Log.e("Sending",
+								"length of new byte array: "
+										+ tmp.getBytes().length
+										+ " length of original payload: "
+										+ RS.getPayload().length);
+
 					String[] parts = tmp.split("\r\n", 2);
+					Log.d("Sending", "adding header for normal replay");
 					tmp = parts[0] + customInfo + parts[1];
 
-					Log.d("Sending", "adding header for normal replay");
 					dataOutputStream.write(tmp.getBytes());
 
 				} else {
