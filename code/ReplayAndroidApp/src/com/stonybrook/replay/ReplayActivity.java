@@ -1193,6 +1193,8 @@ public class ReplayActivity extends ActionBarActivity implements
 	public void vpnFinishCompleteCallback(Boolean success) {
 		try {
 			server = Config.get("server");
+			
+			String oldStatus = selectedApps.get(currentReplayCount).status; 
 
 			// updating progress
 			selectedApps.get(currentReplayCount).status = getResources()
@@ -1216,6 +1218,10 @@ public class ReplayActivity extends ActionBarActivity implements
 						prgBar.setVisibility(View.GONE);
 					}
 				});
+				
+				// restore abort reason to status
+				selectedApps.get(currentReplayCount).status = oldStatus;
+				adapter.notifyDataSetChanged();
 
 				/*replayOngoing = false;
 
