@@ -39,6 +39,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -578,7 +579,8 @@ public class MainActivity extends ActionBarActivity {
 				while (it.hasNext()) {
 					try {
 						JSONObject response = new JSONObject(it.next());
-						String replayName = response.getString("replayName");
+						String replayName = response.getString("replayName")
+								.split("-")[0].toUpperCase();
 						int diff = response.getInt("diff");
 						double rate = response.getDouble("rate");
 
@@ -648,6 +650,19 @@ public class MainActivity extends ActionBarActivity {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			MainActivity.this.finish();
+			MainActivity.this.overridePendingTransition(
+					android.R.anim.slide_in_left,
+					android.R.anim.slide_out_right);
+		}
+		
+		return super.onKeyDown(keyCode, event);
 	}
 
 	/**

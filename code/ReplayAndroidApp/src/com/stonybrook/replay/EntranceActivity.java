@@ -57,7 +57,7 @@ public class EntranceActivity extends ActionBarActivity {
 			startActivity(intent);
 			EntranceActivity.this.overridePendingTransition(
 					R.anim.slide_in_right, R.anim.slide_out_left);
-			EntranceActivity.this.finish();
+			// EntranceActivity.this.finish();
 		}
 
 	};
@@ -89,7 +89,8 @@ public class EntranceActivity extends ActionBarActivity {
 				while (it.hasNext()) {
 					try {
 						JSONObject response = new JSONObject(it.next());
-						String replayName = response.getString("replayName");
+						String replayName = response.getString("replayName")
+								.split("-")[0].toUpperCase();
 						int diff = response.getInt("diff");
 						double rate = response.getDouble("rate");
 
