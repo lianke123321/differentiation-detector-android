@@ -42,7 +42,7 @@
     <string name="create_udp_client">Creating all UDP client sockets</string>
     <string name="run_notf">Starting side channel notifier</string>
     <string name="run_receiver">Starting the Receiver process</string>
-    <string name="run_sender">Starting the Sender process</string>
+    <string name="run_sender">Running the Sender process</string>
     <string name="send_done">Notifying server that replay is complete</string>
     <string name="send_jitter">Sending the jitter statistics</string>
     <string name="receive_result">Receiving results</string>
