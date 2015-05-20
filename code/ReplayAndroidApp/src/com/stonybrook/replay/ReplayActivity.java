@@ -216,7 +216,7 @@ public class ReplayActivity extends ActionBarActivity implements
 					+ " " + selectedAppsRandom.get(i).name);
 
 		enableTiming = (String) getIntent().getStringExtra("timing");
-		iteration = (int) getIntent().getIntExtra("iteration", 1);
+		iteration = (int) getIntent().getIntExtra("iteration", 2);
 		doRandom = getIntent().getBooleanExtra("doRandom", false);
 		doTest = getIntent().getBooleanExtra("doTest", false);
 		forceAddHeader = getIntent().getBooleanExtra("forceAddHeader", false);
@@ -857,16 +857,26 @@ public class ReplayActivity extends ActionBarActivity implements
 
 				}
 
-				// if for testing purpose, add a string to extraString
-				if (doTest) {
+				// initialize endOfTest value
+				boolean endOfTest = false;
+				if (currentIterationCount + 1 == iteration
+						&& (channel.equalsIgnoreCase("random") || (channel
+								.equalsIgnoreCase("vpn") && (!doRandom)))) {
+					Log.w("Replay", "last replay!");
+					endOfTest = true;
+				}
+
+				if (doTest)
 					Log.w("Replay", "include -Test string");
-					sideChannel.declareID(appData.getReplayName(), testID,
-							Config.get("extraString") + "-Test",
-							String.valueOf(historyCount));
-				} else
-					sideChannel.declareID(appData.getReplayName(), testID,
-							Config.get("extraString"),
-							String.valueOf(historyCount));
+
+				sideChannel.declareID(appData.getReplayName(),
+						// for indicating end of test
+						endOfTest ? "True" : "False",
+						testID,
+						// add a tail for testing data
+						doTest ? Config.get("extraString") + "-Test" : Config
+								.get("extraString"), String
+								.valueOf(historyCount));
 
 				// adrian: update progress
 				/*applicationBean.status = getResources().getString(
@@ -1193,8 +1203,8 @@ public class ReplayActivity extends ActionBarActivity implements
 	public void vpnFinishCompleteCallback(Boolean success) {
 		try {
 			server = Config.get("server");
-			
-			String oldStatus = selectedApps.get(currentReplayCount).status; 
+
+			String oldStatus = selectedApps.get(currentReplayCount).status;
 
 			// updating progress
 			selectedApps.get(currentReplayCount).status = getResources()
@@ -1218,7 +1228,7 @@ public class ReplayActivity extends ActionBarActivity implements
 						prgBar.setVisibility(View.GONE);
 					}
 				});
-				
+
 				// restore abort reason to status
 				selectedApps.get(currentReplayCount).status = oldStatus;
 				adapter.notifyDataSetChanged();

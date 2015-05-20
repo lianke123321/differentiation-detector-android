@@ -275,9 +275,9 @@ public class MainActivity extends ActionBarActivity {
 						.setTitle("PLEASE READ ME!!!")
 						.setMessage(
 								"We are going to install a certificate that allows our tests to run."
-										+ "When asked for a password,\n\nLEAVE THE PASSWORD FIELD EMPTY\n\n"
+										+ "When prompted for a password,\n\n    TYPE: 1234\n\n"
 										+ "and click \"OK\".\n\n"
-										+ "If you are using Android 5.0.x, please restart your phone after "
+										+ "If you are using Android 5.x, please restart your phone after "
 										+ "installing certificate to avoid a bug of Android.")
 						.setPositiveButton(
 								"Read instructions above carefully before clicking here!",
@@ -661,7 +661,7 @@ public class MainActivity extends ActionBarActivity {
 					android.R.anim.slide_in_left,
 					android.R.anim.slide_out_right);
 		}
-		
+
 		return super.onKeyDown(keyCode, event);
 	}
 
@@ -702,7 +702,8 @@ public class MainActivity extends ActionBarActivity {
 			TrustedCertificateEntry mUserCertEntry = new TrustedCertificateEntry(
 					json.getString("alias"),
 					(X509Certificate) getCertFromString(
-							json.getString("alias"), json.getString("cert")));
+							json.getString("alias"), json.getString("cert"),
+							json.getString("pass")));
 
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -723,7 +724,8 @@ public class MainActivity extends ActionBarActivity {
 	 * @param certData
 	 * @return
 	 */
-	private Certificate getCertFromString(String alias, String certData) {
+	private Certificate getCertFromString(String alias, String certData,
+			String passwd) {
 		KeyStore keyStore;
 		try {
 			keyStore = KeyStore.getInstance("PKCS12");
@@ -731,7 +733,7 @@ public class MainActivity extends ActionBarActivity {
 			String pkcs12 = certData;
 			byte pkcsBytes[] = Base64.decode(pkcs12.getBytes(), Base64.DEFAULT);
 			InputStream sslInputStream = new ByteArrayInputStream(pkcsBytes);
-			keyStore.load(sslInputStream, "".toCharArray());
+			keyStore.load(sslInputStream, passwd.toCharArray());
 
 			Intent installIntent = KeyChain.createInstallIntent();
 
@@ -780,7 +782,7 @@ public class MainActivity extends ActionBarActivity {
 			JSONObject json = null;
 			try {
 				json = new JSONObject(getWebPage("http://" + gateway
-						+ ":50080/dyn/getTempCertNoPassRandom"));
+						+ ":50080/dyn/getTempCertPassRandom"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

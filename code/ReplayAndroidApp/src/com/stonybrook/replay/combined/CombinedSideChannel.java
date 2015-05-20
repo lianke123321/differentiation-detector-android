@@ -59,12 +59,12 @@ public class CombinedSideChannel {
 
 	}
 
-	public void declareID(String replayName, String testID, String extraString,
-			String historyCount) throws Exception {
+	public void declareID(String replayName, String endOfTest, String testID,
+			String extraString, String historyCount) throws Exception {
 		/*String round = testID.replace('_', '-');
 		String extra = extraString.replace('_', '-');*/
 		String info = id + ";" + testID + ";" + replayName + ";" + extraString
-				+ ";" + historyCount;
+				+ ";" + historyCount + ";" + endOfTest;
 		sendObject(info.getBytes(), objLen);
 		Log.d("declareID", info);
 
