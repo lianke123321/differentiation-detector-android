@@ -3,9 +3,12 @@ package com.stonybrook.replay.combined;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Locale;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -43,7 +46,8 @@ public class ResultChannelThread implements Runnable {
 
 	// for storing results
 	private SharedPreferences settings;
-	Set<String> results;
+	// Set<String> results;
+	JSONArray results;
 
 	private String path;
 	private String analyzerServerUrl = null;
@@ -51,14 +55,15 @@ public class ResultChannelThread implements Runnable {
 	private ArrayList<ApplicationBean> selectedApps = null;
 	private String finishVpn;
 	private String finishRandom;
-//	private ImageReplayListAdapter adapter = null;
+	// private ImageReplayListAdapter adapter = null;
 	private ImageReplayRecyclerViewAdapter adapter = null;
 	private ReplayActivity replayAct;
 
 	public ResultChannelThread(ReplayActivity replayAct, String path, int port,
 			String id, ArrayList<ApplicationBean> selectedApps,
 			String finishVpn, String finishRandom,
-			/*ImageReplayListAdapter*/ ImageReplayRecyclerViewAdapter adapter, SharedPreferences settings) {
+			/*ImageReplayListAdapter*/ImageReplayRecyclerViewAdapter adapter,
+			SharedPreferences settings) {
 		this.replayAct = replayAct;
 		this.path = path;
 		this.analyzerServerUrl = ("http://" + path + ":" + port + "/Results");
@@ -68,7 +73,7 @@ public class ResultChannelThread implements Runnable {
 		this.finishRandom = finishRandom;
 		this.adapter = adapter;
 		this.settings = settings;
-		this.results = new HashSet<String>();
+		this.results = new JSONArray();
 		Log.d("Result Channel",
 				"path: " + this.path + " port: " + String.valueOf(port)
 						+ " finishVpn: " + this.finishVpn + " finishRandom: "
@@ -174,6 +179,7 @@ public class ResultChannelThread implements Runnable {
 
 							counter -= 1;
 							JSONObject response = raw_response.getJSONObject(0);
+
 							Log.d("Result Channel",
 									"response: " + response.toString());
 
@@ -208,8 +214,10 @@ public class ResultChannelThread implements Runnable {
 									selectedApps.get(i).status = "Result error";
 								} else {
 									// put new result into array list
-									Log.d("Result Channel", "put result to set");
-									results.add(response.toString());
+									Log.d("Result Channel",
+											"put result to json array");
+									// results.add(response.toString());
+									results.put(response);
 
 									if (diff == -1) {
 										selectedApps.get(i).status = "No Differentiation";
@@ -244,10 +252,33 @@ public class ResultChannelThread implements Runnable {
 				if (doneReplay && counter == 0) {
 					Log.d("Result Channel", "Done replay");
 					// put results into shared preference
-					if (!results.isEmpty()) {
+					if (results.length() > 0) {
 						Log.d("Result Channel", "Storing results");
+						// get current date and time, and use it as the key of
+						// this batch of results
+						DateFormat dateFormat = new SimpleDateFormat(
+								"yyyy/MM/dd HH:mm:ss", Locale.US);
+						Date date = new Date();
+						String strDate = dateFormat.format(date);
+						// get current results, if not exist, create a json
+						// object with date as the key
+						JSONObject resultsWithDate = new JSONObject(
+								settings.getString("lastResult", "{}"));
+						// remove one history result if there are too many
+						if (resultsWithDate.length() >= 5) {
+							Iterator<String> it = resultsWithDate.keys();
+							if (it.hasNext())
+								resultsWithDate.remove(it.next());
+							else
+								Log.w("Result Channel",
+										"iterator doesn't have next but length is not 0");
+						}
+
+						resultsWithDate.put(strDate, results);
+
 						Editor editor = settings.edit();
-						editor.putStringSet("lastResult", results);
+						editor.putString("lastResult",
+								resultsWithDate.toString());
 						editor.commit();
 					}
 

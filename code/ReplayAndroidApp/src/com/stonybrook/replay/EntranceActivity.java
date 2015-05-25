@@ -1,8 +1,9 @@
 package com.stonybrook.replay;
 
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Locale;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -79,45 +80,63 @@ public class EntranceActivity extends ActionBarActivity {
 			TextView tv = (TextView) view.findViewById(R.id.historyTextview);
 
 			// get results
-			Set<String> results = settings.getStringSet("lastResult", null);
-			String finalResult = "";
-			if (results != null && !results.isEmpty()) {
-				Log.d("EntranceActivity",
-						"Retrieve results succeeded! results: "
-								+ results.toString());
-				Iterator<String> it = results.iterator();
-				while (it.hasNext()) {
-					try {
-						JSONObject response = new JSONObject(it.next());
-						String replayName = response.getString("replayName")
-								.split("-")[0].toUpperCase();
-						int diff = response.getInt("diff");
-						double rate = response.getDouble("rate");
+			// Set<String> results = settings.getStringSet("lastResult", null);
+			try {
+				JSONObject resultsWithDate = new JSONObject(settings.getString(
+						"lastResult", "{}"));
 
-						if (diff == -1) {
-							finalResult += (replayName + ":\n    no differentiation\n\n");
-						} else if (diff == 0) {
-							finalResult += (replayName + ":\n    inconclusive result\n\n");
-						} else if (diff == 1) {
-							String speed = rate < 0 ? "faster" : "slower";
-							String processedRate = String.valueOf((int) Math
-									.abs(rate * 100)) + "% ";
-							finalResult += (replayName
-									+ ":\n    differentiation detected, "
-									+ processedRate + speed + "\n\n");
-						} else {
+				String finalResult = "";
 
+				// if (results != null && !results.isEmpty()) {
+				if (resultsWithDate.length() > 0) {
+					Log.d("EntranceActivity",
+							"Retrieve results succeeded! results: "
+									+ resultsWithDate.toString());
+					// Iterator<String> it = results.iterator();
+					Iterator<String> it = resultsWithDate.keys();
+					while (it.hasNext()) {
+						String strDate = it.next();
+						finalResult += (strDate + ": \n\n");
+
+						// JSONObject response = new JSONObject(it.next());
+						JSONArray responses = resultsWithDate
+								.getJSONArray(strDate);
+						for (int i = 0; i < responses.length(); i++) {
+							JSONObject response = responses.getJSONObject(i);
+							String replayName = response
+									.getString("replayName").split("-")[0]
+									.toUpperCase(Locale.US);
+							int diff = response.getInt("diff");
+							double rate = response.getDouble("rate");
+
+							if (diff == -1) {
+								finalResult += ("    " + replayName + ":\n        no differentiation\n\n");
+							} else if (diff == 0) {
+								finalResult += ("    " + replayName + ":\n        inconclusive result\n\n");
+							} else if (diff == 1) {
+								String speed = rate < 0 ? "faster" : "slower";
+								String processedRate = String
+										.valueOf((int) Math.abs(rate * 100))
+										+ "% ";
+								finalResult += ("    "
+										+ replayName
+										+ ":\n        differentiation detected, "
+										+ processedRate + speed + "\n\n");
+							} else {
+								Log.w("EntranceActivity",
+										"diff has abnormal value");
+							}
 						}
-					} catch (JSONException e) {
-						Log.e("EntranceActivity", "parsing json error");
-						e.printStackTrace();
 					}
-				}
 
-				// Set elements of dialog
-				tv.setText(finalResult);
-			} else {
-				Log.d("EntranceActivity", "No result available");
+					// display processed results
+					tv.setText(finalResult);
+				} else {
+					Log.d("EntranceActivity", "No result available");
+				}
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
 			builder.setPositiveButton(R.string.ok,
