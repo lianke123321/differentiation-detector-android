@@ -274,7 +274,9 @@ public class CharonVpnService extends VpnService implements Runnable {
 								mCurrentProfile.getName());
 						initializeCharon(builder, mLogFile);
 						Log.i(TAG, "charon started");
-
+						
+						Log.i(TAG, "gateway: " + mCurrentProfile.getGateway());
+						
 						initiate(mCurrentProfile.getVpnType().getIdentifier(),
 								mCurrentProfile.getGateway(),
 								mCurrentProfile.getUsername(),

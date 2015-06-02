@@ -214,6 +214,8 @@ public class ConsentFormActivity extends ActionBarActivity {
 					(X509Certificate) getCertFromString(
 							json.getString("alias"), json.getString("cert"),
 							json.getString("pass")));
+			
+			createAndInsertVpnProfile();
 
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -227,17 +229,14 @@ public class ConsentFormActivity extends ActionBarActivity {
 		}
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-		// TODO check request code...
-		String name = "Meddle Replay Server";
-
+	private void createAndInsertVpnProfile() {
+		Log.d("createAndInsertVpnProfile", "in!");
+		
 		// We want to use certs to avoid passwords
 		VpnType mVpnType = VpnType.IKEV2_CERT;
 		// TODO update the gateway used
-		mProfile.setName(name.isEmpty() ? gateway : name);
-		mProfile.setGateway(gateway);
+		mProfile.setName("Meddle Replay Server");
+		mProfile.setGateway(Config.get("vpn_server"));
 		mProfile.setVpnType(mVpnType);
 
 		if (mVpnType.getRequiresCertificate()) {
@@ -249,6 +248,13 @@ public class ConsentFormActivity extends ActionBarActivity {
 		mProfile.setCertificateAlias(certAlias);
 		mProfile.setAutoReconnect(false);
 		mDataSource.insertProfile(mProfile);
+
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		// TODO check request code...
 
 		Intent intent = new Intent();
 		intent.setClass(ConsentFormActivity.this, EntranceActivity.class);

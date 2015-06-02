@@ -295,9 +295,12 @@ public class ResultChannelThread implements Runnable {
 				Thread.sleep(10000);
 			}
 		} catch (InterruptedException ex) {
-			Log.d("Result Channel", "interrupted!");
+			Log.w("Result Channel", "interrupted!");
 		} catch (JSONException e) {
-			Log.d("Result Channel", "parsing json error");
+			Log.e("Result Channel", "parsing json error");
+			e.printStackTrace();
+		} catch (Exception e) {
+			Log.e("Result Channel", "unkown exception");
 			e.printStackTrace();
 		}
 	}

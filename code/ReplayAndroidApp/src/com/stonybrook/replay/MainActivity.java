@@ -58,6 +58,7 @@ import com.gc.materialdesign.views.Button;
 import com.stonybrook.android.data.TrustedCertificateEntry;
 import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
+import com.stonybrook.android.data.VpnType;
 import com.stonybrook.replay.adapter.ImageCheckBoxListAdapter;
 import com.stonybrook.replay.bean.ApplicationBean;
 import com.stonybrook.replay.constant.ReplayConstants;
@@ -562,9 +563,11 @@ public class MainActivity extends ActionBarActivity {
 					MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
 			builder.setTitle("Previous Results");
 
-			View view = LayoutInflater.from(MainActivity.this).inflate(
-					R.layout.history_layout,
-					(RelativeLayout) findViewById(R.layout.activity_main_image));
+			View view = LayoutInflater
+					.from(MainActivity.this)
+					.inflate(
+							R.layout.history_layout,
+							(RelativeLayout) findViewById(R.layout.activity_main_image));
 			builder.setView(view);
 			TextView tv = (TextView) view.findViewById(R.id.historyTextview);
 
@@ -612,8 +615,7 @@ public class MainActivity extends ActionBarActivity {
 										+ ":\n        differentiation detected, "
 										+ processedRate + speed + "\n\n");
 							} else {
-								Log.w("MainActivity",
-										"diff has abnormal value");
+								Log.w("MainActivity", "diff has abnormal value");
 							}
 						}
 					}
@@ -688,11 +690,6 @@ public class MainActivity extends ActionBarActivity {
 	 */
 	private void downloadAndInstallVpnCreds() {
 
-		// get reference to database for storing credentials
-		Context context = this.getApplicationContext();
-		VpnProfileDataSource mDataSource = new VpnProfileDataSource(context);
-		mDataSource.open();
-
 		// create VPN proile, fill it up and save it in the database
 		VpnProfile mProfile = new VpnProfile();
 		getAndUpdateProfileData(mProfile);
@@ -723,6 +720,8 @@ public class MainActivity extends ActionBarActivity {
 							json.getString("alias"), json.getString("cert"),
 							json.getString("pass")));
 
+			createAndInsertVpnProfile(mUserCertEntry);
+
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -733,6 +732,34 @@ public class MainActivity extends ActionBarActivity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private void createAndInsertVpnProfile(
+			TrustedCertificateEntry mUserCertEntry) {
+		// We want to use certs to avoid passwords
+		VpnType mVpnType = VpnType.IKEV2_CERT;
+		// TODO update the gateway used
+		VpnProfile mProfile = new VpnProfile();
+		mProfile.setName("Meddle Replay Server");
+		mProfile.setGateway(Config.get("vpn_server"));
+		mProfile.setVpnType(mVpnType);
+
+		if (mVpnType.getRequiresCertificate()) {
+			mProfile.setUserCertificateAlias(mUserCertEntry.getAlias());
+		}
+		String certAlias = null;
+		// String certAlias = mCheckAuto.isChecked() ? null :
+		// mCertEntry.getAlias();
+		mProfile.setCertificateAlias(certAlias);
+		mProfile.setAutoReconnect(false);
+
+		// get reference to database for storing credentials
+		Context context = this.getApplicationContext();
+		VpnProfileDataSource mDataSource = new VpnProfileDataSource(context);
+		mDataSource.open();
+
+		mDataSource.insertProfile(mProfile);
+
 	}
 
 	/**

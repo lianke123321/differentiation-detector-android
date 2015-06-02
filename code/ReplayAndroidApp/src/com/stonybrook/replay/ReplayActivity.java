@@ -1913,6 +1913,14 @@ public class ReplayActivity extends ActionBarActivity implements
 		VpnProfileDataSource mDataSource = new VpnProfileDataSource(context);
 		mDataSource.open();
 		profile = mDataSource.getAllVpnProfiles().get(0);
+		
+		// update gateway in the profile, using the current ip instead of url
+		// this is not enabled because vpn security check won't allow this
+		/*Log.w("onVpnProfileSelected", "old gateway: " + profile.getGateway());
+		profile.setGateway("replay-s.meddle.mobi");
+		Log.w("onVpnProfileSelected", "new gateway: " + profile.getGateway());
+		mDataSource.updateVpnProfile(profile);*/
+		
 		Bundle profileInfo = new Bundle();
 		profileInfo.putLong(VpnProfileDataSource.KEY_ID, profile.getId());
 		prepareVpnService(profileInfo);
