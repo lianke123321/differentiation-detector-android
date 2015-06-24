@@ -1,23 +1,19 @@
 package com.stonybrook.replay;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 
 import android.app.AlertDialog;
@@ -453,6 +449,9 @@ public class ReplayActivity extends ActionBarActivity implements
 			while (Config.get("publicIP") == "") {
 				Thread.sleep(500);
 			}
+
+			if (Config.get("publicIP") == "127.0.0.1")
+				Log.e("Replay", "failed to get public ip");
 
 			Log.d("Replay", "public IP: " + Config.get("publicIP"));
 			// Check server reachability
@@ -913,16 +912,16 @@ public class ReplayActivity extends ActionBarActivity implements
 						Config.set("addHeader", "true");
 					} else if (!getPublicIP().trim().equalsIgnoreCase(
 							permission[1].trim())) {
-						if (!this.channel.equalsIgnoreCase("vpn")) {
-							Log.w("Replay",
-									"IP flipping detected! enable addHeader.");
-							Config.set("addHeader", "true");
-						}
-					} else {
+						Log.w("Replay",
+								"IP flipping detected! enable addHeader.");
+						Config.set("addHeader", "true");
+					} else if (!this.channel.equalsIgnoreCase("vpn")) {
 						// if IP is consistent, disable addHeader
 						Log.d("Replay",
 								"public IP consistent. disable addHeader");
 						Config.set("addHeader", "false");
+					} else {
+						// do nothing because this is vpn replay
 					}
 
 					Config.set("publicIP", permission[1].trim());
@@ -1913,14 +1912,14 @@ public class ReplayActivity extends ActionBarActivity implements
 		VpnProfileDataSource mDataSource = new VpnProfileDataSource(context);
 		mDataSource.open();
 		profile = mDataSource.getAllVpnProfiles().get(0);
-		
+
 		// update gateway in the profile, using the current ip instead of url
 		// this is not enabled because vpn security check won't allow this
 		/*Log.w("onVpnProfileSelected", "old gateway: " + profile.getGateway());
 		profile.setGateway("replay-s.meddle.mobi");
 		Log.w("onVpnProfileSelected", "new gateway: " + profile.getGateway());
 		mDataSource.updateVpnProfile(profile);*/
-		
+
 		Bundle profileInfo = new Bundle();
 		profileInfo.putLong(VpnProfileDataSource.KEY_ID, profile.getId());
 		prepareVpnService(profileInfo);
@@ -2049,33 +2048,47 @@ public class ReplayActivity extends ActionBarActivity implements
 	}
 
 	private String getPublicIP() {
-		String publicIP = null;
-		while (publicIP == null) {
-			try {
-				HttpParams httpParameters = new BasicHttpParams();
-				// Set the timeout in milliseconds until a connection is
-				// established.
-				// The default value is zero, that means the timeout is not
-				// used.
-				int timeoutConnection = 3000;
-				HttpConnectionParams.setConnectionTimeout(httpParameters,
-						timeoutConnection);
-				// Set the default socket timeout (SO_TIMEOUT)
-				// in milliseconds which is the timeout for waiting for data.
-				int timeoutSocket = 5000;
-				HttpConnectionParams
-						.setSoTimeout(httpParameters, timeoutSocket);
+		String publicIP = "127.0.0.1";
+		String IPRequest = "WHATSMYIPMAN?";
 
-				HttpClient httpclient = new DefaultHttpClient(httpParameters);
-				HttpGet httpget = new HttpGet("http://myexternalip.com/raw");
-				HttpResponse response;
-				response = httpclient.execute(httpget);
-				HttpEntity entity = response.getEntity();
-				publicIP = EntityUtils.toString(entity).trim();
-			} catch (Exception e) {
-				Log.w("getPublicIP", "failed to get public IP!");
-				e.printStackTrace();
+		if (server != null && server != "127.0.0.1") {
+			try {
+				Socket socket = new Socket();
+				// connect to port 80 of replay server
+				InetSocketAddress endPoint = new InetSocketAddress(server, 80);
+				// socket.setTcpNoDelay(true);
+				socket.setReuseAddress(true);
+				socket.setKeepAlive(false);
+				socket.setSoTimeout(20000);
+				socket.connect(endPoint);
+
+				DataOutputStream dataOutputStream = new DataOutputStream(
+						socket.getOutputStream());
+
+				DataInputStream dataInputStream = new DataInputStream(
+						socket.getInputStream());
+
+				dataOutputStream.write(IPRequest.getBytes(Charset
+						.forName("UTF-8")));
+
+				byte[] buffer = new byte[100];
+
+				int bytesRead = dataInputStream.read(buffer);
+				publicIP = new String(buffer, 0, bytesRead, "UTF-8");
+				Log.d("getPublicIP", publicIP);
+
+				socket.close();
+
+				// sanity check
+				if (publicIP.split("\\.").length != 4)
+					throw new Exception("wrong format of public IP!");
+
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				publicIP = "127.0.0.1";
 			}
+		} else {
+			Log.w("getPublicIP", "server ip is not available: " + server);
 		}
 
 		return publicIP;
@@ -2106,8 +2119,8 @@ public class ReplayActivity extends ActionBarActivity implements
 				// throw new UnknownHostException();
 			} catch (UnknownHostException e) {
 				Log.w("GetReplayServerIP", "get IP of replay server failed!");
-				server = "172.0.0.1";
-				meddleIP = "172.0.0.1";
+				server = "127.0.0.1";
+				meddleIP = "127.0.0.1";
 				ReplayActivity.this.runOnUiThread(new Runnable() {
 					public void run() {
 						Toast.makeText(
