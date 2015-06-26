@@ -2460,8 +2460,11 @@ public class ReplayActivity extends ActionBarActivity implements
 			while (i < 5) {
 				try {
 					i++;
-					String str = getPublicIP();
-					if (!str.equalsIgnoreCase(server)) {
+					// String str = getPublicIP();
+					// if (!str.equalsIgnoreCase(server)) {
+					if (CharonVpnService.getInstance() != null
+							&& !CharonVpnService.getInstance()
+									.isFullyConnected()) {
 						Log.d("randomReplay", "Got it!");
 						// Set flag indicating VPN connectivity status
 						isVPNConnected = false;
@@ -2488,7 +2491,7 @@ public class ReplayActivity extends ActionBarActivity implements
 						return true;
 
 					}
-					Log.d("randomReplay", "public IP: " + str);
+					//Log.d("randomReplay", "public IP: " + str);
 				} catch (Exception e) {
 					Log.d("randomReplay", "failed to get VPN IP address");
 					e.printStackTrace();

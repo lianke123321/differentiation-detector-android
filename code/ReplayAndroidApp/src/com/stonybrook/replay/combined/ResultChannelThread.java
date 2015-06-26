@@ -1,8 +1,13 @@
 package com.stonybrook.replay.combined;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,13 +16,9 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -305,68 +306,73 @@ public class ResultChannelThread implements Runnable {
 		}
 	}
 
-	public JSONObject ask4analysis(String id, int historyCount) {
-		ArrayList<NameValuePair> pairs = new ArrayList<NameValuePair>();
-		pairs.add(new BasicNameValuePair("command", "analyze"));
-		pairs.add(new BasicNameValuePair("userID", id));
-		pairs.add(new BasicNameValuePair("historyCount", String
-				.valueOf(historyCount)));
+	private JSONObject ask4analysis(String id, int historyCount) {
+		String urlParas = "";
+		urlParas += "command=analyze&";
+		urlParas += ("userID=" + id + "&");
+		urlParas += ("historyCount=" + String.valueOf(historyCount));
 
-		JSONObject res = sendRequest("POST", null, pairs);
+		JSONObject res = sendRequest("POST", urlParas);
 		return res;
 	}
 
-	public JSONObject getSingleResult(String id, int historyCount) {
-		ArrayList<String> data = new ArrayList<String>();
+	private JSONObject getSingleResult(String id, int historyCount) {
+		/*ArrayList<String> data = new ArrayList<String>();
 		data.add("userID=" + id);
 		data.add("command=" + "singleResult");
-		data.add("historyCount=" + String.valueOf(historyCount));
+		data.add("historyCount=" + String.valueOf(historyCount));*/
+		
+		String urlParas = "";
+		urlParas += ("userID=" + id + "&");
+		urlParas += ("command=singleResult&");
+		urlParas += ("historyCount=" + String.valueOf(historyCount));
 
-		JSONObject res = sendRequest("GET", data, null);
+		JSONObject res = sendRequest("GET", urlParas);
 		return res;
 
 	}
 
 	// overload getSingleResult method. historyCount are not given as a
 	// parameter
-	public JSONObject getSingleResult(String id) {
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("userID=" + id);
-		data.add("command=" + "singleResult");
+	private JSONObject getSingleResult(String id) {
+		String urlParas = "";
+		urlParas += ("userID=" + id + "&");
+		urlParas += ("command=singleResult&");
 
-		JSONObject res = sendRequest("GET", data, null);
+		JSONObject res = sendRequest("GET", urlParas);
 		return res;
 	}
 
-	public JSONObject getMultipleResult(String id, int maxHistoryCount) {
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("userID=" + id);
-		data.add("command=" + "multiResults");
-		data.add("maxHistoryCount=" + String.valueOf(maxHistoryCount));
+	private JSONObject getMultipleResult(String id, int maxHistoryCount) {
+		String urlParas = "";
+		urlParas += ("userID=" + id + "&");
+		urlParas += ("command=multiResults&");
+		urlParas += ("maxHistoryCount=" + String.valueOf(maxHistoryCount));
 
-		JSONObject res = sendRequest("GET", data, null);
+		JSONObject res = sendRequest("GET", urlParas);
 		return res;
 	}
 
 	// overload getMultiple method. maxHistoryCount is not given as a parameter
-	public JSONObject getMultipleResult(String id) {
+	private JSONObject getMultipleResult(String id) {
 		int maxHistoryCount = 10;
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("userID=" + id);
-		data.add("command=" + "multiResults");
-		data.add("maxHistoryCount=" + String.valueOf(maxHistoryCount));
+		
+		String urlParas = "";
+		urlParas += ("userID=" + id + "&");
+		urlParas += ("command=multiResults&");
+		urlParas += ("maxHistoryCount=" + String.valueOf(maxHistoryCount));
 
-		JSONObject res = sendRequest("GET", data, null);
+		JSONObject res = sendRequest("GET", urlParas);
 		return res;
 	}
 
-	public JSONObject sendRequest(String method, ArrayList<String> data,
-			ArrayList<NameValuePair> pairs) {
-
+	private JSONObject sendRequest(String method, String urlParas) {
+		// create return object
 		JSONObject json = null;
+		
 		if (method.equalsIgnoreCase("GET")) {
-			String dataURL = URLEncoder(data);
-			String url_string = this.analyzerServerUrl + "?" + dataURL;
+			//String dataURL = URLEncoder(data);
+			String url_string = this.analyzerServerUrl + "?" + urlParas;
 			Log.d("Result Channel", url_string);
 
 			try {
@@ -394,16 +400,65 @@ public class ResultChannelThread implements Runnable {
 			}
 		} else if (method.equalsIgnoreCase("POST")) {
 			String url_string = this.analyzerServerUrl;
+			byte[] postData = urlParas.getBytes();
 			Log.d("Result Channel", url_string);
 
 			try {
+				URL url = new URL(url_string);
+				Log.w("Result Channel", "1");
+				HttpURLConnection conn = (HttpURLConnection) url
+						.openConnection();
+				Log.w("Result Channel", "2");
+				conn.setRequestMethod("POST");
+				conn.setReadTimeout(10000);
+				conn.setConnectTimeout(15000);
+				conn.setUseCaches(false);
+				conn.setDoInput(true);
+				conn.setDoOutput(true);
+
+				DataOutputStream wr = new DataOutputStream(
+						conn.getOutputStream());
+				wr.write(postData);
+
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(conn.getInputStream()));
+
+				// os.close();
+				StringBuilder sb = new StringBuilder();
+				String line;
+				while ((line = reader.readLine()) != null) {
+					sb.append(line);
+				}
+				reader.close();
+
+				// parse String to json file.
+				json = new JSONObject(sb.toString());
+
+			} catch (MalformedURLException e1) {
+				e1.printStackTrace();
+				json = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+				json = null;
+			} catch (JSONException e) {
+				e.printStackTrace();
+				json = null;
+			} catch (Exception e) {
+				e.printStackTrace();
+				json = null;
+			}
+
+			/*try {
+				Log.w("Result Channel", "1");
 				HttpClient httpClient = new DefaultHttpClient();
 				HttpPost post = new HttpPost(url_string);
-				// URI uri = new URI(url_string);
 				post.setEntity(new UrlEncodedFormEntity(pairs));
+				Log.w("Result Channel", "2");
 				HttpResponse response = httpClient.execute(post);
+				Log.w("Result Channel", "3");
 				BufferedReader rd = new BufferedReader(new InputStreamReader(
 						response.getEntity().getContent()));
+				Log.w("Result Channel", "4");
 				StringBuilder res = new StringBuilder();
 
 				// parse BufferReader rd to StringBuilder res
@@ -412,7 +467,7 @@ public class ResultChannelThread implements Runnable {
 					res.append(line);
 				}
 				rd.close();
-
+				Log.w("Result Channel", "5");
 				// parse String to json file.
 				json = new JSONObject(res.toString());
 			} catch (JSONException e) {
@@ -422,7 +477,7 @@ public class ResultChannelThread implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 				Log.e("Result Channel", "sendRequest POST failed");
-			}
+			}*/
 		}
 
 		return json;
@@ -430,7 +485,7 @@ public class ResultChannelThread implements Runnable {
 	}
 
 	// overload URLencoder to encode map to an url.
-	public String URLEncoder(ArrayList<String> map) {
+	/*private String URLEncoder(ArrayList<String> map) {
 		StringBuilder data = new StringBuilder();
 		for (String s : map) {
 			if (data.length() > 0) {
@@ -441,7 +496,7 @@ public class ResultChannelThread implements Runnable {
 
 		return data.toString();
 
-	}
+	}*/
 
 	// TODO: temporary way to updateUI from this thread
 	// maybe find another way

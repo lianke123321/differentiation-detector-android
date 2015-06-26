@@ -140,7 +140,9 @@ public class CharonVpnService extends VpnService implements Runnable {
 
 				String action = (String) intent.getCharSequenceExtra("action");
 				// Log.d("action", action);
-				if (action.equalsIgnoreCase("stop")) {
+				if (action == null) {
+					Log.e("VPN", "action is null!");
+				} else if (action.equalsIgnoreCase("stop")) {
 					setNextProfile(null);
 				} else {
 					if (bundle != null && mNextProfile == null) {
@@ -157,7 +159,7 @@ public class CharonVpnService extends VpnService implements Runnable {
 
 			}
 		} catch (Exception e) {
-			Log.e("VPN", "failed to connect VPN!");
+			Log.e("VPN", "exception happened at starting point");
 			ACRA.getErrorReporter().handleException(e);
 		}
 		return START_NOT_STICKY;
