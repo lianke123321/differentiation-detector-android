@@ -1,19 +1,23 @@
 package com.stonybrook.replay;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 
 import android.app.AlertDialog;
@@ -2048,44 +2052,50 @@ public class ReplayActivity extends ActionBarActivity implements
 	}
 
 	private String getPublicIP() {
-		String publicIP = "127.0.0.1";
-		String IPRequest = "WHATSMYIPMAN?";
+		String publicIP = null;
 
 		if (server != null && server != "127.0.0.1") {
-			try {
-				Socket socket = new Socket();
-				// connect to port 80 of replay server
-				InetSocketAddress endPoint = new InetSocketAddress(server, 80);
-				// socket.setTcpNoDelay(true);
-				socket.setReuseAddress(true);
-				socket.setKeepAlive(false);
-				socket.setSoTimeout(20000);
-				socket.connect(endPoint);
+			String url = "http://" + server + "/WHATSMYIPMAN";
+			Log.d("getPublicIP", "url: " + url);
+			
+			while (publicIP == null) {
+				try {
+					HttpParams httpParameters = new BasicHttpParams();
+					// Set the timeout in milliseconds until a connection is
+					// established.
+					// The default value is zero, that means the timeout is not
+					// used.
+					int timeoutConnection = 3000;
+					HttpConnectionParams.setConnectionTimeout(httpParameters,
+							timeoutConnection);
+					// Set the default socket timeout (SO_TIMEOUT)
+					// in milliseconds which is the timeout for waiting for
+					// data.
+					int timeoutSocket = 5000;
+					HttpConnectionParams.setSoTimeout(httpParameters,
+							timeoutSocket);
 
-				DataOutputStream dataOutputStream = new DataOutputStream(
-						socket.getOutputStream());
+					HttpClient httpclient = new DefaultHttpClient(
+							httpParameters);
+					HttpGet httpget = new HttpGet(url);
+					HttpResponse response;
+					response = httpclient.execute(httpget);
+					HttpEntity entity = response.getEntity();
+					publicIP = EntityUtils.toString(entity).trim();
 
-				DataInputStream dataInputStream = new DataInputStream(
-						socket.getInputStream());
+					if (publicIP.split("\\.").length != 4) {
+						Log.e("getPublicIP", "wrong format of public IP: "
+								+ publicIP);
+						throw new Exception();
+					} else
+						Log.d("getPublicIP", "public IP: " + publicIP);
 
-				dataOutputStream.write(IPRequest.getBytes(Charset
-						.forName("UTF-8")));
-
-				byte[] buffer = new byte[100];
-
-				int bytesRead = dataInputStream.read(buffer);
-				publicIP = new String(buffer, 0, bytesRead, "UTF-8");
-				Log.d("getPublicIP", publicIP);
-
-				socket.close();
-
-				// sanity check
-				if (publicIP.split("\\.").length != 4)
-					throw new Exception("wrong format of public IP!");
-
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				publicIP = "127.0.0.1";
+				} catch (Exception e) {
+					Log.w("getPublicIP", "failed to get public IP!");
+					e.printStackTrace();
+					publicIP = null;
+					break;
+				}
 			}
 		} else {
 			Log.w("getPublicIP", "server ip is not available: " + server);
@@ -2491,7 +2501,7 @@ public class ReplayActivity extends ActionBarActivity implements
 						return true;
 
 					}
-					//Log.d("randomReplay", "public IP: " + str);
+					// Log.d("randomReplay", "public IP: " + str);
 				} catch (Exception e) {
 					Log.d("randomReplay", "failed to get VPN IP address");
 					e.printStackTrace();
