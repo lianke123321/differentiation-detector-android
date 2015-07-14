@@ -16,6 +16,7 @@
             backward-compatibility can go here.
         -->
      	<item name="colorPrimaryDark">@color/darkerorange</item>
+     	<item name="android:navigationBarColor">@color/darkerorange</item>
     </style>
 
 </resources>

@@ -2052,13 +2052,13 @@ public class ReplayActivity extends ActionBarActivity implements
 	}
 
 	private String getPublicIP() {
-		String publicIP = null;
+		String publicIP = "127.0.0.1";
 
 		if (server != null && server != "127.0.0.1") {
 			String url = "http://" + server + "/WHATSMYIPMAN";
 			Log.d("getPublicIP", "url: " + url);
 			
-			while (publicIP == null) {
+			while (publicIP == "127.0.0.1") {
 				try {
 					HttpParams httpParameters = new BasicHttpParams();
 					// Set the timeout in milliseconds until a connection is
@@ -2093,7 +2093,7 @@ public class ReplayActivity extends ActionBarActivity implements
 				} catch (Exception e) {
 					Log.w("getPublicIP", "failed to get public IP!");
 					e.printStackTrace();
-					publicIP = null;
+					publicIP = "127.0.0.1";
 					break;
 				}
 			}
