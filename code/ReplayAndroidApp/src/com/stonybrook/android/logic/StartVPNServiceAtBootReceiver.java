@@ -5,13 +5,13 @@ package com.stonybrook.android.logic;
 
 
 
+import mobi.meddle.diffdetector.ReplayActivity;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
 
-import com.stonybrook.replay.ReplayActivity;
 
 
 /**

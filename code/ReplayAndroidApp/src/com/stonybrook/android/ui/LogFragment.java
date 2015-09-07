@@ -31,7 +31,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.stonybrook.android.logic.CharonVpnService;
-import com.stonybrook.replay.R;
+import mobi.meddle.diffdetector.R;
 
 public class LogFragment extends Fragment implements Runnable
 {

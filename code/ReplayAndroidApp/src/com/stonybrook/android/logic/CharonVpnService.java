@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 
+import mobi.meddle.diffdetector.ReplayActivity;
+
 import org.acra.ACRA;
 
 import android.annotation.SuppressLint;
@@ -48,7 +50,6 @@ import com.stonybrook.android.data.VpnProfile;
 import com.stonybrook.android.data.VpnProfileDataSource;
 import com.stonybrook.android.logic.VpnStateService.ErrorState;
 import com.stonybrook.android.logic.VpnStateService.State;
-import com.stonybrook.replay.ReplayActivity;
 
 @SuppressLint("NewApi")
 public class CharonVpnService extends VpnService implements Runnable {

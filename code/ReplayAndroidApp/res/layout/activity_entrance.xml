@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/lightorange"
-    tools:context="com.stonybrook.replay.EntranceActivity" >
+    tools:context="mobi.meddle.diffdetector.EntranceActivity" >
     
     <include
         android:id="@+id/entrance_bar"

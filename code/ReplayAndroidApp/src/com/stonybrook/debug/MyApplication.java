@@ -8,7 +8,7 @@ import org.acra.sender.HttpSender;
 
 import android.app.Application;
 
-import com.stonybrook.replay.R;
+import mobi.meddle.diffdetector.R;
 
 @ReportsCrashes(
 	    formUri = "https://ankeli.cloudant.com/acra-diffdetector/_design/acra-storage/_update/report",
