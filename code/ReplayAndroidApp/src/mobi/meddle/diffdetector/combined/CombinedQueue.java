@@ -10,7 +10,6 @@ import mobi.meddle.diffdetector.bean.RequestSet;
 import mobi.meddle.diffdetector.bean.ServerInstance;
 import mobi.meddle.diffdetector.bean.UDPReplayInfoBean;
 import mobi.meddle.diffdetector.bean.UpdateUIBean;
-
 import android.util.Log;
 
 
@@ -159,7 +158,7 @@ public class CombinedQueue {
 		// package this TCPClient into a TCPClientThread, then put it into a
 		// thread
 		CTCPClientThread clientThread = new CTCPClientThread(client, RS, this,
-				sendSema, recvSema, timeOrigin);
+				sendSema, recvSema, timeOrigin, 100);
 		Thread cThread = new Thread(clientThread);
 
 		// if timing is set to be true, wait until expected Time to send

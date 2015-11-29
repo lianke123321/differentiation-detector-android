@@ -8,7 +8,6 @@ import java.util.concurrent.Semaphore;
 
 import mobi.meddle.diffdetector.bean.RequestSet;
 import mobi.meddle.diffdetector.util.Config;
-
 import android.util.Log;
 
 
@@ -22,19 +21,21 @@ public class CTCPClientThread implements Runnable {
 	private Semaphore sendSema = null;
 	private Semaphore recvSema = null;
 	long timeOrigin = 0;
+	private int tolerance = 0;
 	private boolean addInfo = false;
 
 	int bufSize = 4096;
 
 	public CTCPClientThread(CTCPClient client, RequestSet RS,
 			CombinedQueue queue, Semaphore sendSema, Semaphore recvSema,
-			long timeOrigin) {
+			long timeOrigin, int tolerance) {
 		this.client = client;
 		this.RS = RS;
 		this.queue = queue;
 		this.sendSema = sendSema;
 		this.recvSema = recvSema;
 		this.timeOrigin = timeOrigin;
+		this.tolerance = tolerance;
 	}
 
 	/**
@@ -159,6 +160,12 @@ public class CTCPClientThread implements Runnable {
 					// int bytesRead = dataInputStream.read(buffer);
 					// Log.d("Received " + RS.getResponse_len(),
 					// String.valueOf(bytesRead));
+					
+					if (bytesRead < 0 && buffer.length - totalRead < this.tolerance) {
+						Log.w("Receiving", "A few bytes missing, ignore and proceed");
+						break;
+					}
+					
 					if (bytesRead < 0) {
 						Log.e("Receiving", "Not enough bytes! totalRead: "
 								+ totalRead + " expected: " + buffer.length);
